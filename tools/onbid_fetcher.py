@@ -5,14 +5,41 @@ import datetime
 import xml.etree.ElementTree as ET
 
 def fetch_onbid_data():
-    service_key = os.environ.get("ONBID_SERVICE_KEY", "8f25b28707d85a7c657d76d8689bacc8e6d3c87ea74de0330b9048bc7c1f1b98")
+    # 1. Try to read from environment variable
+    service_key = os.environ.get("ONBID_SERVICE_KEY")
+    
+    # 2. If not in environment, try to read from config/onbid_key.txt (Local Config)
+    if not service_key:
+        base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+        key_file_path = os.path.join(base_dir, "config", "onbid_key.txt")
+        if os.path.exists(key_file_path):
+            try:
+                with open(key_file_path, "r", encoding="utf-8") as f:
+                    service_key = f.read().strip()
+                if service_key:
+                    print(f"[+] config/onbid_key.txt 파일에서 API 키를 로드했습니다.")
+            except Exception as e:
+                print(f"[-] API 키 파일 읽기 실패: {e}")
+                
+    # 3. Fallback to default key if still empty
+    if not service_key:
+        service_key = "8f25b28707d85a7c657d76d8689bacc8e6d3c87ea74de0330b9048bc7c1f1b98"
+        
     url = "http://apis.data.go.kr/B010003/OnbidRlstListSrvc2/getRlstCltrList2"
+    
+    # Check if the key needs to be unquoted (preventing double-encoding for keys containing % character)
+    # Public Data Portal keys are often already URL-encoded.
+    import urllib.parse
+    if "%" in service_key:
+        service_key = urllib.parse.unquote(service_key)
     
     params = {
         "serviceKey": service_key,
         "numOfRows": 100,
         "pageNo": 1,
         "dpslDvsCd": "0001",
+        "prptDivCd": "0002,0003,0004,0005,0006,0007,0008,0010",
+        "pvctTrgtYn": "N",
         "_type": "json"
     }
     

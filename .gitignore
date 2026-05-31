@@ -1,0 +1,25 @@
+# Local API Keys (DO NOT PUSH TO GITHUB!)
+config/onbid_key.txt
+
+# Python Virtual Environment
+.venv/
+venv/
+ENV/
+
+# VS Code Settings
+.vscode/
+
+# Python Cache
+**/__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Temporary & Packaging files
+*.zip
+*.log
+*.tmp
+input_sources/json/onbid.json
+input_sources/json/onbid_meta.json
+input_sources/json/court.json
+input_sources/json/court_meta.json
