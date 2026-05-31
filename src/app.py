@@ -1053,6 +1053,7 @@ court_raw, onbid_raw = load_local_datasets()
 
 # Helper for background updater thread
 def run_background_update():
+    lock_path = os.path.join(base_dir, "input_sources", "json", "scraper.lock")
     try:
         print("[Background Update] Starting background scrape...")
         from tools.onbid_fetcher import fetch_onbid_data
@@ -1062,14 +1063,35 @@ def run_background_update():
         print("[Background Update] Background scrape finished.")
     except Exception as e:
         print(f"[Background Update] Error: {e}")
+    finally:
+        if os.path.exists(lock_path):
+            try:
+                os.remove(lock_path)
+            except Exception:
+                pass
 
 def trigger_background_update_if_needed():
     court_path = os.path.join(base_dir, "input_sources", "json", "court.json")
     onbid_path = os.path.join(base_dir, "input_sources", "json", "onbid.json")
+    lock_path = os.path.join(base_dir, "input_sources", "json", "scraper.lock")
     
     needs_update = False
     now = datetime.datetime.now()
     
+    # Check if lock file exists
+    if os.path.exists(lock_path):
+        try:
+            mtime = datetime.datetime.fromtimestamp(os.path.getmtime(lock_path))
+            # If lock is older than 1 hour, treat it as stale and allow execution
+            if (now - mtime).total_seconds() > 3600:
+                print("[Background Update] Stale lock file found. Removing.")
+                os.remove(lock_path)
+            else:
+                print("[Background Update] Scraper is already running (locked). Skipping.")
+                return
+        except Exception:
+            pass
+            
     for path in [court_path, onbid_path]:
         if not os.path.exists(path):
             needs_update = True
@@ -1081,6 +1103,12 @@ def trigger_background_update_if_needed():
             
     if needs_update:
         if "update_thread" not in st.session_state or not st.session_state["update_thread"].is_alive():
+            # Create lock file
+            try:
+                with open(lock_path, "w") as lf:
+                    lf.write(now.strftime("%Y-%m-%d %H:%M:%S"))
+            except Exception:
+                pass
             t = threading.Thread(target=run_background_update, daemon=True)
             st.session_state["update_thread"] = t
             t.start()
@@ -1088,6 +1116,20 @@ def trigger_background_update_if_needed():
 
 # Trigger background update check
 trigger_background_update_if_needed()
+
+# Callback to reset search filters safely before widget instantiation
+def reset_filters():
+    st.session_state["sel_sido_box"] = "전국"
+    st.session_state["sel_source"] = "전체보기 (법원 경매 + 온비드 공매)"
+    st.session_state["search_query_box"] = ""
+    for k in list(st.session_state.keys()):
+        if k.startswith("cb_ptype_"):
+            st.session_state[k] = True
+        if k.startswith("cb_sigungu_"):
+            st.session_state[k] = False
+    st.session_state["sel_budget"] = "제한 없음"
+    st.session_state["sel_time"] = "3개월 이내"
+    st.session_state["prev_sido"] = "전국"
 
 # Initialize Session States
 if "private_data" not in st.session_state:
@@ -1108,19 +1150,8 @@ with st.sidebar.container(border=True):
         help="주소, 사건/관리번호, 물건 유형, 설명/비고 텍스트에서 실시간으로 키워드를 검색합니다."
     )
     
-    # Reset Search Filter button at the top of the container
-    if st.button("🔄 필터 초기화", key="reset_filter_top", help="검색 필터를 전국 및 3개월 이내 전체보기 상태로 복원합니다.", type="secondary"):
-        st.session_state["sel_sido_box"] = "전국"
-        st.session_state["sel_source"] = "전체보기 (법원 경매 + 온비드 공매)"
-        st.session_state["search_query_box"] = ""
-        for k in list(st.session_state.keys()):
-            if k.startswith("cb_ptype_"):
-                st.session_state[k] = True
-            if k.startswith("cb_sigungu_"):
-                st.session_state[k] = False
-        st.session_state["sel_budget"] = "제한 없음"
-        st.session_state["sel_time"] = "3개월 이내"
-        st.session_state["prev_sido"] = "전국"
+    # Reset Search Filter button at the top of the container using safe callback
+    if st.button("🔄 필터 초기화", key="reset_filter_top", help="검색 필터를 전국 및 3개월 이내 전체보기 상태로 복원합니다.", type="secondary", on_click=reset_filters):
         st.rerun()
 
     ptype_opts = [

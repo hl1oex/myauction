@@ -70,7 +70,7 @@ def fetch_onbid_data():
     # Save a metadata file indicating if the scraper had an error
     meta_file = os.path.join(output_dir, "onbid_meta.json")
     meta_info = {
-        "success": len(combined_results) > 0 and not scraper_error,
+        "success": len(rlst_items) > 0 and not rlst_err,
         "item_count": len(combined_results),
         "error_msg": scraper_error,
         "timestamp": datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
