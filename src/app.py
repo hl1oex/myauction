@@ -1096,8 +1096,33 @@ def trigger_background_update_if_needed():
         if not os.path.exists(path):
             needs_update = True
             break
-        mtime = datetime.datetime.fromtimestamp(os.path.getmtime(path))
-        if (now - mtime).total_seconds() > 86400:  # 24 hours
+            
+        meta_path = path.replace(".json", "_meta.json")
+        if not os.path.exists(meta_path):
+            needs_update = True
+            break
+            
+        try:
+            with open(meta_path, "r", encoding="utf-8") as f:
+                meta = json.load(f)
+            success = meta.get("success", False)
+            timestamp_str = meta.get("timestamp", "")
+            item_count = meta.get("item_count", 0)
+            
+            if not success or item_count == 0:
+                needs_update = True
+                break
+                
+            if timestamp_str:
+                last_run = datetime.datetime.strptime(timestamp_str, "%Y-%m-%d %H:%M:%S")
+                # 3 hours = 10800 seconds
+                if (now - last_run).total_seconds() > 10800:
+                    needs_update = True
+                    break
+            else:
+                needs_update = True
+                break
+        except Exception:
             needs_update = True
             break
             
@@ -1112,7 +1137,7 @@ def trigger_background_update_if_needed():
             t = threading.Thread(target=run_background_update, daemon=True)
             st.session_state["update_thread"] = t
             t.start()
-            st.toast("🔄 24시간 지난 오래된 데이터를 백그라운드에서 자동 업데이트 중입니다...", icon="⚙️")
+            st.toast("🔄 3시간 지난 오래된 데이터를 백그라운드에서 자동 업데이트 중입니다...", icon="⚙️")
 
 # Trigger background update check
 trigger_background_update_if_needed()
@@ -1588,7 +1613,9 @@ tab_dashboard, tab_glossary, tab_guide = st.tabs([
 
 with tab_dashboard:
     if "update_thread" in st.session_state and st.session_state["update_thread"].is_alive():
-        st.info("🔄 **실시간 백그라운드 데이터 수집 진행 중**: 오래된 데이터(24시간 초과)의 갱신이 백그라운드에서 자동으로 실행되고 있습니다. 완료 후 화면 조작 시 새로운 데이터가 대시보드에 반영됩니다.")
+        st.info("🔄 **실시간 백그라운드 데이터 수집 진행 중**: 오래된 데이터(3시간 초과)의 갱신이 백그라운드에서 자동으로 실행되고 있습니다. 완료 후 화면 조작 시 새로운 데이터가 대시보드에 반영됩니다.")
+    else:
+        st.info("💡 **데이터 수집 최적화 활성화**: 데이터가 최근 3시간 이내에 정상 수집된 경우, 브라우저 창을 여러 개 열거나 웹 페이지를 새로고침하더라도 추가 수집을 수행하지 않고 기존 수집된 데이터를 그대로 안전하게 재사용하여 네트워크 대역폭과 공공 API 트래픽을 보존합니다.")
     st.subheader("📊 실시간 데이터 완전성 센서 상태")
 
     if realtime_status == 'NORMAL':
