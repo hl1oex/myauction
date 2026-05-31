@@ -16,7 +16,8 @@ def get_legal_risk_warning(reason_str):
             "<div style='margin-bottom: 0.8rem; border-left: 4px solid #ef4444; padding-left: 10px;'>"
             "<strong>🧱 토지 사용권 분쟁 (건물만 매각 / 대지권 없음) 리스크</strong><br/>"
             "<span style='font-size: 0.9em; color: #475569;'>건물의 소유권만 낙찰받고 토지 소유권은 가져오지 못하는 상태입니다. "
-            "추후 토지 소유주로부터 매달 땅값 지료(사용료) 청구 소송을 당하거나, 최악의 경우 건물을 부수고 나가라는 건물 철거 소송을 당해 낙찰 자산을 통째로 잃어버릴 수 있는 법적 파산 위험이 있습니다.</span>"
+            "추후 토지 소유주로부터 매달 땅값 지료(사용료) 청구 소송을 당하거나, 건물 철거 소송을 당해 낙찰 자산을 잃을 수 있습니다.</span><br/>"
+            "<span style='font-size: 0.85em; color: #b91c1c; font-weight: bold;'>👉 초보자 대응 지침: 입찰 절대 금지. 토지 소유자와의 긴 소송이나 지료 청구 압박에 처해 낙찰 대금 전체를 허공에 날릴 위험이 매우 높습니다.</span>"
             "</div>"
         )
         
@@ -25,7 +26,8 @@ def get_legal_risk_warning(reason_str):
             "<div style='margin-bottom: 0.8rem; border-left: 4px solid #f59e0b; padding-left: 10px;'>"
             "<strong>📝 토지별도등기 인수 리스크</strong><br/>"
             "<span style='font-size: 0.9em; color: #475569;'>토지에 별도의 근저당이나 담보권이 남아 있는 건물입니다. "
-            "경매 낙찰대금으로 토지 저당권이 정리되지 않을 경우, 그 저당권이 낙찰자에게 그대로 승계되어 추후 대지 지분을 잃어버리거나 억대의 채무를 대신 갚아야 할 우려가 큽니다.</span>"
+            "낙찰대금으로 토지 저당권이 말소되지 않을 경우, 그 근저당 채무가 낙찰자에게 승계되어 대지 지분을 잃을 우려가 큽니다.</span><br/>"
+            "<span style='font-size: 0.85em; color: #d97706; font-weight: bold;'>👉 초보자 대응 지침: '매각물건명세서' 상에서 토지별도저당이 낙찰로 소멸되는지 반드시 확인해야 합니다. 소멸하지 않고 인수되는 채무가 있다면 입찰하지 마십시오.</span>"
             "</div>"
         )
         
@@ -34,7 +36,8 @@ def get_legal_risk_warning(reason_str):
             "<div style='margin-bottom: 0.8rem; border-left: 4px solid #ef4444; padding-left: 10px;'>"
             "<strong>👥 공동소유 지분 제한 리스크</strong><br/>"
             "<span style='font-size: 0.9em; color: #475569;'>부동산 전체가 아닌 일부 지분(예: 1/2)만 소유하게 되는 물건입니다. "
-            "단독으로 전세를 주거나 실거주, 리모델링, 처분 등을 마음대로 할 수 없으며, 공유물분할소송을 통해 전체를 경매로 넘겨 현금화하는 등 지난하고 고통스러운 법정 분쟁을 오랜 기간 겪어야 합니다.</span>"
+            "단독으로 실거주나 임대를 마음대로 놓을 수 없으며, 타 공유자들과의 공유물분할소송 등 긴 법정 소송을 겪을 가능성이 농후합니다.</span><br/>"
+            "<span style='font-size: 0.85em; color: #b91c1c; font-weight: bold;'>👉 초보자 대응 지침: 지분 물건은 임대/처분이 제한됩니다. 타 공유자의 우선매수청구권 행사 여부 및 공유물 관계를 완벽히 파악할 수 있는 전문가가 아니라면 입찰하지 마십시오.</span>"
             "</div>"
         )
         
@@ -43,9 +46,9 @@ def get_legal_risk_warning(reason_str):
         warnings.append(
             "<div style='margin-bottom: 0.8rem; border-left: 4px solid #ef4444; padding-left: 10px;'>"
             "<strong>🛠️ 유치권 행사 (명도 거부 및 채무 인수) 리스크</strong><br/>"
-            "<span style='font-size: 0.9em; color: #475569;'>공사비를 받지 못한 건설 업자가 해당 부동산을 강점하고 있는 상태입니다. "
-            "기존 낙찰 후 바로 실행 가능한 '인도명령' 청구가 법원에서 받아들여지지 않아, 비워달라는 '명도소송'을 제기하여 수년간 재판을 치러야 할 수 있습니다. "
-            "유치권이 정당할 경우 공사비를 낙찰자가 대신 다 갚아줘야만 비워줍니다.</span>"
+            "<span style='font-size: 0.9em; color: #475569;'>공사비를 받지 못한 건설 업자 등이 부동산을 불법/적법 점유하고 있는 상태입니다. "
+            "단순 인도명령이 기각되어 수년에 걸친 '명도소송'을 치러야 할 수 있으며, 유치권이 정당할 시 공사비를 낙찰자가 대신 다 갚아주어야 합니다.</span><br/>"
+            "<span style='font-size: 0.85em; color: #b91c1c; font-weight: bold;'>👉 초보자 대응 지침: 입찰 절대 피하십시오. 진짜 유치권인지 허위 유치권인지의 증빙 확인이 대단히 어렵고, 명도 해결 시까지 막대한 이자 손실이 발생합니다.</span>"
             "</div>"
         )
         
@@ -53,8 +56,9 @@ def get_legal_risk_warning(reason_str):
         warnings.append(
             "<div style='margin-bottom: 0.8rem; border-left: 4px solid #f59e0b; padding-left: 10px;'>"
             "<strong>🚪 불법/미상 점유자 명도 지연 리스크</strong><br/>"
-            "<span style='font-size: 0.9em; color: #475569;'>점유 관계가 불분명하거나 명도가 매우 곤란한 불법 점유자가 거주하고 있습니다. "
-            "이사 협상이 결렬되면 법원의 문을 두드려 강제집행(강제로 짐을 드러냄)을 진행해야 하며, 강제집행 과정에서 100만~500만 원 안팎의 집행비와 시간 지연 이자가 추가 발생합니다.</span>"
+            "<span style='font-size: 0.9em; color: #475569;'>점유 관계가 불분명하거나 대화가 거부되는 점유자가 거주 중입니다. "
+            "이주 협상이 어긋나면 강제집행(평당 10~15만원 집행비 발생)을 밟아야 하며, 수개월간의 입주 지연이 수반됩니다.</span><br/>"
+            "<span style='font-size: 0.85em; color: #d97706; font-weight: bold;'>👉 초보자 대응 지침: 법적 인도명령 신청을 낙찰 후 잔금 납부 시 바로 청구하고, 점유자와의 타협을 위해 통상적인 이사비 및 강제집행 예산을 미리 공제하고 응찰가를 잡으십시오.</span>"
             "</div>"
         )
         
@@ -63,8 +67,9 @@ def get_legal_risk_warning(reason_str):
         warnings.append(
             "<div style='margin-bottom: 0.8rem; border-left: 4px solid #ef4444; padding-left: 10px;'>"
             "<strong>💰 대항력 있는 세입자 보증금 대위변제 (인수) 리스크</strong><br/>"
-            "<span style='font-size: 0.9em; color: #475569;'>말소기준권리보다 빠른 선순위 임차인이 거주하고 있으며 대항력이 있어 법적으로 보호받습니다. "
-            "낙찰자가 낸 대금에서 이 임차인의 보증금이 전액 변제되지 않으면, **배당받지 못한 세입자의 보증금 잔액은 낙찰자가 무조건 대신 현금으로 물어주어야 집을 인도받을 수 있습니다.** 입찰가 외에 큰 추가 비용 독박 위험이 있습니다.</span>"
+            "<span style='font-size: 0.9em; color: #475569;'>말소기준권리보다 전입신고가 빠른 임차인으로 법적으로 보호받습니다. "
+            "낙찰대금에서 보증금이 전액 변제되지 않을 시, **낙찰자가 세입자의 보증금 미변제 잔액을 현금으로 전부 대신 갚아주어야만 집을 넘겨받을 수 있습니다.**</span><br/>"
+            "<span style='font-size: 0.85em; color: #b91c1c; font-weight: bold;'>👉 초보자 대응 지침: 임차인의 배당 순위와 예상 배당액을 철저히 분석하여, 낙찰자가 독박 써야 하는 '보증금 인수액'을 구하고, 이를 최저입찰가나 감정가에서 제해 차감한 입찰 한도를 설정하십시오.</span>"
             "</div>"
         )
         
@@ -72,8 +77,9 @@ def get_legal_risk_warning(reason_str):
         warnings.append(
             "<div style='margin-bottom: 0.8rem; border-left: 4px solid #6b7280; padding-left: 10px;'>"
             "<strong>⚠️ 정보 부재 및 깜깜이 투자 리스크</strong><br/>"
-            "<span style='font-size: 0.9em; color: #475569;'>법원의 공식 매각 서류나 조사 내용이 공개되지 않았거나 열람 불가능한 경우입니다. "
-            "어떤 하자가 깊게 숨겨져 있는지 권리분석 자체가 불가능하므로 눈을 감고 도박하는 것과 같습니다. 사후 발생한 모든 법적 분쟁 비용은 고스란히 본인 부담입니다.</span>"
+            "<span style='font-size: 0.9em; color: #475569;'>공식 매각 정보망이나 현황조사서가 공개되지 않아 권리분석이 불가능한 물건입니다. "
+            "어떤 하자가 숨겨져 있을지 모르며, 사후 문제 해결 비용은 온전히 낙찰자 몫이 됩니다.</span><br/>"
+            "<span style='font-size: 0.85em; color: #374151; font-weight: bold;'>👉 초보자 대응 지침: 입찰 절대 금지. 정보가 공식 공개될 때까지 기다리거나, 완벽하게 권리 관계를 파악하기 전까지는 도박 투자를 무조건 피하십시오.</span>"
             "</div>"
         )
         
@@ -1054,10 +1060,20 @@ if "uploaded_filename" not in st.session_state:
 with st.sidebar.container(border=True):
     st.markdown('<div class="sidebar-card-title">🔍 상세 검색 조건 설정</div>', unsafe_allow_html=True)
     
+    # 🔍 통합 키워드 검색창 추가
+    search_query = st.text_input(
+        "🔍 통합 키워드 검색 (실시간)",
+        value="",
+        placeholder="예: 평택시, 아파트, 자동차, 2022타경",
+        key="search_query_box",
+        help="주소, 사건/관리번호, 물건 유형, 설명/비고 텍스트에서 실시간으로 키워드를 검색합니다."
+    )
+    
     # Reset Search Filter button at the top of the container
     if st.button("🔄 필터 초기화", key="reset_filter_top", help="검색 필터를 전국 및 3개월 이내 전체보기 상태로 복원합니다.", type="secondary"):
         st.session_state["sel_sido_box"] = "전국"
         st.session_state["sel_source"] = "전체보기 (법원 경매 + 온비드 공매)"
+        st.session_state["search_query_box"] = ""
         for k in list(st.session_state.keys()):
             if k.startswith("cb_ptype_"):
                 st.session_state[k] = True
@@ -1068,7 +1084,12 @@ with st.sidebar.container(border=True):
         st.session_state["prev_sido"] = "전국"
         st.rerun()
 
-    ptype_opts = ["아파트", "다세대 (빌라/연립)", "단독/다가구/전원주택", "오피스텔", "상가/점포/근린상가", "토지/대지/임야", "공장/창고", "기타/미분류"]
+    ptype_opts = [
+        "아파트", "다세대 (빌라/연립)", "단독/다가구/전원주택", "오피스텔", 
+        "상가/점포/근린상가", "토지/대지/임야", "공장/창고", 
+        "[동산] 자동차 / 운송장비", "[동산] 기계 / 장비", "[동산] 물품 / 예술품", 
+        "[동산] 유가증권 / 회원권", "기타/미분류"
+    ]
 
     # Initialize widget session states for resetting
     if "sel_sido_box" not in st.session_state:
@@ -1239,6 +1260,14 @@ def get_ptype_keywords(selected_types):
             kws.append("아파트")
         elif sel_type == "오피스텔":
             kws.append("오피스텔")
+        elif sel_type == "[동산] 자동차 / 운송장비":
+            kws.extend(["자동차", "운송장비", "차량", "승용차", "승합차", "화물차", "이륜차", "특수차", "선박", "항공기"])
+        elif sel_type == "[동산] 기계 / 장비":
+            kws.extend(["기계", "장비", "건설기계", "의료장비", "설비", "기계기구"])
+        elif sel_type == "[동산] 물품 / 예술품":
+            kws.extend(["물품", "예술품", "골동품", "귀금속", "보석", "시계", "명품", "가구", "의류", "가전", "사무용품"])
+        elif sel_type == "[동산] 유가증권 / 회원권":
+            kws.extend(["유가증권", "회원권", "주식", "채권", "콘도", "골프회원권", "지분증권"])
         else:
             kws.extend(["기타", "미분류"])
     return kws
@@ -1355,6 +1384,11 @@ recommended_list = []
 filtered_list = []
 
 for item in recommendation_pool:
+    # 0. Exclude sold/completed items
+    text_to_check = f"{item.get('address', '')} {item.get('desc', '')} {item.get('notes', '')} {item.get('item_id', '')}".lower()
+    if any(kw in text_to_check for kw in ["낙찰", "매각결정", "종결"]):
+        continue
+
     is_passed, reasons = evaluate_hardfilter(item, rules)
     
     if not is_passed:
@@ -1391,6 +1425,14 @@ for item in recommended_list:
     if selected_source == "캠코 온비드 공매만 보기" and item.get("source") != "onbid":
         continue
 
+    # 0.1 Unified Keyword Search
+    search_query_clean = search_query.strip().lower()
+    if search_query_clean:
+        match_text = f"{item.get('address', '')} {item.get('item_id', '')} {item.get('ptype', '')} {item.get('desc', '')} {item.get('notes', '')}".lower()
+        words = search_query_clean.split()
+        if not all(word in match_text for word in words):
+            continue
+
     price = item.get("price", 0)
     address = item.get("address", "")
     ptype = item.get("ptype", "")
@@ -1418,6 +1460,14 @@ for item in filtered_list:
         continue
     if selected_source == "캠코 온비드 공매만 보기" and item.get("source") != "onbid":
         continue
+
+    # 0.1 Unified Keyword Search
+    search_query_clean = search_query.strip().lower()
+    if search_query_clean:
+        match_text = f"{item.get('address', '')} {item.get('item_id', '')} {item.get('ptype', '')} {item.get('desc', '')} {item.get('notes', '')}".lower()
+        words = search_query_clean.split()
+        if not all(word in match_text for word in words):
+            continue
 
     price = item.get("price", 0)
     address = item.get("address", "")
@@ -1705,55 +1755,11 @@ with tab_dashboard:
     st.write("---")
     st.subheader("🎯 맞춤형 추천 매물 목록 (종합 평가 점수순)")
     if strictly_matched_recommended:
-        # Render Python-based sorting selectbox above the table
-        st.markdown("##### ↕️ 테이블 수동 정렬 필터")
-        col_sort1, col_sort2 = st.columns([1, 1])
-        with col_sort1:
-            sort_by = st.selectbox(
-                "정렬 기준 항목", 
-                ["매치 점수", "최저 입찰가", "매각 기일", "사건번호"], 
-                index=0,
-                key="sort_by_box"
-            )
-        with col_sort2:
-            sort_order = st.radio(
-                "정렬 순서 방향", 
-                ["내림차순 (큰 순서 / 최근 일정)", "오름차순 (작은 순서 / 머나먼 일정)"], 
-                index=0,
-                key="sort_order_radio",
-                horizontal=True
-            )
-
-        def get_sort_key(item, sort_by):
-            if sort_by == "매치 점수":
-                return item.get("score", 0)
-            elif sort_by == "최저 입찰가":
-                return item.get("price", 0)
-            elif sort_by == "매각 기일":
-                return item.get("close_date", "9999-12-31")
-            elif sort_by == "사건번호":
-                return item.get("item_id", "")
-            return item.get("score", 0)
-
-        reverse_sort = (sort_order == "내림차순 (큰 순서 / 최근 일정)")
-
-        if sort_by == "매치 점수":
-            strictly_matched_recommended = sorted(
-                strictly_matched_recommended,
-                key=lambda x: (x.get("score", 0), -x.get("remaining_days", 9999)),
-                reverse=reverse_sort
-            )
-        else:
-            strictly_matched_recommended = sorted(
-                strictly_matched_recommended,
-                key=lambda x: get_sort_key(x, sort_by),
-                reverse=reverse_sort
-            )
-
         # Render Beautiful Custom HTML Table
         table_rows = []
         display_recommended = strictly_matched_recommended[:display_limit]
-        st.markdown(f"**전체 {len(strictly_matched_recommended)}건 중 조건에 부합하는 상위 {len(display_recommended)}개 추천 매물을 표시합니다. (컬럼 제목 클릭 시 브라우저 즉시 정렬 지원)**")
+        st.info("💡 **편리한 정렬 안내**: 테이블 각 열의 제목(예: 매치 점수, 최저 입찰가, 매각 기일 등)을 클릭하시면 해당 열을 기준으로 오름차순/내림차순 정렬이 즉시 이루어집니다.")
+        st.markdown(f"**전체 {len(strictly_matched_recommended)}건 중 조건에 부합하는 상위 {len(display_recommended)}개 추천 매물을 표시합니다. (기본 정렬: 종합 추천 점수 높은 순)**")
         import urllib.parse
         for idx, item in enumerate(display_recommended):
             appraisal = item.get("appraisal", 0)

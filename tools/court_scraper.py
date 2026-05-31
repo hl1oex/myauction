@@ -156,10 +156,10 @@ def scrape_court_data():
         if r_warmup.status_code != 200:
             raise ConnectionError(f"웜업 GET 페이지 접속 실패 (상태코드: {r_warmup.status_code})")
             
-        # Build query months (3-month window: current month, next month, month after next)
+        # Build query months (12-month window for upcoming 1 year)
         query_months = []
         today = datetime.date.today()
-        for i in range(3):
+        for i in range(12):
             y = today.year
             m = today.month + i
             if m > 12:
@@ -261,6 +261,12 @@ def scrape_court_data():
                     desc = clean_html(raw_item.get("crrctCtt", "") or raw_item.get("crrctPbancCtt", ""))
                     notes = clean_html(raw_item.get("dspslRmk", ""))
                     
+                    # Exclude sold/completed items
+                    text_to_check = f"{address} {desc} {notes} {raw_item.get('dspslStatNm', '')}".lower()
+                    if any(kw in text_to_check for kw in ["낙찰", "매각결정", "종결"]):
+                        print(f"  Item {cs_no} is already sold/completed. Skipping.")
+                        continue
+
                     # Optimization: Only search Naver for items that PASS the hard filter!
                     is_passed, _ = evaluate_hardfilter({"address": address, "desc": desc, "notes": notes}, rules)
                     
