@@ -80,7 +80,7 @@ def get_legal_risk_warning(reason_str):
     if not warnings:
         warnings.append(
             "<div style='color: #4b5563; font-size: 0.9em;'>"
-            "검출된 제외 제외 키워드에 대해 일반적인 리스크 분석이 매칭되지 않았습니다. 대법원 매각물건명세서의 특이사항을 필히 재확인해 주세요."
+            "검출된 제외 키워드에 대해 일반적인 리스크 분석이 매칭되지 않았습니다. 대법원 매각물건명세서의 특이사항을 필히 재확인해 주세요."
             "</div>"
         )
         
@@ -108,7 +108,7 @@ def render_html(html_str):
 
 # Set Streamlit Page Configuration
 st.set_page_config(
-    page_title="하이브리드 경매/공매 추천 시스템 v1.0",
+    page_title="부동산 경매 추천 시스템 v1.0",
     page_icon="🏠",
     layout="wide",
     initial_sidebar_state="expanded"
@@ -597,6 +597,10 @@ render_html("""
         overflow: hidden;
     }
     
+    .card-court { border-left: 5px solid #2563eb !important; }
+    .card-onbid { border-left: 5px solid #10b981 !important; }
+    .card-private { border-left: 5px solid #64748b !important; }
+    
     .hover-card:hover {
         border-color: rgba(99, 102, 241, 0.35);
         box-shadow: 0 15px 35px rgba(99, 102, 241, 0.08);
@@ -908,7 +912,7 @@ render_html(f"""
     <div class="title-container">
         <div class="title-flex">
             <div>
-                <h1>🏠 하이브리드 법원 경매 & 온비드 공매 추천 시스템 <span class="version-tag">v1.0</span></h1>
+                <h1>🏠 부동산 경매 추천 시스템 <span style="font-size: 0.55em; font-weight: normal; opacity: 0.7; margin-left: 8px; vertical-align: middle;">v1.0</span></h1>
                 <p>GitHub Actions 기반의 매일 새벽 자동 스크래핑과 사설 보조 데이터 수동 보완 기능의 시너지</p>
             </div>
             <div class="sync-time-badge">
@@ -1618,7 +1622,21 @@ with tab_dashboard:
 
             score_badge = f"<span class='badge-score' style='background: linear-gradient(135deg, #2563eb, #1d4ed8); color: white; padding: 4px 10px; border-radius: 20px; font-weight: 700; font-size: 0.9em; box-shadow: 0 2px 4px rgba(37,99,235,0.2);'>{item['score']}점</span>"
 
-            direct_link = f"<a href='https://www.courtauction.go.kr' target='_blank' style='text-decoration: none; color: #2563eb; font-weight: 700; font-size: 1.1em;' title='대법원 경매 공식조회 이동'>🔗</a>"
+            # Dynamic source-based link and color-coded table source badge
+            if item.get("source") == "court":
+                link_url = "https://www.courtauction.go.kr"
+                link_title = "대법원 경매 공식조회 이동"
+                source_badge_table = "<span style='background-color: #eff6ff; color: #1e40af; border: 1px solid #bfdbfe; font-size: 0.78em; padding: 2px 6px; border-radius: 4px; font-weight: 700; margin-right: 6px; vertical-align: middle;'>⚖️ 법원</span>"
+            elif item.get("source") == "onbid":
+                link_url = "https://www.onbid.co.kr"
+                link_title = "온비드 공매 공식조회 이동"
+                source_badge_table = "<span style='background-color: #ecfdf5; color: #047857; border: 1px solid #a7f3d0; font-size: 0.78em; padding: 2px 6px; border-radius: 4px; font-weight: 700; margin-right: 6px; vertical-align: middle;'>🏢 온비드</span>"
+            else:
+                link_url = "https://www.courtauction.go.kr"
+                link_title = "사설 경매 일정표 조회"
+                source_badge_table = "<span style='background-color: #f1f5f9; color: #475569; border: 1px solid #cbd5e1; font-size: 0.78em; padding: 2px 6px; border-radius: 4px; font-weight: 700; margin-right: 6px; vertical-align: middle;'>📁 사설</span>"
+
+            direct_link = f"<a href='{link_url}' target='_blank' style='text-decoration: none; color: #2563eb; font-weight: 700; font-size: 1.1em;' title='{link_title}'>🔗</a>"
 
             # Clean variables for HTML safety
             addr_clean = sanitize_text(item["address"])
@@ -1630,7 +1648,7 @@ with tab_dashboard:
             <tr style="border-bottom: 1px solid #e2e8f0; transition: background-color 0.2s;">
                 <td style="padding: 12px 16px; font-weight: 700; text-align: center; white-space: nowrap;">{score_badge}</td>
                 <td style="padding: 12px 16px; text-align: center; white-space: nowrap;">{grade_badge}</td>
-                <td style="padding: 12px 16px; font-weight: 600; color: #0f172a; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" title="{item_id_clean}">{item_id_clean}</td>
+                <td style="padding: 12px 16px; font-weight: 600; color: #0f172a; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" title="{item_id_clean}">{source_badge_table}{item_id_clean}</td>
                 <td style="padding: 12px 16px; color: #334155; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" title="{addr_clean}">{addr_clean}</td>
                 <td style="padding: 12px 16px; color: #475569; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" title="{ptype_clean}">{ptype_clean}</td>
                 <td style="padding: 12px 16px; font-weight: 700; color: #1e293b; text-align: right; line-height: 1.4;">{price_formatted} <br/> {discount}</td>
@@ -1721,11 +1739,36 @@ with tab_dashboard:
             ptype_clean = sanitize_text(item['ptype'])
             close_date_clean = sanitize_text(item['close_date'])
 
+            # Set dynamic card styling based on source
+            if item.get("source") == "court":
+                card_link_url = "https://www.courtauction.go.kr"
+                card_link_btn_text = "🔗 대법원 법원경매 사건검색 바로가기"
+                card_badge = f"<span class='badge' style='background-color: #eff6ff; color: #1e40af; border: 1px solid #bfdbfe; font-size: 0.78em; padding: 4px 8px; border-radius: 6px; font-weight: 700; margin-right: 10px; vertical-align: middle;'>⚖️ 대법원 경매</span>"
+                onbid_guide_html = ""
+            elif item.get("source") == "onbid":
+                card_link_url = "https://www.onbid.co.kr"
+                card_link_btn_text = "🔗 온비드 공매 물건검색 바로가기"
+                card_badge = f"<span class='badge' style='background-color: #ecfdf5; color: #047857; border: 1px solid #a7f3d0; font-size: 0.78em; padding: 4px 8px; border-radius: 6px; font-weight: 700; margin-right: 10px; vertical-align: middle;'>🏢 온비드 공매</span>"
+                onbid_guide_html = f"""
+                <div style="background-color: #ecfdf5; border: 1px solid #a7f3d0; border-radius: 8px; padding: 1.0rem; margin-top: 1rem; color: #047857; font-size: 0.9em; line-height: 1.5;">
+                    💡 <strong>온비드 공매 핵심 데이터 분석 가이드:</strong><br/>
+                    • <strong>온라인 인터넷 입찰:</strong> 이 물건은 대법원 경매와 달리 법원에 직접 방문할 필요 없이 <strong>온비드 홈페이지(onbid.co.kr)에서 공인인증서로 집에서 입찰 가능</strong>합니다.<br/>
+                    • <strong>물건관리번호 검색:</strong> 온비드 검색 시 사건번호가 아닌 관리번호(<strong>{item_id_clean}</strong>)를 입력해야 조회됩니다.<br/>
+                    • <strong>입찰 기간 확인:</strong> 공매는 보통 수일간(예: 월~수) 입찰을 진행한 후 목요일에 개찰합니다. 입찰 기간 마감 시간을 엄수해 주세요.
+                </div>
+                """
+            else:
+                card_link_url = "https://www.courtauction.go.kr"
+                card_link_btn_text = "🔗 사설 일정표 원본 보기"
+                card_badge = f"<span class='badge' style='background-color: #f1f5f9; color: #475569; border: 1px solid #cbd5e1; font-size: 0.78em; padding: 4px 8px; border-radius: 6px; font-weight: 700; margin-right: 10px; vertical-align: middle;'>📁 사설 경매</span>"
+                onbid_guide_html = ""
+
             card_html = f"""
-            <div class="hover-card">
+            <div class="hover-card card-{item.get('source', 'court')}">
                 <div class="hover-summary">
                     <div>
                         <span class="badge badge-{item['grade'].lower()}" style="padding: 6px 12px; border-radius: 8px; font-weight: 700; font-size: 0.9em; margin-right: 10px;">{item['grade']}등급 - {item['score']}점</span>
+                        {card_badge}
                         <strong style="font-size: 1.15em; color: #0f172a;">{item_id_clean}</strong>
                         <span style="color: #64748b; margin-left: 10px;">| {location_header} | {ptype_clean}</span>
                     </div>
@@ -1748,6 +1791,7 @@ with tab_dashboard:
                             <p style="margin: 4px 0; font-size: 0.9em; color: #475569;"><b>매치 점수 상세:</b> 기본 60점 + 서류 {bd.get('docs_score',0)}점 + 예산 {bd.get('budget_score',0)}점 + 일정 {bd.get('time_score',0)}점 + 지역 {bd.get('region_score',0)}점 + 용도 {bd.get('ptype_score',0)}점 - 사설패널티 {bd.get('private_penalty',0)}점 = <b>{item['score']}점</b></p>
                         </div>
                     </div>
+                    {onbid_guide_html}
                     <div style="margin-top: 1rem; border-top: 1px dashed #eaedf1; padding-top: 1rem;">
                         <p style="margin-bottom: 0.5rem;"><b>📝 법원 비고 및 설명 원문 (아주 상세):</b></p>
                         <div style="background-color: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 1rem; color: #1e293b; font-size: 0.9em; line-height: 1.5;">
@@ -1760,10 +1804,11 @@ with tab_dashboard:
                             {notes_content}
                         </div>
                     </div>
-                    {naver_search_html}\n                {safety_reminder_html}
+                    {naver_search_html}
+                    {safety_reminder_html}
                     <div style="margin-top: 1rem; text-align: right;">
-                        <a href="https://www.courtauction.go.kr" target="_blank" style="display: inline-block; background-color: #2563eb; color: white; padding: 8px 16px; border-radius: 6px; font-weight: 700; text-decoration: none; font-size: 0.85em; box-shadow: 0 4px 10px rgba(37,99,235,0.15); transition: background-color 0.2s;">
-                            🔗 대법원 법원경매 사건검색 바로가기
+                        <a href="{card_link_url}" target="_blank" style="display: inline-block; background-color: #2563eb; color: white; padding: 8px 16px; border-radius: 6px; font-weight: 700; text-decoration: none; font-size: 0.85em; box-shadow: 0 4px 10px rgba(37,99,235,0.15); transition: background-color 0.2s;">
+                            {card_link_btn_text}
                         </a>
                     </div>
                 </div>

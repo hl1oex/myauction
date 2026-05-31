@@ -16,7 +16,7 @@ def package_project():
     # 1. Create README.txt dynamically if it doesn't exist
     readme_path = os.path.join(project_dir, "README.txt")
     readme_content = """=======================================================================
-🏠 하이브리드 법원 경매 & 온비드 공매 추천 시스템 v1.0 사용 설명서
+🏠 부동산 경매 추천 시스템 v1.0 사용 설명서
 =======================================================================
 
 이 폴더는 부동산 경매를 처음 접하는 초보자 분들도 손쉽게 
