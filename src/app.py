@@ -1,5 +1,6 @@
 import os
 import sys
+import threading
 import json
 import requests
 import pandas as pd
@@ -1050,6 +1051,44 @@ def load_local_datasets():
 # Load the real-only local databases
 court_raw, onbid_raw = load_local_datasets()
 
+# Helper for background updater thread
+def run_background_update():
+    try:
+        print("[Background Update] Starting background scrape...")
+        from tools.onbid_fetcher import fetch_onbid_data
+        from tools.court_scraper import scrape_court_data
+        fetch_onbid_data()
+        scrape_court_data()
+        print("[Background Update] Background scrape finished.")
+    except Exception as e:
+        print(f"[Background Update] Error: {e}")
+
+def trigger_background_update_if_needed():
+    court_path = os.path.join(base_dir, "input_sources", "json", "court.json")
+    onbid_path = os.path.join(base_dir, "input_sources", "json", "onbid.json")
+    
+    needs_update = False
+    now = datetime.datetime.now()
+    
+    for path in [court_path, onbid_path]:
+        if not os.path.exists(path):
+            needs_update = True
+            break
+        mtime = datetime.datetime.fromtimestamp(os.path.getmtime(path))
+        if (now - mtime).total_seconds() > 86400:  # 24 hours
+            needs_update = True
+            break
+            
+    if needs_update:
+        if "update_thread" not in st.session_state or not st.session_state["update_thread"].is_alive():
+            t = threading.Thread(target=run_background_update, daemon=True)
+            st.session_state["update_thread"] = t
+            t.start()
+            st.toast("🔄 24시간 지난 오래된 데이터를 백그라운드에서 자동 업데이트 중입니다...", icon="⚙️")
+
+# Trigger background update check
+trigger_background_update_if_needed()
+
 # Initialize Session States
 if "private_data" not in st.session_state:
     st.session_state["private_data"] = []
@@ -1517,6 +1556,8 @@ tab_dashboard, tab_glossary, tab_guide = st.tabs([
 ])
 
 with tab_dashboard:
+    if "update_thread" in st.session_state and st.session_state["update_thread"].is_alive():
+        st.info("🔄 **실시간 백그라운드 데이터 수집 진행 중**: 오래된 데이터(24시간 초과)의 갱신이 백그라운드에서 자동으로 실행되고 있습니다. 완료 후 화면 조작 시 새로운 데이터가 대시보드에 반영됩니다.")
     st.subheader("📊 실시간 데이터 완전성 센서 상태")
 
     if realtime_status == 'NORMAL':
@@ -2227,3 +2268,12 @@ with tab_guide:
             st.error(f"가이드 파일을 읽어오는 도중 오류가 발생했습니다: {e}")
     else:
         st.error("대법원 크롤러 사용법 가이드.md 파일을 프로젝트 루트 폴더에서 찾을 수 없습니다.")
+
+# --- GLOBAL FOOTER ---
+st.write("---")
+render_html("""
+    <div style="text-align: center; color: #64748b; font-size: 0.82rem; padding: 1.5rem 0 2.5rem 0; border-top: 1px solid #e2e8f0; margin-top: 2rem; line-height: 1.6;">
+        <p style="margin: 0 0 0.4rem 0;">🏛️ 본 서비스는 <strong>대한민국 대법원 법원경매정보망</strong> 및 <strong>한국자산관리공사(KAMCO) 온비드(Onbid) 공매망</strong>의 실시간 데이터를 가공하여 활용하고 있습니다.</p>
+        <p style="margin: 0; color: #94a3b8; font-size: 0.78rem;">공식 공공데이터 포털 및 크롤러 연동 정보에 기인한 자료이며, 실제 입찰 참여 시 법적 하자는 등기부등본 열람 등을 통해 반드시 직접 재검증하셔야 합니다.</p>
+    </div>
+""")
