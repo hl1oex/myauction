@@ -138,6 +138,85 @@ def format_krw(val):
         
     return " ".join(parts).replace(" 원", "원")
 
+# Helper function to estimate bidding rounds (회차), failed auctions (유찰 수), and discount rate (저감율)
+def estimate_auction_rounds(appraisal, price, source):
+    if not appraisal or not price or appraisal <= 0 or price <= 0:
+        return 1, 0, 0.0
+    
+    discount_rate = ((appraisal - price) / appraisal) * 100.0
+    if discount_rate < 0:
+        discount_rate = 0.0
+        
+    # Estimate failed count based on source
+    if source == "court":
+        ratio = price / appraisal
+        if ratio >= 0.95:
+            failed_count = 0
+        elif ratio >= 0.75:
+            failed_count = 1
+        elif ratio >= 0.60:
+            failed_count = 2
+        elif ratio >= 0.48:
+            failed_count = 3
+        elif ratio >= 0.38:
+            failed_count = 4
+        else:
+            failed_count = 5
+    elif source == "onbid":
+        ratio = price / appraisal
+        if ratio >= 0.95:
+            failed_count = 0
+        elif ratio >= 0.85:
+            failed_count = 1
+        elif ratio >= 0.75:
+            failed_count = 2
+        elif ratio >= 0.65:
+            failed_count = 3
+        elif ratio >= 0.55:
+            failed_count = 4
+        else:
+            failed_count = 5
+    else:
+        ratio = price / appraisal
+        if ratio >= 0.95:
+            failed_count = 0
+        elif ratio >= 0.75:
+            failed_count = 1
+        elif ratio >= 0.60:
+            failed_count = 2
+        else:
+            failed_count = 3
+
+    bidding_round = failed_count + 1
+    return bidding_round, failed_count, discount_rate
+
+# Helper function to get colorful styling and info for Grade X cards
+def get_risk_card_style(reason_str):
+    # Default
+    border_color = "#dc2626"      # red
+    bg_gradient = "linear-gradient(135deg, #fff5f5 0%, #ffe3e3 100%)"
+    text_color = "#991b1b"
+    badge_text = "🚨 치명적 위험"
+    
+    reason_str = reason_str or ""
+    if any(kw in reason_str for kw in ["지분", "대지권없음", "건물만", "토지만", "유치권"]):
+        border_color = "#b91c1c"  # deep red
+        bg_gradient = "linear-gradient(135deg, #fff1f2 0%, #ffe4e6 100%)"
+        text_color = "#9f1239"
+        badge_text = "🧱 소유권/점유 하자"
+    elif any(kw in reason_str for kw in ["인수", "선순위", "대항력", "임차권", "보증금 인수"]):
+        border_color = "#ea580c"  # orange
+        bg_gradient = "linear-gradient(135deg, #fff7ed 0%, #ffedd5 100%)"
+        text_color = "#c2410c"
+        badge_text = "💰 인수 비용 리스크"
+    elif any(kw in reason_str for kw in ["서류없음", "확인불가", "열람불가", "자료없음"]):
+        border_color = "#4b5563"  # grey
+        bg_gradient = "linear-gradient(135deg, #f9fafb 0%, #f3f4f6 100%)"
+        text_color = "#374151"
+        badge_text = "⚠️ 정보 누락 리스크"
+        
+    return border_color, bg_gradient, text_color, badge_text
+
 # Helper function to get the last synchronization date and time
 def get_sync_timestamp():
     court_path = os.path.join(base_dir, "input_sources", "json", "court.json")
@@ -923,6 +1002,22 @@ render_html(f"""
     </div>
 """)
 
+# Application Header Info Box: Onbid Online Bidding Highlight
+render_html("""
+    <div style="background: linear-gradient(135deg, #ecfdf5 0%, #d1fae5 100%); border: 2px solid #10b981; border-radius: 12px; padding: 1.4rem 1.8rem; margin-bottom: 2rem; box-shadow: 0 10px 25px rgba(16,185,129,0.1); display: flex; align-items: center; gap: 20px;">
+        <div style="font-size: 2.8rem;">🏢</div>
+        <div>
+            <h4 style="margin: 0; color: #047857; font-size: 1.25rem; font-weight: 800; display: flex; align-items: center; gap: 8px;">
+                💡 [핵심 차이] 법원 경매 vs 온비드 공매 입찰방식 비교
+            </h4>
+            <p style="margin: 0.5rem 0 0 0; color: #065f46; font-size: 0.95rem; line-height: 1.6;">
+                • ⚖️ <strong>대법원 법원경매:</strong> 당일 아침 지정된 법원 법정에 <strong>직접 물리적으로 방문</strong>해야만 입찰에 참여할 수 있습니다.<br/>
+                • 🏢 <strong>캠코 온비드 공매:</strong> 법원에 갈 필요 전혀 없이, 집이나 사무실에서 스마트폰 또는 PC를 통해 <strong>100% 인터넷 입찰(onbid.co.kr)</strong>로 편리하게 참여가 가능합니다!
+            </p>
+        </div>
+    </div>
+""")
+
 # Load official local files (No raw URLs to guarantee real local database state)
 def load_local_datasets():
     court_list = []
@@ -962,6 +1057,7 @@ with st.sidebar.container(border=True):
     # Reset Search Filter button at the top of the container
     if st.button("🔄 필터 초기화", key="reset_filter_top", help="검색 필터를 전국 및 3개월 이내 전체보기 상태로 복원합니다.", type="secondary"):
         st.session_state["sel_sido_box"] = "전국"
+        st.session_state["sel_source"] = "전체보기 (법원 경매 + 온비드 공매)"
         for k in list(st.session_state.keys()):
             if k.startswith("cb_ptype_"):
                 st.session_state[k] = True
@@ -977,6 +1073,8 @@ with st.sidebar.container(border=True):
     # Initialize widget session states for resetting
     if "sel_sido_box" not in st.session_state:
         st.session_state["sel_sido_box"] = "전국"
+    if "sel_source" not in st.session_state:
+        st.session_state["sel_source"] = "전체보기 (법원 경매 + 온비드 공매)"
     if "sel_budget" not in st.session_state:
         st.session_state["sel_budget"] = "제한 없음"
     if "sel_time" not in st.session_state:
@@ -993,6 +1091,14 @@ with st.sidebar.container(border=True):
         "💡 **초보자 가이드**\n\n"
         "처음이시라면 기본 설정 상태에서 아래의 **[매칭 추천 시작]** 버튼을 바로 누르셔도 좋습니다. "
         "기본적으로 최근 3개월 내의 모든 추천 매물을 보여줍니다."
+    )
+
+    # 0. Select Source (All, Court, Onbid)
+    selected_source = st.selectbox(
+        "⚖️ 물건 출처 선택",
+        ["전체보기 (법원 경매 + 온비드 공매)", "대법원 법원경매만 보기", "캠코 온비드 공매만 보기"],
+        key="sel_source",
+        help="조회하고자 하는 매물의 공식 수집망 출처를 필터링합니다."
     )
 
     st.markdown("---")
@@ -1279,6 +1385,12 @@ strictly_matched_recommended = []
 strictly_matched_filtered = []
 
 for item in recommended_list:
+    # 0. Source Filter Check
+    if selected_source == "대법원 법원경매만 보기" and item.get("source") != "court":
+        continue
+    if selected_source == "캠코 온비드 공매만 보기" and item.get("source") != "onbid":
+        continue
+
     price = item.get("price", 0)
     address = item.get("address", "")
     ptype = item.get("ptype", "")
@@ -1301,6 +1413,12 @@ for item in recommended_list:
     strictly_matched_recommended.append(item)
 
 for item in filtered_list:
+    # 0. Source Filter Check
+    if selected_source == "대법원 법원경매만 보기" and item.get("source") != "court":
+        continue
+    if selected_source == "캠코 온비드 공매만 보기" and item.get("source") != "onbid":
+        continue
+
     price = item.get("price", 0)
     address = item.get("address", "")
     ptype = item.get("ptype", "")
@@ -1403,6 +1521,37 @@ with tab_dashboard:
             st.success(onbid_status_msg)
         else:
             st.error(onbid_status_msg + "\n\n💡 **온비드 연동 장애시 플랜B 해결 가이드**: 공공데이터포털 API 키 만료로 인해 수집이 안될 때, 온비드 홈페이지에서 '공고일정표' 엑셀/CSV 파일을 직접 다운로드받아 좌측 사이드바 **[사설 경매 파일 수동 업로드]**에 드래그하여 올려주시면 정상적으로 데이터가 병합되어 작동합니다.")
+
+    if selected_source == "캠코 온비드 공매만 보기":
+        st.write("---")
+        render_html("""
+            <div style="background: linear-gradient(135deg, #f0fdf4 0%, #ecfdf5 100%); border: 1.5px solid #10b981; border-radius: 12px; padding: 1.5rem; margin-top: 1rem; box-shadow: 0 4px 15px rgba(16,185,129,0.05);">
+                <h4 style="margin: 0 0 0.8rem 0; color: #047857; font-size: 1.15rem; font-weight: 800; display: flex; align-items: center; gap: 8px;">
+                    🏢 온비드(Onbid) 공매 단독 상세 브리핑 모드 (인터넷 입찰 특화)
+                </h4>
+                <p style="margin: 0 0 1rem 0; color: #065f46; font-size: 0.9rem; line-height: 1.6;">
+                    현재 <strong>캠코 온비드 공매만 보기</strong> 필터가 활성화되어 있습니다. 온비드 공매는 법정 방문 필요 없이 인터넷으로 전국 물건에 입찰할 수 있는 막강한 장점이 있습니다. 아래의 핵심 가이드를 참고하여 입찰을 진행해 보세요.
+                </p>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                    <div style="background: white; padding: 1rem; border-radius: 8px; border: 1px solid #d1fae5; box-shadow: 0 2px 8px rgba(0,0,0,0.02);">
+                        <strong style="color: #047857; font-size: 0.95rem; display: block; margin-bottom: 0.5rem;">🔑 온비드 인터넷 입찰 3단계 준비:</strong>
+                        <ol style="margin: 0; padding-left: 1.2rem; font-size: 0.85rem; color: #374151; line-height: 1.5;">
+                            <li><strong>온비드 가입 & 인증서 등록:</strong> 공동인증서(범용 또는 온비드전용)를 등록해야 온라인 서명이 가능합니다.</li>
+                            <li><strong>입찰보증금 마련:</strong> 최저입찰가 혹은 본인 입찰가의 10%(공고마다 다름)를 계좌에 보증금으로 준비합니다.</li>
+                            <li><strong>인터넷 입찰서 제출:</strong> 물건의 '입찰기간' 내에 온비드 사이트에서 입찰서를 작성하고 부여된 가상계좌로 보증금을 송금하면 완료!</li>
+                        </ol>
+                    </div>
+                    <div style="background: white; padding: 1rem; border-radius: 8px; border: 1px solid #d1fae5; box-shadow: 0 2px 8px rgba(0,0,0,0.02);">
+                        <strong style="color: #047857; font-size: 0.95rem; display: block; margin-bottom: 0.5rem;">⭐ 온비드 공매의 핵심 체크포인트:</strong>
+                        <ul style="margin: 0; padding-left: 1.2rem; font-size: 0.85rem; color: #374151; line-height: 1.5;">
+                            <li><strong>사건번호 대신 '관리번호':</strong> 온비드는 사건번호가 아닌 14자리 <strong>'물건관리번호'</strong>(예: 2026-XXXXXX-XXX)로 검색 및 입찰을 진행합니다.</li>
+                            <li><strong>수일간 진행되는 입찰기간:</strong> 단 몇 시간 동안만 기일입찰을 하는 법원경매와 달리, 공매는 보통 <strong>월요일 10:00부터 수요일 17:00까지</strong> 3일간 넉넉하게 입찰을 접수합니다.</li>
+                            <li><strong>신속한 보증금 환불:</strong> 패찰 시 등록한 본인 환불 계좌로 <strong>개찰 당일(통상 목요일) 오후</strong>에 즉시 자동 환불됩니다.</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        """)
 
     # Detailed Search Conditions Dashboard
     st.write("---")
@@ -1605,14 +1754,13 @@ with tab_dashboard:
         table_rows = []
         display_recommended = strictly_matched_recommended[:display_limit]
         st.markdown(f"**전체 {len(strictly_matched_recommended)}건 중 조건에 부합하는 상위 {len(display_recommended)}개 추천 매물을 표시합니다. (컬럼 제목 클릭 시 브라우저 즉시 정렬 지원)**")
+        import urllib.parse
         for idx, item in enumerate(display_recommended):
             appraisal = item.get("appraisal", 0)
             price = item.get("price", 0)
-            discount = ""
-            if appraisal > 0 and price > 0:
-                rate = ((appraisal - price) / appraisal) * 100
-                if rate > 0:
-                    discount = f"<span style='color: #ef4444; font-weight: 700;'>({rate:.0f}% 저렴)</span>"
+            
+            bidding_round, failed_count, discount_rate = estimate_auction_rounds(appraisal, price, item.get("source"))
+            discount_rate_str = f"<span style='color: #ef4444; font-weight: 700;'>▼ {discount_rate:.0f}%</span>" if discount_rate > 0 else "0%"
 
             appraisal_formatted = format_krw(appraisal)
             price_formatted = format_krw(price)
@@ -1636,13 +1784,13 @@ with tab_dashboard:
                 link_title = "사설 경매 일정표 조회"
                 source_badge_table = "<span style='background-color: #f1f5f9; color: #475569; border: 1px solid #cbd5e1; font-size: 0.78em; padding: 2px 6px; border-radius: 4px; font-weight: 700; margin-right: 6px; vertical-align: middle;'>📁 사설</span>"
 
-            direct_link = f"<a href='{link_url}' target='_blank' style='text-decoration: none; color: #2563eb; font-weight: 700; font-size: 1.1em;' title='{link_title}'>🔗</a>"
-
             # Clean variables for HTML safety
             addr_clean = sanitize_text(item["address"])
             item_id_clean = sanitize_text(item["item_id"])
             ptype_clean = sanitize_text(item["ptype"])
             close_date_clean = sanitize_text(item["close_date"])
+
+            direct_link = f"<a href='{link_url}' target='_blank' style='text-decoration: none; color: #2563eb; font-weight: 700; font-size: 1.1em;' title='{link_title}'>🔗</a> <a href='https://map.naver.com/v5/search/{urllib.parse.quote(addr_clean)}' target='_blank' style='text-decoration: none; color: #059669; font-weight: 700; font-size: 1.1em; margin-left: 6px;' title='네이버 지도로 바로 연결'>🗺️</a>"
 
             row_html = f"""
             <tr style="border-bottom: 1px solid #e2e8f0; transition: background-color 0.2s;">
@@ -1651,7 +1799,9 @@ with tab_dashboard:
                 <td style="padding: 12px 16px; font-weight: 600; color: #0f172a; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" title="{item_id_clean}">{source_badge_table}{item_id_clean}</td>
                 <td style="padding: 12px 16px; color: #334155; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" title="{addr_clean}">{addr_clean}</td>
                 <td style="padding: 12px 16px; color: #475569; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" title="{ptype_clean}">{ptype_clean}</td>
-                <td style="padding: 12px 16px; font-weight: 700; color: #1e293b; text-align: right; line-height: 1.4;">{price_formatted} <br/> {discount}</td>
+                <td style="padding: 12px 16px; font-weight: 700; color: #1e293b; text-align: right; line-height: 1.4;">{price_formatted} <br/> <span style="color: #64748b; font-size: 0.85em; font-weight: normal;">감정: {appraisal_formatted}</span></td>
+                <td style="padding: 12px 16px; text-align: center; line-height: 1.4; white-space: nowrap;"><span style="color: #1e3a8a; font-weight: 700;">{bidding_round}회차</span> <br/> <span style="color: #475569; font-size: 0.85em;">(유찰 {failed_count}회)</span></td>
+                <td style="padding: 12px 16px; text-align: center; white-space: nowrap;">{discount_rate_str}</td>
                 <td style="padding: 12px 16px; color: #475569; font-weight: 500; text-align: center; white-space: nowrap;">{close_date_clean}</td>
                 <td style="padding: 12px 16px; text-align: center; white-space: nowrap;">{direct_link}</td>
             </tr>
@@ -1661,17 +1811,19 @@ with tab_dashboard:
         table_body = "\n".join(table_rows)
         table_html = f"""
         <div style="overflow-x: auto; margin-bottom: 2rem; border-radius: 12px; border: 1px solid #e2e8f0; box-shadow: 0 4px 20px rgba(0,0,0,0.03); background-color: #ffffff;">
-            <table id="rec-table" style="width: 100%; min-width: 1210px; table-layout: fixed; border-collapse: collapse; text-align: left; font-size: 0.9rem;">
+            <table id="rec-table" style="width: 100%; min-width: 1350px; table-layout: fixed; border-collapse: collapse; text-align: left; font-size: 0.9rem;">
                 <thead>
                     <tr style="background-color: #0f172a; color: #f8fafc; border-bottom: 2px solid #cbd5e1;">
-                        <th onclick="sortHtmlTable('rec-table', 0, true)" style="padding: 14px 16px; font-weight: 700; text-align: center; width: 110px; cursor: pointer; user-select: none;">매치 점수 ↕</th>
-                        <th onclick="sortHtmlTable('rec-table', 1, false)" style="padding: 14px 16px; font-weight: 700; text-align: center; width: 100px; cursor: pointer; user-select: none;">등급 ↕</th>
+                        <th onclick="sortHtmlTable('rec-table', 0, true)" style="padding: 14px 16px; font-weight: 700; text-align: center; width: 100px; cursor: pointer; user-select: none;">매치 점수 ↕</th>
+                        <th onclick="sortHtmlTable('rec-table', 1, false)" style="padding: 14px 16px; font-weight: 700; text-align: center; width: 80px; cursor: pointer; user-select: none;">등급 ↕</th>
                         <th onclick="sortHtmlTable('rec-table', 2, false)" style="padding: 14px 16px; font-weight: 700; width: 150px; cursor: pointer; user-select: none;">사건/관리번호 ↕</th>
-                        <th onclick="sortHtmlTable('rec-table', 3, false)" style="padding: 14px 16px; font-weight: 700; width: 320px; cursor: pointer; user-select: none;">소재지 주소 ↕</th>
-                        <th onclick="sortHtmlTable('rec-table', 4, false)" style="padding: 14px 16px; font-weight: 700; width: 140px; cursor: pointer; user-select: none;">물건 용도 ↕</th>
-                        <th onclick="sortHtmlTable('rec-table', 5, true)" style="padding: 14px 16px; font-weight: 700; text-align: right; width: 180px; cursor: pointer; user-select: none;">최저 입찰가 ↕</th>
-                        <th onclick="sortHtmlTable('rec-table', 6, false)" style="padding: 14px 16px; font-weight: 700; text-align: center; width: 130px; cursor: pointer; user-select: none;">매각 기일 ↕</th>
-                        <th style="padding: 14px 16px; font-weight: 700; text-align: center; width: 80px; user-select: none;">이동</th>
+                        <th onclick="sortHtmlTable('rec-table', 3, false)" style="padding: 14px 16px; font-weight: 700; width: 260px; cursor: pointer; user-select: none;">소재지 주소 ↕</th>
+                        <th onclick="sortHtmlTable('rec-table', 4, false)" style="padding: 14px 16px; font-weight: 700; width: 120px; cursor: pointer; user-select: none;">물건 용도 ↕</th>
+                        <th onclick="sortHtmlTable('rec-table', 5, true)" style="padding: 14px 16px; font-weight: 700; text-align: right; width: 180px; cursor: pointer; user-select: none;">최저 입찰가 / 감정가 ↕</th>
+                        <th onclick="sortHtmlTable('rec-table', 6, true)" style="padding: 14px 16px; font-weight: 700; text-align: center; width: 140px; cursor: pointer; user-select: none;">입찰 회차 / 유찰 ↕</th>
+                        <th onclick="sortHtmlTable('rec-table', 7, true)" style="padding: 14px 16px; font-weight: 700; text-align: center; width: 110px; cursor: pointer; user-select: none;">감정가 대비 저감 ↕</th>
+                        <th onclick="sortHtmlTable('rec-table', 8, false)" style="padding: 14px 16px; font-weight: 700; text-align: center; width: 110px; cursor: pointer; user-select: none;">매각 기일 ↕</th>
+                        <th style="padding: 14px 16px; font-weight: 700; text-align: center; width: 100px; user-select: none;">이동</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -1692,9 +1844,9 @@ with tab_dashboard:
             )
             appraisal = item.get("appraisal", 0)
             price = item.get("price", 0)
-            discount_str = ""
-            if appraisal > 0 and price > 0:
-                discount_str = f" (감정가 대비 {((appraisal - price) / appraisal)*100:.1f}% 저감)"
+            
+            bidding_round, failed_count, discount_rate = estimate_auction_rounds(appraisal, price, item.get("source"))
+            discount_str = f" (감정가 대비 ▼{discount_rate:.0f}% 저감)" if discount_rate > 0 else ""
 
             bd = item.get("score_breakdown", {})
             source_name = '대법원 법원경매' if item['source'] == 'court' else ('온비드 공유공매' if item['source'] == 'onbid' else '사설 일정표')
@@ -1786,8 +1938,8 @@ with tab_dashboard:
                         </div>
                         <div>
                             <p style="margin: 4px 0;"><b>감정 평가액:</b> {appraisal_formatted}</p>
-                            <p style="margin: 4px 0;"><b>최저 입찰가격:</b> {price_formatted} <span style="color: #2563eb; font-weight: bold;">{discount_str}</span></p>
-                            <p style="margin: 4px 0;"><b>공식 서류 확인완료:</b> {item['docs_ok']}</p>
+                            <p style="margin: 4px 0;"><b>최저 입찰가격:</b> {price_formatted} <span style="color: #ef4444; font-weight: bold;">{discount_str}</span></p>
+                            <p style="margin: 4px 0;"><b>입찰 진행 상태:</b> <span style="color: #1e3a8a; font-weight: 700;">{bidding_round}회차 입찰</span> (유찰 {failed_count}회)</p>
                             <p style="margin: 4px 0; font-size: 0.9em; color: #475569;"><b>매치 점수 상세:</b> 기본 60점 + 서류 {bd.get('docs_score',0)}점 + 예산 {bd.get('budget_score',0)}점 + 일정 {bd.get('time_score',0)}점 + 지역 {bd.get('region_score',0)}점 + 용도 {bd.get('ptype_score',0)}점 - 사설패널티 {bd.get('private_penalty',0)}점 = <b>{item['score']}점</b></p>
                         </div>
                     </div>
@@ -1807,6 +1959,9 @@ with tab_dashboard:
                     {naver_search_html}
                     {safety_reminder_html}
                     <div style="margin-top: 1rem; text-align: right;">
+                        <a href="https://map.naver.com/v5/search/{urllib.parse.quote(addr_clean)}" target="_blank" style="display: inline-block; background-color: #059669; color: white; padding: 8px 16px; border-radius: 6px; font-weight: 700; text-decoration: none; font-size: 0.85em; box-shadow: 0 4px 10px rgba(5,150,105,0.15); transition: background-color 0.2s; margin-right: 8px;">
+                            🗺️ 네이버 지도 바로가기
+                        </a>
                         <a href="{card_link_url}" target="_blank" style="display: inline-block; background-color: #2563eb; color: white; padding: 8px 16px; border-radius: 6px; font-weight: 700; text-decoration: none; font-size: 0.85em; box-shadow: 0 4px 10px rgba(37,99,235,0.15); transition: background-color 0.2s;">
                             {card_link_btn_text}
                         </a>
@@ -1836,58 +1991,18 @@ with tab_dashboard:
     """)
 
     if strictly_matched_filtered:
-        # Render Beautiful Custom HTML Table for Filtered items
-        table_rows = []
+        # Render Colorful Custom cards for Filtered items (No table!)
         display_filtered = strictly_matched_filtered[:display_filtered_limit]
-        st.markdown(f"**전체 {len(strictly_matched_filtered)}건 중 대표적인 상위 {len(display_filtered)}개 제외 매물을 표시합니다. (컬럼 제목 클릭 시 브라우저 즉시 정렬 지원)**")
+        st.markdown(f"**전체 {len(strictly_matched_filtered)}건 중 대표적인 상위 {len(display_filtered)}개 제외 매물을 컬러풀 카드 타입으로 표시합니다. (마우스 오버 시 자동 전개)**")
+        import urllib.parse
         for item in display_filtered:
-            price_formatted = format_krw(item.get("price", 0))
-
-            grade_badge = f"<span class='badge badge-x' style='background-color: #fee2e2; color: #991b1b; padding: 4px 8px; border-radius: 6px; font-weight: 700; font-size: 0.85em;'>X등급</span>"
-
             # Clean variables for HTML safety
             addr_clean = sanitize_text(item["address"])
             item_id_clean = sanitize_text(item["item_id"])
             ptype_clean = sanitize_text(item["ptype"])
             reason_clean = sanitize_text(item["filter_reason"])
+            price_formatted = format_krw(item.get("price", 0))
 
-            row_html = f"""
-            <tr style="border-bottom: 1px solid #e2e8f0; background-color: #fffafb; transition: background-color 0.2s;">
-                <td style="padding: 12px 16px; text-align: center; white-space: nowrap;">{grade_badge}</td>
-                <td style="padding: 12px 16px; font-weight: 600; color: #991b1b; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" title="{item_id_clean}">{item_id_clean}</td>
-                <td style="padding: 12px 16px; color: #334155; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" title="{addr_clean}">{addr_clean}</td>
-                <td style="padding: 12px 16px; color: #475569; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" title="{ptype_clean}">{ptype_clean}</td>
-                <td style="padding: 12px 16px; font-weight: 700; color: #1e293b; text-align: right; white-space: nowrap;">{price_formatted}</td>
-                <td style="padding: 12px 16px; color: #b91c1c; font-weight: 600; font-size: 0.85em; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" title="{reason_clean}">{reason_clean}</td>
-            </tr>
-            """
-            table_rows.append(row_html)
-
-        table_body = "\n".join(table_rows)
-        table_html = f"""
-        <div style="overflow-x: auto; margin-bottom: 2rem; border-radius: 12px; border: 1px solid #fee2e2; box-shadow: 0 4px 20px rgba(0,0,0,0.02); background-color: #ffffff;">
-            <table id="flt-table" style="width: 100%; min-width: 1120px; table-layout: fixed; border-collapse: collapse; text-align: left; font-size: 0.9rem;">
-                <thead>
-                    <tr style="background-color: #7f1d1d; color: #f8fafc; border-bottom: 2px solid #fca5a5;">
-                        <th onclick="sortHtmlTable('flt-table', 0, false)" style="padding: 14px 16px; font-weight: 700; text-align: center; width: 100px; cursor: pointer; user-select: none;">등급 ↕</th>
-                        <th onclick="sortHtmlTable('flt-table', 1, false)" style="padding: 14px 16px; font-weight: 700; width: 150px; cursor: pointer; user-select: none;">사건/관리번호 ↕</th>
-                        <th onclick="sortHtmlTable('flt-table', 2, false)" style="padding: 14px 16px; font-weight: 700; width: 250px; cursor: pointer; user-select: none;">소재지 주소 ↕</th>
-                        <th onclick="sortHtmlTable('flt-table', 3, false)" style="padding: 14px 16px; font-weight: 700; width: 140px; cursor: pointer; user-select: none;">물건 용도 ↕</th>
-                        <th onclick="sortHtmlTable('flt-table', 4, true)" style="padding: 14px 16px; font-weight: 700; text-align: right; width: 150px; cursor: pointer; user-select: none;">최저 입찰가 ↕</th>
-                        <th onclick="sortHtmlTable('flt-table', 5, false)" style="padding: 14px 16px; font-weight: 700; width: 330px; cursor: pointer; user-select: none;">제외 차단 사유 (검출 키워드) ↕</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {table_body}
-                </tbody>
-            </table>
-        </div>
-        """
-        render_html(table_html)
-
-        # Premium Hover Cards for Filtered items (Auto expanded on mouse hover)
-        st.markdown("#### 🔍 차단 매물 상세 분석 및 위험 키워드 검출 원문 열람 (마우스 오버 시 자동 전개)")
-        for item in display_filtered:
             legal_warning_html = get_legal_risk_warning(reason_clean)
             desc_content = item.get("desc") if item.get("desc") else "등록된 비고가 없습니다."
             notes_content = item.get("notes") if item.get("notes") else "등록된 특이사항이 없습니다."
@@ -1896,20 +2011,34 @@ with tab_dashboard:
             desc_content = sanitize_text(desc_content)
             notes_content = sanitize_text(notes_content)
 
-            addr_clean = sanitize_text(item['address'])
             addr_parts = addr_clean.split()
             location_header = f"{addr_parts[0]} {addr_parts[1]}" if len(addr_parts) > 1 else addr_clean
             source_name = '대법원 법원경매' if item['source'] == 'court' else ('온비드 공유공매' if item['source'] == 'onbid' else '사설 일정표')
 
-            item_id_clean = sanitize_text(item['item_id'])
-            ptype_clean = sanitize_text(item['ptype'])
-            reason_clean = sanitize_text(item['filter_reason'])
+            # Dynamic colorful style based on risk keywords
+            border_color, bg_gradient, text_color, badge_text = get_risk_card_style(reason_clean)
+
+            # Set dynamic card styling based on source
+            if item.get("source") == "court":
+                card_link_url = "https://www.courtauction.go.kr"
+                card_link_btn_text = "🔗 대법원 법원경매 사건검색 바로가기"
+                card_badge = f"<span class='badge' style='background-color: #eff6ff; color: #1e40af; border: 1px solid #bfdbfe; font-size: 0.78em; padding: 4px 8px; border-radius: 6px; font-weight: 700; margin-right: 10px; vertical-align: middle;'>⚖️ 대법원 경매</span>"
+            elif item.get("source") == "onbid":
+                card_link_url = "https://www.onbid.co.kr"
+                card_link_btn_text = "🔗 온비드 공매 물건검색 바로가기"
+                card_badge = f"<span class='badge' style='background-color: #ecfdf5; color: #047857; border: 1px solid #a7f3d0; font-size: 0.78em; padding: 4px 8px; border-radius: 6px; font-weight: 700; margin-right: 10px; vertical-align: middle;'>🏢 온비드 공매</span>"
+            else:
+                card_link_url = "https://www.courtauction.go.kr"
+                card_link_btn_text = "🔗 사설 일정표 원본 보기"
+                card_badge = f"<span class='badge' style='background-color: #f1f5f9; color: #475569; border: 1px solid #cbd5e1; font-size: 0.78em; padding: 4px 8px; border-radius: 6px; font-weight: 700; margin-right: 10px; vertical-align: middle;'>📁 사설 경매</span>"
 
             card_html = f"""
-            <div class="hover-card" style="border-left: 6px solid #dc2626;">
+            <div class="hover-card" style="border-left: 6px solid {border_color}; background: {bg_gradient};">
                 <div class="hover-summary">
                     <div>
-                        <span class="badge badge-x" style="background-color: #fee2e2; color: #991b1b; padding: 6px 12px; border-radius: 8px; font-weight: 700; font-size: 0.9em; margin-right: 10px;">X등급 (제외)</span>
+                        <span class="badge" style="background-color: #ef4444; color: white; padding: 6px 12px; border-radius: 8px; font-weight: 700; font-size: 0.9em; margin-right: 10px;">X등급 (제외)</span>
+                        <span class="badge" style="background-color: {border_color}; color: white; padding: 4px 8px; border-radius: 6px; font-weight: 700; font-size: 0.8em; margin-right: 10px; vertical-align: middle;">{badge_text}</span>
+                        {card_badge}
                         <strong style="font-size: 1.15em; color: #0f172a;">{item_id_clean}</strong>
                         <span style="color: #64748b; margin-left: 10px;">| {location_header} | {ptype_clean}</span>
                     </div>
@@ -1922,7 +2051,9 @@ with tab_dashboard:
                         <p style="margin: 4px 0;"><b>사건/관리번호:</b> {item_id_clean} ({source_name})</p>
                         <p style="margin: 4px 0;"><b>소재지 주소:</b> {addr_clean}</p>
                         <p style="margin: 4px 0;"><b>물건 유형/용도:</b> {ptype_clean}</p>
-                        <p style="margin: 4px 0; color: #dc2626; font-weight: bold;">🚨 제외 차단 사유 (검출 키워드): {reason_clean}</p>\n                {legal_warning_html}
+                        <p style="margin: 4px 0;"><b>최저 입찰가격:</b> {price_formatted}</p>
+                        <p style="margin: 4px 0; color: #dc2626; font-weight: bold;">🚨 제외 차단 사유 (검출 키워드): {reason_clean}</p>
+                        {legal_warning_html}
                     </div>
                     <div style="margin-top: 1rem; border-top: 1px dashed #eaedf1; padding-top: 1rem;">
                         <p style="margin-bottom: 0.5rem;"><b>📝 법원 비고 및 설명 원문:</b></p>
@@ -1937,8 +2068,11 @@ with tab_dashboard:
                         </div>
                     </div>
                     <div style="margin-top: 1rem; text-align: right;">
-                        <a href="https://www.courtauction.go.kr" target="_blank" style="display: inline-block; background-color: #b91c1c; color: white; padding: 8px 16px; border-radius: 6px; font-weight: 700; text-decoration: none; font-size: 0.85em; box-shadow: 0 4px 10px rgba(185,28,28,0.15); transition: background-color 0.2s;">
-                            🔗 대법원 법원경매 사건검색 바로가기
+                        <a href="https://map.naver.com/v5/search/{urllib.parse.quote(addr_clean)}" target="_blank" style="display: inline-block; background-color: #059669; color: white; padding: 8px 16px; border-radius: 6px; font-weight: 700; text-decoration: none; font-size: 0.85em; box-shadow: 0 4px 10px rgba(5,150,105,0.15); transition: background-color 0.2s; margin-right: 8px;">
+                            🗺️ 네이버 지도 바로가기
+                        </a>
+                        <a href="{card_link_url}" target="_blank" style="display: inline-block; background-color: #b91c1c; color: white; padding: 8px 16px; border-radius: 6px; font-weight: 700; text-decoration: none; font-size: 0.85em; box-shadow: 0 4px 10px rgba(185,28,28,0.15); transition: background-color 0.2s;">
+                            {card_link_btn_text}
                         </a>
                     </div>
                 </div>
