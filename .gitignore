@@ -23,3 +23,6 @@ input_sources/json/onbid.json
 input_sources/json/onbid_meta.json
 input_sources/json/court.json
 input_sources/json/court_meta.json
+
+*.bat
+경매_추천_시스템_v1.0.zip
