@@ -1,5 +1,4 @@
 import pandas as pd
-import numpy as np
 import re
 
 # Standard mapping dictionary from Korean headers to standard English keys

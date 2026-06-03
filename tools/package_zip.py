@@ -85,7 +85,6 @@ def package_project():
     print("=======================================================================")
 
 if __name__ == "__main__":
-    import sys
     try:
         sys.stdout.reconfigure(encoding='utf-8')
     except AttributeError:

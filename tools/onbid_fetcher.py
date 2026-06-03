@@ -19,7 +19,7 @@ def fetch_onbid_data():
                 with open(key_file_path, "r", encoding="utf-8") as f:
                     service_key = f.read().strip()
                 if service_key:
-                    print(f"[+] config/onbid_key.txt 파일에서 API 키를 로드했습니다.")
+                    print("[+] config/onbid_key.txt 파일에서 API 키를 로드했습니다.")
             except Exception as e:
                 print(f"[-] API 키 파일 읽기 실패: {e}")
                 
@@ -34,15 +34,35 @@ def fetch_onbid_data():
     rlst_url = "http://apis.data.go.kr/B010003/OnbidRlstListSrvc2/getRlstCltrList2"
     mvhcl_url = "http://apis.data.go.kr/B010003/OnbidMvhclListSrvc2/getMvhclCltrList2"
     
-    # Fetch Real Estate
-    print("Fetching Onbid Real Estate data...")
-    rlst_items, rlst_err = fetch_paginated_data(rlst_url, service_key, {"prptDivCd": "0002,0003,0004,0005,0006,0007,0008,0010"})
-    print(f"Collected {len(rlst_items)} Real Estate items. (Error: {rlst_err})")
+    # 공공데이터 API의 다중 콤마 코드 차단 우회를 위한 개별 순회 수집 방식 가동
+    target_div_codes = ["0001", "0002", "0003", "0004", "0005", "0006", "0007", "0008", "0010"]
+    rlst_items = []
+    rlst_err = ""
+    
+    print("Fetching Onbid Real Estate data by individual categories...")
+    for code in target_div_codes:
+        print(f"  Fetching Real Estate code {code}...")
+        items, err = fetch_paginated_data(rlst_url, service_key, {"prptDivCd": code})
+        if err:
+            rlst_err = err
+        rlst_items.extend(items)
+        time.sleep(0.1) # 서버 보호 디레이
+        
+    print(f"Collected {len(rlst_items)} Real Estate items. (Last Error: {rlst_err})")
     
     # Fetch Movables/Vehicles
-    print("Fetching Onbid Movables/Vehicles data...")
-    mvhcl_items, mvhcl_err = fetch_paginated_data(mvhcl_url, service_key, {"prptDivCd": "0002,0003,0004,0005,0006,0007,0008,0010"})
-    print(f"Collected {len(mvhcl_items)} Movables/Vehicles items. (Error: {mvhcl_err})")
+    mvhcl_items = []
+    mvhcl_err = ""
+    print("Fetching Onbid Movables/Vehicles data by individual categories...")
+    for code in target_div_codes:
+        print(f"  Fetching Movables code {code}...")
+        items, err = fetch_paginated_data(mvhcl_url, service_key, {"prptDivCd": code})
+        if err:
+            mvhcl_err = err
+        mvhcl_items.extend(items)
+        time.sleep(0.1)
+        
+    print(f"Collected {len(mvhcl_items)} Movables/Vehicles items. (Last Error: {mvhcl_err})")
     
     combined_results = rlst_items + mvhcl_items
     scraper_error = rlst_err or mvhcl_err
@@ -83,7 +103,7 @@ def fetch_paginated_data(url, service_key, extra_params):
     items_collected = []
     scraper_error = ""
     
-    while page <= 10:  # Fetch up to 10 pages (max 1000 items)
+    while page <= 15:  # 페이지 범위를 15페이지로 확대하여 수집 극대화 (max 1500 items)
         params = {
             "serviceKey": service_key,
             "numOfRows": 100,
@@ -178,7 +198,8 @@ def parse_json_item(item):
                 return str(val).strip()
         return default
 
-    address = get_val(["onbidCltrNm", "ONBID_CLTR_NM", "lnmAdr", "LNM_ADR", "roadAdr", "ROAD_ADR"], "주소 미상")
+    # 🟢 [주소 정상화 버그 패치] lnmAdr(지번주소)와 roadAdr(도로명주소)를 최우선 순위로 끌어올림
+    address = get_val(["lnmAdr", "LNM_ADR", "roadAdr", "ROAD_ADR", "onbidCltrNm", "ONBID_CLTR_NM"], "주소 미상")
 
     close_date_raw = get_val(["cltrBidEndDt", "CLTR_BID_END_DT", "pbctClsDtm", "PBCT_CLS_DTM"], "")
     close_date = ""
@@ -226,7 +247,8 @@ def parse_xml_item(item):
                 return elem.text.strip()
         return default
 
-    address = get_val(["onbidCltrNm", "lnmAdr", "roadAdr"], "주소 미상")
+    # 🟢 [XML 주소 정상화 버그 패치]
+    address = get_val(["lnmAdr", "roadAdr", "onbidCltrNm"], "주소 미상")
 
     close_date_raw = get_val(["cltrBidEndDt", "pbctClsDtm"], "")
     close_date = ""

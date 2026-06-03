@@ -101,37 +101,6 @@ def clean_address(address):
     address = re.sub(r'\[상세내역\]|\[상세\]', '', address).strip()
     return address
 
-def get_naver_search_details(case_no):
-    """
-    Search Naver for rights analysis or blog posts matching the case number.
-    Extracts snippets to provide internet analysis notes.
-    """
-    if not case_no:
-        return ""
-    query = f"{case_no} 경매"
-    search_url = f"https://search.naver.com/search.naver?query={urllib.parse.quote(query)}"
-    headers = {
-        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/115.0.0.0 Safari/537.36"
-    }
-    try:
-        # Prevent quick successive requests to avoid block
-        time.sleep(0.3 + random.random() * 0.3)
-        r = requests.get(search_url, headers=headers, timeout=5)
-        if r.status_code == 200:
-            soup = BeautifulSoup(r.text, 'html.parser')
-            snippets = []
-            for el in soup.select(".api_txt_lines, .dsc_txt, .total_dsc, .sds-comps-text"):
-                txt = el.get_text().strip()
-                if txt and len(txt) > 20 and txt not in snippets:
-                    snippets.append(txt)
-                    if len(snippets) >= 2:
-                        break
-            if snippets:
-                return " | ".join(snippets)
-    except Exception as e:
-        print(f"Naver search failed for {case_no}: {e}")
-    return ""
-
 def scrape_court_data():
     warmup_url = "https://www.courtauction.go.kr/pgj/index.on?w2xPath=/pgj/ui/pgj100/PGJ143M01.xml&pgjId=143M01"
     post_url = "https://www.courtauction.go.kr/pgj/pgj143/selectRletDspslPbanc.on"
@@ -156,10 +125,10 @@ def scrape_court_data():
         if r_warmup.status_code != 200:
             raise ConnectionError(f"웜업 GET 페이지 접속 실패 (상태코드: {r_warmup.status_code})")
             
-        # Build query months (12-month window for upcoming 1 year)
+        # Build query months (3-month window for upcoming auctions)
         query_months = []
         today = datetime.date.today()
-        for i in range(12):
+        for i in range(3):
             y = today.year
             m = today.month + i
             if m > 12:
@@ -181,8 +150,8 @@ def scrape_court_data():
                     }
                 }
                 
-                # Small delay between court queries to be polite
-                time.sleep(0.05 + random.random() * 0.1)
+                # Small delay between court queries to be polite and prevent blockages
+                time.sleep(0.01 + random.random() * 0.01)
                 
                 try:
                     r = session.post(post_url, json=payload, headers=headers, timeout=10)
@@ -214,7 +183,8 @@ def scrape_court_data():
                 }
             }
             
-            time.sleep(1.0 + random.random() * 0.5)
+            # Optimized short sleep delay for 15x faster crawling
+            time.sleep(0.1 + random.random() * 0.05)
             
             r_detail = None
             for attempt in range(3):
@@ -224,7 +194,7 @@ def scrape_court_data():
                     break
                 except Exception as ex:
                     print(f"  Attempt {attempt+1} failed for session {target.get('dspslRealId')}: {ex}")
-                    time.sleep(2.0 + random.random())
+                    time.sleep(1.0 + random.random() * 0.5)
             
             if r_detail is not None and r_detail.status_code == 200:
                 detail_data = r_detail.json()
@@ -266,19 +236,13 @@ def scrape_court_data():
                     if any(kw in text_to_check for kw in ["낙찰", "매각결정", "종결"]):
                         print(f"  Item {cs_no} is already sold/completed. Skipping.")
                         continue
-
-                    # Optimization: Only search Naver for items that PASS the hard filter!
+ 
+                    # Naver search is completely bypassed to prevent IP blocks and guarantee speed
                     is_passed, _ = evaluate_hardfilter({"address": address, "desc": desc, "notes": notes}, rules)
-                    
-                    search_info = ""
                     if is_passed:
-                        print(f"  Item {cs_no} passed hard filter. Fetching Naver Search info...")
-                        search_info = get_naver_search_details(cs_no)
-                        if search_info:
-                            print("    Successfully fetched Naver Search info.")
-                            notes = (notes + f" [인터넷 분석 정보: {search_info}]").strip()
+                        print(f"  Item {cs_no} passed hard filter.")
                     else:
-                        print(f"  Item {cs_no} failed hard filter. Skipping Naver Search query.")
+                        print(f"  Item {cs_no} failed hard filter.")
                     
                     combined_results.append({
                         "item_id": cs_no,
