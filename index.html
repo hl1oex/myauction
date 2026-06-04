@@ -55,22 +55,155 @@
             background-color: #eff6ff !important;
             box-shadow: 0 4px 12px rgba(30, 64, 175, 0.06) !important;
         }
+    
+        /* 🚀 새로 생성되는 듯한 부드러운 카드 렌더링 애니메이션 */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(12px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        .fade-in-up {
+            animation: fadeInUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) both;
+        }
+
+        /* 📱 모바일 지능형 필터링 센터 컴팩트 스타일 */
+        @media (max-w: 1023px) {
+            #sidebar-panel.sidebar-compact {
+                padding: 0.75rem !important;
+            }
+            #sidebar-panel.sidebar-compact .space-y-4 > :not([hidden]) ~ :not([hidden]) {
+                margin-top: 0.5rem !important;
+                margin-bottom: 0px !important;
+            }
+            #sidebar-panel.sidebar-compact label {
+                font-size: 10px !important;
+                margin-bottom: 0.25rem !important;
+            }
+            #sidebar-panel.sidebar-compact input,
+            #sidebar-panel.sidebar-compact select {
+                padding-top: 0.375rem !important;
+                padding-bottom: 0.375rem !important;
+                padding-left: 0.5rem !important;
+                padding-right: 0.5rem !important;
+                font-size: 12px !important;
+                border-radius: 8px !important;
+            }
+            #sidebar-panel.sidebar-compact .p-3,
+            #sidebar-panel.sidebar-compact .p-3.5 {
+                padding: 0.5rem !important;
+                border-radius: 10px !important;
+            }
+            #sidebar-panel.sidebar-compact #sigungu-container {
+                max-height: 80px !important;
+            }
+        }
+
+        /* 📄 사용자 가이드 & 법률 사전 - 표준 보고서 문서 스타일 (가독성 극대화) */
+        .document-view h2 {
+            font-size: 1.05rem !important; /* 17px */
+            font-weight: 800 !important;
+            color: #0f172a !important; /* slate-900 */
+            margin-top: 1.75rem !important;
+            margin-bottom: 0.875rem !important;
+            padding-bottom: 0.5rem !important;
+            border-bottom: 1px solid #e2e8f0 !important;
+            text-align: left !important;
+        }
+        .document-view h3 {
+            font-size: 0.95rem !important; /* 15px */
+            font-weight: 700 !important;
+            color: #1e40af !important; /* royalBlue */
+            margin-top: 1.5rem !important;
+            margin-bottom: 0.75rem !important;
+            text-align: left !important;
+        }
+        .document-view h4 {
+            font-size: 0.85rem !important; /* 13.6px */
+            font-weight: 700 !important;
+            color: #334155 !important; /* slate-700 */
+            margin-top: 1.25rem !important;
+            margin-bottom: 0.5rem !important;
+            text-align: left !important;
+        }
+        .document-view p {
+            font-size: 0.82rem !important; /* 13px */
+            line-height: 1.625 !important;
+            color: #475569 !important; /* slate-600 */
+            letter-spacing: -0.015em !important;
+            margin-bottom: 0.875rem !important;
+            text-align: left !important;
+        }
+        .document-view ul, .document-view ol {
+            margin-top: 0.5rem !important;
+            margin-bottom: 0.875rem !important;
+            padding-left: 1.25rem !important;
+            list-style-position: outside !important;
+            text-align: left !important;
+        }
+        .document-view li {
+            font-size: 0.82rem !important;
+            line-height: 1.625 !important;
+            color: #475569 !important;
+            margin-bottom: 0.375rem !important;
+            text-align: left !important;
+        }
+        .document-view table {
+            width: 100% !important;
+            border-collapse: collapse !important;
+            margin: 1.25rem 0 !important;
+            font-size: 0.78rem !important; /* 12.5px */
+            background: #ffffff !important;
+            border-radius: 12px !important;
+            overflow: hidden !important;
+            border: 1px solid #e2e8f0 !important;
+        }
+        .document-view th {
+            background-color: #f8fafc !important; /* slate-50 */
+            color: #1e293b !important; /* slate-800 */
+            font-weight: 800 !important;
+            padding: 0.75rem 1rem !important;
+            border-bottom: 2px solid #e2e8f0 !important;
+            text-align: left !important;
+        }
+        .document-view td {
+            padding: 0.75rem 1rem !important;
+            color: #475569 !important; /* slate-600 */
+            border-bottom: 1px solid #f1f5f9 !important;
+            text-align: left !important;
+        }
+        .document-view tr:hover {
+            background-color: #f8fafc !important;
+        }
+        .document-view blockquote {
+            border-left: 4px solid #cbd5e1 !important; /* slate-300 */
+            padding-left: 1rem !important;
+            font-style: italic !important;
+            color: #64748b !important; /* slate-500 */
+            margin: 0.875rem 0 !important;
+            text-align: left !important;
+        }
     </style>
+
 </head>
 <body class="bg-pearlWhiteBg text-slate-800 font-sans h-screen overflow-hidden flex flex-col">
 
     <!-- 🌐 1. 상단 글로벌 헤더바 -->
-    <header class="bg-white border-b border-slate-200 h-16 min-h-[64px] flex items-center justify-between px-6 shadow-sm z-30">
-        <!-- [좌측 영역] 로고 및 타이틀 (모바일 필터 토글 장착) -->
-        <div class="flex items-center gap-3 w-[70%] sm:w-[50%] lg:w-1/3">
-            <button onclick="toggleSidebar()" class="lg:hidden p-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 flex items-center justify-center transition-all select-none mr-1 flex-shrink-0" title="필터 열기">
+    <header class="bg-white border-b border-slate-200 h-16 min-h-[64px] flex items-center justify-start px-6 shadow-sm z-30">
+        <!-- [좌측 영역] 로고 및 타이틀 (모바일 필터 토글 제거 및 w-full로 전면 개방) -->
+        <div class="flex items-center gap-3 w-full">
+            <button id="header-sidebar-toggle-btn" onclick="toggleSidebar()" class="hidden p-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 flex items-center justify-center transition-all select-none mr-1 flex-shrink-0" title="필터 열기">
                 <i class="fa-solid fa-sliders text-xs"></i>
             </button>
             <div class="bg-royalBlue text-white w-9 h-9 rounded-xl flex items-center justify-center shadow-md shadow-blue-500/10 flex-shrink-0">
                 <i class="fa-solid fa-hotel text-sm"></i>
             </div>
             <div class="truncate">
-                <h1 class="text-xs sm:text-base font-extrabold tracking-tight text-slate-900 flex items-center gap-2 whitespace-nowrap">
+                <h1 class="text-sm sm:text-base font-extrabold tracking-tight text-slate-900 flex items-center gap-2 whitespace-nowrap">
                     AI 부동산 경공매 추천 시스템
                     <span class="bg-blue-50 text-royalBlue text-[10px] px-2 py-0.5 rounded-full font-black border border-blue-200">v1.0</span>
                 </h1>
@@ -78,8 +211,8 @@
             </div>
         </div>
         
-        <!-- [중앙 영역] 실시간 자산 현황판 및 연결 센서 (태블릿 이상 노출) -->
-        <div class="hidden md:flex items-center justify-center gap-3 w-1/3">
+        <!-- [중앙 영역] 실시간 자산 현황판 및 연결 센서 (사용자 시안에 맞춰 hidden 처리) -->
+        <div class="hidden">
             <div id="connection-sensor" onclick="fetchDataFromServer(); fetchSyncStatus();" 
                  class="flex items-center gap-2 px-3 py-1.5 rounded-full bg-slate-50 border border-slate-200 text-slate-700 text-xs font-black shadow-sm transition-all duration-300 cursor-pointer hover:bg-slate-100 active:scale-95 whitespace-nowrap" 
                  title="클릭하시면 즉시 실시간 데이터 연동 및 동기화를 재시도합니다.">
@@ -93,15 +226,15 @@
             </div>
         </div>
 
-        <!-- [우측 영역] 자동 동기화 정보 (데스크톱 전용 노출) -->
-        <div class="hidden lg:flex items-center justify-end gap-1.5 w-1/3 text-[11px] text-slate-400 font-bold">
+        <!-- [우측 영역] 자동 동기화 정보 (사용자 시안에 맞춰 hidden 처리) -->
+        <div class="hidden">
             <i class="fa-solid fa-clock-rotate-left"></i>
             <span>백그라운드 스케줄 수집 작동 중</span>
         </div>
     </header>
  
     <!-- 🎛️ 2. 메인 3단 전문가 대시보드 그리드 영역 -->
-    <div class="flex flex-1 overflow-hidden h-full relative">
+    <div id="main-grid-container" class="flex flex-1 overflow-hidden h-full relative">
 
         <!-- 🖤 Mobile Sidebar Backdrop Overlay -->
         <div id="sidebar-backdrop" class="fixed inset-0 bg-slate-900/40 z-40 hidden lg:hidden transition-opacity duration-300" onclick="toggleSidebar()"></div>
@@ -116,7 +249,7 @@
                 </div>
                 <div class="flex items-center gap-2.5">
                     <button onclick="resetFilters()" class="text-xs font-bold text-slate-400 hover:text-royalBlue transition-colors">초기화</button>
-                    <button onclick="toggleSidebar()" class="lg:hidden text-slate-400 hover:text-rose-500 transition-colors select-none" title="필터 닫기"><i class="fa-solid fa-xmark text-sm"></i></button>
+                    <button id="sidebar-close-btn" onclick="toggleSidebar()" class="lg:hidden text-slate-400 hover:text-rose-500 transition-colors select-none" title="필터 닫기"><i class="fa-solid fa-xmark text-sm"></i></button>
                 </div>
             </div>
 
@@ -243,17 +376,7 @@
                     </div>
                 </div>
 
-                <!-- [신규 기능 3] 사설 경매 엑셀/CSV 수동 업로드 및 Mix(병합) 패널 -->
-                <div class="bg-blue-50/50 border border-blue-200 rounded-xl p-3.5 space-y-2">
-                    <strong class="text-xs font-black text-royalBlue uppercase tracking-wider block">📁 사설 경매 파일 수동 업로드 (Mix)</strong>
-                    <p class="text-xs text-slate-500 leading-normal">• CSV 또는 JSON 파일을 업로드하면 대법원/온비드 원문과 중복을 자동 비교하여 병합 수집합니다.</p>
-                    <input type="file" id="file-uploader" accept=".csv, .json" class="hidden" onchange="handleFileUpload(this)">
-                    <button onclick="document.getElementById('file-uploader').click()" 
-                            class="w-full bg-white border border-blue-300 text-royalBlue hover:bg-blue-50 py-2 rounded-lg text-xs font-black shadow-sm flex items-center justify-center gap-1.5 transition-colors">
-                        <i class="fa-solid fa-cloud-arrow-up"></i> 내 PC 파일 선택하기
-                    </button>
-                    <div id="upload-status" class="text-[9px] text-slate-400 font-bold text-center hidden"></div>
-                </div>
+
             </div>
 
             <!-- 하단 수집 동기화 메타 현황 -->
@@ -276,20 +399,34 @@
         </aside>
 
         <!-- 📊 [COLUMN 2] 중앙 메인 피드: 통계 KPI & 추천 매물 카드 피드 (Width: 50%) -->
-        <section class="flex-1 bg-slate-50 border-r border-slate-200 flex flex-col h-full overflow-hidden">
-            <!-- 중앙 상단 통계 KPI 바 -->
-            <div class="bg-white border-b border-slate-200 p-3 grid grid-cols-1 sm:grid-cols-3 gap-3 z-10 shadow-sm">
-                <div class="bg-blue-50/50 border border-blue-100 rounded-xl p-2.5 text-center">
-                    <p class="text-[10px] sm:text-xs font-black text-royalBlue uppercase tracking-wider mb-0.5">추천 적합 매물 (전체 <span id="kpi-total-count" class="font-outfit text-slate-500 font-bold">0</span>건 중)</p>
-                    <h3 id="kpi-recommended-count" class="text-sm sm:text-lg font-black text-slate-900 font-outfit">0건</h3>
+        <section id="center-feed-section" class="flex-1 bg-slate-50 border-r border-slate-200 flex flex-col h-full overflow-hidden">
+            <!-- 중앙 상단 통계 KPI 바 (반응형: 모바일 한 줄 통합 vs PC 3단 그리드) -->
+            <div class="bg-white border-b border-slate-200 p-3 z-10 shadow-sm">
+                <!-- 📱 모바일 전용: 한 줄 통합 노출 (1024px 미만 lg:hidden) -->
+                <div class="lg:hidden text-center py-1.5 bg-slate-50 border border-slate-200 rounded-xl px-3 shadow-sm">
+                    <div class="text-[10px] sm:text-[11px] font-extrabold text-slate-750 leading-normal flex flex-wrap items-center justify-center gap-1">
+                        <span>추천 적합 매물 <strong id="kpi-recommended-count-mob" class="text-royalBlue font-outfit font-black">0건</strong> <span class="text-slate-400 font-bold font-sans">(전체 <span id="kpi-total-count-mob" class="font-outfit font-bold">0</span>건 중)</span></span>
+                        <span class="text-slate-400 font-bold mx-1">,</span>
+                        <span>🟢 고적합 <strong id="kpi-high-count-mob" class="text-emeraldSuccess font-outfit font-black">0건</strong> <span class="text-slate-400 font-bold font-sans">(A~B등급)</span></span>
+                        <span class="text-slate-400 font-bold mx-1">,</span>
+                        <span>🚨 위험 탈락 매물 <strong id="kpi-risk-count-mob" class="text-crimsonAlert font-outfit font-black">0건</strong> <span class="text-slate-400 font-bold font-sans">(X)</span></span>
+                    </div>
                 </div>
-                <div class="bg-emerald-50/50 border border-emerald-100 rounded-xl p-2.5 text-center">
-                    <p class="text-[10px] sm:text-xs font-black text-emeraldSuccess uppercase tracking-wider mb-0.5">고적합 (A~B등급)</p>
-                    <h3 id="kpi-high-count" class="text-sm sm:text-lg font-black text-emeraldSuccess font-outfit">0건</h3>
-                </div>
-                <div class="bg-rose-50/50 border border-rose-100 rounded-xl p-2.5 text-center">
-                    <p class="text-[10px] sm:text-xs font-black text-crimsonAlert uppercase tracking-wider mb-0.5">위험 탈락 매물 (X)</p>
-                    <h3 id="kpi-risk-count" class="text-sm sm:text-lg font-black text-crimsonAlert font-outfit">0건</h3>
+                
+                <!-- 💻 PC/태블릿 전용: 기존 3개 칸 나누기 구조 -->
+                <div class="hidden lg:grid grid-cols-3 gap-3">
+                    <div class="bg-blue-50/50 border border-blue-100 rounded-xl p-2.5 text-center">
+                        <p class="text-[10px] sm:text-xs font-black text-royalBlue uppercase tracking-wider mb-0.5">추천 적합 매물 (전체 <span id="kpi-total-count" class="font-outfit text-slate-500 font-bold">0</span>건 중)</p>
+                        <h3 id="kpi-recommended-count" class="text-sm sm:text-lg font-black text-slate-900 font-outfit">0건</h3>
+                    </div>
+                    <div class="bg-emerald-50/50 border border-emerald-100 rounded-xl p-2.5 text-center">
+                        <p class="text-[10px] sm:text-xs font-black text-emeraldSuccess uppercase tracking-wider mb-0.5">고적합 (A~B등급)</p>
+                        <h3 id="kpi-high-count" class="text-sm sm:text-lg font-black text-emeraldSuccess font-outfit">0건</h3>
+                    </div>
+                    <div class="bg-rose-50/50 border border-rose-100 rounded-xl p-2.5 text-center">
+                        <p class="text-[10px] sm:text-xs font-black text-crimsonAlert uppercase tracking-wider mb-0.5">위험 탈락 매물 (X)</p>
+                        <h3 id="kpi-risk-count" class="text-sm sm:text-lg font-black text-crimsonAlert font-outfit">0건</h3>
+                    </div>
                 </div>
             </div>
 
@@ -305,63 +442,14 @@
                 </button>
                 <button id="tab-guide-btn" onclick="switchMiddleTab('guide')" 
                         class="border-b-2 border-transparent text-slate-500 py-3 text-sm font-black flex items-center gap-1.5 transition-all hover:text-royalBlue">
-                    <i class="fa-solid fa-circle-info"></i> 크롤러 사용 가이드
+                    <i class="fa-solid fa-circle-info"></i> 사용자 가이드
                 </button>
             </div>
 
             <!-- 🎯 [TAB 1: 추천 매물 피드 컨테이너] -->
             <div id="dashboard-view" class="flex flex-col flex-1 overflow-hidden">
-                <!-- [핵심 차이 & 5대 자동화 플랜] Collapsible premium notices -->
-                <div class="p-4 pb-0 space-y-3">
-                    <!-- 온비드 vs 법원 경매 비교 안내 (기본 오픈, 토글 가능) -->
-                    <div class="bg-emerald-50 border border-emerald-200 rounded-2xl p-4 shadow-sm relative overflow-hidden">
-                        <button onclick="toggleNotice('bidding-compare-notice')" class="absolute top-3.5 right-4 text-emerald-700 hover:text-emerald-900 text-xs font-black">
-                            <i id="bidding-compare-icon" class="fa-solid fa-chevron-up"></i>
-                        </button>
-                        <h4 class="text-xs font-black text-emerald-800 flex items-center gap-1.5 mb-0 select-none cursor-pointer" onclick="toggleNotice('bidding-compare-notice')">
-                            <i class="fa-solid fa-circle-info text-emeraldSuccess"></i> 💡 [핵심 차이] 법원 경매 vs 온비드 공매 입찰방식 비교
-                        </h4>
-                        <div id="bidding-compare-notice" class="text-[10px] text-emerald-700 leading-relaxed space-y-1 mt-2.5 transition-all duration-300">
-                            <p>• ⚖️ <strong>대법원 법원경매:</strong> 당일 아침 지정된 법원 법정에 <strong>직접 물리적으로 방문</strong>해야만 입찰에 참여할 수 있습니다.</p>
-                            <p>• 🏢 <strong>캠코 온비드 공매:</strong> 법원에 갈 필요 전혀 없이, 집이나 사무실에서 스마트폰 또는 PC를 통해 <strong>100% 인터넷 입찰(onbid.co.kr)</strong>로 편리하게 참여가 가능합니다!</p>
-                        </div>
-                    </div>
-                    
-                    <!-- 5대 자동 수집 연동 플랜 안내 (기본 접힘, 토글 가능) -->
-                    <div class="bg-slate-50 border border-slate-200 rounded-2xl p-4 shadow-sm relative overflow-hidden">
-                        <button onclick="toggleNotice('sync-plan-notice')" class="absolute top-3.5 right-4 text-slate-500 hover:text-slate-800 text-xs font-black">
-                            <i id="sync-plan-icon" class="fa-solid fa-chevron-down"></i>
-                        </button>
-                        <h4 class="text-xs font-black text-slate-800 flex items-center gap-1.5 mb-0 select-none cursor-pointer" onclick="toggleNotice('sync-plan-notice')">
-                            <i class="fa-solid fa-network-wired text-royalBlue"></i> ⚡ 5대 실시간 자동 수집 연동 플랜 (Plan A ~ E) 아키텍처 상세
-                        </h4>
-                        <div id="sync-plan-notice" class="hidden text-[9.5px] text-slate-600 leading-relaxed mt-3 grid grid-cols-1 md:grid-cols-2 gap-3 transition-all duration-300">
-                            <div class="bg-white border border-slate-100 rounded-xl p-3">
-                                <strong class="text-blue-600 font-bold block mb-1">🚀 플랜 A: GitHub Actions (클라우드 스케줄러)</strong>
-                                매일 새벽 3시에 클라우드 크론 트리거가 동작하여 대법원 및 온비드 사이트를 완전 자동으로 스크래핑한 뒤 로컬 DB에 자동 배포하는 1순위 무인 자동화 체계입니다.
-                            </div>
-                            <div class="bg-white border border-slate-100 rounded-xl p-3">
-                                <strong class="text-emerald-600 font-bold block mb-1">🔌 플랜 B: 공공데이터포털 Open API 실시간 연동</strong>
-                                공공 포털의 KAMCO 자산물건 정보 OpenAPI에 1시간마다 실시간 백그라운드 호출을 실행하여, 신규 온비드 공매 물건 정보를 탐지하고 실시간 업데이트합니다.
-                            </div>
-                            <div class="bg-white border border-slate-100 rounded-xl p-3">
-                                <strong class="text-amber-600 font-bold block mb-1">🔄 플랜 C: 다중 노드 웹 크롤러 정기 데몬</strong>
-                                분산된 로컬 백업 서버의 스케줄러를 통해 12시간마다 자동 백그라운드 크롤링 데몬을 구동하여 공식 DB의 무결성을 2중으로 상시 보강합니다.
-                            </div>
-                            <div class="bg-white border border-slate-100 rounded-xl p-3">
-                                <strong class="text-rose-600 font-bold block mb-1">🌐 플랜 D: 헤드리스 브라우저 Selenium 자동화</strong>
-                                대법원 사이트의 스크립트 차단 및 변경 감지 시, Selenium Headless Chrome 브라우저 가상 구동 데몬이 자동 가동되어 원문 매각명세서와 하자를 정밀 수집합니다.
-                            </div>
-                            <div class="bg-white border border-slate-100 rounded-xl p-3 md:col-span-2">
-                                <strong class="text-indigo-600 font-bold block mb-1">☁️ 플랜 E: AWS Lambda & CloudWatch 정기 동적 트리거</strong>
-                                고가용성을 위해 AWS 서버리스 환경에서 무중단 분산 수집을 분 단위로 처리하며, IP 블록 발생 시 프록시 노드를 자동으로 우회 가동하는 지능형 클라우드 자동화 시스템입니다.
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
                 <!-- 정렬 및 리스트 필터 바 -->
-                <div class="px-5 py-2.5 bg-white border-b border-slate-200 flex justify-between items-center z-10 shadow-sm mt-3.5">
+                <div class="px-5 py-2.5 bg-white border-b border-slate-200 flex justify-between items-center z-10 shadow-sm">
                     <span class="text-xs font-black text-slate-400 uppercase tracking-wider">정렬 옵션</span>
                     <div class="flex flex-wrap gap-1">
                         <button id="sort-score-btn" onclick="sortData('score')" class="bg-royalBlue text-white px-2 py-1 rounded text-[10px] font-black shadow-sm transition-all">✨ 점수순</button>
@@ -381,215 +469,308 @@
                     </div>
                 </div>
 
-                <!-- 🔍 실시간 하단 프리뷰 바 (마우스 오버 시 실시간 연동) -->
-                <div id="bottom-preview-bar" class="bg-slate-900 text-slate-100 border-t border-slate-800 p-2.5 flex items-center justify-between gap-4 z-10 shadow-lg text-[11px] transition-all duration-300 select-none">
-                    <div class="flex items-center gap-2 font-bold truncate">
-                        <span class="bg-royalBlue text-white text-[8.5px] px-1.5 py-0.5 rounded flex-shrink-0 animate-pulse font-black">LIVE PREVIEW</span>
-                        <span id="preview-title" class="text-slate-300 truncate">분석할 매물 위에 마우스를 올리거나 클릭해 주세요.</span>
+                <!-- 🔍 실시간 하단 프리뷰 바 (마우스 오버 시 실시간 연동 및 사이트 푸터 정보 통합) -->
+                <div id="bottom-preview-bar" class="sticky bottom-0 w-full bg-slate-900 text-slate-100 border-t border-slate-800 p-3 flex flex-col md:flex-row md:items-center md:justify-between gap-2.5 z-30 shadow-2xl text-[10.5px] transition-all duration-300 select-none">
+                    <!-- Left Column: Site Info & LIVE PREVIEW Title -->
+                    <div class="flex flex-col gap-1 w-full md:w-auto truncate">
+                        <!-- Site Info (PC환경처럼 모바일에도 고정 표시) -->
+                        <div class="flex items-center justify-between md:justify-start gap-2 text-[9px] text-slate-400 font-extrabold tracking-wide uppercase border-b border-slate-800 md:border-b-0 pb-1 md:pb-0">
+                            <span class="flex items-center gap-1"><i class="fa-solid fa-circle-nodes text-royalBlue animate-pulse"></i> AI 경시/공매 통합 시스템 v1.0</span>
+                            <span class="md:before:content-['|'] md:before:mx-2 md:before:text-slate-700 flex items-center gap-1"><i class="fa-solid fa-clock-rotate-left text-slate-500"></i> 실시간 수집 데몬 가동 중</span>
+                        </div>
+                        <!-- Live Preview Title -->
+                        <div class="flex items-center gap-2 font-bold truncate mt-1 md:mt-0">
+                            <span class="bg-royalBlue text-white text-[8px] px-1 py-0.2 rounded flex-shrink-0 font-black tracking-tighter">LIVE PREVIEW</span>
+                            <span id="preview-title" class="text-slate-200 font-extrabold truncate">분석할 매물 위에 마우스를 올리거나 클릭해 주세요.</span>
+                        </div>
                     </div>
-                    <div class="flex items-center gap-3 font-semibold text-slate-400 flex-shrink-0">
+                    <!-- Right Column: Currently Viewed Property Metrics -->
+                    <div class="flex flex-wrap items-center gap-x-3 gap-y-1 font-semibold text-slate-350 flex-shrink-0 text-[10px] md:text-[11px] pt-1 md:pt-0 border-t border-slate-800 md:border-t-0 justify-between md:justify-end">
                         <span id="preview-price" class="text-rose-400 font-extrabold font-outfit"></span>
                         <span id="preview-grade" class="text-blue-400 font-extrabold font-outfit"></span>
-                        <span id="preview-risk" class="text-amber-400 truncate max-w-[240px]"></span>
+                        <span id="preview-risk" class="text-amber-400 truncate max-w-[200px] md:max-w-[280px]"></span>
                     </div>
                 </div>
             </div>
 
             <!-- 📚 [TAB 2: 초보자 법률 용어/리스크 사전 컨테이너] (기본 숨김) -->
-            <div id="glossary-view" class="hidden flex-1 overflow-y-auto p-5 space-y-6 custom-scrollbar bg-slate-50">
-                <div class="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm space-y-2">
-                    <h3 class="text-sm font-extrabold text-slate-900"><i class="fa-solid fa-graduation-cap text-royalBlue"></i> 초보자를 위한 경매 용어 및 법적 리스크 백과사전</h3>
-                    <p class="text-[10px] text-slate-500 leading-normal">부동산 경매는 법률 용어와 하자가 얽혀 있어 사전지식이 없는 일반 사용자에게는 진입장벽이 매우 높습니다. 아래 사전을 통해 필수적인 권리분석 개념과 낙찰 후 직면할 수 있는 법적 문제들을 쉽게 이해해 보세요.</p>
-                </div>
+            <div id="glossary-view" class="hidden flex-1 overflow-y-auto p-5 sm:p-8 custom-scrollbar bg-slate-50 document-view">
+                <div class="max-w-3xl mx-auto w-full space-y-5 py-2 font-sans">
+                    <!-- Title block -->
+                    <div class="bg-white border border-slate-200 rounded-2xl p-4 sm:p-5 shadow-sm space-y-2 text-center lg:text-left">
+                        <h3 class="text-xs sm:text-sm font-extrabold text-slate-900 flex items-center justify-center lg:justify-start gap-1.5">
+                            <i class="fa-solid fa-graduation-cap text-royalBlue text-xs sm:text-sm"></i> 경매/공매 필수 법률 용어 및 리스크 사전
+                        </h3>
+                        <p class="text-[10px] sm:text-[11.5px] text-slate-500 leading-relaxed font-medium">부동산 경공매 입찰 전 반드시 숙지해야 할 핵심 법률 용어와 치명적인 권리분석 리스크 항목들을 정리한 사전입니다. 성공적인 입찰을 위한 가이드로 삼으십시오.</p>
+                    </div>
 
-                <!-- 1. 경매 기초 개념 -->
-                <div class="space-y-3">
-                    <h4 class="text-[11px] font-black text-slate-400 uppercase tracking-wider"><i class="fa-solid fa-magnifying-glass"></i> 1️⃣ 경매의 기초 개념</h4>
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <!-- 최저입찰가 -->
-                        <div class="bg-white border border-slate-200 rounded-2xl p-4 shadow-sm hover:border-royalBlue/30 transition-all flex flex-col justify-between">
-                            <div>
-                                <strong class="text-xs font-black text-royalBlue block mb-1">💰 최저입찰가 (Minimum Bid Price)</strong>
-                                <p class="text-[10px] text-slate-600 leading-relaxed">경매 물건의 매각을 시작할 때 법원이 지정한 가장 낮은 입찰 금액입니다. 아무도 이 가격 이상으로 입찰하지 않아 유찰되면 보통 법원에 따라 최저입찰가가 20%~30%씩 감액(저감)되어 다음 입찰 일정이 잡힙니다.</p>
+                    <!-- 1. 경매 기초 필수 용어 -->
+                    <div class="space-y-3">
+                        <h4 class="text-[10px] sm:text-xs font-black text-slate-400 uppercase tracking-wider text-center lg:text-left"><i class="fa-solid fa-circle-question"></i> 1️⃣ 경매/공매 기초 필수 용어</h4>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-3.5">
+                            <!-- 최저입찰가 -->
+                            <div class="bg-white border border-slate-200 rounded-2xl p-4 shadow-sm hover:border-royalBlue/30 transition-all flex flex-col justify-between text-center lg:text-left">
+                                <div>
+                                    <strong class="text-xs font-black text-royalBlue block mb-1">💰 최저입찰가 (Minimum Bid Price)</strong>
+                                    <p class="text-[10px] sm:text-[11px] text-slate-600 leading-relaxed font-medium">경매 매각을 시작할 때 법원이 지정한 가장 낮은 입찰 가격입니다. 유찰될 때마다 대법원 경매는 20~30%씩, 온비드 공매는 10%씩 금액이 낮아져 다음 입찰로 진행됩니다.</p>
+                                </div>
+                                <span class="text-[9px] sm:text-[10px] text-rose-600 font-bold block mt-3 pt-2 border-t border-slate-100">⚠️ 이 금액보다 단 1원이라도 낮게 기재해 입찰할 경우 즉시 무효 처리됩니다.</span>
                             </div>
-                            <span class="text-[9px] text-rose-600 font-bold block mt-3 pt-2 border-t border-slate-100">⚠️ 주의점: 입찰 시 반드시 이 금액 이상으로 적어야 합니다. 단 1원이라도 낮게 적으면 보증금을 냈더라도 무효 처리됩니다.</span>
-                        </div>
-                        <!-- 감정평가액 -->
-                        <div class="bg-white border border-slate-200 rounded-2xl p-4 shadow-sm hover:border-royalBlue/30 transition-all flex flex-col justify-between">
-                            <div>
-                                <strong class="text-xs font-black text-royalBlue block mb-1">⚖️ 감정평가액 (Appraisal Value)</strong>
-                                <p class="text-[10px] text-slate-600 leading-relaxed">감정평가사가 해당 부동산의 시세, 위치, 상태 등을 종합 고려하여 평가한 경매 개시 시점의 가치입니다.</p>
+                            <!-- 감정평가액 -->
+                            <div class="bg-white border border-slate-200 rounded-2xl p-4 shadow-sm hover:border-royalBlue/30 transition-all flex flex-col justify-between text-center lg:text-left">
+                                <div>
+                                    <strong class="text-xs font-black text-royalBlue block mb-1">⚖️ 감정평가액 (Appraisal Value)</strong>
+                                    <p class="text-[10px] sm:text-[11px] text-slate-600 leading-relaxed font-medium">법원이나 집행기관의 의뢰를 받은 감정평가사가 해당 매물의 상태, 거래 사례 등을 분석해 책정한 가격입니다. 입찰 가격 산정의 표준 기준선 역할을 합니다.</p>
+                                </div>
+                                <span class="text-[9px] sm:text-[10px] text-amber-600 font-bold block mt-3 pt-2 border-t border-slate-100">⚠️ 감정 시점은 통상 입찰일 기준 6개월~1년 전이므로 현재 시세와 다를 수 있습니다.</span>
                             </div>
-                            <span class="text-[9px] text-amber-600 font-bold block mt-3 pt-2 border-t border-slate-100">⚠️ 주의점: 감정평가 시점은 대개 입찰일보다 6개월~1년 전이므로, 현재 시장 시세와 괴리가 클 수 있습니다. 현재 실거래가를 따로 대조하셔야 합니다.</span>
-                        </div>
-                        <!-- 매각기일 -->
-                        <div class="bg-white border border-slate-200 rounded-2xl p-4 shadow-sm hover:border-royalBlue/30 transition-all flex flex-col justify-between">
-                            <div>
-                                <strong class="text-xs font-black text-royalBlue block mb-1">📅 매각기일 (Auction Date)</strong>
-                                <p class="text-[10px] text-slate-600 leading-relaxed">실제로 입찰 법정에 출석하여 입찰표를 던지거나, 온비드를 통해 입찰서를 마감하는 당일 일정입니다.</p>
+                            <!-- 매각기일 -->
+                            <div class="bg-white border border-slate-200 rounded-2xl p-4 shadow-sm hover:border-royalBlue/30 transition-all flex flex-col justify-between text-center lg:text-left">
+                                <div>
+                                    <strong class="text-xs font-black text-royalBlue block mb-1">📅 매각기일 (Auction Date)</strong>
+                                    <p class="text-[10px] sm:text-[11px] text-slate-600 leading-relaxed font-medium">실제로 입찰서를 제출하고 개찰을 진행하는 기일입니다. 법원경매는 정해진 당일 오전에 직접 현장에 참석해 응찰해야 하며, 온비드는 공고된 입찰 기간 내 온라인 제출합니다.</p>
+                                </div>
+                                <span class="text-[9px] sm:text-[10px] text-slate-500 font-bold block mt-3 pt-2 border-t border-slate-100">📌 법원 현장 입찰 시 신분증, 도장, 입찰보증금 수표를 빠짐없이 지참해야 합니다.</span>
                             </div>
-                            <span class="text-[9px] text-slate-500 font-bold block mt-3 pt-2 border-t border-slate-100">📌 정보: 법원 경매의 경우 매각기일 당일 오전 10시부터 보통 11시 10분경까지 입찰을 마감합니다. 신분증, 입찰보증금, 도장을 준비해야 합니다.</span>
-                        </div>
-                        <!-- 매각물건명세서 -->
-                        <div class="bg-white border border-slate-200 rounded-2xl p-4 shadow-sm hover:border-royalBlue/30 transition-all flex flex-col justify-between">
-                            <div>
-                                <strong class="text-xs font-black text-royalBlue block mb-1">📜 매각물건명세서 (Bid Object Description)</strong>
-                                <p class="text-[10px] text-slate-600 leading-relaxed">법원이 경매 물건의 권리 관계, 점유자 현황, 하자를 조사하여 일반 대중에게 공식 공개하는 가장 중요한 서류입니다.</p>
+                            <!-- 매각물건명세서 -->
+                            <div class="bg-white border border-slate-200 rounded-2xl p-4 shadow-sm hover:border-royalBlue/30 transition-all flex flex-col justify-between text-center lg:text-left">
+                                <div>
+                                    <strong class="text-xs font-black text-royalBlue block mb-1">📜 매각물건명세서 (Bid Object Description)</strong>
+                                    <p class="text-[10px] sm:text-[11px] text-slate-600 leading-relaxed font-medium">사법보좌관이나 집행관이 조사한 권리 관계, 세입자 현황, 현장 조사 내용 및 물건의 중대 하자가 공식적으로 기재되는 서류로, 권리분석의 핵심 바이블입니다.</p>
+                                </div>
+                                <span class="text-[9px] sm:text-[10px] text-rose-600 font-bold block mt-3 pt-2 border-t border-slate-100">🚨 이 서류에 기재되지 않은 권리상 오류나 점유자 하자는 법원에서 면책되므로 매우 주의해야 합니다.</span>
                             </div>
-                            <span class="text-[9px] text-rose-600 font-bold block mt-3 pt-2 border-t border-slate-100">⚠️ 주의점: 여기에 기재되지 않은 권리 관계나 임차 관계 하자는 경매 법원이 책임을 지지 않으므로 꼼꼼히 열람해야 합니다.</span>
+                            <!-- 인도명령 제도 vs 명도 소송 -->
+                            <div class="bg-white border border-slate-200 rounded-2xl p-4 shadow-sm hover:border-royalBlue/30 transition-all flex flex-col justify-between text-center lg:text-left md:col-span-2">
+                                <div>
+                                    <strong class="text-xs font-black text-royalBlue block mb-1">🚪 인도명령 제도 vs 명도 소송 (Delivery Order vs Eviction Lawsuit)</strong>
+                                    <p class="text-[10px] sm:text-[11px] text-slate-600 leading-relaxed font-medium">낙찰 대금을 완납한 매수인이 불법 점유자나 세입자를 퇴거시키기 위해 법원에 요청하는 제도적 절차입니다. 법원경매는 **'인도명령'** 제도가 있어 대금 납부 후 6개월 내 신청하면 재판 없이 집행관을 통해 빠르게 강제집행(2~3개월 소요)을 진행할 수 있어 대단히 유리합니다. 반면, 온비드 공매는 인도명령 제도가 없어 점유자가 거부할 시 즉시 본소송인 **'명도소송'**(최소 6개월~1년 소요)을 거쳐 판결문을 획득해야 집행이 가능합니다.</p>
+                                </div>
+                                <span class="text-[9px] sm:text-[10px] text-emeraldSuccess font-bold block mt-3 pt-2 border-t border-slate-100">📌 공매에 응찰할 때는 점유자 명도 비용(이사비, 소송 기회비용 등)을 보수적으로 감안해 예산을 수립하십시오.</span>
+                            </div>
                         </div>
                     </div>
-                </div>
 
-                <!-- 2. 치명적인 위험 권리 -->
-                <div class="space-y-3">
-                    <h4 class="text-[11px] font-black text-slate-400 uppercase tracking-wider"><i class="fa-solid fa-triangle-exclamation"></i> 2️⃣ 낙찰자에게 돈을 물어내게 하는 치명적인 리스크</h4>
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <!-- 대항력과 선순위 임차인 -->
-                        <div class="bg-white border border-slate-200 rounded-2xl p-4 shadow-sm border-l-4 border-l-rose-500 flex flex-col justify-between">
-                            <div>
-                                <strong class="text-xs font-black text-rose-800 block mb-1">👤 대항력과 선순위 임차인 (Prior Tenant)</strong>
-                                <p class="text-[10px] text-slate-600 leading-relaxed">세입자가 주택의 최초 근저당권보다 먼저 전입신고를 마치고 점유하고 있다면 '대항력'을 가집니다. 낙찰자가 바뀌더라도 본인의 보증금을 전액 돌려받을 때까지 집을 비워주지 않고 거주할 법적 권리가 있습니다.</p>
+                    <!-- 2. 치명적인 법적 권리 리스크 -->
+                    <div class="space-y-3">
+                        <h4 class="text-[10px] sm:text-xs font-black text-slate-400 uppercase tracking-wider text-center lg:text-left"><i class="fa-solid fa-triangle-exclamation"></i> 2️⃣ 낙찰자에게 치명적인 법적 권리 리스크</h4>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <!-- 대항력과 선순위 임차인 -->
+                            <div class="bg-white border border-slate-200 rounded-2xl p-4 shadow-sm border-l-4 border-l-rose-500 flex flex-col justify-between text-center lg:text-left">
+                                <div>
+                                    <strong class="text-xs font-black text-rose-800 block mb-1">👤 선순위 대항력 임차인 (Prior Tenant)</strong>
+                                    <p class="text-[10px] sm:text-[11px] text-slate-600 leading-relaxed font-medium">말소기준권리(최초 근저당 등)보다 먼저 대항요건(주택의 인도 및 전입신고)을 갖춘 임차인입니다. 낙찰자가 보증금 전액을 반환해 줄 때까지 거주를 계속하며 명도를 거부할 법적 권리를 행사할 수 있습니다.</p>
+                                </div>
+                                <span class="text-[9px] sm:text-[10px] text-rose-700 font-bold block mt-3 pt-2 border-t border-slate-100">🚨 법원에서 전액 배당받지 못한 보증금의 잔액은 낙찰자가 무조건 인수하여 전액 물어주어야 합니다.</span>
                             </div>
-                            <span class="text-[9px] text-rose-700 font-bold block mt-3 pt-2 border-t border-slate-100">🚨 추후 문제: 법원에서 다 배당받지 못한 보증금 잔액은 낙찰자가 무조건 인수하여 대신 물어주어야만 방을 비워줍니다. (독박 채무 리스크)</span>
+                            <!-- 유치권 -->
+                            <div class="bg-white border border-slate-200 rounded-2xl p-4 shadow-sm border-l-4 border-l-rose-500 flex flex-col justify-between text-center lg:text-left">
+                                <div>
+                                    <strong class="text-xs font-black text-rose-800 block mb-1">🛠️ 유치권 (Lien)</strong>
+                                    <p class="text-[10px] sm:text-[11px] text-slate-600 leading-relaxed font-medium">공사대금, 리모델링 수수료 등을 지급받지 못한 채권자가 돈을 돌려받을 때까지 해당 부동산을 점유하고 비워주지 않을 수 있는 법적 권리입니다. 성립 여부가 모호해 법적 다툼이 가장 흔히 발생합니다.</p>
+                                </div>
+                                <span class="text-[9px] sm:text-[10px] text-rose-700 font-bold block mt-3 pt-2 border-t border-slate-100">🚨 허위 유치권이라 하더라도 인도명령이 기각될 수 있어 명도 협상이 장기화되고 자금이 묶일 수 있습니다.</span>
+                            </div>
+                            <!-- 대지사용권 없음 / 대지권 미등기 -->
+                            <div class="bg-white border border-slate-200 rounded-2xl p-4 shadow-sm border-l-4 border-l-rose-500 flex flex-col justify-between text-center lg:text-left">
+                                <div>
+                                    <strong class="text-xs font-black text-rose-800 block mb-1">🧱 대지권 미등기 및 대지사용권 없음</strong>
+                                    <p class="text-[10px] sm:text-[11px] text-slate-600 leading-relaxed font-medium">아파트/오피스텔 등 집합건물에서 토지 지분(대지권)이 제외된 채 건물 부분만 매각 대상으로 나온 특수 물건입니다. 분양 대금 미납 등 다양한 사유로 발생합니다.</p>
+                                </div>
+                                <span class="text-[9px] sm:text-[10px] text-rose-700 font-bold block mt-3 pt-2 border-t border-slate-100">🚨 대지 소유주로부터 토지 사용료(지료) 소송을 당하거나 건물 철거 소송에 휘말릴 위험이 높은 초고위험 하자입니다.</span>
+                            </div>
+                            <!-- 선순위 가등기 / 가처분 -->
+                            <div class="bg-white border border-slate-200 rounded-2xl p-4 shadow-sm border-l-4 border-l-rose-500 flex flex-col justify-between text-center lg:text-left">
+                                <div>
+                                    <strong class="text-xs font-black text-rose-800 block mb-1">🔒 선순위 가등기 및 가처분 (Prior Claims)</strong>
+                                    <p class="text-[10px] sm:text-[11px] text-slate-600 leading-relaxed font-medium">소유권 이전 청구 가등기나 처분금지 가처분이 등기부등본상 최초 저당권보다 선순위로 설정되어 있는 하자입니다. 경매 낙찰 후 매각되더라도 말소되지 않고 낙찰자에게 그대로 승계됩니다.</p>
+                                </div>
+                                <span class="text-[9px] sm:text-[10px] text-rose-700 font-bold block mt-3 pt-2 border-t border-slate-100">🚨 가등기권자가 본등기를 마치면 낙찰자는 소유권을 박탈당하므로 선순위 가등기/가처분 물건은 입찰 금지가 원칙입니다.</span>
+                            </div>
+                            <!-- 농지취득자격증명 -->
+                            <div class="bg-white border border-slate-200 rounded-2xl p-4 shadow-sm border-l-4 border-l-amber-500 flex flex-col justify-between text-center lg:text-left md:col-span-2">
+                                <div>
+                                    <strong class="text-xs font-black text-amber-800 block mb-1">🌱 농지취득자격증명 (농취증, Farmland Certificate)</strong>
+                                    <p class="text-[10px] sm:text-[11px] text-slate-600 leading-relaxed font-medium">경공매 대상 토지가 전(밭), 답(논), 과수원 등 '농지'인 경우, 매수인이 취득할 자격이 있는지 면사무소나 관공서에서 자격을 심사하여 발급해 주는 공적 행명 증명서입니다. 법원경매에서는 낙찰 후 매각결정기일(1주일 이내)까지 농취증 실물을 제출해야만 법적 매각 허가가 납니다.</p>
+                                </div>
+                                <span class="text-[9px] sm:text-[10px] text-amber-700 font-bold block mt-3 pt-2 border-t border-slate-100">🚨 기한 내에 농취증을 제출하지 못할 경우 매각이 불허가 처리될 뿐만 아니라, 법원에 납부했던 입찰보증금(최저가의 10%) 전액이 몰수되는 치명적인 불이익을 당하므로 입찰 전 발급 여부를 반드시 확인해야 합니다.</span>
+                            </div>
                         </div>
-                        <!-- 유치권 -->
-                        <div class="bg-white border border-slate-200 rounded-2xl p-4 shadow-sm border-l-4 border-l-rose-500 flex flex-col justify-between">
-                            <div>
-                                <strong class="text-xs font-black text-rose-800 block mb-1">🛠️ 유치권 (Lien)</strong>
-                                <p class="text-[10px] text-slate-600 leading-relaxed">건물 공사비나 수리비를 받지 못한 건축 업자 등이 돈을 받을 때까지 해당 건물이나 부동산을 점유하고 넘겨주지 않을 수 있는 법적 권리입니다.</p>
+                    </div>
+                
+                    <!-- 3. 낙찰자에게 돈을 물어내게 하는 치명적인 리스크 -->
+                    <div class="space-y-4 border border-rose-200 bg-rose-50/10 p-5 sm:p-6 rounded-2xl shadow-sm">
+                        <h4 class="text-sm sm:text-base font-extrabold text-rose-800 mb-2 flex items-center gap-1.5"><i class="fa-solid fa-triangle-exclamation"></i> 3️⃣ 낙찰자에게 돈을 물어내게 하는 치명적인 리스크</h4>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <!-- 대항력과 선순위 임차인 -->
+                            <div class="bg-white border border-slate-200 rounded-2xl p-4 shadow-sm border-l-4 border-l-rose-500 flex flex-col justify-between">
+                                <div>
+                                    <strong class="text-xs sm:text-sm font-extrabold text-rose-800 block mb-1">👤 대항력과 선순위 임차인 (Prior Tenant)</strong>
+                                    <p class="text-[11px] sm:text-xs text-slate-600 leading-relaxed font-medium">세입자가 주택의 최초 근저당권보다 먼저 전입신고를 마치고 점유하고 있다면 '대항력'을 가집니다. 낙찰자가 바뀌더라도 본인의 보증금을 전액 돌려받을 때까지 집을 비워주지 않고 거주할 법적 권리가 있습니다.</p>
+                                </div>
+                                <span class="text-[10px] sm:text-[11px] text-rose-700 font-bold block mt-3 pt-2 border-t border-slate-100">🚨 추후 문제: 법원에서 다 배당받지 못한 보증금 잔액은 낙찰자가 무조건 인수하여 대신 물어주어야만 방을 비워줍니다. (독박 채무 리스크)</span>
                             </div>
-                            <span class="text-[9px] text-rose-700 font-bold block mt-3 pt-2 border-t border-slate-100">🚨 추후 문제: 유치권이 접수된 물건을 낙찰받으면 일반 인도명령이 기각될 수 있으며, 기나긴 명도 소송 및 대위 변제 리스크가 극대화됩니다.</span>
+                            <!-- 유치권 -->
+                            <div class="bg-white border border-slate-200 rounded-2xl p-4 shadow-sm border-l-4 border-l-rose-500 flex flex-col justify-between">
+                                <div>
+                                    <strong class="text-xs sm:text-sm font-extrabold text-rose-800 block mb-1">🛠️ 유치권 (Lien)</strong>
+                                    <p class="text-[11px] sm:text-xs text-slate-600 leading-relaxed font-medium">건물 공사비나 수리비를 받지 못한 건축 업자 등이 돈을 받을 때까지 해당 건물이나 부동산을 점유하고 넘겨주지 않을 수 있는 법적 권리입니다.</p>
+                                </div>
+                                <span class="text-[10px] sm:text-[11px] text-rose-700 font-bold block mt-3 pt-2 border-t border-slate-100">🚨 추후 문제: 유치권이 접수된 물건을 낙찰받으면 일반 인도명령이 기각될 수 있으며, 기나긴 명도 소송 및 대위 변제 리스크가 극대화됩니다.</span>
+                            </div>
+                            <!-- 대지사용권 없음 -->
+                            <div class="bg-white border border-slate-200 rounded-2xl p-4 shadow-sm border-l-4 border-l-rose-500 flex flex-col justify-between md:col-span-2">
+                                <div>
+                                    <strong class="text-xs sm:text-sm font-extrabold text-rose-800 block mb-1">🧱 대지사용권 없음 / 대지권 미등기 (No Land Rights)</strong>
+                                    <p class="text-[11px] sm:text-xs text-slate-600 leading-relaxed font-medium">아파트나 빌라 등 집합건물에서 건물 부분만 경매로 나오고, 그 건물이 서 있는 토지(대지)에 대한 지분(대지사용권)은 경매에서 제외되거나 등기되지 않은 상태를 뜻합니다.</p>
+                                </div>
+                                <span class="text-[10px] sm:text-[11px] text-rose-700 font-bold block mt-3 pt-2 border-t border-slate-100">🚨 추후 문제: 낙찰자가 대지권을 가지지 못하므로 대지 소유주로부터 토지 사용료(지료) 청구 소송을 당하거나 건물 철거 소송에 휘말릴 수 있으며, 종국에는 건물을 헐값에 매각당할 수 있는 치명적 하자입니다.</span>
+                            </div>
                         </div>
-                        <!-- 대지사용권 없음 -->
-                        <div class="bg-white border border-slate-200 rounded-2xl p-4 shadow-sm border-l-4 border-l-rose-500 flex flex-col justify-between">
-                            <div>
-                                <strong class="text-xs font-black text-rose-800 block mb-1">🧱 대지사용권 없음 / 대지권 미등기 (No Land Rights)</strong>
-                                <p class="text-[10px] text-slate-600 leading-relaxed">아파트나 빌라 등 집합건물에서 건물 부분만 경매로 나오고, 그 건물이 서 있는 토지(대지)에 대한 지분(대지사용권)은 경매에서 제외되거나 등기되지 않은 상태를 뜻합니다.</p>
-                            </div>
-                            <span class="text-[9px] text-rose-700 font-bold block mt-3 pt-2 border-t border-slate-100">🚨 추후 문제: 낙찰자가 대지권을 가지지 못하므로 대지 소유주로부터 토지 사용료(지료) 청구 소송을 당하거나 건물 철거 소송에 휘말릴 수 있으며, 종국에는 건물을 헐값에 매각당할 수 있는 치명적 하자입니다.</span>
+                    </div>
+
+                </div>
+            </div>
+            
+            <!-- 🏠 [TAB 3: 사용자 가이드 컨테이너] (기본 숨김) --><!-- 🏠 [TAB 3: 사용자 가이드 컨테이너] (기본 숨김) -->
+            <div id="guide-view" class="hidden flex-1 overflow-y-auto p-5 sm:p-8 custom-scrollbar bg-slate-50 document-view">
+                <div class="max-w-3xl mx-auto w-full space-y-6 py-2">
+                    <div id="guide-content-area"></div>
+                    
+                    <!-- 📁 사용자 가이드 하단 사설 경매 엑셀/CSV 수동 업로드 및 Mix(병합) 패널 -->
+                    <div class="bg-white border border-slate-200 rounded-2xl p-4 sm:p-5 space-y-3 shadow-sm my-6 text-center lg:text-left">
+                        <strong class="text-xs sm:text-sm font-extrabold text-royalBlue uppercase tracking-wider block flex items-center justify-center lg:justify-start gap-1.5">
+                            <i class="fa-solid fa-file-excel"></i> 📁 사설 경매 파일 수동 업로드 (Mix)
+                        </strong>
+                        <p class="text-[10px] sm:text-xs text-slate-500 leading-relaxed font-medium">유료 경매 정보 사이트(마이옥션, 태인 등)에서 다운로드받은 CSV 또는 JSON 형식의 매물 리스트 파일을 업로드합니다.<br/>주소 또는 사건번호를 기준으로 실시간 수집된 공식 데이터와 교차 비교하여 중복을 자동 제거하고, 비고 정보는 하나로 병합(Mix) 처리합니다.</p>
+                        
+                        <div class="pt-2">
+                            <input type="file" id="file-uploader" accept=".csv, .json" class="hidden" onchange="handleFileUpload(this)">
+                            <button onclick="document.getElementById('file-uploader').click()" 
+                                    class="w-full sm:w-auto bg-royalBlue text-white hover:bg-royalHover py-2 px-4 rounded-xl text-[10.5px] sm:text-xs font-black shadow-md flex items-center justify-center gap-2 transition-colors mx-auto lg:mx-0">
+                                <i class="fa-solid fa-cloud-arrow-up"></i> 내 PC 파일 선택 및 업로드
+                            </button>
+                            <div id="upload-status" class="text-[10px] sm:text-xs font-black text-center mt-3 text-slate-500 hidden"></div>
                         </div>
                     </div>
                 </div>
             </div>
-
-    <!-- 🧮 [SLIDE-OVER DRAWER BACKDROP] 우측 상세 분석 서랍 배경 암전 레이어 -->
+        </div>
+        <!-- 🧮 [SLIDE-OVER DRAWER BACKDROP] 우측 상세 분석 서랍 배경 암전 레이어 -->
     <div id="drawer-backdrop" class="fixed inset-0 bg-slate-900/40 z-40 hidden transition-opacity duration-300" onclick="closeDetailDrawer()"></div>
 
     <!-- 🧮 [SLIDE-OVER DRAWER] 우측 상세 분석 슬라이드 서랍 (시안 2: 모던 포털 카드형) -->
     <aside id="detail-drawer" class="fixed inset-y-0 right-0 z-50 w-full sm:max-w-[700px] bg-white shadow-2xl border-l border-slate-200 flex flex-col h-full transform translate-x-full transition-transform duration-300 ease-out">
-        <!-- 상세 헤더 -->
-        <div class="p-5 border-b border-slate-200 bg-slate-50 flex justify-between items-start gap-4">
-            <div class="space-y-1.5 flex-1">
-                <span id="detail-badge" class="inline-block text-xs font-black px-2.5 py-1 rounded-md"></span>
-                <h3 id="detail-address" class="text-sm sm:text-xl font-extrabold text-slate-900 leading-tight"></h3>
-                <p id="detail-no" class="text-xs sm:text-sm font-bold text-slate-500 mt-1.5"></p>
+        <!-- 상세 헤더 (반응형 모바일 스코어 배치 및 빈칸 여백 줄임) -->
+        <div class="relative p-4 sm:p-5 border-b border-slate-200 bg-slate-50 flex flex-col sm:flex-row justify-between sm:items-start gap-3 sm:gap-4 pr-24 sm:pr-5">
+            <div class="space-y-1 sm:space-y-1.5 flex-1">
+                <span id="detail-badge" class="inline-block text-[10px] sm:text-xs font-black px-2 py-0.5 sm:px-2.5 sm:py-1 rounded-md"></span>
+                <h3 id="detail-address" class="text-xs sm:text-lg font-extrabold text-slate-900 leading-snug sm:leading-tight"></h3>
+                <p id="detail-no" class="text-[10px] sm:text-xs font-bold text-slate-500 mt-1"></p>
             </div>
-            <div class="flex items-center gap-3">
-                <div id="detail-score-circle" class="flex-shrink-0 w-14 h-14 rounded-full border-4 flex flex-col items-center justify-center font-outfit shadow-sm bg-white">
-                    <span id="detail-score-val" class="text-sm sm:text-base font-black leading-none"></span>
-                    <span class="text-[8px] text-slate-400 font-bold">SCORE</span>
+            
+            <!-- 우측 스코어 영역 -->
+            <div class="flex items-center gap-2 sm:gap-3 absolute top-4 right-14 sm:static flex-shrink-0">
+                <div id="detail-score-circle" class="w-9 h-9 sm:w-14 sm:h-14 rounded-full border-2 sm:border-4 flex flex-col items-center justify-center font-outfit shadow-sm bg-white">
+                    <span id="detail-score-val" class="text-xs sm:text-base font-black leading-none"></span>
+                    <span class="text-[5px] sm:text-[8px] text-slate-400 font-bold leading-none mt-0.5 sm:mt-1">SCORE</span>
                 </div>
-                <button onclick="closeDetailDrawer()" class="w-10 h-10 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-500 hover:text-slate-700 flex items-center justify-center transition-all select-none" title="닫기 (Esc)">
-                    <i class="fa-solid fa-xmark text-lg"></i>
-                </button>
             </div>
+            
+            <!-- 닫기 버튼: 모바일 absolute 고정 -->
+            <button onclick="closeDetailDrawer()" class="absolute top-4 right-4 sm:static w-8 h-8 sm:w-10 sm:h-10 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-500 hover:text-slate-700 flex items-center justify-center transition-all select-none" title="닫기 (Esc)">
+                <i class="fa-solid fa-xmark text-base sm:text-lg"></i>
+            </button>
         </div>
 
         <!-- 상세 내용 스크롤 영역 -->
-        <div class="flex-1 overflow-y-auto p-6 space-y-6 custom-scrollbar">
+        <div class="flex-1 overflow-y-auto p-4 sm:p-5 space-y-4 sm:space-y-5 custom-scrollbar bg-slate-50/50">
             
-            <!-- 🏠 [신규] 부동산 정밀 가치 평가 & 명도 분석 분석 판넬 -->
-            <div class="bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 rounded-2xl p-5 space-y-4 shadow-sm">
-                <h4 class="text-xs sm:text-sm font-black text-royalBlue flex items-center gap-2">
-                    <i class="fa-solid fa-hotel"></i> 🏠 AI 부동산 정밀 가치 평가 & 예상 명도 리포트
+            <!-- 🏠 1. 물건 세부 스펙 분석 -->
+            <div class="bg-white border border-slate-200 rounded-2xl p-3.5 sm:p-4 space-y-2 shadow-sm">
+                <h4 class="text-xs sm:text-sm font-black text-slate-800 flex items-center gap-1.5">
+                    <i class="fa-solid fa-list-check text-royalBlue"></i> 🏠 물건 세부 스펙 분석
                 </h4>
-                <div class="grid grid-cols-2 gap-4 text-xs font-bold text-slate-700">
-                    <div class="bg-white/80 p-3 rounded-xl border border-blue-100 flex flex-col justify-between">
-                        <span class="text-slate-400 text-[10px] sm:text-xs">🎯 예상 낙찰 확률 비율</span>
-                        <span id="detail-ai-bid-rate" class="text-sm sm:text-base font-black text-royalBlue mt-1 font-outfit">84% ~ 89% (감정가 대비)</span>
+                <div class="grid grid-cols-2 gap-2 text-[11px] sm:text-xs text-slate-750">
+                    <div class="bg-slate-50 border border-slate-100 p-2 rounded-xl flex justify-between items-center">
+                        <span class="text-slate-450 font-semibold text-[10px] sm:text-xs">용도 분류</span>
+                        <span id="detail-spec-ptype" class="font-extrabold text-slate-800"></span>
                     </div>
-                    <div class="bg-white/80 p-3 rounded-xl border border-blue-100 flex flex-col justify-between">
-                        <span class="text-slate-400 text-[10px] sm:text-xs">🚪 예상 명도 소요 기간</span>
-                        <span id="detail-ai-evict-period" class="text-sm sm:text-base font-black text-amber-600 mt-1">낙찰 후 약 3개월 내 협상 가능</span>
+                    <div class="bg-slate-50 border border-slate-100 p-2 rounded-xl flex justify-between items-center">
+                        <span class="text-slate-450 font-semibold text-[10px] sm:text-xs">진행 회차</span>
+                        <span id="detail-spec-round" class="font-extrabold text-slate-800"></span>
                     </div>
-                    <div class="bg-white/80 p-3 rounded-xl border border-blue-100 flex flex-col justify-between col-span-2">
-                        <span class="text-slate-400 text-[10px] sm:text-xs block mb-1">🔍 주변 아파트 실거래 시세 대조 분석</span>
-                        <span id="detail-ai-market-compare" class="text-xs sm:text-sm font-black text-emeraldSuccess">주변 동급 면적 실거래 평균가 대비 약 12% 저렴하게 공급 중!</span>
+                    <div class="bg-slate-50 border border-slate-100 p-2 rounded-xl flex justify-between items-center">
+                        <span class="text-slate-450 font-semibold text-[10px] sm:text-xs">감정 평가액</span>
+                        <span id="detail-spec-appraisal" class="font-extrabold text-slate-800 font-outfit"></span>
+                    </div>
+                    <div class="bg-slate-50 border border-slate-100 p-2 rounded-xl flex justify-between items-center">
+                        <span class="text-slate-450 font-semibold text-[10px] sm:text-xs">최저 입찰가</span>
+                        <span id="detail-spec-minimum" class="font-extrabold text-rose-600 font-outfit"></span>
+                    </div>
+                    <div class="bg-slate-50 border border-slate-100 p-2 rounded-xl flex justify-between items-center col-span-2">
+                        <span class="text-slate-450 font-semibold text-[10px] sm:text-xs">매각/입찰 기일</span>
+                        <span id="detail-spec-date" class="font-extrabold text-slate-800"></span>
                     </div>
                 </div>
             </div>
 
-            <!-- [신규 기능 4] AI 7대 권리 하자 및 리스크 정밀 진단 보고서 (초보자 대응 지침 포함) -->
+            <!-- 📊 2. 인근 낙찰 통계 및 시장 지표 -->
+            <div class="bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 rounded-2xl p-3.5 sm:p-4 space-y-2.5 shadow-sm">
+                <h4 class="text-xs sm:text-sm font-black text-royalBlue flex items-center gap-1.5">
+                    <i class="fa-solid fa-chart-simple"></i> 📊 인근 낙찰 통계 및 시장 지표
+                </h4>
+                <div class="grid grid-cols-2 gap-2.5 text-[11px] sm:text-xs font-bold text-slate-700">
+                    <div class="bg-white/80 p-2.5 rounded-xl border border-blue-100 flex flex-col justify-between">
+                        <span class="text-slate-455 text-[10px] sm:text-xs">🎯 예상 낙찰 확률 비율</span>
+                        <span id="detail-ai-bid-rate" class="text-xs sm:text-sm font-black text-royalBlue mt-0.5 font-outfit"></span>
+                    </div>
+                    <div class="bg-white/80 p-2.5 rounded-xl border border-blue-100 flex flex-col justify-between">
+                        <span class="text-slate-455 text-[10px] sm:text-xs">🚪 예상 명도 소요 기간</span>
+                        <span id="detail-ai-evict-period" class="text-xs sm:text-sm font-black text-amber-600 mt-0.5"></span>
+                    </div>
+                    <div class="bg-white/80 p-2.5 rounded-xl border border-blue-100 flex flex-col justify-between col-span-2">
+                        <span class="text-slate-455 text-[10px] sm:text-xs block mb-0.5">🔍 주변 동종 실거래 시세 대조 분석</span>
+                        <span id="detail-ai-market-compare" class="text-[11px] sm:text-xs font-black text-emeraldSuccess leading-relaxed"></span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 🛡️ 3. AI 7대 권리 리스크 정밀 하이브리드 리포트 -->
             <div>
-                <h4 class="text-xs sm:text-sm font-black text-slate-500 uppercase tracking-wider mb-3 flex items-center gap-1.5">
+                <h4 class="text-xs sm:text-sm font-black text-slate-500 uppercase tracking-wider mb-2.5 flex items-center gap-1.5">
                     <i class="fa-solid fa-shield-halved text-royalBlue"></i> AI 7대 권리 리스크 정밀 하이브리드 리포트
                 </h4>
-                <!-- 동적으로 주입될 7대 법적 하자리포트 판넬 -->
-                <div id="detail-risk-report" class="space-y-4">
+                <div id="detail-risk-report" class="space-y-3">
                     <!-- 지능형 리스크 카드가 주입됨 -->
                 </div>
             </div>
 
-            <!-- 공고 원문 및 비고 요약 -->
+            <!-- 📝 4. 공고문 원문 및 집행관 비고 요약 -->
             <div>
-                <h4 class="text-xs sm:text-sm font-black text-slate-500 uppercase tracking-wider mb-3 flex items-center gap-1.5">
+                <h4 class="text-xs sm:text-sm font-black text-slate-500 uppercase tracking-wider mb-2.5 flex items-center gap-1.5">
                     <i class="fa-solid fa-align-left text-slate-500"></i> 공고문 원문 및 집행관 비고 요약
                 </h4>
-                <div id="detail-desc" class="text-xs sm:text-sm text-slate-600 leading-relaxed bg-slate-50 border border-slate-200 rounded-xl p-4 shadow-sm max-h-[180px] overflow-y-auto custom-scrollbar"></div>
+                <div id="detail-desc" class="text-xs sm:text-sm text-slate-650 leading-relaxed bg-white border border-slate-200 rounded-xl p-3.5 shadow-sm max-h-[140px] overflow-y-auto custom-scrollbar"></div>
             </div>
 
-            <!-- 🌐 [신규] 정부 공용 웹 포털 정보 연동 및 등기소 등 아웃링크 추가 -->
-            <div class="bg-slate-50 border border-slate-200 rounded-2xl p-5 space-y-3.5">
-                <h4 class="text-xs sm:text-sm font-black text-slate-800 flex items-center gap-1.5">
-                    <i class="fa-solid fa-globe text-emeraldSuccess"></i> 🌐 정부 실무 공용 정보망 연동 및 서류 조회
-                </h4>
-                <p class="text-[11px] text-slate-500 leading-relaxed">경공매 입찰 전, 법적 하자 및 실소유주 정보를 검증하기 위해 정부/공공 포털에서 추가 서류를 대조해 보십시오.</p>
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
-                    <!-- 대법원 등기소 -->
-                    <a href="https://www.iros.go.kr" target="_blank" class="bg-white border border-slate-200 hover:border-royalBlue hover:text-royalBlue rounded-xl p-3 flex items-center gap-2.5 transition-all shadow-sm">
-                        <i class="fa-solid fa-file-signature text-royalBlue text-sm"></i>
-                        <div>
-                            <strong class="block text-[11px] sm:text-xs">대법원 인터넷등기소</strong>
-                            <span class="text-[9.5px] text-slate-400 block mt-0.5">등기부등본 실시간 열람/발급</span>
-                        </div>
-                    </a>
-                    <!-- 정부 24 전입세대 -->
-                    <a href="https://www.gov.kr" target="_blank" class="bg-white border border-slate-200 hover:border-emeraldSuccess hover:text-emeraldSuccess rounded-xl p-3 flex items-center gap-2.5 transition-all shadow-sm">
-                        <i class="fa-solid fa-users text-emeraldSuccess text-sm"></i>
-                        <div>
-                            <strong class="block text-[11px] sm:text-xs">정부24 전입세대확인서</strong>
-                            <span class="text-[9.5px] text-slate-400 block mt-0.5">실제 대항력 세입자 거주 확인</span>
-                        </div>
-                    </a>
-                    <!-- 네이버 부동산 시세 -->
-                    <a id="btn-naver-land-price" href="https://land.naver.com" target="_blank" class="bg-white border border-slate-200 hover:border-amber-500 hover:text-amber-500 rounded-xl p-3 flex items-center gap-2.5 transition-all shadow-sm col-span-1 sm:col-span-2">
-                        <i class="fa-solid fa-house-chimney text-amber-500 text-sm"></i>
-                        <div>
-                            <strong class="block text-[11px] sm:text-xs">네이버 부동산 시세/실거래 조회</strong>
-                            <span class="text-[9.5px] text-slate-400 block mt-0.5">인근 동종 평형대 최근 3개월 실거래 가격대 정밀 대조</span>
-                        </div>
-                    </a>
-                </div>
-            </div>
-
-            <!-- 🧮 세법 스마트 낙찰 계획서 계산기 -->
-            <div class="bg-white border border-slate-200 rounded-xl p-4 shadow-sm">
-                <div class="flex items-center justify-between mb-3 pb-2 border-b border-slate-100">
+            <!-- 🧮 5. 세법 스마트 낙찰 계획서 계산기 (시인성 제고 및 컴팩트화) -->
+            <div class="bg-white border border-slate-200 rounded-2xl p-3.5 sm:p-4 shadow-sm space-y-3">
+                <div class="flex items-center justify-between pb-2 border-b border-slate-100">
                     <h4 class="text-xs sm:text-sm font-black text-slate-800 flex items-center gap-1.5">
                         <i class="fa-solid fa-calculator text-royalBlue"></i> 스마트 정밀 소요자금 계획서
                     </h4>
-                    <span id="tax-rate-badge" class="text-xs font-black px-2.5 py-0.5 rounded-full border"></span>
+                    <span id="tax-rate-badge" class="text-[9px] font-black px-2 py-0.5 rounded-full border"></span>
                 </div>
 
                 <div class="space-y-3">
-                    <!-- 🧮 디스플레이 스크린 탑재 및 인터랙티브 계산기 키패드 -->
+                    <!-- 디스플레이 스크린 탑재 및 인터랙티브 계산기 키패드 -->
                     <div>
-                        <label class="block text-[10px] font-black text-slate-400 uppercase tracking-wider mb-1">내 예상 입찰 응찰가 입력 및 🧮 디지털 계산기 패드</label>
+                        <label class="block text-[9.5px] font-black text-slate-400 uppercase tracking-wider mb-1">내 예상 입찰 응찰가 입력 및 🧮 디지털 계산기 패드</label>
                         
                         <!-- 실시간 원화 금액 포맷 디지털 모니터 -->
                         <div class="bg-gradient-to-br from-slate-900 via-slate-950 to-slate-900 border border-slate-800 rounded-xl p-2.5 text-right text-emerald-400 font-mono font-black shadow-[inset_0_2px_4px_rgba(0,0,0,0.8),0_1px_1px_rgba(255,255,255,0.05)] flex items-center justify-between h-9 select-none mb-1.5">
-                            <div class="flex items-center text-[8px] sm:text-[10px] text-slate-500 font-bold uppercase tracking-widest gap-1 select-none">
+                            <div class="flex items-center text-[8px] sm:text-[9.5px] text-slate-500 font-bold uppercase tracking-widest gap-1 select-none">
                                 <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
                                 <span>Display</span>
                             </div>
@@ -600,73 +781,221 @@
                                class="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-1.5 text-xs sm:text-sm font-black focus:outline-none focus:border-royalBlue focus:bg-white transition-all text-royalBlue font-outfit mb-1.5">
 
                         <!-- 인터랙티브 계산기 그리드 버튼 키패드 -->
-                        <div class="grid grid-cols-4 gap-1.5 pt-1">
+                        <div class="grid grid-cols-4 gap-1 pt-1">
                             <!-- Row 1 -->
-                            <button type="button" onclick="pressCalcKey('+1억')" class="bg-royalBlue/10 hover:bg-royalBlue/20 text-royalBlue text-xs font-black py-1.5 rounded-md transition-all select-none font-sans">+1억</button>
-                            <button type="button" onclick="pressCalcKey('+1천')" class="bg-royalBlue/10 hover:bg-royalBlue/20 text-royalBlue text-xs font-black py-1.5 rounded-md transition-all select-none font-sans">+1천만</button>
-                            <button type="button" onclick="pressCalcKey('+1백')" class="bg-royalBlue/10 hover:bg-royalBlue/20 text-royalBlue text-xs font-black py-1.5 rounded-md transition-all select-none font-sans">+1백만</button>
-                            <button type="button" onclick="pressCalcKey('C')" class="bg-rose-500 hover:bg-rose-600 text-white text-xs font-black py-1.5 rounded-md transition-all select-none font-bold">C</button>
+                            <button type="button" onclick="pressCalcKey('+1억')" class="bg-royalBlue/5 hover:bg-royalBlue/15 text-royalBlue text-[11px] font-black py-1.5 rounded-md transition-all select-none font-sans">+1억</button>
+                            <button type="button" onclick="pressCalcKey('+1천')" class="bg-royalBlue/5 hover:bg-royalBlue/15 text-royalBlue text-[11px] font-black py-1.5 rounded-md transition-all select-none font-sans">+1천만</button>
+                            <button type="button" onclick="pressCalcKey('+1백')" class="bg-royalBlue/5 hover:bg-royalBlue/15 text-royalBlue text-[11px] font-black py-1.5 rounded-md transition-all select-none font-sans">+1백만</button>
+                            <button type="button" onclick="pressCalcKey('C')" class="bg-rose-500 hover:bg-rose-600 text-white text-[11px] font-black py-1.5 rounded-md transition-all select-none font-bold">C</button>
                             
                             <!-- Row 2 -->
-                            <button type="button" onclick="pressCalcKey('7')" class="bg-slate-100 hover:bg-slate-200 text-slate-800 text-xs font-extrabold py-1.5 rounded-md transition-all select-none font-outfit">7</button>
-                            <button type="button" onclick="pressCalcKey('8')" class="bg-slate-100 hover:bg-slate-200 text-slate-800 text-xs font-extrabold py-1.5 rounded-md transition-all select-none font-outfit">8</button>
-                            <button type="button" onclick="pressCalcKey('9')" class="bg-slate-100 hover:bg-slate-200 text-slate-800 text-xs font-extrabold py-1.5 rounded-md transition-all select-none font-outfit">9</button>
-                            <button type="button" onclick="pressCalcKey('backspace')" class="bg-amber-100 hover:bg-amber-200 text-amber-800 text-xs font-black py-1.5 rounded-md transition-all select-none">⌫</button>
+                            <button type="button" onclick="pressCalcKey('7')" class="bg-slate-100 hover:bg-slate-200 text-slate-800 text-[11px] font-extrabold py-1.5 rounded-md transition-all select-none font-outfit">7</button>
+                            <button type="button" onclick="pressCalcKey('8')" class="bg-slate-100 hover:bg-slate-200 text-slate-800 text-[11px] font-extrabold py-1.5 rounded-md transition-all select-none font-outfit">8</button>
+                            <button type="button" onclick="pressCalcKey('9')" class="bg-slate-100 hover:bg-slate-200 text-slate-800 text-[11px] font-extrabold py-1.5 rounded-md transition-all select-none font-outfit">9</button>
+                            <button type="button" onclick="pressCalcKey('backspace')" class="bg-amber-100 hover:bg-amber-200 text-amber-800 text-[11px] font-black py-1.5 rounded-md transition-all select-none">⌫</button>
                             
                             <!-- Row 3 -->
-                            <button type="button" onclick="pressCalcKey('4')" class="bg-slate-100 hover:bg-slate-200 text-slate-800 text-xs font-extrabold py-1.5 rounded-md transition-all select-none font-outfit">4</button>
-                            <button type="button" onclick="pressCalcKey('5')" class="bg-slate-100 hover:bg-slate-200 text-slate-800 text-xs font-extrabold py-1.5 rounded-md transition-all select-none font-outfit">5</button>
-                            <button type="button" onclick="pressCalcKey('6')" class="bg-slate-100 hover:bg-slate-200 text-slate-800 text-xs font-extrabold py-1.5 rounded-md transition-all select-none font-outfit">6</button>
-                            <button type="button" id="preset-minimum-btn" class="bg-indigo-50 hover:bg-indigo-100 text-indigo-700 text-xs font-black py-1.5 rounded-md transition-all select-none font-bold">최저가</button>
+                            <button type="button" onclick="pressCalcKey('4')" class="bg-slate-100 hover:bg-slate-200 text-slate-800 text-[11px] font-extrabold py-1.5 rounded-md transition-all select-none font-outfit">4</button>
+                            <button type="button" onclick="pressCalcKey('5')" class="bg-slate-100 hover:bg-slate-200 text-slate-800 text-[11px] font-extrabold py-1.5 rounded-md transition-all select-none font-outfit">5</button>
+                            <button type="button" onclick="pressCalcKey('6')" class="bg-slate-100 hover:bg-slate-200 text-slate-800 text-[11px] font-extrabold py-1.5 rounded-md transition-all select-none font-outfit">6</button>
+                            <button type="button" id="preset-minimum-btn" class="bg-indigo-50 hover:bg-indigo-100 text-indigo-700 text-[11px] font-black py-1.5 rounded-md transition-all select-none font-bold">최저가</button>
                             
                             <!-- Row 4 -->
-                            <button type="button" onclick="pressCalcKey('1')" class="bg-slate-100 hover:bg-slate-200 text-slate-800 text-xs font-extrabold py-1.5 rounded-md transition-all select-none font-outfit">1</button>
-                            <button type="button" onclick="pressCalcKey('2')" class="bg-slate-100 hover:bg-slate-200 text-slate-800 text-xs font-extrabold py-1.5 rounded-md transition-all select-none font-outfit">2</button>
-                            <button type="button" onclick="pressCalcKey('3')" class="bg-slate-100 hover:bg-slate-200 text-slate-800 text-xs font-extrabold py-1.5 rounded-md transition-all select-none font-outfit">3</button>
-                            <button type="button" id="preset-appraisal-btn" class="bg-indigo-50 hover:bg-indigo-100 text-indigo-700 text-xs font-black py-1.5 rounded-md transition-all select-none font-bold">감정가</button>
+                            <button type="button" onclick="pressCalcKey('1')" class="bg-slate-100 hover:bg-slate-200 text-slate-800 text-[11px] font-extrabold py-1.5 rounded-md transition-all select-none font-outfit">1</button>
+                            <button type="button" onclick="pressCalcKey('2')" class="bg-slate-100 hover:bg-slate-200 text-slate-800 text-[11px] font-extrabold py-1.5 rounded-md transition-all select-none font-outfit">2</button>
+                            <button type="button" onclick="pressCalcKey('3')" class="bg-slate-100 hover:bg-slate-200 text-slate-800 text-[11px] font-extrabold py-1.5 rounded-md transition-all select-none font-outfit">3</button>
+                            <button type="button" id="preset-appraisal-btn" class="bg-indigo-50 hover:bg-indigo-100 text-indigo-700 text-[11px] font-black py-1.5 rounded-md transition-all select-none font-bold">감정가</button>
                             
                             <!-- Row 5 -->
-                            <button type="button" onclick="pressCalcKey('0')" class="bg-slate-100 hover:bg-slate-200 text-slate-800 text-xs font-extrabold py-1.5 rounded-md transition-all select-none font-outfit">0</button>
-                            <button type="button" onclick="pressCalcKey('00')" class="bg-slate-100 hover:bg-slate-200 text-slate-800 text-xs font-extrabold py-1.5 rounded-md transition-all select-none font-outfit">00</button>
-                            <button type="button" onclick="pressCalcKey('000')" class="bg-slate-100 hover:bg-slate-200 text-slate-800 text-xs font-extrabold py-1.5 rounded-md transition-all select-none font-outfit">000</button>
-                            <button type="button" onclick="pressCalcKey('enter')" class="bg-emerald-500 hover:bg-emerald-600 text-white text-xs font-black py-1.5 rounded-md transition-all select-none flex items-center justify-center"><i class="fa-solid fa-check"></i></button>
+                            <button type="button" onclick="pressCalcKey('0')" class="bg-slate-100 hover:bg-slate-200 text-slate-800 text-[11px] font-extrabold py-1.5 rounded-md transition-all select-none font-outfit">0</button>
+                            <button type="button" onclick="pressCalcKey('00')" class="bg-slate-100 hover:bg-slate-200 text-slate-800 text-[11px] font-extrabold py-1.5 rounded-md transition-all select-none font-outfit">00</button>
+                            <button type="button" onclick="pressCalcKey('000')" class="bg-slate-100 hover:bg-slate-200 text-slate-800 text-[11px] font-extrabold py-1.5 rounded-md transition-all select-none font-outfit">000</button>
+                            <button type="button" onclick="pressCalcKey('enter')" class="bg-emerald-500 hover:bg-emerald-600 text-white text-[11px] font-black py-1.5 rounded-md transition-all select-none flex items-center justify-center"><i class="fa-solid fa-check"></i></button>
                         </div>
                     </div>
 
-                    <!-- 상세 세무 영수증 명세표 -->
-                    <div class="bg-slate-50 rounded-xl p-4 border border-slate-200 text-xs sm:text-sm font-bold text-slate-600 space-y-3">
-                        <div class="flex justify-between">
+                    <!-- 🏦 LTV 대출 및 금리 시뮬레이터 (7단계 선택 복구) -->
+                    <div class="bg-slate-50/50 rounded-xl p-3 border border-slate-200/80 space-y-2.5">
+                        <div class="flex items-center justify-between">
+                            <label class="text-[10px] sm:text-xs font-black text-slate-700 uppercase tracking-wider flex items-center gap-1">
+                                <i class="fa-solid fa-building-columns text-royalBlue text-[10px]"></i> 경락잔금대출 설정 (LTV)
+                            </label>
+                            <span id="ltv-percentage-badge" class="text-[9px] font-black px-2 py-0.5 rounded-full border border-blue-200 bg-blue-50 text-royalBlue font-mono">비대출 (0%)</span>
+                        </div>
+                        <div class="flex flex-wrap gap-1 bg-slate-100 p-1 rounded-xl border border-slate-200/60 shadow-inner">
+                            <label class="flex-1 min-w-[34px] cursor-pointer text-center">
+                                <input type="radio" name="ltv-select" value="0" checked onchange="runCalculator()" class="sr-only peer">
+                                <span class="block py-1 text-[10px] sm:text-xs font-extrabold rounded-lg text-slate-500 peer-checked:bg-white peer-checked:text-royalBlue peer-checked:shadow-sm hover:text-slate-700 transition-all select-none">0%</span>
+                            </label>
+                            <label class="flex-1 min-w-[34px] cursor-pointer text-center">
+                                <input type="radio" name="ltv-select" value="30" onchange="runCalculator()" class="sr-only peer">
+                                <span class="block py-1 text-[10px] sm:text-xs font-extrabold rounded-lg text-slate-500 peer-checked:bg-white peer-checked:text-royalBlue peer-checked:shadow-sm hover:text-slate-700 transition-all select-none">30%</span>
+                            </label>
+                            <label class="flex-1 min-w-[34px] cursor-pointer text-center">
+                                <input type="radio" name="ltv-select" value="40" onchange="runCalculator()" class="sr-only peer">
+                                <span class="block py-1 text-[10px] sm:text-xs font-extrabold rounded-lg text-slate-500 peer-checked:bg-white peer-checked:text-royalBlue peer-checked:shadow-sm hover:text-slate-700 transition-all select-none">40%</span>
+                            </label>
+                            <label class="flex-1 min-w-[34px] cursor-pointer text-center">
+                                <input type="radio" name="ltv-select" value="50" onchange="runCalculator()" class="sr-only peer">
+                                <span class="block py-1 text-[10px] sm:text-xs font-extrabold rounded-lg text-slate-500 peer-checked:bg-white peer-checked:text-royalBlue peer-checked:shadow-sm hover:text-slate-700 transition-all select-none">50%</span>
+                            </label>
+                            <label class="flex-1 min-w-[34px] cursor-pointer text-center">
+                                <input type="radio" name="ltv-select" value="60" onchange="runCalculator()" class="sr-only peer">
+                                <span class="block py-1 text-[10px] sm:text-xs font-extrabold rounded-lg text-slate-500 peer-checked:bg-white peer-checked:text-royalBlue peer-checked:shadow-sm hover:text-slate-700 transition-all select-none">60%</span>
+                            </label>
+                            <label class="flex-1 min-w-[34px] cursor-pointer text-center">
+                                <input type="radio" name="ltv-select" value="70" onchange="runCalculator()" class="sr-only peer">
+                                <span class="block py-1 text-[10px] sm:text-xs font-extrabold rounded-lg text-slate-500 peer-checked:bg-white peer-checked:text-royalBlue peer-checked:shadow-sm hover:text-slate-700 transition-all select-none">70%</span>
+                            </label>
+                            <label class="flex-1 min-w-[34px] cursor-pointer text-center">
+                                <input type="radio" name="ltv-select" value="80" onchange="runCalculator()" class="sr-only peer">
+                                <span class="block py-1 text-[10px] sm:text-xs font-extrabold rounded-lg text-slate-500 peer-checked:bg-white peer-checked:text-royalBlue peer-checked:shadow-sm hover:text-slate-700 transition-all select-none">80%</span>
+                            </label>
+                        </div>
+
+                        <!-- 금리 설정 슬라이더 (LTV > 0 일때만 노출) -->
+                        <div id="loan-interest-slider-area" class="hidden space-y-1.5 pt-2 border-t border-slate-200/60">
+                            <div class="flex justify-between items-center">
+                                <label class="text-[9.5px] sm:text-[10.5px] font-black text-slate-700 uppercase tracking-wider">📈 대출 연 금리 설정</label>
+                                <span id="interest-rate-label" class="text-[11px] sm:text-xs font-black text-royalBlue font-outfit">4.5%</span>
+                            </div>
+                            <input type="range" id="loan-interest-slider" min="2.0" max="8.0" step="0.1" value="4.5" oninput="updateInterestRateLabel(this.value)" 
+                                   class="w-full accent-royalBlue cursor-pointer">
+                            <div class="flex justify-between text-[9px] text-slate-400 font-bold font-mono">
+                                <span>2.0%</span>
+                                <span>5.0%</span>
+                                <span>8.0%</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 상세 세무 영수증 명세표 (시인성 제고 및 대조색 보강) -->
+                    <div class="bg-white rounded-xl p-3 border border-slate-200 text-[11px] sm:text-xs font-bold text-slate-600 space-y-2">
+                        <div class="flex justify-between items-center py-0.5">
                             <span>지출 1) 낙찰 대금</span>
-                            <span id="tax-val-bid" class="text-slate-900 font-outfit">0원</span>
+                            <span id="tax-val-bid" class="text-slate-900 font-outfit font-black">0원</span>
                         </div>
-                        <div class="flex justify-between items-center">
-                            <span class="flex items-center gap-1.5">지출 2) 예상 취득세 <strong id="tax-rate-display" class="text-xs text-royalBlue bg-blue-50 px-2 py-0.5 rounded font-bold border border-blue-200"></strong></span>
-                            <span id="tax-val-acquisition" class="text-rose-600 font-outfit">0원</span>
+                        <div class="flex justify-between items-center py-0.5">
+                            <span class="flex items-center gap-1">지출 2) 예상 취득세 <strong id="tax-rate-display" class="text-[9px] text-royalBlue bg-blue-50 px-1 py-0.2 rounded font-black border border-blue-200/60">1.5%</strong></span>
+                            <span id="tax-val-acquisition" class="text-rose-600 font-outfit font-black">0원</span>
                         </div>
-                        <div class="flex justify-between">
-                            <span>지출 3) 법무/수수료 부대비용 (0.5%)</span>
-                            <span id="tax-val-agency" class="text-slate-900 font-outfit">0원</span>
+                        <div class="flex justify-between items-center py-0.5">
+                            <span>지출 3) 법무 및 부대 비용 (0.5%)</span>
+                            <span id="tax-val-agency" class="text-slate-900 font-outfit font-black">0원</span>
                         </div>
-                        <div class="border-t border-slate-200 my-2"></div>
-                        <div class="flex justify-between text-xs sm:text-sm text-slate-900 font-black">
-                            <span>💰 총 예상 소요 자금</span>
-                            <span id="tax-val-total" class="text-royalBlue font-outfit text-base">0원</span>
+                        
+                        <!-- 총 예상 소요 자금 하이라이트 박스 -->
+                        <div class="bg-blue-50/60 border border-blue-100 rounded-xl p-2.5 my-1 flex justify-between items-center">
+                            <span class="text-royalBlue font-black flex items-center gap-1"><i class="fa-solid fa-coins"></i> 총 예상 소요 자금</span>
+                            <span id="tax-val-total" class="text-royalBlue font-outfit text-sm font-black">0원</span>
+                        </div>
+                        
+                        <!-- LTV 대출 적용 시 추가되는 금융 조달 계획 명세 -->
+                        <div id="financial-plan-area" class="hidden pt-2 border-t border-dashed border-slate-200 space-y-2">
+                            <div class="flex justify-between items-center py-0.5 text-slate-650">
+                                <span class="flex items-center gap-1"><i class="fa-solid fa-building-columns text-slate-400"></i> 예상 잔금 대출액 (<span id="calc-ltv-label" class="font-mono">0%</span>)</span>
+                                <span id="tax-val-loan" class="text-slate-900 font-outfit font-extrabold">0원</span>
+                            </div>
+                            <div class="flex justify-between items-center py-0.5 text-slate-650">
+                                <span>💸 연 대출 이자 (월 평균)</span>
+                                <span id="tax-val-interest" class="text-rose-600 font-outfit font-extrabold">0원</span>
+                            </div>
+                            
+                            <!-- 실 가용 필요 자금 하이라이트 박스 -->
+                            <div class="bg-emerald-50/60 border border-emerald-100 rounded-xl p-2.5 flex justify-between items-center mt-1">
+                                <span class="text-emeraldSuccess font-black flex items-center gap-1"><i class="fa-solid fa-hand-holding-dollar"></i> 실 가용 필요 자금 (최소 현금)</span>
+                                <span id="tax-val-cash" class="text-emeraldSuccess font-outfit text-sm font-black">0원</span>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
-        </div>
 
-        <!-- 하단 아웃링크 이동 액션바 -->
-        <div class="p-4 border-t border-slate-200 bg-slate-50/50 flex gap-2">
-            <a id="btn-naver-map" target="_blank" 
-               class="flex-1 bg-emeraldSuccess hover:bg-emerald-700 text-white py-3.5 rounded-xl text-xs sm:text-sm font-black shadow-sm flex items-center justify-center gap-1.5 transition-colors cursor-pointer">
-                <i class="fa-solid fa-map-location-dot text-sm"></i> 네이버 지도로 보기
-            </a>
-            <a id="btn-official-site" target="_blank" 
-               class="flex-1 bg-royalBlue hover:bg-royalHover text-white py-3.5 rounded-xl text-xs sm:text-sm font-black shadow-sm flex items-center justify-center gap-1.5 transition-colors cursor-pointer">
-                <i class="fa-solid fa-arrow-up-right-from-square text-sm"></i> 매각원문 이동
-            </a>
+            <!-- 📋 6. 입찰 당일 필수 체크리스트 (법원경매 / 온비드 공매 방법별 동적 분기, 연동망 위에 위치) -->
+            <div class="bg-white border border-slate-200 rounded-2xl p-3.5 sm:p-4 space-y-2.5 shadow-sm">
+                <h4 class="text-xs sm:text-sm font-black text-slate-800 flex items-center gap-1.5">
+                    <i class="fa-solid fa-clipboard-check text-royalBlue"></i> 📋 입찰 당일 필수 체크리스트
+                </h4>
+                <div id="detail-checklist-content" class="text-[10.5px] sm:text-xs font-medium text-slate-650 leading-relaxed space-y-1.5">
+                    <!-- Javascript에서 동적으로 주입됨 -->
+                </div>
+            </div>
+
+            <!-- 🌐 7. 정부 실무 공용 정보망 연동 및 서류 조회 (맨 밑으로 내림, 2x3 대칭 레이아웃 컴팩트화) -->
+            <div class="bg-slate-50 border border-slate-200 rounded-2xl p-3.5 space-y-3">
+                <h4 class="text-xs sm:text-sm font-black text-slate-800 flex items-center gap-1.5">
+                    <i class="fa-solid fa-globe text-royalBlue"></i> 🌐 정부 실무 공용 정보망 연동 및 서류 조회
+                </h4>
+                <p class="text-[9.5px] text-slate-500 leading-relaxed font-medium">실소유주와 점유 관계, 토지/건물 용도 및 현재 실거래 시세를 확인하기 위해 공식 공공 포털로 연동해 보십시오.</p>
+                
+                <div class="grid grid-cols-2 gap-2 text-xs">
+                    <!-- 1. 공식 매각원문 -->
+                    <a id="btn-official-site" href="https://www.courtauction.go.kr" target="_blank" class="bg-blue-50/40 border border-blue-200 hover:border-royalBlue hover:shadow-md rounded-xl p-2 flex items-center gap-2.5 transition-all shadow-sm group">
+                        <div class="bg-royalBlue text-white group-hover:bg-royalHover w-7 h-7 rounded-lg flex items-center justify-center flex-shrink-0 transition-colors">
+                            <i class="fa-solid fa-arrow-up-right-from-square text-[10px]"></i>
+                        </div>
+                        <div class="truncate">
+                            <strong class="block text-[10.5px] sm:text-xs font-black text-royalBlue group-hover:text-royalHover transition-colors truncate">매각원문 이동</strong>
+                            <span class="text-[9px] text-blue-500/70 font-bold block mt-0.5 truncate">법원 공식 공고 정보 이동</span>
+                        </div>
+                    </a>
+                    
+                    <!-- 2. 네이버 지도 보기 -->
+                    <a id="btn-naver-map" href="https://map.naver.com" target="_blank" class="bg-emerald-50/40 border border-emerald-200 hover:border-emeraldSuccess hover:shadow-md rounded-xl p-2 flex items-center gap-2.5 transition-all shadow-sm group">
+                        <div class="bg-emeraldSuccess text-white group-hover:bg-emerald-700 w-7 h-7 rounded-lg flex items-center justify-center flex-shrink-0 transition-colors">
+                            <i class="fa-solid fa-map-location-dot text-[10px]"></i>
+                        </div>
+                        <div class="truncate">
+                            <strong class="block text-[10.5px] sm:text-xs font-black text-emeraldSuccess group-hover:text-emerald-700 transition-colors truncate">네이버 지도로 보기</strong>
+                            <span class="text-[9px] text-emerald-600/70 font-bold block mt-0.5 truncate">물건지 실위치 및 로드뷰</span>
+                        </div>
+                    </a>
+
+                    <!-- 3. 대법원 인터넷등기소 -->
+                    <a href="https://www.iros.go.kr" target="_blank" class="bg-white border border-slate-200 hover:border-royalBlue hover:shadow-md rounded-xl p-2 flex items-center gap-2.5 transition-all shadow-sm group">
+                        <div class="bg-blue-50 text-royalBlue group-hover:bg-royalBlue group-hover:text-white w-7 h-7 rounded-lg flex items-center justify-center flex-shrink-0 transition-colors">
+                            <i class="fa-solid fa-file-signature text-[10px]"></i>
+                        </div>
+                        <div class="truncate">
+                            <strong class="block text-[10.5px] sm:text-xs font-black text-slate-800 group-hover:text-royalBlue transition-colors truncate">인터넷등기소</strong>
+                            <span class="text-[9px] text-slate-400 font-bold block mt-0.5 truncate">등기부등본 권리관계 열람</span>
+                        </div>
+                    </a>
+
+                    <!-- 4. 정부24 전입세대확인서 -->
+                    <a href="https://www.gov.kr" target="_blank" class="bg-white border border-slate-200 hover:border-royalBlue hover:shadow-md rounded-xl p-2 flex items-center gap-2.5 transition-all shadow-sm group">
+                        <div class="bg-blue-50 text-royalBlue group-hover:bg-royalBlue group-hover:text-white w-7 h-7 rounded-lg flex items-center justify-center flex-shrink-0 transition-colors">
+                            <i class="fa-solid fa-users text-[10px]"></i>
+                        </div>
+                        <div class="truncate">
+                            <strong class="block text-[10.5px] sm:text-xs font-black text-slate-800 group-hover:text-royalBlue transition-colors truncate">전입세대확인서</strong>
+                            <span class="text-[9px] text-slate-400 font-bold block mt-0.5 truncate">대항력 점유 세입자 대조</span>
+                        </div>
+                    </a>
+
+                    <!-- 5. 건축물대장 무료열람 -->
+                    <a href="https://www.gov.kr/portal/main" target="_blank" class="bg-white border border-slate-200 hover:border-royalBlue hover:shadow-md rounded-xl p-2 flex items-center gap-2.5 transition-all shadow-sm group">
+                        <div class="bg-blue-50 text-royalBlue group-hover:bg-royalBlue group-hover:text-white w-7 h-7 rounded-lg flex items-center justify-center flex-shrink-0 transition-colors">
+                            <i class="fa-solid fa-building text-[10px]"></i>
+                        </div>
+                        <div class="truncate">
+                            <strong class="block text-[10.5px] sm:text-xs font-black text-slate-800 group-hover:text-royalBlue transition-colors truncate">건축물대장 열람</strong>
+                            <span class="text-[9px] text-slate-400 font-bold block mt-0.5 truncate">위반건축물 및 대장 조회</span>
+                        </div>
+                    </a>
+
+                    <!-- 6. 네이버 부동산 시세 조회 -->
+                    <a id="btn-naver-land-price" href="https://land.naver.com" target="_blank" class="bg-white border border-slate-200 hover:border-royalBlue hover:shadow-md rounded-xl p-2 flex items-center gap-2.5 transition-all shadow-sm group">
+                        <div class="bg-blue-50 text-royalBlue group-hover:bg-royalBlue group-hover:text-white w-7 h-7 rounded-lg flex items-center justify-center flex-shrink-0 transition-colors">
+                            <i class="fa-solid fa-house-chimney text-[10px]"></i>
+                        </div>
+                        <div class="truncate">
+                            <strong class="block text-[10.5px] sm:text-xs font-black text-slate-800 group-hover:text-royalBlue transition-colors truncate">실거래 시세 대조</strong>
+                            <span class="text-[9px] text-slate-400 font-bold block mt-0.5 truncate">동종 면적 실거래 시세 대조</span>
+                        </div>
+                    </a>
+                </div>
+            </div>
         </div>
     </aside>
 
@@ -687,7 +1016,7 @@
         }
 
         // 로컬 FastAPI 개발 서버 주소 설정 (서버 자체 서빙 및 로컬 file:// 실행 환경 감지 하이브리드 연동)
-        const API_BASE_URL = window.location.origin.startsWith("file") ? "http://168.107.33.213/action" : window.location.origin + "/action";
+        const API_BASE_URL = window.location.origin.startsWith("file") ? "http://168.107.33.213/action" : (window.location.origin.includes("127.0.0.1") || window.location.origin.includes("localhost")) ? window.location.origin : window.location.origin + "/action";
         
         let originalProperties = [];  // 서버에서 수신한 전체 데이터 원본
         let filteredProperties = [];  // 검색/필터 가공 데이터
@@ -794,20 +1123,73 @@
         ];
 
         // 페이지 파싱 즉시 가동 (CDN 병목으로 인한 멈춤 완전 우회 및 스크롤 옵저버 탑재)
+                // 📱 지능형 필터링 센터 모바일 화면 내 페이지 가운데 배치 (E2E 스크롤 및 콤팩트 스타일)
+        function handleFeedScroll(e) {
+            const target = e.currentTarget;
+            if (target.scrollTop + target.clientHeight >= target.scrollHeight - 100) {
+                loadMoreProperties();
+            }
+        }
+
+        function initResponsiveLayout() {
+            const sidebar = document.getElementById("sidebar-panel");
+            const dashboardView = document.getElementById("dashboard-view");
+            const mainGridContainer = document.getElementById("main-grid-container");
+            const centerSection = document.getElementById("center-feed-section");
+            const headerToggleBtn = document.getElementById("header-sidebar-toggle-btn");
+            const closeBtn = document.getElementById("sidebar-close-btn");
+            const propertiesContainer = document.getElementById("properties-container");
+
+            if (!sidebar || !dashboardView || !mainGridContainer || !centerSection || !propertiesContainer) return;
+
+            // 스크롤 이벤트 해제 후 알맞은 컨테이너에 재바인딩
+            dashboardView.removeEventListener("scroll", handleFeedScroll);
+            propertiesContainer.removeEventListener("scroll", handleFeedScroll);
+
+            if (window.innerWidth < 1024) {
+                // 모바일 레이아웃: 필터 패널을 피드 중앙 맨 위로 배치
+                if (sidebar.parentNode !== dashboardView) {
+                    dashboardView.insertBefore(sidebar, dashboardView.firstChild);
+                }
+                // 페이지 전체 스크롤 활성화: dashboard-view를 스크롤러로 사용
+                dashboardView.className = "bg-slate-50 flex flex-col flex-1 overflow-y-auto custom-scrollbar";
+                propertiesContainer.className = "overflow-visible bg-white";
+                
+                // 모바일 컴팩트 스타일: 필터 패널의 높이를 고정하지 않고 스크롤되도록 둠 + 여백 축소
+                sidebar.className = "bg-white border-b border-slate-200 p-3 space-y-3 w-full flex-shrink-0 block z-10 sidebar-compact";
+                
+                if (headerToggleBtn) headerToggleBtn.classList.add("hidden");
+                if (closeBtn) closeBtn.classList.add("hidden");
+                
+                // 모바일 스크롤 바인딩
+                dashboardView.addEventListener("scroll", handleFeedScroll);
+            } else {
+                // 데스크톱 레이아웃: 필터 패널을 왼쪽 열로 이동
+                if (sidebar.parentNode !== mainGridContainer) {
+                    mainGridContainer.insertBefore(sidebar, centerSection);
+                }
+                // 데스크톱 스크롤: properties-container만 스크롤
+                dashboardView.className = "flex flex-col flex-1 overflow-hidden";
+                propertiesContainer.className = "flex-1 overflow-auto custom-scrollbar bg-white";
+                
+                sidebar.className = "bg-white border-r border-slate-200 flex flex-col h-full lg:w-[22%] lg:min-w-[290px] lg:max-w-[350px] block";
+                if (headerToggleBtn) headerToggleBtn.classList.add("hidden"); // 항상 숨김 유지
+                if (closeBtn) closeBtn.classList.remove("hidden");
+                
+                // 데스크톱 스크롤 바인딩
+                propertiesContainer.addEventListener("scroll", handleFeedScroll);
+            }
+        }
+
+        window.addEventListener("resize", initResponsiveLayout);
+
+
         document.addEventListener("DOMContentLoaded", function() {
+            initResponsiveLayout();
             fetchDataFromServer();
             fetchSyncStatus();
             
-            // 🚀 스크롤 끝 감지 기반 무한 스크롤(Infinite Scroll) 지연 로드 엔진 마운트
-            const container = document.getElementById("properties-container");
-            if (container) {
-                container.addEventListener("scroll", function() {
-                    // 스크롤이 하단에서 100px 이내로 도달했을 때 추가 로드 작동
-                    if (container.scrollTop + container.clientHeight >= container.scrollHeight - 100) {
-                        loadMoreProperties();
-                    }
-                });
-            }
+
         });
 
         // 1. [3중 방어막] 백엔드 데이터 비동기 연동 및 로딩 정지 방지
@@ -1101,16 +1483,6 @@
             
             currentPage = 1; // 필터 적용 시 1페이지부터 다시 그리기
             sortData('score');
-
-            // 모바일 뷰포트(1024px 미만)일 때 필터 적용 시 사이드바를 자동으로 닫음
-            if (window.innerWidth < 1024) {
-                const sidebar = document.getElementById("sidebar-panel");
-                const backdrop = document.getElementById("sidebar-backdrop");
-                if (sidebar && backdrop && !sidebar.classList.contains("-translate-x-full")) {
-                    sidebar.classList.add("-translate-x-full");
-                    backdrop.classList.add("hidden");
-                }
-            }
         }
 
         // 5. 정렬 기준 정렬 함수 (헤더 양방향 정렬 및 다차원 정렬 완벽 지원)
@@ -1204,10 +1576,32 @@
 
         // 6. 메인 피드 대시보드 KPI 값 갱신 및 상단 글로벌 카운트 배지 갱신
         function updateKPIDashboard() {
-            document.getElementById("kpi-recommended-count").innerText = `${filteredProperties.length}건`;
-            
-            const totalEl = document.getElementById("kpi-total-count");
-            if (totalEl) totalEl.innerText = originalProperties.length.toLocaleString();
+            const recommendedText = `${filteredProperties.length}건`;
+            const totalText = originalProperties.length.toLocaleString();
+            const highGradeCount = filteredProperties.filter(item => item.grade === 'A' || item.grade === 'B').length;
+            const highText = `${highGradeCount}건`;
+            const riskCount = filteredProperties.filter(item => item.grade === 'X').length;
+            const riskText = `${riskCount}건`;
+
+            // Update PC/Desktop elements
+            const recPC = document.getElementById("kpi-recommended-count");
+            if (recPC) recPC.innerText = recommendedText;
+            const totPC = document.getElementById("kpi-total-count");
+            if (totPC) totPC.innerText = totalText;
+            const highPC = document.getElementById("kpi-high-count");
+            if (highPC) highPC.innerText = highText;
+            const riskPC = document.getElementById("kpi-risk-count");
+            if (riskPC) riskPC.innerText = riskText;
+
+            // Update Mobile elements
+            const recMob = document.getElementById("kpi-recommended-count-mob");
+            if (recMob) recMob.innerText = recommendedText;
+            const totMob = document.getElementById("kpi-total-count-mob");
+            if (totMob) totMob.innerText = totalText;
+            const highMob = document.getElementById("kpi-high-count-mob");
+            if (highMob) highMob.innerText = highText;
+            const riskMob = document.getElementById("kpi-risk-count-mob");
+            if (riskMob) riskMob.innerText = riskText;
             
             const headerTotal = document.getElementById("header-total-count");
             const headerCourt = document.getElementById("header-court-count");
@@ -1217,20 +1611,12 @@
                 const courtCount = originalProperties.filter(p => p.source === 'court').length;
                 const onbidCount = originalProperties.filter(p => p.source === 'onbid').length;
                 
-                headerTotal.innerText = originalProperties.length.toLocaleString();
+                headerTotal.innerText = totalText;
                 headerCourt.innerText = courtCount.toLocaleString();
                 headerOnbid.innerText = onbidCount.toLocaleString();
             }
-            
-            const highGradeCount = filteredProperties.filter(item => item.grade === 'A' || item.grade === 'B').length;
-            document.getElementById("kpi-high-count").innerText = `${highGradeCount}건`;
-            
-            const riskCount = filteredProperties.filter(item => item.grade === 'X').length;
-            document.getElementById("kpi-risk-count").innerText = `${riskCount}건`;
         }
 
-
-        // 7. 필터 리셋
         function resetFilters() {
             document.getElementById("search-input").value = "";
             document.getElementById("source-filter").value = "all";
@@ -1302,7 +1688,7 @@
             // 처음 1페이지 로드 시에는 그리드 컨테이너 생성
             if (currentPage === 1) {
                 container.innerHTML = `
-                    <div id="properties-grid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 p-5">
+                    <div id="properties-grid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 p-5 pb-16 lg:pb-5">
                         <!-- 동적 카드들이 마운팅됨 -->
                     </div>
                 `;
@@ -1320,7 +1706,7 @@
             const pageItems = filteredProperties.slice(startIndex, endIndex);
             let htmlBuffer = [];
             
-            pageItems.forEach(item => {
+            pageItems.forEach((item, idx) => {
                 let sourceBadge = "";
                 
                 if (item.source === 'court') {
@@ -1366,9 +1752,11 @@
                 // 유찰 및 저감율 연산 호출
                 const est = estimateAuctionRounds(item.appraised_value, item.minimum_bid, item.source);
  
+                const delay = (idx % 10) * 40;
                 const cardHtml = `
                     <div onclick="selectProperty(${item.id})" onmouseover="handleRowHover(${item.id})" id="card-${item.id}"
-                         class="${cardBg} ${hoverBorder} ${activeBorderClass} border rounded-2xl p-4 flex flex-col justify-between cursor-pointer transition-all duration-300 transform hover:-translate-y-1 select-none">
+                         class="${cardBg} ${hoverBorder} ${activeBorderClass} fade-in-up border rounded-2xl p-4 flex flex-col justify-between cursor-pointer transition-all duration-300 transform hover:-translate-y-1 select-none"
+                         style="animation-delay: ${delay}ms;">
                         
                         <!-- Top Badges Row -->
                         <div class="flex justify-between items-center mb-3">
@@ -1606,8 +1994,16 @@
             
             // 1. 우측 상세 슬라이드 실시간 동기화 (사용자가 타이핑 중인 계산기 포커스를 해치지 않고 연동)
             loadDetailView(item);
-            
-            // 2. 실시간 하단 프리뷰 바 동기화
+        }
+
+        // 상세 분석 패널 데이터 렌더러
+        function loadDetailView(item) {
+            if (!item) return;
+
+            document.getElementById("detail-address").innerText = item.address;
+            document.getElementById("detail-no").innerText = `사건번호/관리번호 : ${item.auction_no} (${item.round_info})`;
+
+            // 2. 실시간 하단 프리뷰 바 동기화 (Hover & Click 통합 연동)
             const previewTitle = document.getElementById("preview-title");
             const previewPrice = document.getElementById("preview-price");
             const previewGrade = document.getElementById("preview-grade");
@@ -1619,14 +2015,6 @@
                 previewGrade.innerHTML = `<i class="fa-solid fa-shield-halved"></i> AI: ${item.grade}등급 (${item.score}점)`;
                 previewRisk.innerHTML = `<i class="fa-solid fa-triangle-exclamation text-amber-400"></i> ${item.notes_content || '검출된 권리 하자 없음'}`;
             }
-        }
-
-        // 상세 분석 패널 데이터 렌더러
-        function loadDetailView(item) {
-            if (!item) return;
-
-            document.getElementById("detail-address").innerText = item.address;
-            document.getElementById("detail-no").innerText = `사건번호/관리번호 : ${item.auction_no} (${item.round_info})`;
             
             // 배지 및 등급 점수 바인딩
             const badge = document.getElementById("detail-badge");
@@ -1647,17 +2035,74 @@
             scoreVal.innerText = item.score;
             
             if (item.grade === 'A') {
-                scoreCircle.className = "flex-shrink-0 w-14 h-14 rounded-full border-4 border-emeraldSuccess flex flex-col items-center justify-center font-outfit text-emeraldSuccess bg-emerald-50/20 shadow-sm shadow-emerald-500/10";
+                scoreCircle.className = "w-9 h-9 sm:w-14 sm:h-14 rounded-full border-2 sm:border-4 border-emeraldSuccess flex flex-col items-center justify-center font-outfit text-emeraldSuccess bg-emerald-50/20 shadow-sm shadow-emerald-500/10 flex-shrink-0";
             } else if (item.grade === 'B') {
-                scoreCircle.className = "flex-shrink-0 w-14 h-14 rounded-full border-4 border-royalBlue flex flex-col items-center justify-center font-outfit text-royalBlue bg-blue-50/20 shadow-sm shadow-blue-500/10";
+                scoreCircle.className = "w-9 h-9 sm:w-14 sm:h-14 rounded-full border-2 sm:border-4 border-royalBlue flex flex-col items-center justify-center font-outfit text-royalBlue bg-blue-50/20 shadow-sm shadow-blue-500/10 flex-shrink-0";
             } else if (item.grade === 'X') {
-                scoreCircle.className = "flex-shrink-0 w-14 h-14 rounded-full border-4 border-rose-500 flex flex-col items-center justify-center font-outfit text-rose-600 bg-rose-50/20 shadow-sm shadow-rose-500/10";
+                scoreCircle.className = "w-9 h-9 sm:w-14 sm:h-14 rounded-full border-2 sm:border-4 border-rose-500 flex flex-col items-center justify-center font-outfit text-rose-600 bg-rose-50/20 shadow-sm shadow-rose-500/10 flex-shrink-0 animate-pulse";
             } else {
-                scoreCircle.className = "flex-shrink-0 w-14 h-14 rounded-full border-4 border-slate-400 flex flex-col items-center justify-center font-outfit text-slate-500 bg-slate-50 shadow-sm";
+                scoreCircle.className = "w-9 h-9 sm:w-14 sm:h-14 rounded-full border-2 sm:border-4 border-slate-400 flex flex-col items-center justify-center font-outfit text-slate-500 bg-slate-50 shadow-sm flex-shrink-0";
             }
  
             // 원문 설명 바인딩
             document.getElementById("detail-desc").innerText = item.desc_content || "상세 비고 내용이 없습니다.";
+            
+            // 🏠 물건 세부 스펙 분석 바인딩
+            document.getElementById("detail-spec-ptype").innerText = item.ptype || "미상";
+            document.getElementById("detail-spec-round").innerText = item.round_info || "신건";
+            document.getElementById("detail-spec-appraisal").innerText = formatKRW(item.appraised_value);
+            document.getElementById("detail-spec-minimum").innerText = formatKRW(item.minimum_bid);
+            document.getElementById("detail-spec-date").innerText = `${item.bidding_date || "미상"} (${calculateRemainingDays(item.bidding_date) >= 0 ? 'D-' + calculateRemainingDays(item.bidding_date) : '종결'})`;
+
+            // 📋 입찰 당일 필수 체크리스트 동적 렌더링
+            const checklistContent = document.getElementById("detail-checklist-content");
+            if (checklistContent) {
+                if (item.source === 'court') {
+                    checklistContent.innerHTML = `
+                        <div class="p-2.5 bg-blue-50/40 border border-blue-100 rounded-xl space-y-1.5 text-slate-705">
+                            <strong class="text-royalBlue block text-[11px] sm:text-xs mb-1 flex items-center gap-1"><i class="fa-solid fa-scale-balanced text-[10px]"></i> ⚖️ 대법원 법원경매 입찰 준비 (현장 법정 출석 필수)</strong>
+                            <div class="flex items-start gap-1">
+                                <span class="text-royalBlue font-black flex-shrink-0">1.</span>
+                                <span><strong>본인 신분증 & 개인 도장 지참</strong> (인감도장 권장, 대리 입찰 시 인감증명서 및 위임장 필수 준비)</span>
+                            </div>
+                            <div class="flex items-start gap-1">
+                                <span class="text-royalBlue font-black flex-shrink-0">2.</span>
+                                <span><strong>입찰보증금 (10%) 지참</strong> (당회차 최저매각가격의 10%를 수표 1장으로 은행에서 사전 발급)</span>
+                            </div>
+                            <div class="flex items-start gap-1">
+                                <span class="text-royalBlue font-black flex-shrink-0">3.</span>
+                                <span><strong>기일입찰표 정밀 기재</strong> (사건번호, 물건번호 및 입찰가 금액 칸의 자릿수 실수/오타 확인 필수)</span>
+                            </div>
+                            <div class="flex items-start gap-1">
+                                <span class="text-royalBlue font-black flex-shrink-0">4.</span>
+                                <span><strong>입찰 마감 시간 엄수</strong> (법원별 마감 시간 - 대개 오전 11시 10분 전에 집행관 수취함에 입찰서 투함)</span>
+                            </div>
+                        </div>
+                    `;
+                } else {
+                    checklistContent.innerHTML = `
+                        <div class="p-2.5 bg-emerald-50/40 border border-emerald-100 rounded-xl space-y-1.5 text-slate-705">
+                            <strong class="text-emeraldSuccess block text-[11px] sm:text-xs mb-1 flex items-center gap-1"><i class="fa-solid fa-laptop text-[10px]"></i> 🏢 캠코 온비드공매 입찰 준비 (100% 인터넷 입찰)</strong>
+                            <div class="flex items-start gap-1">
+                                <span class="text-emeraldSuccess font-black flex-shrink-0">1.</span>
+                                <span><strong>공동인증서 등록 상태 검증</strong> (온비드 회원 가입 및 전자 입찰용 범용/공매전용 인증서 연동 여부 확인)</span>
+                            </div>
+                            <div class="flex items-start gap-1">
+                                <span class="text-emeraldSuccess font-black flex-shrink-0">2.</span>
+                                <span><strong>인터넷 입찰서 작성 및 제출</strong> (공매 입찰 기간 - 대개 월요일 10:00부터 수요일 17:00까지 마감 기한 내 온라인 접수)</span>
+                            </div>
+                            <div class="flex items-start gap-1">
+                                <span class="text-emeraldSuccess font-black flex-shrink-0">3.</span>
+                                <span><strong>입찰보증금 (10%) 납부</strong> (본인이 써낸 입찰금액의 10%를 지정 가상계좌로 이체 후 정상 확인 처리 검토)</span>
+                            </div>
+                            <div class="flex items-start gap-1">
+                                <span class="text-emeraldSuccess font-black flex-shrink-0">4.</span>
+                                <span><strong>결과 발표 대기</strong> (목요일 오전 11시 개찰 후 낙찰 문자 메시지 및 나의온비드 낙찰 결과 확인)</span>
+                            </div>
+                        </div>
+                    `;
+                }
+            }
             
             // AI 7대 리스크 정밀 리포트 렌더링 주입
             const riskReportPanel = document.getElementById("detail-risk-report");
@@ -1739,21 +2184,74 @@
             // 필요 소요 총자금 합계
             const totalBudget = bidInputVal + acquisitionTax + agencyFee;
 
+            // LTV 계산 및 금리 시뮬레이션
+            const ltvRadio = document.querySelector('input[name="ltv-select"]:checked');
+            const ltvPercent = ltvRadio ? parseInt(ltvRadio.value) : 0;
+            
+            const ltvBadge = document.getElementById("ltv-percentage-badge");
+            const sliderArea = document.getElementById("loan-interest-slider-area");
+            const planArea = document.getElementById("financial-plan-area");
+            
+            if (ltvPercent > 0) {
+                if (sliderArea) sliderArea.classList.remove("hidden");
+                if (planArea) planArea.classList.remove("hidden");
+                if (ltvBadge) ltvBadge.innerText = `LTV ${ltvPercent}% 대출`;
+                
+                const interestRate = parseFloat(document.getElementById("loan-interest-slider").value) || 4.5;
+                const loanAmount = Math.floor(bidInputVal * (ltvPercent / 100));
+                const annualInterest = loanAmount * (interestRate / 100);
+                const monthlyInterest = Math.floor(annualInterest / 12);
+                const cashRequired = totalBudget - loanAmount;
+                
+                const calcLtvLabel = document.getElementById("calc-ltv-label");
+                if (calcLtvLabel) calcLtvLabel.innerText = `${ltvPercent}%`;
+                
+                const taxValLoan = document.getElementById("tax-val-loan");
+                if (taxValLoan) taxValLoan.innerText = formatKRW(loanAmount);
+                
+                const taxValInterest = document.getElementById("tax-val-interest");
+                if (taxValInterest) taxValInterest.innerText = formatKRW(monthlyInterest) + " /월";
+                
+                const taxValCash = document.getElementById("tax-val-cash");
+                if (taxValCash) taxValCash.innerText = formatKRW(cashRequired);
+            } else {
+                if (sliderArea) sliderArea.classList.add("hidden");
+                if (planArea) planArea.classList.add("hidden");
+                if (ltvBadge) ltvBadge.innerText = "비대출 (0%)";
+            }
+
             // DOM 렌더링 반영
             const rateBadge = document.getElementById("tax-rate-badge");
-            rateBadge.innerText = rateLabel;
-            rateBadge.className = taxRate === 0.046 
-                ? "text-[9px] font-black px-2 py-0.5 rounded-full border border-amber-300 bg-amber-50 text-amber-700"
-                : "text-[9px] font-black px-2 py-0.5 rounded-full border border-blue-200 bg-blue-50 text-royalBlue";
+            if (rateBadge) {
+                rateBadge.innerText = rateLabel;
+                rateBadge.className = taxRate === 0.046 
+                    ? "text-[9px] font-black px-2 py-0.5 rounded-full border border-amber-300 bg-amber-50 text-amber-700"
+                    : "text-[9px] font-black px-2 py-0.5 rounded-full border border-blue-200 bg-blue-50 text-royalBlue";
+            }
 
-            document.getElementById("tax-rate-display").innerText = `${(taxRate * 100).toFixed(1)}%`;
-            document.getElementById("tax-val-bid").innerText = formatKRW(bidInputVal);
-            document.getElementById("tax-val-acquisition").innerText = "+ " + formatKRW(acquisitionTax);
-            document.getElementById("tax-val-agency").innerText = "+ " + formatKRW(agencyFee);
-            document.getElementById("tax-val-total").innerText = formatKRW(totalBudget);
+            const taxRateDisplay = document.getElementById("tax-rate-display");
+            if (taxRateDisplay) taxRateDisplay.innerText = `${(taxRate * 100).toFixed(1)}%`;
+            
+            const taxValBid = document.getElementById("tax-val-bid");
+            if (taxValBid) taxValBid.innerText = formatKRW(bidInputVal);
+            
+            const taxValAcquisition = document.getElementById("tax-val-acquisition");
+            if (taxValAcquisition) taxValAcquisition.innerText = "+ " + formatKRW(acquisitionTax);
+            
+            const taxValAgency = document.getElementById("tax-val-agency");
+            if (taxValAgency) taxValAgency.innerText = "+ " + formatKRW(agencyFee);
+            
+            const taxValTotal = document.getElementById("tax-val-total");
+            if (taxValTotal) taxValTotal.innerText = formatKRW(totalBudget);
         }
 
-        // 11. 퀵 입찰액 보정 함수
+        function updateInterestRateLabel(val) {
+            const label = document.getElementById("interest-rate-label");
+            if (label) label.innerText = parseFloat(val).toFixed(1) + "%";
+            runCalculator();
+        }
+        
+
         function adjustBid(amount) {
             const input = document.getElementById("calc-bid-input");
             let val = parseInt(input.value) || 0;
@@ -1862,7 +2360,7 @@
             }
         }
 
-        // 간단한 마크다운 HTML 렌더러 (Catastrophic Backtracking을 방지하는 정밀 라인 파서)
+        // 간단한 마크다운 HTML 렌더러 (테이블 파서 및 모바일 텍스트 정렬/가로폭 보강)
         function convertMarkdownToHtml(md) {
             if (!md) return "";
             
@@ -1881,6 +2379,10 @@
             
             let inList = false;
             let listType = ""; // "ul", "ol"
+
+            let inTable = false;
+            let tableHeaders = [];
+            let tableRows = [];
             
             // 리스트 닫기 헬퍼
             function closeList() {
@@ -1914,17 +2416,17 @@
                         let cleanLine = line;
                         if (cleanLine.startsWith("* ") || cleanLine.startsWith("- ")) {
                             cleanLine = cleanLine.substring(2);
-                            return `<li class="ml-4 list-disc my-1">${parseInlineStyles(cleanLine)}</li>`;
+                            return `<li class="text-[9.5px] sm:text-[11.5px] text-slate-650 my-1 text-center lg:text-left lg:list-item lg:ml-4 lg:list-disc">${parseInlineStyles(cleanLine)}</li>`;
                         } else if (/^\d+\.\s/.test(cleanLine)) {
                             cleanLine = cleanLine.replace(/^\d+\.\s/, "");
-                            return `<li class="ml-4 list-decimal my-1">${parseInlineStyles(cleanLine)}</li>`;
+                            return `<li class="text-[9.5px] sm:text-[11.5px] text-slate-650 my-1 text-center lg:text-left lg:list-item lg:ml-4 lg:list-decimal">${parseInlineStyles(cleanLine)}</li>`;
                         }
-                        return `<p class="my-1">${parseInlineStyles(cleanLine)}</p>`;
+                        return `<p class="my-1 text-[9.5px] sm:text-[11.5px] leading-relaxed text-center lg:text-left">${parseInlineStyles(cleanLine)}</p>`;
                     }).join("");
                     
                     htmlResult.push(`
-                        <div class="my-3 p-3.5 border ${alertClass} rounded-2xl text-[10px] space-y-1">
-                            <strong>${alertTitle}</strong>
+                        <div class="my-3 p-3.5 border ${alertClass} rounded-2xl text-[10px] sm:text-xs space-y-1.5 shadow-sm text-center lg:text-left">
+                            <strong class="block text-center lg:text-left">${alertTitle}</strong>
                             <div class="space-y-1">${parsedContent}</div>
                         </div>
                     `);
@@ -1945,6 +2447,28 @@
                 // 링크
                 formatted = formatted.replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" target="_blank" class="text-royalBlue hover:underline font-black">$1</a>');
                 return formatted;
+            }
+
+            // HTML 테이블 렌더링 헬퍼
+            function renderTableHtml(headers, rows) {
+                let ths = headers.map(h => `<th class="p-2 sm:p-2.5 font-extrabold text-slate-800 bg-slate-100 border-b border-slate-200 text-center lg:text-left">${parseInlineStyles(h)}</th>`).join("");
+                let trs = rows.map(r => {
+                    let tds = r.map(c => `<td class="p-2 sm:p-2.5 text-[9.5px] sm:text-xs text-slate-650 border-b border-slate-100 text-center lg:text-left">${parseInlineStyles(c)}</td>`).join("");
+                    return `<tr class="hover:bg-slate-50/50 transition-colors">${tds}</tr>`;
+                }).join("");
+                
+                return `
+                    <div class="overflow-x-auto my-4 rounded-2xl border border-slate-200/80 shadow-sm max-w-full">
+                        <table class="w-full text-[10px] sm:text-xs border-collapse bg-white min-w-[420px] lg:min-w-full">
+                            <thead>
+                                <tr>${ths}</tr>
+                            </thead>
+                            <tbody class="divide-y divide-slate-100">
+                                ${trs}
+                            </tbody>
+                        </table>
+                    </div>
+                `;
             }
             
             for (let i = 0; i < lines.length; i++) {
@@ -1969,6 +2493,34 @@
                 if (inCodeBlock) {
                     codeContent.push(line);
                     continue;
+                }
+
+                // 1.5 테이블 파싱 처리
+                if (trimmed.startsWith("|")) {
+                    closeList();
+                    closeAlert();
+                    
+                    // 테이블 구분선 (|---|---|) 스킵
+                    if (trimmed.replace(/[|:\-\s]/g, "") === "") {
+                        continue;
+                    }
+                    
+                    let cells = trimmed.split("|").map(c => c.trim()).filter((c, idx, arr) => idx > 0 && idx < arr.length - 1);
+                    if (!inTable) {
+                        inTable = true;
+                        tableHeaders = cells;
+                        tableRows = [];
+                    } else {
+                        tableRows.push(cells);
+                    }
+                    continue;
+                } else {
+                    if (inTable) {
+                        htmlResult.push(renderTableHtml(tableHeaders, tableRows));
+                        inTable = false;
+                        tableHeaders = [];
+                        tableRows = [];
+                    }
                 }
                 
                 // 2. 얼럿 블록 및 인용구 (&gt;) 처리
@@ -2001,7 +2553,7 @@
                     if (inAlertBlock) {
                         alertContent.push(content);
                     } else {
-                        htmlResult.push(`<blockquote class="border-l-4 border-slate-300 pl-4 italic text-slate-500 my-2">${parseInlineStyles(content)}</blockquote>`);
+                        htmlResult.push(`<blockquote class="border-l-4 border-slate-300 pl-4 italic text-slate-500 my-2 text-center lg:text-left">${parseInlineStyles(content)}</blockquote>`);
                     }
                     continue;
                 } else {
@@ -2012,19 +2564,19 @@
                 if (trimmed.startsWith("# ")) {
                     closeList();
                     let content = trimmed.substring(2);
-                    htmlResult.push(`<h2 class="text-sm font-extrabold text-slate-900 border-b border-slate-200 pb-2 mb-4 mt-4">${parseInlineStyles(content)}</h2>`);
+                    htmlResult.push(`<h2 class="text-sm sm:text-base font-extrabold text-slate-900 border-b border-slate-200 pb-2 mb-4 mt-6 text-center lg:text-left">${parseInlineStyles(content)}</h2>`);
                     continue;
                 }
                 if (trimmed.startsWith("## ")) {
                     closeList();
                     let content = trimmed.substring(3);
-                    htmlResult.push(`<h3 class="text-xs font-extrabold text-royalBlue mt-5 mb-2 flex items-center gap-1.5">${parseInlineStyles(content)}</h3>`);
+                    htmlResult.push(`<h3 class="text-xs sm:text-sm font-extrabold text-royalBlue mt-5 mb-2 flex items-center justify-center lg:justify-start gap-1.5 text-center lg:text-left">${parseInlineStyles(content)}</h3>`);
                     continue;
                 }
                 if (trimmed.startsWith("### ")) {
                     closeList();
                     let content = trimmed.substring(4);
-                    htmlResult.push(`<h4 class="text-[11px] font-black text-slate-800 mt-4 mb-1">${parseInlineStyles(content)}</h4>`);
+                    htmlResult.push(`<h4 class="text-[10px] sm:text-[11px] font-black text-slate-800 mt-4 mb-1 text-center lg:text-left">${parseInlineStyles(content)}</h4>`);
                     continue;
                 }
                 
@@ -2043,21 +2595,21 @@
                     let content = listMatch[2];
                     if (!inList || listType !== "ul") {
                         closeList();
-                        htmlResult.push('<ul class="my-2 space-y-1">');
+                        htmlResult.push('<ul class="my-2 space-y-1 text-center lg:text-left list-none lg:list-inside">');
                         inList = true;
                         listType = "ul";
                     }
-                    htmlResult.push(`<li class="ml-4 list-disc text-slate-600 my-1">${parseInlineStyles(content)}</li>`);
+                    htmlResult.push(`<li class="text-slate-655 my-1 text-[9.5px] sm:text-[11px] text-center lg:text-left lg:list-item lg:ml-4 lg:list-disc">${parseInlineStyles(content)}</li>`);
                     continue;
                 } else if (numListMatch) {
                     let content = numListMatch[2];
                     if (!inList || listType !== "ol") {
                         closeList();
-                        htmlResult.push('<ol class="my-2 space-y-1">');
+                        htmlResult.push('<ol class="my-2 space-y-1 text-center lg:text-left list-none lg:list-inside">');
                         inList = true;
                         listType = "ol";
                     }
-                    htmlResult.push(`<li class="ml-4 list-decimal text-slate-600 my-1">${parseInlineStyles(content)}</li>`);
+                    htmlResult.push(`<li class="text-slate-655 my-1 text-[9.5px] sm:text-[11px] text-center lg:text-left lg:list-item lg:ml-4 lg:list-decimal">${parseInlineStyles(content)}</li>`);
                     continue;
                 } else {
                     if (trimmed === "") {
@@ -2067,10 +2619,14 @@
                 
                 // 6. 일반 문단 처리
                 if (trimmed !== "") {
-                    htmlResult.push(`<p class="text-[10px] text-slate-600 leading-relaxed my-2">${parseInlineStyles(trimmed)}</p>`);
+                    htmlResult.push(`<p class="text-[9.5px] sm:text-[11px] text-slate-600 leading-relaxed my-2 text-center lg:text-left tracking-tight">${parseInlineStyles(trimmed)}</p>`);
                 } else {
                     htmlResult.push("<br/>");
                 }
+            }
+            
+            if (inTable) {
+                htmlResult.push(renderTableHtml(tableHeaders, tableRows));
             }
             
             closeList();
@@ -2079,44 +2635,117 @@
             return htmlResult.join("\n");
         }
 
-        // 백업용 고화질 오프라인 HTML 가이드
         function getFallbackGuideHTML() {
             return `
-                <div class="space-y-4">
-                    <h2 class="text-sm font-extrabold text-slate-900 border-b border-slate-200 pb-2 mb-4">🏠 대법원 경매 크롤러 및 대시보드 사용 가이드</h2>
-                    <p class="text-[10px] text-slate-500">본 대시보드는 대법원 경매 정보망의 실시간 자동 스크래핑 시스템 및 하이브리드 추천 대시보드의 작동 원리와 패치 내역을 완벽하게 내장하고 있습니다.</p>
+                <div class="space-y-5 font-sans text-center lg:text-left">
+                    <h2 class="text-sm sm:text-base font-extrabold text-slate-900 border-b border-slate-200 pb-2 mb-4 flex items-center justify-center lg:justify-start gap-1.5">
+                        <i class="fa-solid fa-book-open text-royalBlue"></i> 🏠 대시보드 시스템 안내 및 사용자 가이드
+                    </h2>
+                    <p class="text-[9.5px] sm:text-[11px] text-slate-500 leading-relaxed font-medium">본 대시보드는 대법원 경매 정보망의 실시간 자동 스크래핑 시스템 및 캠코 온비드 공매의 실시간 연동 데몬, 그리고 하이브리드 추천 엔진의 작동 가이드라인입니다.</p>
                     
                     <div class="border-t border-slate-200 my-4"></div>
                     
-                    <h3 class="text-xs font-extrabold text-royalBlue mb-2"><i class="fa-solid fa-gears"></i> 1. 시스템 작동 아키텍처</h3>
-                    <p class="text-[10px] text-slate-600 leading-relaxed">
-                        1. <strong>세션 수립(Warmup)</strong>: 대법원 서버의 보안 차단을 방지하기 위해 메인 페이지에 선요청을 보내 보안 토큰 및 접속 세션을 획득합니다.<br/>
-                        2. <strong>기일 일정 조회</strong>: 당월 및 익월에 예정되어 있는 전국 법원의 기일 세션 리스트를 확보합니다.<br/>
-                        3. <strong>상세 물건 파싱</strong>: 기일별 상세 쿼리를 통해 실제 입찰 진행 중인 물건들을 대위 수집하고, 권리분석 하드필터 규칙을 작동시켜 위해 물건을 걸러냅니다.<br/>
-                        4. <strong>실시간 DB 적재</strong>: 정제된 물건들은 SQLite 로컬 데이터베이스(\`auction.db\`)에 즉각 저장됩니다.
+                    <!-- 1. 부동산 경매 vs 캠코 공매 실무 비교 분석 -->
+                    <h3 class="text-xs sm:text-sm font-extrabold text-royalBlue mb-2 flex items-center justify-center lg:justify-start gap-1.5">
+                        <i class="fa-solid fa-scale-balanced text-royalBlue"></i> 1. 부동산 경매 vs 캠코 공매 실무 비교 분석
+                    </h3>
+                    <p class="text-[9.5px] sm:text-[11px] text-slate-600 leading-relaxed mb-3 font-medium">
+                        경매와 공매는 채무자의 자산을 강제 매각하여 채권을 회수한다는 목적은 같지만, 집행 기관, 입찰 방식, 그리고 낙찰자 관점에서의 <strong>명도(인도) 법적 권한</strong>에서 매우 큰 차이가 있습니다.
                     </p>
                     
-                    <div class="border-t border-slate-200 my-4"></div>
-                    
-                    <h3 class="text-xs font-extrabold text-royalBlue mb-2"><i class="fa-solid fa-triangle-exclamation"></i> 2. 중요 버그 패치 및 기능 개선 사항 (완료)</h3>
-                    <div class="space-y-2 text-[10px] text-slate-600">
-                        <div class="p-3 border border-rose-200 bg-rose-50/50 rounded-xl">
-                            <strong class="text-rose-800 font-bold block mb-1">🚨 패치 1. 데이터 수집 누락 버그 해결 (수집량 극대화)</strong>
-                            기존에 정정공고만 파싱하여 수십 건의 일반 매물이 누락되던 심각한 경로 버그를 해결하고, 정상 진행 중인 법원 본 매물 보관 경로를 완전 확보하여 전체 경매 물건이 온전하게 수집되도록 정밀 보정 완료했습니다.
-                        </div>
-                        <div class="p-3 border border-emerald-200 bg-emerald-50/50 rounded-xl">
-                            <strong class="text-emerald-800 font-bold block mb-1">💡 패치 2. 한글 디코딩 및 한자 자형 완전 복구</strong>
-                            대법원 수신 바이트 인코딩을 UTF-8 표준으로 복구하여, 사건번호의 "타경" 한자나 소재지 동명/도로명이 깨진 문자 없이 매끄러운 한글 상태로 DB에 안전 저장되도록 개선했습니다.
+                    <div class="overflow-x-auto my-3 rounded-2xl border border-slate-200 shadow-sm max-w-full">
+                        <table class="w-full text-[9.5px] sm:text-xs border-collapse bg-white min-w-[420px] lg:min-w-full">
+                            <thead>
+                                <tr class="bg-slate-100/80 border-b border-slate-200">
+                                    <th class="p-2 font-extrabold text-slate-800 text-center lg:text-left">비교 항목</th>
+                                    <th class="p-2 font-extrabold text-slate-800 text-center lg:text-left">⚖️ 대법원 법원경매</th>
+                                    <th class="p-2 font-extrabold text-slate-800 text-center lg:text-left">🏢 캠코 온비드 공매</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-slate-100 text-slate-650">
+                                <tr class="hover:bg-slate-50/50 transition-colors">
+                                    <td class="p-2 text-center lg:text-left font-black text-slate-700">입찰 방식</td>
+                                    <td class="p-2 text-center lg:text-left">관할 법원 입찰 법정 (100% 현장 출석)</td>
+                                    <td class="p-2 text-center lg:text-left">인터넷 온비드 홈페이지 및 모바일 앱 (100% 온라인)</td>
+                                </tr>
+                                <tr class="hover:bg-slate-50/50 transition-colors">
+                                    <td class="p-2 text-center lg:text-left font-black text-slate-700">명도(인도) 책임</td>
+                                    <td class="p-2 text-center lg:text-left font-bold text-rose-600">인도명령 제도 존재 (매우 유리)</td>
+                                    <td class="p-2 text-center lg:text-left text-slate-550">인도명령 제도 없음 (무조건 명도소송)</td>
+                                </tr>
+                                <tr class="hover:bg-slate-50/50 transition-colors">
+                                    <td class="p-2 text-center lg:text-left font-black text-slate-700">입찰 보증금</td>
+                                    <td class="p-2 text-center lg:text-left">최저매각가격의 10% (고정)</td>
+                                    <td class="p-2 text-center lg:text-left font-bold text-royalBlue">본인이 써낸 입찰금액의 10%</td>
+                                </tr>
+                                <tr class="hover:bg-slate-50/50 transition-colors">
+                                    <td class="p-2 text-center lg:text-left font-black text-slate-700">유찰 저감율</td>
+                                    <td class="p-2 text-center lg:text-left">1회 유찰 시 20% 또는 30% 감액</td>
+                                    <td class="p-2 text-center lg:text-left">1회 유찰 시 10%씩 감액 (최대 50%)</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- 실무 투자 포인트 요약 -->
+                    <div class="bg-white border border-slate-200 rounded-2xl p-4 shadow-sm space-y-3 my-4">
+                        <strong class="text-xs font-black text-slate-900 block text-center lg:text-left">💡 실무 투자 포인트 요약 (핵심 차이)</strong>
+                        <div class="space-y-2 text-[9.5px] sm:text-[11px] text-slate-600 leading-relaxed text-center lg:text-left">
+                            <p>• <strong>명도 편의성 (인도명령 제도)</strong>: <strong class="text-rose-700 font-extrabold">경매가 압도적으로 유리합니다.</strong> 경매는 강력한 사법 조치인 '인도명령'이 있어 낙찰대금 납부 후 6개월 이내에 신청하면 소송 없이도 신속하게 집행관을 통해 강제집행할 수 있습니다. 반면, 공매는 이러한 제도적 혜택이 없어 점유자가 불응 시 무조건 기나긴 '명도소송'(최소 6개월에서 1년 이상 소요)을 거쳐야 하므로 추가 비용과 법적 스트레스가 발생할 수 있습니다.</p>
+                            <p>• <strong>시간 및 공간적 유연성</strong>: 공매는 평일 3일간 24시간 언제 어디서나 인터넷과 스마트폰 앱(온비드)을 통해 입찰을 진행하므로 일상생활에 방해 없이 참여할 수 있습니다. 반면, 경매는 평일 오전 지정된 시간까지 해당 부동산 관할 법원의 물리적인 입찰 법정에 직접 출석해야 하므로 시간적 제약이 매우 큽니다.</p>
+                            <p>• <strong>입찰보증금 계산법</strong>: 법원경매는 당회차 <strong>'최저 매각가격의 10%'</strong>를 보증금으로 제출하면 됩니다. 반면, 온비드 공매는 본인이 실제로 작성해 적어낸 <strong>'입찰 금액의 10%'</strong>를 이체해야 합니다. 공매에서 보증금을 최저가 기준으로 오인하여 부족하게 납부하면 즉시 무효 처리되므로 주의가 필요합니다.</p>
                         </div>
                     </div>
                     
                     <div class="border-t border-slate-200 my-4"></div>
                     
-                    <h3 class="text-xs font-extrabold text-royalBlue mb-2"><i class="fa-solid fa-terminal"></i> 3. 사용 방법 및 수동 연동 (Mix)</h3>
-                    <p class="text-[10px] text-slate-600 leading-relaxed">
-                        • <strong>백그라운드 자동 수집</strong>: uvicorn 서버가 켜진 상태에서 1시간마다 실시간 백업 스케줄러가 백그라운드 스레드로 연동되어 동기화를 상시 유지합니다.<br/>
-                        • <strong>사설 데이터 병합(Mix)</strong>: 유료 사이트 등에서 다운받은 CSV 파일을 왼쪽 사이드바 <strong>[사설 경매 파일 수동 업로드]</strong>에 올려주시면, 주소지를 지능적으로 매칭해 중복을 제거한 뒤 비고란을 하나로 병합해 줍니다.
+                    <!-- 2. 5대 실시간 자동 수집 연동 플랜 상세 -->
+                    <h3 class="text-xs sm:text-sm font-extrabold text-royalBlue mb-2 flex items-center justify-center lg:justify-start gap-1.5">
+                        <i class="fa-solid fa-network-wired"></i> 2. 5대 실시간 자동 수집 연동 플랜 (Plan A ~ E) 상세
+                    </h3>
+                    <p class="text-[9.5px] sm:text-[11px] text-slate-655 leading-relaxed mb-3 font-medium">
+                        본 시스템은 외부 기관의 점검, 스크립트 탐지, IP 차단 및 통신 오류에 대처하기 위해 5중으로 백업되는 실시간 수집 연동 시스템을 갖추고 있습니다.
                     </p>
+                    
+                    <div class="space-y-2.5 text-[9.5px] sm:text-[11px] text-slate-600">
+                        <div class="p-3 border border-slate-200 bg-white rounded-xl leading-relaxed text-center lg:text-left shadow-sm">
+                            <strong class="text-blue-600 font-extrabold block mb-0.5"><i class="fa-solid fa-circle-play text-[10px]"></i> Plan A: GitHub Actions (클라우드 스케줄러)</strong>
+                            매일 새벽 3시에 클라우드 인프라(GitHub Actions Runner) 상에서 주기적인 크론 잡이 가동됩니다. 사전에 지정된 크롤러가 작동하여 대법원 법원경매 정보망과 온비드 데이터허브의 주요 신규 물건과 기일 정보를 파싱 및 적재한 후, 데이터베이스에 안전하게 머지하는 자동화 엔진입니다.
+                        </div>
+                        <div class="p-3 border border-slate-200 bg-white rounded-xl leading-relaxed text-center lg:text-left shadow-sm">
+                            <strong class="text-emerald-600 font-extrabold block mb-0.5"><i class="fa-solid fa-circle-play text-[10px]"></i> Plan B: 공공데이터포털 Open API 실시간 연동</strong>
+                            한국자산관리공사(KAMCO)가 공공데이터포털을 통해 제공하는 온비드 자산정보 OpenAPI와 실시간으로 동기화됩니다. uvicorn 서버 구동 중 백그라운드 스레드 데몬이 1시간 주기로 API를 폴링하여 최신 공매 물건, 저감 비율 및 기일 변동 데이터를 실시간 수집합니다.
+                        </div>
+                        <div class="p-3 border border-slate-200 bg-white rounded-xl leading-relaxed text-center lg:text-left shadow-sm">
+                            <strong class="text-amber-600 font-extrabold block mb-0.5"><i class="fa-solid fa-circle-play text-[10px]"></i> Plan C: 분산 다중 노드 백업 수집 데몬</strong>
+                            클라우드 가상 서버(VPS) 및 로컬 환경에 독립적으로 설치된 2nd/3rd 노드가 12시간마다 교차 구동됩니다. 이를 통해 메인 수집 노드의 하드웨어 고장이나 데이터 유실에 대비하고, 공식 데이터베이스의 무결성과 데이터 정합성을 다중 검증합니다.
+                        </div>
+                        <div class="p-3 border border-slate-200 bg-white rounded-xl leading-relaxed text-center lg:text-left shadow-sm">
+                            <strong class="text-rose-600 font-extrabold block mb-0.5"><i class="fa-solid fa-circle-play text-[10px]"></i> Plan D: 헤드리스 브라우저 Selenium 자동화</strong>
+                            대법원 경매 사이트의 엄격한 스크래핑 차단 정책(Anti-Scraping)이나 웹 요소 변경을 실시간 우회합니다. 서버단에서 가상의 헤드리스 크롬 브라우저(Selenium) 인스턴스를 동적으로 띄워, 인간 사용자의 정상 클릭/탐색 패턴을 모방함으로써 공식 경매매각명세서 원문의 권리 및 임차 정보 하자를 완벽하게 파싱합니다.
+                        </div>
+                        <div class="p-3 border border-slate-200 bg-white rounded-xl leading-relaxed text-center lg:text-left shadow-sm">
+                            <strong class="text-indigo-600 font-extrabold block mb-0.5"><i class="fa-solid fa-circle-play text-[10px]"></i> Plan E: AWS Lambda & proxy 동적 우회 가동</strong>
+                            수집량이 폭증하거나 대법원 서버로부터 IP가 집중 차단되는 임계 상태에 돌입하면 가동됩니다. AWS Lambda 서버리스 핸들러가 병렬로 기동되어 수집 처리를 분산하고, IP 차단 감지 시 동적 프록시 노드를 통해 접속 IP를 자동 우회함으로써 무중단 동기화를 보장합니다.
+                        </div>
+                    </div>
+                    
+                    <div class="border-t border-slate-200 my-4"></div>
+                    
+                    <!-- 3. 중요 버그 패치 및 기능 개선 사항 (완료) -->
+                    <h3 class="text-xs sm:text-sm font-extrabold text-royalBlue mb-2 flex items-center justify-center lg:justify-start gap-1.5">
+                        <i class="fa-solid fa-triangle-exclamation"></i> 3. 중요 버그 패치 및 기능 개선 사항 (완료)
+                    </h3>
+                    <div class="space-y-2 text-[9.5px] sm:text-[11px] text-slate-600 text-center lg:text-left">
+                        <div class="p-3 border border-rose-200 bg-rose-50/50 rounded-xl">
+                            <strong class="text-rose-800 font-extrabold block mb-0.5">🚨 패치 1. 데이터 수집 누락 버그 해결 (수집량 극대화)</strong>
+                            기존에 일반 매물이 누락되던 심각한 경로 버그를 해결하고, 정상 진행 중인 법원 본 매물 보관 경로를 완전 확보하여 전체 경매 물건이 온전하게 수집되도록 정밀 보정 완료했습니다.
+                        </div>
+                        <div class="p-3 border border-emerald-200 bg-emerald-50/50 rounded-xl">
+                            <strong class="text-emerald-800 font-extrabold block mb-0.5">💡 패치 2. 한글 디코딩 및 한자 자형 완전 복구</strong>
+                            대법원 수신 바이트 인코딩을 UTF-8 표준으로 복구하여, 사건번호의 "타경" 한자나 소재지 동명/도로명이 깨진 문자 없이 매끄러운 한글 상태로 DB에 안전 저장되도록 개선했습니다.
+                        </div>
+                    </div>
                 </div>
             `;
         }

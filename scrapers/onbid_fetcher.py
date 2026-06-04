@@ -28,37 +28,77 @@ def calculate_remaining_days(close_date_str):
     except ValueError:
         return 9999
 
-def evaluate_hardfilter(address, desc, notes):
-    search_text = f"{address} {desc} {notes}"
-    for category, keywords in HARDFILTER_RULES.items():
-        for kw in keywords:
-            if kw in search_text:
-                return False
-    return True
-
-def compute_softscore(price, close_date_str):
+def compute_softscore(price, appraisal, address, ptype, close_date_str, desc, notes):
+    # 기본 스코어는 60점 시작
     score = 60
-    # 서류 완전성 가점
-    score += 10
-    # 예산 적합성 가점
-    score += 10
-    # 기일 여유 가점
-    remaining_days = calculate_remaining_days(close_date_str)
-    if 0 <= remaining_days <= 90:
-        score += 5
-    # 온비드 공매 혜택 가점
-    score += 5
     
+    # 1. 문서 완전성 및 예산 적합성 (기본 가점 +15)
+    score += 15
+    
+    # 2. 기일 임박 시급성 및 여유도 (+5)
+    remaining_days = calculate_remaining_days(close_date_str)
+    if 0 <= remaining_days <= 14:
+        score += 5  # 매우 임박하여 즉시 분석 필요
+    elif 15 <= remaining_days <= 90:
+        score += 3  # 안정적 검토 가능
+        
+    # 3. 입지 우수성 가점 (+10)
+    # 서울 핵심 지역(강남, 서초, 송파) 및 성남 분당구 검출 시 가점 부여
+    address_clean = address or ""
+    if any(loc in address_clean for loc in ["강남구", "서초구", "송파구", "분당구"]):
+        score += 10
+        
+    # 4. 용도 선호 유형 가점 (+10)
+    # 아파트, 오피스텔 등 선호도 높은 주거용 부동산 가점
+    ptype_clean = ptype or ""
+    if any(pref in ptype_clean for pref in ["아파트", "오피스텔", "주택"]):
+        score += 10
+    elif any(pref in ptype_clean for pref in ["상가", "점포", "근린"]):
+        score += 5
+        
+    # 5. 유찰 할인율 매력도 (+10)
+    # 감정가 대비 최저가 저감폭 계산 (유찰 횟수가 많고 가격 매력도가 클수록 가점)
+    if appraisal and appraisal > 0 and price and price > 0:
+        discount_ratio = (appraisal - price) / appraisal
+        if discount_ratio >= 0.30:
+            score += 10  # 30% 이상 초저가 할인 매물
+        elif discount_ratio >= 0.20:
+            score += 5   # 20% 이상 일반 할인 매물
+
+    # 6. 리스크 감점 세분화
+    # 6.1 치명적 리스크 검사 -> 강제 X등급 및 0점 처리
+    fatal_keywords = ["대지권없음", "건물만", "토지만", "대지권 미등기", "유치권", "유치권 주장", "지분"]
+    search_text = f"{address} {desc} {notes}".lower()
+    
+    for kw in fatal_keywords:
+        if kw in search_text:
+            return 0, "X", remaining_days
+            
+    # 6.2 일반/주의 리스크 검사 -> 부분 감점 (건당 -25, 최소 0점 한도)
+    moderate_keywords = ["점유관계미상", "명도곤란", "선순위 임차인", "대항력", "임차권", "보증금 인수", "토지별도", "서류없음", "확인불가", "열람불가", "자료없음"]
+    moderate_count = 0
+    for kw in moderate_keywords:
+        if kw in search_text:
+            moderate_count += 1
+            
+    if moderate_count > 0:
+        score = max(0, score - 25)
+        
+    # 최종 등급 매핑
     if score >= 90:
         grade = "A"
     elif score >= 80:
         grade = "B"
     elif score >= 70:
         grade = "C"
-    elif score >= 60:
+    elif score >= 50:
         grade = "D"
     else:
         grade = "E"
+        
+    # 만약 주의 리스크가 검출되었는데 점수 상으로 A/B인 경우 D등급으로 보정하여 안전성 확보
+    if moderate_count > 0 and grade in ["A", "B", "C"]:
+        grade = "D"
         
     return score, grade, remaining_days
 
@@ -242,14 +282,22 @@ def fetch_onbid_data():
                             if any(kw in text_to_check for kw in ["낙찰", "매각결정", "종결"]):
                                 continue
                                 
-                            is_passed = evaluate_hardfilter(address, desc, notes)
+                            # 1. 신규 정밀 AI 스코어링 및 등급/D-Day 산출
+                            score, grade, rem_days = compute_softscore(
+                                price=price,
+                                appraisal=appraisal,
+                                address=address,
+                                ptype=ptype,
+                                close_date_str=close_date,
+                                desc=desc,
+                                notes=notes
+                            )
                             
-                            if is_passed:
-                                score, grade, rem_days = compute_softscore(price, close_date)
-                            else:
-                                score, grade = 0, "X"
-                                rem_days = calculate_remaining_days(close_date)
-                                notes = f"⚠️ 하드필터 제외 단어 검출! (공매 주의 요망) | {notes}"
+                            # 위험 표시 보강
+                            if grade == "X":
+                                notes = f"⚠️ 치명적 AI 하자 분류! (입찰 비권장) | {notes}"
+                            elif grade == "D":
+                                notes = f"🟡 AI 주의 리스크 검출! (특별 매각조건 등 확인 권장) | {notes}"
                                 
                             items_collected.append({
                                 "source": "onbid",
