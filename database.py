@@ -60,23 +60,26 @@ from firebase_admin import credentials
 from firebase_admin import firestore
 
 def get_firestore_client():
-    """Firebase 서비스 계정 키 파일을 사용해 Firestore 클라이언트를 반환합니다."""
+    """Firebase 서비스 계정 키 파일 또는 Application Default Credentials를 사용해 Firestore 클라이언트를 반환합니다."""
     # config 폴더 내에 서비스 계정 키를 배치하도록 가이드합니다.
     key_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "config", "serviceAccountKey.json")
     
-    if not os.path.exists(key_path):
-        print(f"[-] Firebase 서비스 계정 키를 찾을 수 없습니다: {key_path}")
-        print("    Firebase Console -> 프로젝트 설정 -> 서비스 계정에서 새 비공개 키를 생성하여 저장해 주십시오.")
-        return None
-        
     try:
         # 이미 초기화된 앱이 있는지 확인합니다.
         if not firebase_admin._apps:
-            cred = credentials.Certificate(key_path)
-            firebase_admin.initialize_app(cred)
+            if os.path.exists(key_path):
+                cred = credentials.Certificate(key_path)
+                firebase_admin.initialize_app(cred)
+                print("[+] Firebase Admin SDK initialized via Service Account Key file.")
+            else:
+                # 파일이 없을 경우 ADC (Application Default Credentials) 기반 자동 초기화 fallback
+                firebase_admin.initialize_app()
+                print("[+] Firebase Admin SDK initialized via Application Default Credentials (ADC).")
         return firestore.client()
     except Exception as e:
         print(f"[-] Firebase Admin SDK 초기화 오류 발생: {e}")
+        print("    로컬 환경에서 데이터를 클라우드로 밀어 넣으려면 config/serviceAccountKey.json 키 파일을 생성하거나")
+        print("    'gcloud auth application-default login' 등을 수행해 주셔야 합니다.")
         return None
 
 def sync_sqlite_to_firestore():
@@ -140,3 +143,4 @@ def sync_sqlite_to_firestore():
 
 if __name__ == "__main__":
     init_db()
+    sync_sqlite_to_firestore()
