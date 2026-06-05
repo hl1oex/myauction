@@ -127,6 +127,16 @@ def save_to_db(properties_list):
             
     conn.commit()
     conn.close()
+    
+    # SQLite 저장 처리가 종료되면 변경점을 Firestore에 반영하기 위해 전송 함수를 호출합니다.
+    try:
+        import sys
+        sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+        from database import sync_sqlite_to_firestore
+        sync_sqlite_to_firestore()
+    except Exception as sync_err:
+        print(f"[-] 클라우드 Firestore 동기화 전송 오류: {sync_err}")
+        
     return success_count
 
 def log_sync_status(status, count, error_msg=""):

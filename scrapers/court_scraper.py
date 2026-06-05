@@ -398,6 +398,15 @@ def scrape_court_data():
             success_count = save_to_db(combined_results)
             log_sync_status("SUCCESS", success_count)
             print(f"[+] Court data synchronized successfully! Total: {success_count} listings.")
+            
+            # SQLite에 데이터 적재가 성공한 후, 온라인 연동을 위해 클라우드 Firestore로 데이터를 일괄 푸시합니다.
+            try:
+                import sys
+                sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+                from database import sync_sqlite_to_firestore
+                sync_sqlite_to_firestore()
+            except Exception as sync_err:
+                print(f"[-] 클라우드 Firestore 동기화 중 에러가 일어났습니다: {sync_err}")
         else:
             log_sync_status("SUCCESS", 0)
             

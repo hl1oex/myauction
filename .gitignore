@@ -26,3 +26,7 @@ input_sources/json/court_meta.json
 
 *.bat
 경매_추천_시스템_v1.0.zip
+  
+# Firebase Hosting temporary directories  
+.firebase/  
+dist/ 
