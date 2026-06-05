@@ -1,6 +1,6 @@
 // 로컬 FastAPI 서버 통신 모듈을 대체하여 Firebase Firestore에서 실시간 매물 목록과 수집 로그를 직접 조회하는 데이터 통신 모듈입니다.
 
-import { collection, getDocs, query, where, doc, getDoc } from 'firebase/firestore';
+import { collection, getDocs, query, where, doc, getDoc, onSnapshot } from 'firebase/firestore';
 import { db } from './firebase';
 import { Property } from '../types';
 
@@ -91,5 +91,96 @@ export async function fetchSyncStatus(): Promise<SyncStatus> {
   } catch (error) {
     console.error('동기화 로그 데이터 획득 실패', error);
     throw error;
+  }
+}
+
+/**
+ * properties 컬렉션의 변화를 실시간으로 구독하는 리스너를 생성합니다.
+ */
+export function subscribeProperties(
+  onData: (properties: Property[]) => void,
+  onError: (error: Error) => void,
+  source?: string,
+  search?: string
+): () => void {
+  try {
+    const propertiesCollectionRef = collection(db, 'properties');
+    let q = query(propertiesCollectionRef);
+
+    if (source && source !== 'all') {
+      q = query(propertiesCollectionRef, where('source', '==', source));
+    }
+
+    const unsubscribe = onSnapshot(q, (querySnapshot) => {
+      const results: Property[] = [];
+      querySnapshot.forEach((docSnapshot) => {
+        results.push(docSnapshot.data() as Property);
+      });
+
+      if (search) {
+        const searchLower = search.toLowerCase();
+        const filtered = results.filter(p => 
+          (p.address && p.address.toLowerCase().includes(searchLower)) ||
+          (p.auction_no && p.auction_no.toLowerCase().includes(searchLower)) ||
+          (p.ptype && p.ptype.toLowerCase().includes(searchLower))
+        );
+        onData(filtered);
+      } else {
+        onData(results);
+      }
+    }, (error) => {
+      console.error('Firestore properties 실시간 구독 실패', error);
+      onError(error);
+    });
+
+    return unsubscribe;
+  } catch (error) {
+    console.error('Firestore properties 실시간 리스너 등록 에러', error);
+    onError(error as Error);
+    return () => {};
+  }
+}
+
+/**
+ * sync_info 문서의 변화를 실시간으로 구독하는 리스너를 생성합니다.
+ */
+export function subscribeSyncStatus(
+  onData: (status: SyncStatus) => void,
+  onError: (error: Error) => void
+): () => void {
+  try {
+    const statusDocRef = doc(db, 'status', 'sync_info');
+    const unsubscribe = onSnapshot(statusDocRef, (docSnapshot) => {
+      if (docSnapshot.exists()) {
+        const data = docSnapshot.data();
+        const logs = data.logs || [];
+        
+        const lastCourtLog = logs.find((l: any) => l.task_name === 'court_scraper');
+        const lastOnbidLog = logs.find((l: any) => l.task_name === 'onbid_fetcher');
+
+        onData({
+          success: true,
+          last_court_sync: lastCourtLog ? lastCourtLog.timestamp : '기록 없음',
+          last_onbid_sync: lastOnbidLog ? lastOnbidLog.timestamp : '기록 없음',
+          logs: logs
+        });
+      } else {
+        onData({
+          success: false,
+          last_court_sync: '정보 없음',
+          last_onbid_sync: '정보 없음',
+          logs: []
+        });
+      }
+    }, (error) => {
+      console.error('Firestore sync_info 실시간 구독 실패', error);
+      onError(error);
+    });
+
+    return unsubscribe;
+  } catch (error) {
+    console.error('Firestore sync_info 실시간 리스너 등록 에러', error);
+    onError(error as Error);
+    return () => {};
   }
 }

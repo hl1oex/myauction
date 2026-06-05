@@ -11,30 +11,32 @@ import {
   SafeAreaView,
 } from 'react-native';
 import { COLORS } from '../components/Theme';
-import { fetchSyncStatus, SyncStatus } from '../utils/api';
+import { subscribeSyncStatus, SyncStatus } from '../utils/api';
 
 export const GuideScreen: React.FC = () => {
   const [syncStatus, setSyncStatus] = useState<SyncStatus | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
   const [syncError, setSyncError] = useState<string | null>(null);
 
-  // Firestore status 컬렉션으로부터 수집 로그 정보를 불러옵니다.
-  const loadSyncStatus = useCallback(async () => {
+  // Firestore status 컬렉션으로부터 수집 로그 정보를 실시간으로 구독합니다.
+  useEffect(() => {
     setLoading(true);
     setSyncError(null);
-    try {
-      const status = await fetchSyncStatus();
-      setSyncStatus(status);
-    } catch (err) {
-      setSyncError('클라우드 동기화 서버 연결에 실패하여 수집 이력을 가져올 수 없습니다.');
-    } finally {
-      setLoading(false);
-    }
-  }, []);
+    
+    const unsubscribe = subscribeSyncStatus(
+      (status) => {
+        setSyncStatus(status);
+        setLoading(false);
+      },
+      (err) => {
+        setSyncError('클라우드 동기화 서버 연결에 실패하여 수집 이력을 가져올 수 없습니다.');
+        setLoading(false);
+      }
+    );
 
-  useEffect(() => {
-    loadSyncStatus();
-  }, [loadSyncStatus]);
+    // 컴포넌트 언마운트 시 리스너 구독 해제
+    return () => unsubscribe();
+  }, []);
 
   return (
     <SafeAreaView style={styles.safeArea}>
@@ -56,9 +58,10 @@ export const GuideScreen: React.FC = () => {
         <View style={styles.card}>
           <View style={styles.syncHeaderRow}>
             <Text style={styles.cardTitle}>📡 클라우드 수집 동기화 상태</Text>
-            <TouchableOpacity onPress={loadSyncStatus} disabled={loading}>
-              <Text style={styles.refreshText}>{loading ? '로딩 중...' : '새로고침'}</Text>
-            </TouchableOpacity>
+            <View style={styles.liveIndicator}>
+              <View style={styles.liveDot} />
+              <Text style={styles.liveText}>실시간 수신</Text>
+            </View>
           </View>
 
           {loading ? (
@@ -200,10 +203,25 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginBottom: 10,
   },
-  refreshText: {
-    fontSize: 14,
+  liveIndicator: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: COLORS.emeraldLight,
+    paddingHorizontal: 8,
+    paddingVertical: 3,
+    borderRadius: 6,
+  },
+  liveDot: {
+    width: 5,
+    height: 5,
+    borderRadius: 99,
+    backgroundColor: COLORS.emeraldSuccess,
+    marginRight: 4,
+  },
+  liveText: {
+    fontSize: 11,
     fontWeight: 'bold',
-    color: COLORS.royalBlue,
+    color: COLORS.emeraldSuccess,
   },
   loader: {
     marginVertical: 20,

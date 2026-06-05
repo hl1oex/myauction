@@ -3,6 +3,18 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- ⚠️ 콘솔 경고 필터 (Tailwind CDN 프로덕션 경고 메시지 콘솔 출력 차단) -->
+    <script>
+        (function() {
+            const originalWarn = console.warn;
+            console.warn = function(...args) {
+                if (args[0] && typeof args[0] === 'string' && (args[0].includes('cdn.tailwindcss.com') || args[0].includes('tailwindcss.com/docs'))) {
+                    return;
+                }
+                originalWarn.apply(console, args);
+            };
+        })();
+    </script>
     <title>AI 부동산 경시/공매 실시간 통합 추천 시스템 v1.1</title>
     <!-- 💎 1. 프리미엄 디자인 타이포그래피를 위한 Google Fonts 연동 -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -200,44 +212,43 @@
 </head>
 <body class="bg-pearlWhiteBg text-slate-800 font-sans h-screen overflow-hidden flex flex-col">
 
-    <!-- 🌐 1. 상단 글로벌 헤더바 -->
-    <header class="bg-white border-b border-slate-200 h-16 min-h-[64px] flex items-center justify-start px-6 shadow-sm z-30">
-        <!-- [좌측 영역] 로고 및 타이틀 (모바일 필터 토글 제거 및 w-full로 전면 개방) -->
-        <div class="flex items-center gap-3 w-full">
-            <button id="header-sidebar-toggle-btn" onclick="toggleSidebar()" class="hidden p-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 flex items-center justify-center transition-all select-none mr-1 flex-shrink-0" title="필터 열기">
-                <i class="fa-solid fa-sliders text-xs"></i>
+    <!-- 🌐 1. 상단 글로벌 헤더바 (수직 크기 축소 및 실시간 연동등 복구) -->
+    <header class="bg-white border-b border-slate-200 h-12 min-h-[48px] flex items-center justify-between px-4 shadow-sm z-30">
+        <!-- [좌측 영역] 로고 및 타이틀 -->
+        <div class="flex items-center gap-2.5">
+            <button id="header-sidebar-toggle-btn" onclick="toggleSidebar()" class="hidden p-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-705 flex items-center justify-center transition-all select-none mr-1 flex-shrink-0" title="필터 열기">
+                <i class="fa-solid fa-sliders text-[10px]"></i>
             </button>
-            <div class="bg-royalBlue text-white w-9 h-9 rounded-xl flex items-center justify-center shadow-md shadow-blue-500/10 flex-shrink-0">
-                <i class="fa-solid fa-hotel text-sm"></i>
+            <div class="bg-royalBlue text-white w-7 h-7 rounded-lg flex items-center justify-center shadow-md shadow-blue-500/10 flex-shrink-0">
+                <i class="fa-solid fa-hotel text-xs"></i>
             </div>
             <div class="truncate">
-                <h1 class="text-sm sm:text-base font-extrabold tracking-tight text-slate-900 flex items-center gap-2 whitespace-nowrap">
+                <h1 class="text-xs sm:text-sm font-extrabold tracking-tight text-slate-900 flex items-center gap-1.5 whitespace-nowrap">
                     AI 부동산 경공매 추천 시스템
-                    <span class="bg-blue-50 text-royalBlue text-[10px] px-2 py-0.5 rounded-full font-black border border-blue-200">v1.1</span>
+                    <span class="bg-blue-50 text-royalBlue text-[9px] px-1.5 py-0.2 rounded-full font-black border border-blue-200">v1.1</span>
                 </h1>
-                <p class="text-[9px] sm:text-[10px] text-slate-400 font-bold uppercase tracking-wider">Premium Elegant Pearl White</p>
+                <p class="text-[8px] text-slate-400 font-bold uppercase tracking-wider leading-none">Premium Elegant Pearl White</p>
             </div>
         </div>
         
-        <!-- [중앙 영역] 실시간 자산 현황판 및 연결 센서 (사용자 시안에 맞춰 hidden 처리) -->
-        <div class="hidden">
+        <!-- [우측 영역] 실시간 자산 현황판 및 연결 센서 (hidden 해제 및 우측 정밀 배치) -->
+        <div class="flex items-center gap-2 ml-auto">
             <div id="connection-sensor" onclick="fetchDataFromServer(); fetchSyncStatus();" 
-                 class="flex items-center gap-2 px-3 py-1.5 rounded-full bg-slate-50 border border-slate-200 text-slate-700 text-xs font-black shadow-sm transition-all duration-300 cursor-pointer hover:bg-slate-100 active:scale-95 whitespace-nowrap" 
+                 class="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-slate-50 border border-slate-200 text-slate-705 text-[9.5px] font-black shadow-sm transition-all duration-300 cursor-pointer hover:bg-slate-100 active:scale-95 whitespace-nowrap" 
                  title="클릭하시면 즉시 실시간 데이터 연동 및 동기화를 재시도합니다.">
-                <span class="w-2.5 h-2.5 rounded-full bg-slate-400"></span>
+                <span class="w-1.5 h-1.5 rounded-full bg-slate-400"></span>
                 <span>연동 대기 중</span>
             </div>
             
-            <div class="flex items-center gap-1.5 px-3.5 py-1.5 bg-blue-50/80 border border-blue-100 text-royalBlue text-xs font-black rounded-full shadow-sm whitespace-nowrap">
-                <i class="fa-solid fa-database text-[10px]"></i>
-                <span>실시간 수집 자산: <span id="header-total-count" class="font-outfit font-black">0</span>건 (<span id="header-court-count" class="font-outfit font-bold">0</span>경매 | <span id="header-onbid-count" class="font-outfit font-bold">0</span>공매)</span>
+            <div class="hidden md:flex items-center gap-1 px-2.5 py-1 bg-blue-50/80 border border-blue-100 text-royalBlue text-[9.5px] font-black rounded-full shadow-sm whitespace-nowrap">
+                <i class="fa-solid fa-database text-[8px]"></i>
+                <span>실시간 수집: <span id="header-total-count" class="font-outfit font-black">0</span>건 (<span id="header-court-count" class="font-outfit font-bold">0</span>경매 | <span id="header-onbid-count" class="font-outfit font-bold">0</span>공매)</span>
             </div>
-        </div>
-
-        <!-- [우측 영역] 자동 동기화 정보 (사용자 시안에 맞춰 hidden 처리) -->
-        <div class="hidden">
-            <i class="fa-solid fa-clock-rotate-left"></i>
-            <span>백그라운드 스케줄 수집 작동 중</span>
+            
+            <div class="hidden lg:flex items-center gap-1 text-[9.5px] text-slate-400 font-bold whitespace-nowrap ml-1.5">
+                <i class="fa-solid fa-clock-rotate-left"></i>
+                <span>백그라운드 스케줄 수집 중</span>
+            </div>
         </div>
     </header>
  
@@ -423,17 +434,17 @@
                 
                 <!-- 💻 PC/태블릿 전용: 기존 3개 칸 나누기 구조 -->
                 <div class="hidden lg:grid grid-cols-3 gap-2">
-                    <div class="bg-blue-50/50 border border-blue-100 rounded-xl p-2 text-center">
+                    <div class="bg-blue-50/50 border border-blue-100 rounded-xl p-1.5 text-center">
                         <p class="text-[10px] sm:text-xs font-black text-royalBlue uppercase tracking-wider mb-0.5">추천 적합 매물 (전체 <span id="kpi-total-count" class="font-outfit text-slate-500 font-bold">0</span>건 중)</p>
-                        <h3 id="kpi-recommended-count" class="text-sm sm:text-lg font-black text-slate-900 font-outfit">0건</h3>
+                        <h3 id="kpi-recommended-count" class="text-xs sm:text-sm font-black text-slate-900 font-outfit">0건</h3>
                     </div>
-                    <div class="bg-emerald-50/50 border border-emerald-100 rounded-xl p-2 text-center">
+                    <div class="bg-emerald-50/50 border border-emerald-100 rounded-xl p-1.5 text-center">
                         <p class="text-[10px] sm:text-xs font-black text-emeraldSuccess uppercase tracking-wider mb-0.5">고적합 (A~B등급)</p>
-                        <h3 id="kpi-high-count" class="text-sm sm:text-lg font-black text-emeraldSuccess font-outfit">0건</h3>
+                        <h3 id="kpi-high-count" class="text-xs sm:text-sm font-black text-emeraldSuccess font-outfit">0건</h3>
                     </div>
-                    <div class="bg-rose-50/50 border border-rose-100 rounded-xl p-2 text-center">
+                    <div class="bg-rose-50/50 border border-rose-100 rounded-xl p-1.5 text-center">
                         <p class="text-[10px] sm:text-xs font-black text-crimsonAlert uppercase tracking-wider mb-0.5">위험 탈락 매물 (X)</p>
-                        <h3 id="kpi-risk-count" class="text-sm sm:text-lg font-black text-crimsonAlert font-outfit">0건</h3>
+                        <h3 id="kpi-risk-count" class="text-xs sm:text-sm font-black text-crimsonAlert font-outfit">0건</h3>
                     </div>
                 </div>
             </div>
@@ -441,15 +452,15 @@
             <!-- 💎 프리미엄 3대 탭 탐색기 (가독성을 극대화한 미니멀 디자인) -->
             <div class="bg-white border-b border-slate-200 grid grid-cols-3 z-10 text-center">
                 <button id="tab-dashboard-btn" onclick="switchMiddleTab('dashboard')" 
-                        class="border-b-2 border-royalBlue text-royalBlue py-2.5 text-[10px] min-[360px]:text-[11px] sm:text-xs md:text-sm font-black flex items-center justify-center gap-1 transition-all w-full">
+                        class="border-b-2 border-royalBlue text-royalBlue py-1.5 text-[10px] min-[360px]:text-[11px] sm:text-xs md:text-sm font-black flex items-center justify-center gap-1 transition-all w-full">
                     <i class="fa-solid fa-chart-line text-[10px] sm:text-xs"></i> 추천 매물 피드
                 </button>
                 <button id="tab-glossary-btn" onclick="switchMiddleTab('glossary')" 
-                        class="border-b-2 border-transparent text-slate-500 py-2.5 text-[10px] min-[360px]:text-[11px] sm:text-xs md:text-sm font-black flex items-center justify-center gap-1 transition-all hover:text-royalBlue w-full">
+                        class="border-b-2 border-transparent text-slate-500 py-1.5 text-[10px] min-[360px]:text-[11px] sm:text-xs md:text-sm font-black flex items-center justify-center gap-1 transition-all hover:text-royalBlue w-full">
                     <i class="fa-solid fa-book text-[10px] sm:text-xs"></i> 법률 용어/리스크 사전
                 </button>
                 <button id="tab-guide-btn" onclick="switchMiddleTab('guide')" 
-                        class="border-b-2 border-transparent text-slate-500 py-2.5 text-[10px] min-[360px]:text-[11px] sm:text-xs md:text-sm font-black flex items-center justify-center gap-1 transition-all hover:text-royalBlue w-full">
+                        class="border-b-2 border-transparent text-slate-500 py-1.5 text-[10px] min-[360px]:text-[11px] sm:text-xs md:text-sm font-black flex items-center justify-center gap-1 transition-all hover:text-royalBlue w-full">
                     <i class="fa-solid fa-circle-info text-[10px] sm:text-xs"></i> 사용자 가이드
                 </button>
             </div>
@@ -457,7 +468,7 @@
             <!-- 🎯 [TAB 1: 추천 매물 피드 컨테이너] -->
             <div id="dashboard-view" class="flex flex-col flex-1 overflow-hidden">
                 <!-- 정렬 및 리스트 필터 바 -->
-                <div class="px-5 py-2.5 bg-white border-b border-slate-200 flex justify-between items-center z-10 shadow-sm">
+                <div class="px-3.5 py-1.5 bg-white border-b border-slate-200 flex justify-between items-center z-10 shadow-sm">
                     <span class="text-xs font-black text-slate-400 uppercase tracking-wider">정렬 옵션</span>
                     <div class="flex flex-wrap gap-1">
                         <button id="sort-score-btn" onclick="sortData('score')" class="bg-royalBlue text-white px-2 py-1 rounded text-[10px] font-black shadow-sm transition-all">✨ 점수순</button>
@@ -1725,7 +1736,7 @@
             // 처음 1페이지 로드 시에는 그리드 컨테이너 생성
             if (currentPage === 1) {
                 container.innerHTML = `
-                    <div id="properties-grid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 p-5 pb-16 lg:pb-5">
+                    <div id="properties-grid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-2.5 p-3 pb-12 lg:pb-3">
                         <!-- 동적 카드들이 마운팅됨 -->
                     </div>
                 `;
@@ -1792,11 +1803,11 @@
                 const delay = (idx % 10) * 40;
                 const cardHtml = `
                     <div onclick="selectProperty(${item.id})" onmouseover="handleRowHover(${item.id})" id="card-${item.id}"
-                         class="${cardBg} ${hoverBorder} ${activeBorderClass} fade-in-up border rounded-2xl p-4 flex flex-col justify-between cursor-pointer transition-all duration-300 transform hover:-translate-y-1 select-none"
+                         class="${cardBg} ${hoverBorder} ${activeBorderClass} fade-in-up border rounded-2xl p-3 flex flex-col justify-between cursor-pointer transition-all duration-300 transform hover:-translate-y-1 select-none"
                          style="animation-delay: ${delay}ms;">
                         
                         <!-- Top Badges Row -->
-                        <div class="flex justify-between items-center mb-3">
+                        <div class="flex justify-between items-center mb-2">
                             <div class="flex gap-1.5 items-center">
                                 ${sourceBadge}
                                 <span class="${ddayClass} text-[11.5px] font-black px-1.5 py-0.5 rounded-md">${ddayText}</span>
@@ -1808,19 +1819,19 @@
                         </div>
 
                         <!-- Mid Content: Address & Info -->
-                        <div class="space-y-1.5 flex-1 flex flex-col justify-between">
+                        <div class="space-y-1 flex-1 flex flex-col justify-between">
                             <div>
                                 <h4 class="${riskTitleClass} font-extrabold text-sm leading-normal line-clamp-2 min-h-[32px] tracking-tight hover:text-royalBlue transition-colors" title="${item.address}">
                                     ${item.address}
                                 </h4>
-                                <div class="text-[12px] text-slate-400 font-bold mt-1.5 flex justify-between items-center">
+                                <div class="text-[12px] text-slate-400 font-bold mt-1 flex justify-between items-center">
                                     <span class="truncate max-w-[120px] text-slate-400">${item.ptype}</span>
                                     <span class="font-mono text-slate-500 font-bold bg-slate-100 border border-slate-200 px-1 py-0.2 rounded text-[11px]">${item.auction_no}</span>
                                 </div>
                             </div>
 
                             <!-- Financial Details -->
-                            <div class="mt-4 pt-3.5 border-t border-slate-100 space-y-1">
+                            <div class="mt-2.5 pt-2.5 border-t border-slate-100 space-y-1">
                                 <div class="flex items-center justify-between">
                                     <span class="text-[11.5px] text-slate-400 font-bold">최저 매각가</span>
                                     <span class="text-rose-600 font-black text-sm font-outfit tracking-wide">${formatKRW(item.minimum_bid)}</span>
@@ -1837,7 +1848,7 @@
                         </div>
 
                         <!-- AI Risk Summary Note -->
-                        <div class="mt-3.5 pt-3 border-t border-slate-100/80">
+                        <div class="mt-2.5 pt-2 border-t border-slate-100/80">
                             <div class="text-[11.5px] ${item.grade === 'X' ? 'text-rose-600 font-black' : 'text-slate-500 font-bold'} truncate flex items-center gap-1.5" title="${item.notes_content}">
                                 <i class="fa-solid fa-triangle-exclamation ${item.grade === 'X' ? 'text-rose-600 animate-pulse' : 'text-amber-500'} text-[10px] flex-shrink-0"></i>
                                 <span class="truncate">${item.notes_content || '검출된 특이 권리 관계가 없습니다.'}</span>

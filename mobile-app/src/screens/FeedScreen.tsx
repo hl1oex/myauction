@@ -15,7 +15,7 @@ import {
 import { Property, FilterState } from '../types';
 import { COLORS } from '../components/Theme';
 import { PropertyCard } from '../components/PropertyCard';
-import { fetchProperties } from '../utils/api';
+import { subscribeProperties } from '../utils/api';
 import { auth } from '../utils/firebase';
 import { onAuthStateChanged } from 'firebase/auth';
 import { fetchFavorites } from '../utils/firebaseDb';
@@ -75,29 +75,30 @@ export const FeedScreen: React.FC<FeedScreenProps> = ({ onSelectProperty }) => {
     gradeFilter: 'all',
   });
 
-  // 서버로부터 전체 데이터를 가져옵니다.
-  const loadData = useCallback(async () => {
+  // Firestore properties 실시간 구독 리스너 가동 (실시간 연동 완비)
+  useEffect(() => {
     setLoading(true);
     setError(null);
-    try {
-      // API 모듈을 사용해 데이터를 호출합니다.
-      const data = await fetchProperties(filters.source, filters.search);
-      setProperties(data);
-      // 로그인된 사용자라면 데이터가 갱신되는 시점에 관심 물건 목록도 다시 가져옵니다.
-      if (auth.currentUser) {
-        await loadFavorites(auth.currentUser.uid);
-      }
-    } catch (err) {
-      setError('클라우드 데이터베이스 연결 상태가 원활하지 않습니다. 네트워크 환경을 확인하십시오.');
-    } finally {
-      setLoading(false);
-    }
-  }, [filters.source, filters.search, loadFavorites]);
 
-  // 서버 주소가 변경되거나 검색어/소스가 바뀔 때 데이터를 다시 불러옵니다.
-  useEffect(() => {
-    loadData();
-  }, [loadData]);
+    const unsubscribe = subscribeProperties(
+      async (data) => {
+        setProperties(data);
+        if (auth.currentUser) {
+          await loadFavorites(auth.currentUser.uid);
+        }
+        setLoading(false);
+      },
+      (err) => {
+        setError('클라우드 데이터베이스 연결 상태가 원활하지 않습니다. 네트워크 환경을 확인하십시오.');
+        setLoading(false);
+      },
+      filters.source,
+      filters.search
+    );
+
+    // 컴포넌트 언마운트 혹은 조건 변경 시 구독 해제 클린업 수행
+    return () => unsubscribe();
+  }, [filters.source, filters.search, loadFavorites]);
 
   // 로컬 필터링을 수행하여 화면에 렌더링할 목록을 추출합니다.
   useEffect(() => {
