@@ -26,10 +26,7 @@
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
     <!-- 💎 4. 로열 금융 핀테크 특화 아이콘 라이브러리 FontAwesome 연동 -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
-    <!-- 💎 Firebase Web SDK CDN 연동 (v10 compat 모드) -->
-    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+    <!-- 💎 Firebase Web SDK는 하단 함수에서 dynamic import 모듈로 로드합니다. -->
     
     <script>
         tailwind.config = {
@@ -1037,17 +1034,8 @@
         // 로컬 FastAPI 개발 서버 주소 설정 (서버 자체 서빙 및 로컬 file:// 실행 환경 감지 하이브리드 연동)
         const API_BASE_URL = window.location.origin.startsWith("file") ? "http://168.107.33.213/action" : (window.location.origin.includes("127.0.0.1") || window.location.origin.includes("localhost")) ? window.location.origin : window.location.origin + "/action";
 
-        // 🚀 Firebase 클라우드 초기화 (서버리스 직접 조회 전환)
-        const firebaseConfig = {
-            apiKey: "demo-api-key-placeholder",
-            authDomain: "action-b8c75.firebaseapp.com",
-            projectId: "action-b8c75",
-            storageBucket: "action-b8c75.appspot.com",
-            messagingSenderId: "000000000000",
-            appId: "1:000000000000:web:demoapp"
-        };
-        firebase.initializeApp(firebaseConfig);
-        const db = firebase.firestore();
+        // 🚀 Firebase 클라우드 초기화는 데이터 수집 함수에서 dynamic import 모듈로 로딩 및 할당합니다.
+        let db = null;
         
         let originalProperties = [];  // 서버에서 수신한 전체 데이터 원본
         let filteredProperties = [];  // 검색/필터 가공 데이터
@@ -1214,68 +1202,120 @@
 
         window.addEventListener("resize", initResponsiveLayout);
 
-
         document.addEventListener("DOMContentLoaded", function() {
             initResponsiveLayout();
             fetchDataFromServer();
             fetchSyncStatus();
-            
-
         });
+
+        let isFirstLoad = true; // 최초 로드 여부 플래그
 
         // 1. [3중 방어막] 백엔드 데이터 비동기 연동 및 로딩 정지 방지 (전체 건수 모니터링 연동)
         async function fetchDataFromServer() {
             const sensor = document.getElementById("connection-sensor");
             try {
-                // 실시간 Firestore Properties 컬렉션 직접 쿼리
-                const snapshot = await db.collection("properties").get();
-                if (!snapshot.empty) {
-                    originalProperties = [];
-                    snapshot.forEach(doc => {
-                        originalProperties.push({ id: doc.id, ...doc.data() });
-                    });
-                    
-                    // 헤더 통계 카운팅 동적 갱신 지원을 위해 전역 상태 데이터 보완
-                    const total = originalProperties.length;
-                    const court = originalProperties.filter(p => p.source === 'court').length;
-                    const onbid = originalProperties.filter(p => p.source === 'onbid').length;
-                    
-                    const headerTotal = document.getElementById("header-total-count");
-                    const headerCourt = document.getElementById("header-court-count");
-                    const headerOnbid = document.getElementById("header-onbid-count");
-                    if (headerTotal) headerTotal.innerText = total;
-                    if (headerCourt) headerCourt.innerText = court;
-                    if (headerOnbid) headerOnbid.innerText = onbid;
-                    
-                    sensor.innerHTML = '<span class="w-2 h-2 rounded-full bg-[#10b981] animate-ping"></span><span>🟢 실시간 데이터 연동 정상 (' + originalProperties.length.toLocaleString() + '건)</span>';
-                    sensor.className = "flex items-center gap-2 px-3 py-1.5 rounded-full bg-emerald-50 border border-emerald-200 text-emerald-700 text-[10px] font-black shadow-sm cursor-pointer";
-                } else {
-                    throw new Error("서버 데이터 응답이 비었습니다.");
+                // Firebase SDK 동적 모듈 로드
+                const { initializeApp, getApp } = await import("https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js");
+                const { getFirestore, collection, onSnapshot } = await import("https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js");
+
+                const firebaseConfig = {
+                    apiKey: "demo-api-key-placeholder",
+                    authDomain: "action-b8c75.firebaseapp.com",
+                    projectId: "action-b8c75",
+                    storageBucket: "action-b8c75.appspot.com",
+                    messagingSenderId: "000000000000",
+                    appId: "1:000000000000:web:demoapp"
+                };
+
+                let app;
+                try {
+                    app = getApp();
+                } catch {
+                    app = initializeApp(firebaseConfig);
                 }
+                db = getFirestore(app, "action");
+
+                // onSnapshot 기반 실시간 구독 활성화
+                onSnapshot(collection(db, "properties"), (snapshot) => {
+                    if (!snapshot.empty) {
+                        originalProperties = [];
+                        snapshot.forEach(doc => {
+                            originalProperties.push({ id: doc.id, ...doc.data() });
+                        });
+                        
+                        // 헤더 통계 카운팅 동적 갱신 지원을 위해 전역 상태 데이터 보완
+                        const total = originalProperties.length;
+                        const court = originalProperties.filter(p => p.source === 'court').length;
+                        const onbid = originalProperties.filter(p => p.source === 'onbid').length;
+                        
+                        const headerTotal = document.getElementById("header-total-count");
+                        const headerCourt = document.getElementById("header-court-count");
+                        const headerOnbid = document.getElementById("header-onbid-count");
+                        if (headerTotal) headerTotal.innerText = total;
+                        if (headerCourt) headerCourt.innerText = court;
+                        if (headerOnbid) headerOnbid.innerText = onbid;
+                        
+                        sensor.innerHTML = '<span class="w-2 h-2 rounded-full bg-[#10b981] animate-ping"></span><span>🟢 실시간 데이터 연동 정상 (' + originalProperties.length.toLocaleString() + '건)</span>';
+                        sensor.className = "flex items-center gap-2 px-3 py-1.5 rounded-full bg-emerald-50 border border-emerald-200 text-emerald-700 text-[10px] font-black shadow-sm cursor-pointer";
+                        
+                        applyFilters();
+                    } else {
+                        if (isFirstLoad) {
+                            throw new Error("서버 데이터 응답이 비었습니다.");
+                        }
+                    }
+                    isFirstLoad = false;
+                }, (error) => {
+                    console.error("Firestore properties 리스너 에러:", error);
+                    loadFallbackData();
+                });
+
             } catch (error) {
                 console.warn("⚠️ Firestore 연결 실패 - 예비 시뮬레이션 데이터를 안전 탑재합니다.", error);
-                originalProperties = fallbackData;
-                sensor.innerHTML = '<span class="w-2 h-2 rounded-full bg-amber-500"></span><span>🟡 로컬 오프라인 모드 가동 (' + originalProperties.length.toLocaleString() + '건)</span>';
-                sensor.className = "flex items-center gap-2 px-3 py-1.5 rounded-full bg-amber-50 border border-amber-200 text-amber-700 text-[10px] font-black shadow-sm cursor-pointer";
+                loadFallbackData();
             }
-            
+        }
+
+        function loadFallbackData() {
+            const sensor = document.getElementById("connection-sensor");
+            originalProperties = fallbackData;
+            sensor.innerHTML = '<span class="w-2 h-2 rounded-full bg-amber-500"></span><span>🟡 로컬 오프라인 모드 가동 (' + originalProperties.length.toLocaleString() + '건)</span>';
+            sensor.className = "flex items-center gap-2 px-3 py-1.5 rounded-full bg-amber-50 border border-amber-200 text-amber-700 text-[10px] font-black shadow-sm cursor-pointer";
             applyFilters();
         }
 
         // 수집 트래커 로그 현황 가져오기
         async function fetchSyncStatus() {
             try {
-                // status 컬렉션의 sync_info 문서 직접 조회
-                const doc = await db.collection("status").doc("sync_info").get();
-                if (doc.exists) {
-                    const data = doc.data();
-                    document.getElementById("sync-court-time").innerText = data.last_court_sync || "연동 전";
-                    document.getElementById("sync-onbid-time").innerText = data.last_onbid_sync || "연동 전";
-                }
+                const { getApp } = await import("https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js");
+                const { getFirestore, doc, onSnapshot } = await import("https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js");
+                
+                const app = getApp();
+                const dbInstance = getFirestore(app, "action");
+                
+                onSnapshot(doc(dbInstance, "status", "sync_info"), (docSnap) => {
+                    if (docSnap.exists()) {
+                        const data = docSnap.data();
+                        let syncTimeStr = "연동 전";
+                        if (data.last_sync_timestamp) {
+                            const date = data.last_sync_timestamp.toDate ? data.last_sync_timestamp.toDate() : new Date(data.last_sync_timestamp);
+                            syncTimeStr = date.toLocaleString('ko-KR', { hour12: false });
+                        }
+                        document.getElementById("sync-court-time").innerText = syncTimeStr;
+                        document.getElementById("sync-onbid-time").innerText = syncTimeStr;
+                    }
+                }, (error) => {
+                    console.error("Firestore sync_info 리스너 에러:", error);
+                    setOfflineSyncTime();
+                });
             } catch (error) {
-                document.getElementById("sync-court-time").innerText = "오프라인";
-                document.getElementById("sync-onbid-time").innerText = "오프라인";
+                setOfflineSyncTime();
             }
+        }
+
+        function setOfflineSyncTime() {
+            document.getElementById("sync-court-time").innerText = "오프라인";
+            document.getElementById("sync-onbid-time").innerText = "오프라인";
         }
 
         // 2. 예산 설정 라벨 포맷터 (디바운스 연동)

@@ -75,7 +75,7 @@ def get_firestore_client():
                 # 파일이 없을 경우 ADC (Application Default Credentials) 기반 자동 초기화 fallback
                 firebase_admin.initialize_app()
                 print("[+] Firebase Admin SDK initialized via Application Default Credentials (ADC).")
-        return firestore.client()
+        return firestore.client(database_id="action")
     except Exception as e:
         print(f"[-] Firebase Admin SDK 초기화 오류 발생: {e}")
         print("    로컬 환경에서 데이터를 클라우드로 밀어 넣으려면 config/serviceAccountKey.json 키 파일을 생성하거나")
