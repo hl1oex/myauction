@@ -15,6 +15,10 @@
     <!-- 💎 4. 로열 금융 핀테크 특화 아이콘 라이브러리 FontAwesome 연동 -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
+    <!-- 💎 Firebase Web SDK CDN 연동 (v10 compat 모드) -->
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+    
     <script>
         tailwind.config = {
             theme: {
@@ -258,7 +262,7 @@
             </div>
 
             <!-- 스크롤 가능한 필터 폼 -->
-            <div class="flex-1 overflow-y-auto p-4 space-y-4 custom-scrollbar">
+            <div class="flex-1 overflow-y-auto p-3.5 space-y-3.5 custom-scrollbar">
                 <!-- 키워드 검색 -->
                 <div>
                     <label class="block text-[11px] sm:text-xs font-black text-slate-500 uppercase tracking-wider mb-1.5">🔍 통합 검색 키워드</label>
@@ -405,7 +409,7 @@
         <!-- 📊 [COLUMN 2] 중앙 메인 피드: 통계 KPI & 추천 매물 카드 피드 (Width: 50%) -->
         <section id="center-feed-section" class="flex-1 bg-slate-50 border-r border-slate-200 flex flex-col h-full overflow-hidden">
             <!-- 중앙 상단 통계 KPI 바 (반응형: 모바일 한 줄 통합 vs PC 3단 그리드) -->
-            <div class="bg-white border-b border-slate-200 p-3 z-10 shadow-sm">
+            <div class="bg-white border-b border-slate-200 p-2 z-10 shadow-sm">
                 <!-- 📱 모바일 전용: 한 줄 통합 노출 (1024px 미만 lg:hidden) -->
                 <div class="lg:hidden text-center py-1.5 bg-slate-50 border border-slate-200 rounded-xl px-3 shadow-sm">
                     <div class="text-[10px] sm:text-[11px] font-extrabold text-slate-750 leading-normal flex flex-wrap items-center justify-center gap-1">
@@ -418,16 +422,16 @@
                 </div>
                 
                 <!-- 💻 PC/태블릿 전용: 기존 3개 칸 나누기 구조 -->
-                <div class="hidden lg:grid grid-cols-3 gap-3">
-                    <div class="bg-blue-50/50 border border-blue-100 rounded-xl p-2.5 text-center">
+                <div class="hidden lg:grid grid-cols-3 gap-2">
+                    <div class="bg-blue-50/50 border border-blue-100 rounded-xl p-2 text-center">
                         <p class="text-[10px] sm:text-xs font-black text-royalBlue uppercase tracking-wider mb-0.5">추천 적합 매물 (전체 <span id="kpi-total-count" class="font-outfit text-slate-500 font-bold">0</span>건 중)</p>
                         <h3 id="kpi-recommended-count" class="text-sm sm:text-lg font-black text-slate-900 font-outfit">0건</h3>
                     </div>
-                    <div class="bg-emerald-50/50 border border-emerald-100 rounded-xl p-2.5 text-center">
+                    <div class="bg-emerald-50/50 border border-emerald-100 rounded-xl p-2 text-center">
                         <p class="text-[10px] sm:text-xs font-black text-emeraldSuccess uppercase tracking-wider mb-0.5">고적합 (A~B등급)</p>
                         <h3 id="kpi-high-count" class="text-sm sm:text-lg font-black text-emeraldSuccess font-outfit">0건</h3>
                     </div>
-                    <div class="bg-rose-50/50 border border-rose-100 rounded-xl p-2.5 text-center">
+                    <div class="bg-rose-50/50 border border-rose-100 rounded-xl p-2 text-center">
                         <p class="text-[10px] sm:text-xs font-black text-crimsonAlert uppercase tracking-wider mb-0.5">위험 탈락 매물 (X)</p>
                         <h3 id="kpi-risk-count" class="text-sm sm:text-lg font-black text-crimsonAlert font-outfit">0건</h3>
                     </div>
@@ -435,17 +439,17 @@
             </div>
 
             <!-- 💎 프리미엄 3대 탭 탐색기 (가독성을 극대화한 미니멀 디자인) -->
-            <div class="bg-white border-b border-slate-200 px-5 flex gap-4 z-10 overflow-x-auto whitespace-nowrap scrollbar-none">
+            <div class="bg-white border-b border-slate-200 grid grid-cols-3 z-10 text-center">
                 <button id="tab-dashboard-btn" onclick="switchMiddleTab('dashboard')" 
-                        class="border-b-2 border-royalBlue text-royalBlue py-3 text-sm font-black flex items-center gap-1.5 transition-all">
+                        class="border-b-2 border-royalBlue text-royalBlue py-2.5 text-sm font-black flex items-center justify-center gap-1.5 transition-all w-full">
                     <i class="fa-solid fa-chart-line"></i> 추천 매물 피드
                 </button>
                 <button id="tab-glossary-btn" onclick="switchMiddleTab('glossary')" 
-                        class="border-b-2 border-transparent text-slate-500 py-3 text-sm font-black flex items-center gap-1.5 transition-all hover:text-royalBlue">
+                        class="border-b-2 border-transparent text-slate-500 py-2.5 text-sm font-black flex items-center justify-center gap-1.5 transition-all hover:text-royalBlue w-full">
                     <i class="fa-solid fa-book"></i> 법률 용어/리스크 사전
                 </button>
                 <button id="tab-guide-btn" onclick="switchMiddleTab('guide')" 
-                        class="border-b-2 border-transparent text-slate-500 py-3 text-sm font-black flex items-center gap-1.5 transition-all hover:text-royalBlue">
+                        class="border-b-2 border-transparent text-slate-500 py-2.5 text-sm font-black flex items-center justify-center gap-1.5 transition-all hover:text-royalBlue w-full">
                     <i class="fa-solid fa-circle-info"></i> 사용자 가이드
                 </button>
             </div>
@@ -498,10 +502,10 @@
             </div>
 
             <!-- 📚 [TAB 2: 초보자 법률 용어/리스크 사전 컨테이너] (기본 숨김) -->
-            <div id="glossary-view" class="hidden flex-1 overflow-y-auto p-5 sm:p-8 custom-scrollbar bg-slate-50 document-view">
+            <div id="glossary-view" class="hidden flex-1 overflow-y-auto p-3.5 sm:p-5 custom-scrollbar bg-slate-50 document-view">
                 <div class="max-w-3xl mx-auto w-full space-y-5 py-2 font-sans">
                     <!-- Title block -->
-                    <div class="bg-white border border-slate-200 rounded-2xl p-4 sm:p-5 shadow-sm space-y-2 text-center lg:text-left">
+                    <div class="bg-white border border-slate-200 rounded-2xl p-3 sm:p-4 shadow-sm space-y-1.5 text-center lg:text-left">
                         <h3 class="text-xs sm:text-sm font-extrabold text-slate-900 flex items-center justify-center lg:justify-start gap-1.5">
                             <i class="fa-solid fa-graduation-cap text-royalBlue text-xs sm:text-sm"></i> 경매/공매 필수 법률 용어 및 리스크 사전
                         </h3>
@@ -666,7 +670,7 @@
     <!-- 🧮 [SLIDE-OVER DRAWER] 우측 상세 분석 슬라이드 서랍 (시안 2: 모던 포털 카드형) -->
     <aside id="detail-drawer" class="fixed inset-y-0 right-0 z-50 w-full sm:max-w-[700px] bg-white shadow-2xl border-l border-slate-200 flex flex-col h-full transform translate-x-full transition-transform duration-300 ease-out">
         <!-- 상세 헤더 (반응형 모바일 스코어 배치 및 빈칸 여백 줄임) -->
-        <div class="relative p-4 sm:p-5 border-b border-slate-200 bg-slate-50 flex flex-col sm:flex-row justify-between sm:items-start gap-3 sm:gap-4 pr-24 sm:pr-5">
+        <div class="relative p-3.5 sm:p-4 border-b border-slate-200 bg-slate-50 flex flex-col sm:flex-row justify-between sm:items-start gap-2.5 sm:gap-3 pr-24 sm:pr-5">
             <div class="space-y-1 sm:space-y-1.5 flex-1">
                 <span id="detail-badge" class="inline-block text-[10px] sm:text-xs font-black px-2 py-0.5 sm:px-2.5 sm:py-1 rounded-md"></span>
                 <h3 id="detail-address" class="text-xs sm:text-lg font-extrabold text-slate-900 leading-snug sm:leading-tight"></h3>
@@ -1021,6 +1025,18 @@
 
         // 로컬 FastAPI 개발 서버 주소 설정 (서버 자체 서빙 및 로컬 file:// 실행 환경 감지 하이브리드 연동)
         const API_BASE_URL = window.location.origin.startsWith("file") ? "http://168.107.33.213/action" : (window.location.origin.includes("127.0.0.1") || window.location.origin.includes("localhost")) ? window.location.origin : window.location.origin + "/action";
+
+        // 🚀 Firebase 클라우드 초기화 (서버리스 직접 조회 전환)
+        const firebaseConfig = {
+            apiKey: "demo-api-key-placeholder",
+            authDomain: "action-b8c75.firebaseapp.com",
+            projectId: "action-b8c75",
+            storageBucket: "action-b8c75.appspot.com",
+            messagingSenderId: "000000000000",
+            appId: "1:000000000000:web:demoapp"
+        };
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
         
         let originalProperties = [];  // 서버에서 수신한 전체 데이터 원본
         let filteredProperties = [];  // 검색/필터 가공 데이터
@@ -1196,22 +1212,37 @@
 
         });
 
-        // 1. [3중 방어막] 백엔드 데이터 비동기 연동 및 로딩 정지 방지
         // 1. [3중 방어막] 백엔드 데이터 비동기 연동 및 로딩 정지 방지 (전체 건수 모니터링 연동)
         async function fetchDataFromServer() {
             const sensor = document.getElementById("connection-sensor");
             try {
-                // 3초 타임아웃을 강제 주입하여 서버가 대기 중이더라도 멈춤 없이 우회 처리
-                const response = await axios.get(`${API_BASE_URL}/api/properties`, { timeout: 3000 });
-                if (response.data && response.data.success && Array.isArray(response.data.data) && response.data.data.length > 0) {
-                    originalProperties = response.data.data;
+                // 실시간 Firestore Properties 컬렉션 직접 쿼리
+                const snapshot = await db.collection("properties").get();
+                if (!snapshot.empty) {
+                    originalProperties = [];
+                    snapshot.forEach(doc => {
+                        originalProperties.push({ id: doc.id, ...doc.data() });
+                    });
+                    
+                    // 헤더 통계 카운팅 동적 갱신 지원을 위해 전역 상태 데이터 보완
+                    const total = originalProperties.length;
+                    const court = originalProperties.filter(p => p.source === 'court').length;
+                    const onbid = originalProperties.filter(p => p.source === 'onbid').length;
+                    
+                    const headerTotal = document.getElementById("header-total-count");
+                    const headerCourt = document.getElementById("header-court-count");
+                    const headerOnbid = document.getElementById("header-onbid-count");
+                    if (headerTotal) headerTotal.innerText = total;
+                    if (headerCourt) headerCourt.innerText = court;
+                    if (headerOnbid) headerOnbid.innerText = onbid;
+                    
                     sensor.innerHTML = '<span class="w-2 h-2 rounded-full bg-[#10b981] animate-ping"></span><span>🟢 실시간 데이터 연동 정상 (' + originalProperties.length.toLocaleString() + '건)</span>';
                     sensor.className = "flex items-center gap-2 px-3 py-1.5 rounded-full bg-emerald-50 border border-emerald-200 text-emerald-700 text-[10px] font-black shadow-sm cursor-pointer";
                 } else {
-                    throw new Error("서버 데이터 응답이 비었거나 정상 리스트 형식이 아닙니다.");
+                    throw new Error("서버 데이터 응답이 비었습니다.");
                 }
             } catch (error) {
-                console.warn("⚠️ API 서버 연결 실패 - 예비 시뮬레이션 데이터를 안전 탑재합니다.", error);
+                console.warn("⚠️ Firestore 연결 실패 - 예비 시뮬레이션 데이터를 안전 탑재합니다.", error);
                 originalProperties = fallbackData;
                 sensor.innerHTML = '<span class="w-2 h-2 rounded-full bg-amber-500"></span><span>🟡 로컬 오프라인 모드 가동 (' + originalProperties.length.toLocaleString() + '건)</span>';
                 sensor.className = "flex items-center gap-2 px-3 py-1.5 rounded-full bg-amber-50 border border-amber-200 text-amber-700 text-[10px] font-black shadow-sm cursor-pointer";
@@ -1223,10 +1254,12 @@
         // 수집 트래커 로그 현황 가져오기
         async function fetchSyncStatus() {
             try {
-                const response = await axios.get(`${API_BASE_URL}/api/status`, { timeout: 2000 });
-                if (response.data && response.data.success) {
-                    document.getElementById("sync-court-time").innerText = response.data.last_court_sync || "연동 전";
-                    document.getElementById("sync-onbid-time").innerText = response.data.last_onbid_sync || "연동 전";
+                // status 컬렉션의 sync_info 문서 직접 조회
+                const doc = await db.collection("status").doc("sync_info").get();
+                if (doc.exists) {
+                    const data = doc.data();
+                    document.getElementById("sync-court-time").innerText = data.last_court_sync || "연동 전";
+                    document.getElementById("sync-onbid-time").innerText = data.last_onbid_sync || "연동 전";
                 }
             } catch (error) {
                 document.getElementById("sync-court-time").innerText = "오프라인";
