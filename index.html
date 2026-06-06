@@ -220,9 +220,9 @@
                 <i class="fa-solid fa-hotel text-xs"></i>
             </div>
             <div class="truncate">
-                <h1 class="text-xs sm:text-sm font-extrabold tracking-tight text-slate-900 flex items-center gap-1.5 whitespace-nowrap">
+                <h1 class="text-[10px] min-[360px]:text-xs sm:text-sm font-extrabold tracking-tight text-slate-900 flex items-center gap-1 min-[360px]:gap-1.5 whitespace-nowrap">
                     AI 부동산 경공매 추천 시스템
-                    <span class="bg-blue-50 text-royalBlue text-[9px] px-1.5 py-0.2 rounded-full font-black border border-blue-200">v1.1</span>
+                    <span class="bg-blue-50 text-royalBlue text-[8px] min-[360px]:text-[9px] px-1 min-[360px]:px-1.5 py-0.2 rounded-full font-black border border-blue-200">v1.1</span>
                 </h1>
                 <p class="text-[8px] text-slate-400 font-bold uppercase tracking-wider leading-none">Premium Elegant Pearl White</p>
             </div>
@@ -418,14 +418,24 @@
         <section id="center-feed-section" class="flex-1 bg-slate-50 border-r border-slate-200 flex flex-col h-full overflow-hidden">
             <!-- 중앙 상단 통계 KPI 바 (반응형: 모바일 한 줄 통합 vs PC 3단 그리드) -->
             <div class="bg-white border-b border-slate-200 p-2 z-10 shadow-sm">
-                <!-- 📱 모바일 전용: 한 줄 통합 노출 (1024px 미만 lg:hidden) -->
-                <div class="lg:hidden text-center py-1.5 bg-slate-50 border border-slate-200 rounded-xl px-3 shadow-sm">
-                    <div class="text-[10px] sm:text-[11px] font-extrabold text-slate-750 leading-normal flex flex-wrap items-center justify-center gap-1">
-                        <span>추천 적합 매물 <strong id="kpi-recommended-count-mob" class="text-royalBlue font-outfit font-black">0건</strong> <span class="text-slate-400 font-bold font-sans">(전체 <span id="kpi-total-count-mob" class="font-outfit font-bold">0</span>건 중)</span></span>
-                        <span class="text-slate-400 font-bold mx-1">,</span>
-                        <span>🟢 고적합 <strong id="kpi-high-count-mob" class="text-emeraldSuccess font-outfit font-black">0건</strong> <span class="text-slate-400 font-bold font-sans">(A~B등급)</span></span>
-                        <span class="text-slate-400 font-bold mx-1">,</span>
-                        <span>🚨 위험 탈락 매물 <strong id="kpi-risk-count-mob" class="text-crimsonAlert font-outfit font-black">0건</strong> <span class="text-slate-400 font-bold font-sans">(X)</span></span>
+                <!-- 📱 모바일 전용: 3열 구조의 미니 그리드 카드로 개편하여 가독성 밸런스 극대화 (1024px 미만 lg:hidden) -->
+                <div class="lg:hidden bg-white z-10">
+                    <div class="grid grid-cols-3 gap-1.5 text-center">
+                        <div class="bg-blue-50/40 border border-blue-100/60 rounded-xl py-1 px-1.5">
+                            <p class="text-[8px] min-[360px]:text-[9px] font-black text-royalBlue mb-0.5 whitespace-nowrap">추천 적합 매물</p>
+                            <h3 class="text-[9.5px] min-[360px]:text-[11px] font-black text-slate-900 font-outfit leading-none">
+                                <span id="kpi-recommended-count-mob">0건</span>
+                                <span class="text-[8px] font-bold text-slate-400 font-sans">(전체 <span id="kpi-total-count-mob">0</span>)</span>
+                            </h3>
+                        </div>
+                        <div class="bg-emerald-50/40 border border-emerald-100/60 rounded-xl py-1 px-1.5">
+                            <p class="text-[8px] min-[360px]:text-[9px] font-black text-emeraldSuccess mb-0.5 whitespace-nowrap">🟢 고적합 (A~B)</p>
+                            <h3 id="kpi-high-count-mob" class="text-[9.5px] min-[360px]:text-[11px] font-black text-emeraldSuccess font-outfit leading-none">0건</h3>
+                        </div>
+                        <div class="bg-rose-50/40 border border-rose-100/60 rounded-xl py-1 px-1.5">
+                            <p class="text-[8px] min-[360px]:text-[9px] font-black text-crimsonAlert mb-0.5 whitespace-nowrap">🚨 위험 탈락 (X)</p>
+                            <h3 id="kpi-risk-count-mob" class="text-[9.5px] min-[360px]:text-[11px] font-black text-crimsonAlert font-outfit leading-none">0건</h3>
+                        </div>
                     </div>
                 </div>
                 
@@ -449,16 +459,16 @@
             <!-- 💎 프리미엄 3대 탭 탐색기 (가독성을 극대화한 미니멀 디자인) -->
             <div class="bg-white border-b border-slate-200 grid grid-cols-3 z-10 text-center">
                 <button id="tab-dashboard-btn" onclick="switchMiddleTab('dashboard')" 
-                        class="border-b-2 border-royalBlue text-royalBlue py-1.5 text-[10px] min-[360px]:text-[11px] sm:text-xs md:text-sm font-black flex items-center justify-center gap-1 transition-all w-full">
-                    <i class="fa-solid fa-chart-line text-[10px] sm:text-xs"></i> 추천 매물 피드
+                        class="border-b-2 border-royalBlue text-royalBlue py-1.5 text-[8.5px] min-[360px]:text-[9.5px] min-[400px]:text-[10.5px] sm:text-xs md:text-sm font-black flex flex-col min-[390px]:flex-row items-center justify-center gap-0.5 min-[390px]:gap-1 transition-all w-full whitespace-nowrap">
+                    <i class="fa-solid fa-chart-line text-[9px] sm:text-xs"></i> <span>추천 매물 피드</span>
                 </button>
                 <button id="tab-glossary-btn" onclick="switchMiddleTab('glossary')" 
-                        class="border-b-2 border-transparent text-slate-500 py-1.5 text-[10px] min-[360px]:text-[11px] sm:text-xs md:text-sm font-black flex items-center justify-center gap-1 transition-all hover:text-royalBlue w-full">
-                    <i class="fa-solid fa-book text-[10px] sm:text-xs"></i> 법률 용어/리스크 사전
+                        class="border-b-2 border-transparent text-slate-500 py-1.5 text-[8.5px] min-[360px]:text-[9.5px] min-[400px]:text-[10.5px] sm:text-xs md:text-sm font-black flex flex-col min-[390px]:flex-row items-center justify-center gap-0.5 min-[390px]:gap-1 transition-all hover:text-royalBlue w-full whitespace-nowrap">
+                    <i class="fa-solid fa-book text-[9px] sm:text-xs"></i> <span>법률 용어/리스크 사전</span>
                 </button>
                 <button id="tab-guide-btn" onclick="switchMiddleTab('guide')" 
-                        class="border-b-2 border-transparent text-slate-500 py-1.5 text-[10px] min-[360px]:text-[11px] sm:text-xs md:text-sm font-black flex items-center justify-center gap-1 transition-all hover:text-royalBlue w-full">
-                    <i class="fa-solid fa-circle-info text-[10px] sm:text-xs"></i> 사용자 가이드
+                        class="border-b-2 border-transparent text-slate-500 py-1.5 text-[8.5px] min-[360px]:text-[9.5px] min-[400px]:text-[10.5px] sm:text-xs md:text-sm font-black flex flex-col min-[390px]:flex-row items-center justify-center gap-0.5 min-[390px]:gap-1 transition-all hover:text-royalBlue w-full whitespace-nowrap">
+                    <i class="fa-solid fa-circle-info text-[9px] sm:text-xs"></i> <span>사용자 가이드</span>
                 </button>
             </div>
 
