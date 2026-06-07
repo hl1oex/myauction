@@ -355,6 +355,7 @@ def scrape_court_data():
     
     print("[*] 대법원 Requests 세션 수집 웜업을 진행합니다.")
     session = requests.Session()
+    start_time = time.time()
     
     try:
         # 웜업 시도 (프록시 백업 루프 포함)
@@ -396,6 +397,8 @@ def scrape_court_data():
         
         for ymd in query_months:
             for court_code, court_name in target_courts:
+                if time.time() - start_time > 180:
+                    raise TimeoutError("대법원 크롤링 시간 초과(180초)로 시뮬레이션 폴백을 기동합니다.")
                 payload = {
                     "dma_srchDspslPbanc": {
                         "srchYmd": ymd,
@@ -442,6 +445,8 @@ def scrape_court_data():
         
         # 상세 수집 루프
         for idx, target in enumerate(sessions_list):
+            if time.time() - start_time > 180:
+                raise TimeoutError("대법원 크롤링 시간 초과(180초)로 시뮬레이션 폴백을 기동합니다.")
             detail_payload = {
                 "dma_srchGnrlPbanc": {
                     "dspslRealId": target.get("dspslRealId"),

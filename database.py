@@ -134,7 +134,7 @@ def sync_sqlite_to_supabase():
             
             # API 부하 분산과 안정적 전송을 위해 200개 단위로 끊어 업로드합니다.
             if len(batch_data) >= batch_size:
-                res = requests.post(upsert_url, headers=headers, json=batch_data)
+                res = requests.post(upsert_url, headers=headers, json=batch_data, timeout=15)
                 if res.status_code not in [200, 201]:
                     print(f"[-] 매물 업로드 실패 ({res.status_code}): {res.text}")
                     return
@@ -143,7 +143,7 @@ def sync_sqlite_to_supabase():
 
         # 루프 완료 후 남은 데이터가 있다면 마저 전송합니다.
         if batch_data:
-            res = requests.post(upsert_url, headers=headers, json=batch_data)
+            res = requests.post(upsert_url, headers=headers, json=batch_data, timeout=15)
             if res.status_code not in [200, 201]:
                 print(f"[-] 남은 매물 업로드 실패 ({res.status_code}): {res.text}")
                 return
@@ -164,7 +164,7 @@ def sync_sqlite_to_supabase():
         }
         
         status_upsert_url = f"{supabase_url}/rest/v1/sync_info?on_conflict=id"
-        res_status = requests.post(status_upsert_url, headers=headers, json=status_payload)
+        res_status = requests.post(status_upsert_url, headers=headers, json=status_payload, timeout=15)
         if res_status.status_code not in [200, 201]:
             print(f"[-] 동기화 상태 로그 업로드 실패 ({res_status.status_code}): {res_status.text}")
             return
