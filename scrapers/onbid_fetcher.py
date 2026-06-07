@@ -6,6 +6,7 @@ import xml.etree.ElementTree as ET
 import time
 import sqlite3
 import urllib.parse
+import random
 
 # DB 경로 설정 (부모 폴더의 auction.db)
 DB_PATH = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "auction.db")
@@ -17,6 +18,17 @@ HARDFILTER_RULES = {
     "추가비용": ["인수", "선순위", "선순위 임차인", "대항력", "임차권", "보증금 인수"],
     "정보부족": ["서류없음", "확인불가", "열람불가", "자료없음"]
 }
+
+def safe_int(val_str, default=0):
+    if not val_str:
+        return default
+    cleaned = "".join([c for c in str(val_str) if c.isdigit() or c == '-'])
+    if not cleaned:
+        return default
+    try:
+        return int(cleaned)
+    except ValueError:
+        return default
 
 def calculate_remaining_days(close_date_str):
     if not close_date_str:
@@ -232,6 +244,18 @@ def generate_simulated_onbid_data():
 
 def fetch_onbid_data():
     service_key = os.environ.get("ONBID_SERVICE_KEY")
+    
+    # config/onbid_key.txt에서 키 로드 시도
+    try:
+        key_file_path = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "config", "onbid_key.txt")
+        if os.path.exists(key_file_path):
+            with open(key_file_path, "r", encoding="utf-8") as f:
+                file_key = f.read().strip()
+                if file_key:
+                    service_key = file_key
+    except Exception as key_err:
+        print(f"[-] 서비스키 파일 로드 오류: {key_err}")
+        
     if not service_key:
         service_key = "8f25b28707d85a7c657d76d8689bacc8e6d3c87ea74de0330b9048bc7c1f1b98"
         
@@ -243,8 +267,7 @@ def fetch_onbid_data():
     print("Fetching Onbid Real Estate data from OpenAPI...")
     items_collected = []
     
-    # 🟢 [수집량 대용량 증폭 패치] 부동산 관련 카테고리 코드를 개별 루프로 전면 탐색
-    target_div_codes = ["0001", "0002", "0003", "0004", "0005", "0006", "0007", "0008", "0010"]
+    target_div_codes = ["0002", "0003", "0004", "0005", "0007", "0010"]
     
     try:
         for code in target_div_codes:
@@ -256,37 +279,93 @@ def fetch_onbid_data():
                     "dpslDvsCd": "0001",
                     "pvctTrgtYn": "N",
                     "prptDivCd": code,
-                    "_type": "json"
+                    "returnType": "json"
                 }
                 
-                time.sleep(0.05) # 공공 API 트래픽 초과 방지 매너 딜레이
+                # 공공 API 트래픽 초과 방지 및 안정적인 조회를 위해 딜레이 조정 (0.5~1.0초 지터 적용)
+                time.sleep(0.5 + random.random() * 0.5)
                 try:
                     response = requests.get(rlst_url, params=params, timeout=10)
                     if response.status_code == 200:
-                        data = response.json()
-                        header = data.get("response", {}).get("header", {})
-                        if header.get("resultCode") != "00":
-                            continue
+                        response.encoding = "utf-8" # 응답 인코딩을 명시적으로 설정하여 한글 깨짐 방지
+                        text = response.text
+                        items = []
+                        total_count = 0
+                        
+                        # XML 응답인 경우 처리
+                        if text.strip().startswith("<?xml") or "<response>" in text:
+                            root = ET.fromstring(text)
                             
-                        body = data.get("response", {}).get("body", {})
-                        items = body.get("items", {}).get("item", [])
+                            # 공통 에러 XML(OpenAPI_ServiceResponse)을 고려한 헤더 및 에러 정보 파싱
+                            header = root.find("header")
+                            if header is None:
+                                # OpenAPI 공통 에러 노드(cmmMsgHeader) 탐색
+                                cmm_header = root.find("cmmMsgHeader")
+                                if cmm_header is not None:
+                                    res_code = cmm_header.findtext("returnReasonCode") or ""
+                                    res_msg = cmm_header.findtext("returnAuthMsg") or cmm_header.findtext("errMsg") or ""
+                                else:
+                                    res_code = ""
+                                    res_msg = ""
+                            else:
+                                res_code = header.findtext("resultCode") if header is not None else ""
+                                res_msg = header.findtext("resultMsg") if header is not None else ""
+                                
+                            if res_code != "00" and res_code != "":
+                                print(f"[DEBUG] Onbid API Response Error: {res_msg} (code: {res_code})")
+                                continue
+                            
+                            body = root.find("body")
+                            if body is not None:
+                                items_node = body.find("items")
+                                if items_node is not None:
+                                    items = items_node.findall("item")
+                                total_count_text = body.findtext("totalCount")
+                                if total_count_text:
+                                    total_count = safe_int(total_count_text)
+                        else:
+                            # JSON 응답인 경우 처리 (폴백 방어)
+                            data = response.json()
+                            header = data.get("response", {}).get("header", {})
+                            if header.get("resultCode") != "00":
+                                print(f"[DEBUG] Onbid API Response Error: {header.get('resultMsg')} (code: {header.get('resultCode')})")
+                                continue
+                                
+                            body = data.get("response", {}).get("body", {})
+                            items = body.get("items", {}).get("item", [])
+                            if isinstance(items, dict):
+                                items = [items]
+                            total_count = safe_int(body.get("totalCount", 0))
                         
                         if not items:
                             break
                             
-                        if isinstance(items, dict):
-                            items = [items]
-                            
                         for item in items:
-                            # 🟢 [주소 매핑 정상화] 지번주소/도로명주소를 물건명보다 우선 획득하여 주소 검색 필터 누락 원천 해결
-                            address = item.get("lnmAdr") or item.get("roadAdr") or item.get("onbidCltrNm") or "주소 미상"
-                            cltr_no = item.get("cltrMngNo", "")
-                            if not cltr_no:
-                                continue
-                                
-                            price = int(item.get("lowstBidPrcIndctCont") or item.get("cltrMnprPrc") or 0)
-                            appraisal = int(item.get("apslEvlAmt") or item.get("dpslMnprPrc") or 0)
-                            ptype = item.get("cltrUsgSclsCtgrNm") or item.get("prptDivNm") or "기타"
+                            if isinstance(item, ET.Element):
+                                # XML 파싱
+                                cltr_no = item.findtext("cltrMngNo") or ""
+                                if not cltr_no:
+                                    continue
+                                # 지번주소/도로명주소 우선 획득, 없으면 물건명 활용
+                                address = item.findtext("lnmAdr") or item.findtext("roadAdr") or item.findtext("onbidCltrNm") or "주소 미상"
+                                price = safe_int(item.findtext("lowstBidPrcIndctCont") or item.findtext("cltrMnprPrc") or 0)
+                                appraisal = safe_int(item.findtext("apslEvlAmt") or item.findtext("dpslMnprPrc") or 0)
+                                ptype = item.findtext("cltrUsgSclsCtgrNm") or item.findtext("prptDivNm") or "기타"
+                                close_date_raw = item.findtext("cltrBidEndDt") or item.findtext("pbctClsDtm") or ""
+                                desc = item.findtext("onbidCltrNm") or ""
+                                notes = item.findtext("pbctCdtnNo") or ""
+                            else:
+                                # JSON 파싱
+                                cltr_no = item.get("cltrMngNo", "")
+                                if not cltr_no:
+                                    continue
+                                address = item.get("lnmAdr") or item.get("roadAdr") or item.get("onbidCltrNm") or "주소 미상"
+                                price = safe_int(item.get("lowstBidPrcIndctCont") or item.get("cltrMnprPrc") or 0)
+                                appraisal = safe_int(item.get("apslEvlAmt") or item.get("dpslMnprPrc") or 0)
+                                ptype = item.get("cltrUsgSclsCtgrNm") or item.get("prptDivNm") or "기타"
+                                close_date_raw = item.get("cltrBidEndDt") or item.get("pbctClsDtm") or ""
+                                desc = item.get("onbidCltrNm") or ""
+                                notes = item.get("pbctCdtnNo") or ""
                             
                             # 🚫 [비부동산 데이터 차단] 자동차, 중기, 선박, 항공기, 기계, 기구, 차량, 동산, 유가증권, 물품, 권리 등 배제
                             ptype_lower = ptype.lower()
@@ -298,14 +377,10 @@ def fetch_onbid_data():
                             if any(kw in address_lower for kw in ["등록번호:", "차명:", "차대번호:", "원동기형식:"]):
                                 continue
                                 
-                            close_date_raw = item.get("cltrBidEndDt") or item.get("pbctClsDtm") or ""
                             close_date = ""
                             if close_date_raw and len(close_date_raw) >= 8:
                                 close_date = f"{close_date_raw[0:4]}-{close_date_raw[4:6]}-{close_date_raw[6:8]}"
                                 
-                            desc = item.get("onbidCltrNm") or ""
-                            notes = item.get("pbctCdtnNo") or ""
-                            
                             text_to_check = f"{address} {desc} {notes}".lower()
                             if any(kw in text_to_check for kw in ["낙찰", "매각결정", "종결"]):
                                 continue
@@ -344,7 +419,6 @@ def fetch_onbid_data():
                                 "remaining_days": rem_days
                             })
                         
-                        total_count = int(body.get("totalCount", 0))
                         if len(items) == 0 or (page * 100) >= total_count:
                             break
                     else:
