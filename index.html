@@ -1296,24 +1296,46 @@
             try {
                 // Supabase로부터 전체 매물을 비동기로 가져오는 함수를 정의합니다.
                 const loadData = async () => {
-                    const { data, error } = await supabaseClient
-                        .from('properties')
-                        .select('*');
-                    
-                    if (error) throw error;
+                    let allData = [];
+                    let from = 0;
+                    const step = 1000;
+                    let hasMore = true;
+
+                    // Supabase 서버의 1,000건 최대 응답 캡 제한을 극복하기 위해 페이징 루프 동기화를 실행합니다.
+                    while (hasMore) {
+                        const { data, error } = await supabaseClient
+                            .from('properties')
+                            .select('*')
+                            .range(from, from + step - 1);
+                        
+                        if (error) throw error;
+                        
+                        if (data && data.length > 0) {
+                            allData = allData.concat(data);
+                            if (data.length < step) {
+                                hasMore = false;
+                            } else {
+                                from += step;
+                            }
+                        } else {
+                            hasMore = false;
+                        }
+                    }
 
                     if (dbTimeoutTimer) {
                         clearTimeout(dbTimeoutTimer);
                         dbTimeoutTimer = null;
                     }
 
-                    if (data && data.length > 0) {
-                        originalProperties = data.map(item => {
+                    if (allData.length > 0) {
+                        originalProperties = allData.map(item => {
                             let finalId = item.id;
                             if (!isNaN(Number(finalId))) {
                                 finalId = Number(finalId);
                             }
-                            return { ...item, id: finalId };
+                            // DB에서 업로드 시 제외되었던 remaining_days를 수신 후 동적으로 연산하여 계산 필터를 활성화합니다.
+                            const remDays = calculateRemainingDays(item.bidding_date);
+                            return { ...item, id: finalId, remaining_days: remDays };
                         });
 
                         // 로컬스토리지에 최신 매물 목록 캐싱
