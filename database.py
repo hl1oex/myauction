@@ -54,42 +54,40 @@ def init_db():
     conn.close()
     print("[+] Subfolder Real-estate-auction/auction.db Database initialized successfully!")
 
-# Firebase Admin SDK 관련 패키지를 활용해 데이터를 안전하게 동기화하기 위해 모듈을 추가 구성하였습니다.
-import firebase_admin
-from firebase_admin import credentials
-from firebase_admin import firestore
+# Firebase Admin SDK 관련 패키지를 제거하고 Supabase REST API를 활용해 데이터를 안전하게 동기화하도록 개량하였습니다.
+import requests
+import json
+from datetime import datetime, timezone
 
-def get_firestore_client():
-    """Firebase 서비스 계정 키 파일 또는 Application Default Credentials를 사용해 Firestore 클라이언트를 반환합니다."""
-    # config 폴더 내에 서비스 계정 키를 배치하도록 가이드합니다.
-    key_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "config", "serviceAccountKey.json")
+def get_supabase_client_info():
+    """환경 변수 또는 로컬 supabase_config.json 파일로부터 Supabase URL과 Service Key를 로드합니다."""
+    # 1. 환경 변수 확인 (GitHub Actions 등 온라인 구동 환경용)
+    url = os.environ.get("SUPABASE_URL")
+    service_key = os.environ.get("SUPABASE_SERVICE_KEY")
     
-    try:
-        # 이미 초기화된 앱이 있는지 확인합니다.
-        if not firebase_admin._apps:
-            if os.path.exists(key_path):
-                cred = credentials.Certificate(key_path)
-                firebase_admin.initialize_app(cred)
-                print("[+] Firebase Admin SDK initialized via Service Account Key file.")
-            else:
-                # 파일이 없을 경우 ADC (Application Default Credentials) 기반 자동 초기화 fallback
-                firebase_admin.initialize_app()
-                print("[+] Firebase Admin SDK initialized via Application Default Credentials (ADC).")
-        return firestore.client(database_id="action")
-    except Exception as e:
-        print(f"[-] Firebase Admin SDK 초기화 오류 발생: {e}")
-        print("    로컬 환경에서 데이터를 클라우드로 밀어 넣으려면 config/serviceAccountKey.json 키 파일을 생성하거나")
-        print("    'gcloud auth application-default login' 등을 수행해 주셔야 합니다.")
-        return None
+    if url and service_key:
+        return url, service_key
+        
+    # 2. 로컬 파일 확인
+    config_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "config", "supabase_config.json")
+    if os.path.exists(config_path):
+        try:
+            with open(config_path, "r", encoding="utf-8") as f:
+                config = json.load(f)
+                return config.get("supabase_url"), config.get("supabase_service_key")
+        except Exception as e:
+            print(f"[-] Supabase 설정 파일 파싱 오류: {e}")
+            
+    return None, None
 
-def sync_sqlite_to_firestore():
-    """SQLite에 적재된 경매/공매 매물 데이터를 Firestore 클라우드로 동기화합니다."""
-    db_fs = get_firestore_client()
-    if not db_fs:
-        print("[-] Firestore 클라이언트 초기화 실패로 동기화를 생략합니다.")
+def sync_sqlite_to_supabase():
+    """SQLite에 적재된 경매/공매 매물 데이터를 Supabase PostgreSQL 클라우드로 동기화합니다."""
+    supabase_url, supabase_key = get_supabase_client_info()
+    if not supabase_url or not supabase_key or "placeholder" in supabase_url:
+        print("[-] Supabase 접속 정보가 누락되었거나 데모 상태입니다. 동기화를 생략합니다.")
         return
         
-    print("[*] SQLite -> Firestore 동기화를 시작합니다.")
+    print("[*] SQLite -> Supabase PostgreSQL 동기화를 시작합니다.")
     conn = get_db_connection()
     cursor = conn.cursor()
     
@@ -98,49 +96,74 @@ def sync_sqlite_to_firestore():
         cursor.execute("SELECT * FROM properties")
         rows = cursor.fetchall()
         
-        # Firestore의 'properties' 컬렉션을 타겟으로 설정합니다.
-        # 고유값인 SQLite의 id를 문서 ID로 활용합니다.
-        batch = db_fs.batch()
+        headers = {
+            "apikey": supabase_key,
+            "Authorization": f"Bearer {supabase_key}",
+            "Content-Type": "application/json",
+            "Prefer": "resolution=merge-duplicates"
+        }
+        
+        # 사건번호(auction_no) 충돌 시 업데이트하도록 Upsert API 엔드포인트를 호출합니다.
+        upsert_url = f"{supabase_url}/rest/v1/properties?on_conflict=auction_no"
         count = 0
+        batch_size = 200
+        batch_data = []
         
         for row in rows:
             data = dict(row)
-            doc_id = str(data["id"])
-            doc_ref = db_fs.collection("properties").document(doc_id)
-            
-            # Firestore 업로드 포맷에 맞춰 데이터 타입을 정비합니다.
-            batch.set(doc_ref, data)
+            # D-Day 계산은 모바일/웹 프론트엔드에서 계산하므로 D-Day 컬럼은 업로드하지 않거나 기본값 처리합니다.
+            if "remaining_days" in data:
+                del data["remaining_days"]
+            if "updated_at" in data:
+                del data["updated_at"]
+                
+            batch_data.append(data)
             count += 1
             
-            # Firestore Batch는 500개 제한이 있으므로 나누어 커밋합니다.
-            if count % 400 == 0:
-                batch.commit()
-                batch = db_fs.batch()
+            # API 부하 분산과 안정적 전송을 위해 200개 단위로 끊어 업로드합니다.
+            if len(batch_data) >= batch_size:
+                res = requests.post(upsert_url, headers=headers, json=batch_data)
+                if res.status_code not in [200, 201]:
+                    print(f"[-] 매물 업로드 실패 ({res.status_code}): {res.text}")
+                    return
                 print(f"[+] {count}개 매물 업로드 완료...")
-                
-        if count % 400 != 0:
-            batch.commit()
+                batch_data = []
+
+        # 루프 완료 후 남은 데이터가 있다면 마저 전송합니다.
+        if batch_data:
+            res = requests.post(upsert_url, headers=headers, json=batch_data)
+            if res.status_code not in [200, 201]:
+                print(f"[-] 남은 매물 업로드 실패 ({res.status_code}): {res.text}")
+                return
+            print(f"[+] 최종 {count}개 매물 업로드 완료...")
             
-        print(f"[+] Firestore 동기화 완료: 총 {count}개 매물이 전송되었습니다.")
+        print(f"[+] Supabase 동기화 완료: 총 {count}개 매물이 전송되었습니다.")
         
-        # 마지막 동기화 시간과 수집기 로그도 Firestore에 업로드하여 모바일 앱이 참조할 수 있게 합니다.
+        # 마지막 동기화 시간과 수집기 로그도 Supabase sync_info 테이블에 업로드하여 앱이 참조할 수 있게 합니다.
         cursor.execute("SELECT * FROM sync_logs ORDER BY timestamp DESC LIMIT 5")
         log_rows = cursor.fetchall()
         logs_list = [dict(log) for log in log_rows]
         
-        status_ref = db_fs.collection("status").document("sync_info")
-        status_ref.set({
-            "last_sync_timestamp": firestore.SERVER_TIMESTAMP,
+        status_payload = {
+            "id": 1,
+            "last_sync_timestamp": datetime.now(timezone.utc).isoformat(),
             "total_properties_count": count,
             "logs": logs_list
-        })
+        }
+        
+        status_upsert_url = f"{supabase_url}/rest/v1/sync_info?on_conflict=id"
+        res_status = requests.post(status_upsert_url, headers=headers, json=status_payload)
+        if res_status.status_code not in [200, 201]:
+            print(f"[-] 동기화 상태 로그 업로드 실패 ({res_status.status_code}): {res_status.text}")
+            return
+            
         print("[+] 동기화 상태 로그 업로드 완료!")
         
     except Exception as e:
-        print(f"[-] Firestore 동기화 중 오류 발생: {e}")
+        print(f"[-] Supabase 동기화 중 오류 발생: {e}")
     finally:
         conn.close()
 
 if __name__ == "__main__":
     init_db()
-    sync_sqlite_to_firestore()
+    sync_sqlite_to_supabase()

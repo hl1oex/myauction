@@ -1,9 +1,9 @@
-// Firestore로부터 사용자의 관심 물건 목록을 가져와 프리미엄 카드 리스트 형태로 렌더링하는 관심 목록 화면입니다.
+// Supabase DB로부터 사용자의 관심 물건 목록을 가져와 프리미엄 카드 리스트 형태로 렌더링하는 관심 목록 화면입니다.
 
 import React, { useState, useEffect } from 'react';
 import { StyleSheet, Text, View, FlatList, ActivityIndicator, TouchableOpacity } from 'react-native';
 import { Property } from '../types';
-import { fetchFavorites } from '../utils/firebaseDb';
+import { fetchFavorites } from '../utils/api';
 import { PropertyCard } from '../components/PropertyCard';
 import { COLORS } from '../components/Theme';
 

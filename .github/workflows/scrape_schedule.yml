@@ -31,21 +31,13 @@ jobs:
       - name: Execute Onbid API Fetcher
         env:
           ONBID_SERVICE_KEY: ${{ secrets.ONBID_SERVICE_KEY || '8f25b28707d85a7c657d76d8689bacc8e6d3c87ea74de0330b9048bc7c1f1b98' }}
-        run: python tools/onbid_fetcher.py
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
+        run: python scrapers/onbid_fetcher.py
 
       - name: Execute Court Scraper
-        run: python tools/court_scraper.py
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
+        run: python scrapers/court_scraper.py
 
-      - name: Commit and Push Changes
-        run: |
-          git config --global user.name "github-actions[bot]"
-          git config --global user.email "github-actions[bot]@users.noreply.github.com"
-          git add input_sources/json/court.json input_sources/json/onbid.json
-          
-          # Check if there are any changes to commit to avoid failing the build
-          if git diff --quiet && git diff --staged --quiet; then
-            echo "No changes in data files to commit."
-          else
-            git commit -m "Auto-update: Daily court & onbid scraped data [skip ci]"
-            git push origin main
-          fi

@@ -16,7 +16,7 @@ export interface Property {
   grade: string;
   score: number;
   remaining_days: number;
-  updated_at: string;
+  updated_at?: string;
 }
 
 export interface FilterState {
@@ -24,6 +24,7 @@ export interface FilterState {
   source: 'all' | 'court' | 'onbid' | 'private';
   ptype: 'all' | 'apart' | 'store' | 'house' | 'land' | 'factory';
   sido: string;
+  sigungu: string;
   dateLimit: number; // 남은 기일 필터링 (D-Day 한도)
   budgetLimit: number; // 가용 예산 한도
   hidePast: boolean; // 과거 마감 매물 제외 여부

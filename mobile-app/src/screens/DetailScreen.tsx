@@ -12,9 +12,7 @@ import {
 } from 'react-native';
 import { Property } from '../types';
 import { COLORS } from '../components/Theme';
-import { auth } from '../utils/firebase';
-import { onAuthStateChanged } from 'firebase/auth';
-import { addFavorite, removeFavorite, fetchFavorites } from '../utils/firebaseDb';
+import { supabase } from '../utils/supabase';
 
 interface DetailScreenProps {
   property: Property;
@@ -27,24 +25,41 @@ export const DetailScreen: React.FC<DetailScreenProps> = ({ property, onBack }) 
 
   // 화면 진입 시 로그인된 사용자의 관심 물건 등록 상태를 실시간으로 확인하여 UI에 동기화합니다.
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
-      if (currentUser) {
-        setUserId(currentUser.uid);
-        checkFavoriteStatus(currentUser.uid);
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      if (session && session.user) {
+        setUserId(session.user.id);
+        checkFavoriteStatus(session.user.id);
       } else {
         setUserId(null);
         setIsFavorite(false);
       }
     });
-    return () => unsubscribe();
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      if (session && session.user) {
+        setUserId(session.user.id);
+        checkFavoriteStatus(session.user.id);
+      } else {
+        setUserId(null);
+        setIsFavorite(false);
+      }
+    });
+
+    return () => {
+      subscription.unsubscribe();
+    };
   }, [property.id]);
 
-  // Firestore에서 즐겨찾기 목록을 조회해 현재 매물이 등록되어 있는 상태인지 검증합니다.
+  // Supabase에서 즐겨찾기 목록을 조회해 현재 매물이 등록되어 있는 상태인지 검증합니다.
   const checkFavoriteStatus = async (uid: string) => {
     try {
-      const favs = await fetchFavorites(uid);
-      const exists = favs.some((f) => f.id === property.id);
-      setIsFavorite(exists);
+      const { data, error } = await supabase
+        .from('user_favorites')
+        .select('*')
+        .eq('user_id', uid)
+        .eq('property_id', property.id);
+      if (error) throw error;
+      setIsFavorite(data && data.length > 0);
     } catch (error) {
       console.error('관심 매물 상태 체크 오류', error);
     }
@@ -59,10 +74,21 @@ export const DetailScreen: React.FC<DetailScreenProps> = ({ property, onBack }) 
 
     try {
       if (isFavorite) {
-        await removeFavorite(userId, property.id);
+        const { error } = await supabase
+          .from('user_favorites')
+          .delete()
+          .eq('user_id', userId)
+          .eq('property_id', property.id);
+        if (error) throw error;
         setIsFavorite(false);
       } else {
-        await addFavorite(userId, property);
+        const { error } = await supabase
+          .from('user_favorites')
+          .insert({
+            user_id: userId,
+            property_id: property.id
+          });
+        if (error) throw error;
         setIsFavorite(true);
       }
     } catch (error) {

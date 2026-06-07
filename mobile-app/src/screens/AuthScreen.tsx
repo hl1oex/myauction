@@ -1,9 +1,8 @@
-// Firebase Authentication을 통해 사용자 회원가입 및 로그인을 처리하는 인증 화면 컴포넌트입니다.
+// Supabase Auth 서비스를 통해 사용자 회원가입 및 로그인을 처리하는 인증 화면 컴포넌트입니다.
 
 import React, { useState } from 'react';
 import { StyleSheet, Text, View, TextInput, TouchableOpacity, Alert, ActivityIndicator } from 'react-native';
-import { signInWithEmailAndPassword, createUserWithEmailAndPassword } from 'firebase/auth';
-import { auth } from '../utils/firebase';
+import { supabase } from '../utils/supabase';
 import { COLORS } from '../components/Theme';
 
 interface AuthScreenProps {
@@ -45,26 +44,28 @@ export function AuthScreen({ onSuccess, onCancel }: AuthScreenProps) {
     try {
       if (isSignUp) {
         // 회원가입을 시도합니다.
-        await createUserWithEmailAndPassword(auth, email, password);
+        const { error } = await supabase.auth.signUp({ email, password });
+        if (error) throw error;
         Alert.alert('성공', '회원가입이 완료되었습니다.');
       } else {
         // 로그인을 시도합니다.
-        await signInWithEmailAndPassword(auth, email, password);
+        const { error } = await supabase.auth.signInWithPassword({ email, password });
+        if (error) throw error;
       }
       onSuccess();
     } catch (error: any) {
       console.error('인증 처리 중 오류 발생', error);
-      let errorMessage = '인증 처리 과정에서 오류가 발생했습니다.';
+      let errorMessage = error.message || '인증 처리 과정에서 오류가 발생했습니다.';
       
-      // Firebase 에러 코드에 따라 유저 친화적인 메시지를 매핑하여 제공합니다.
-      if (error.code === 'auth/email-already-in-use') {
+      // Supabase 에러 메시지에 따라 유저 친화적인 메시지를 매핑하여 제공합니다.
+      if (error.message.includes('already registered') || error.message.includes('Email already exists')) {
         errorMessage = '이미 사용 중인 이메일 주소입니다.';
-      } else if (error.code === 'auth/invalid-credential') {
+      } else if (error.message.includes('Invalid login credentials')) {
         errorMessage = '이메일 또는 비밀번호가 일치하지 않습니다.';
-      } else if (error.code === 'auth/invalid-email') {
+      } else if (error.message.includes('Email address is invalid')) {
         errorMessage = '유효하지 않은 이메일 형식입니다.';
-      } else if (error.code === 'auth/weak-password') {
-        errorMessage = '비밀번호 강도가 너무 약합니다.';
+      } else if (error.message.includes('Password should be at least')) {
+        errorMessage = '비밀번호는 최소 6자 이상이어야 합니다.';
       }
       
       Alert.alert('오류', errorMessage);

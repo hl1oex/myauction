@@ -26,9 +26,14 @@
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
     <!-- 💎 4. 로열 금융 핀테크 특화 아이콘 라이브러리 FontAwesome 연동 -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- 💎 Firebase Web SDK는 하단 함수에서 dynamic import 모듈로 로드합니다. -->
+    <!-- 💎 5. Supabase Web SDK CDN 연동 -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     
     <script>
+        const supabaseUrl = "https://ubaxyfxcsxsvrryowswb.supabase.co";
+        const supabaseAnonKey = "sb_publishable_JrM_2rrvppC105lHndMLkg_x2x0sLUE";
+        const supabaseClient = supabase.createClient(supabaseUrl, supabaseAnonKey);
+
         tailwind.config = {
             theme: {
                 extend: {
@@ -345,7 +350,8 @@
                             class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-sm font-semibold focus:bg-white focus:outline-none focus:ring-2 focus:ring-royalBlue/10 focus:border-royalBlue transition-all">
                         <option value="999">기한 제한 없음</option>
                         <option value="30">30일 이내 임박 매물</option>
-                        <option value="90" selected>90일 이내 (기본 권장)</option>
+                        <option value="90">90일 이내 (3달)</option>
+                        <option value="180" selected>180일 이내 (6달 / 권장)</option>
                     </select>
                 </div>
 
@@ -456,19 +462,23 @@
                 </div>
             </div>
 
-            <!-- 💎 프리미엄 3대 탭 탐색기 (가독성을 극대화한 미니멀 디자인) -->
-            <div class="bg-white border-b border-slate-200 grid grid-cols-3 z-10 text-center">
+            <!-- 💎 프리미엄 4대 탭 탐색기 (가독성을 극대화한 미니멀 디자인) -->
+            <div class="bg-white border-b border-slate-200 grid grid-cols-4 z-10 text-center">
                 <button id="tab-dashboard-btn" onclick="switchMiddleTab('dashboard')" 
-                        class="border-b-2 border-royalBlue text-royalBlue py-1.5 text-[8.5px] min-[360px]:text-[9.5px] min-[400px]:text-[10.5px] sm:text-xs md:text-sm font-black flex flex-col min-[390px]:flex-row items-center justify-center gap-0.5 min-[390px]:gap-1 transition-all w-full whitespace-nowrap">
-                    <i class="fa-solid fa-chart-line text-[9px] sm:text-xs"></i> <span>추천 매물 피드</span>
+                        class="border-b-2 border-royalBlue text-royalBlue py-2 text-[8.5px] min-[360px]:text-[9.5px] min-[400px]:text-[10.5px] sm:text-xs md:text-sm font-black flex flex-col min-[390px]:flex-row items-center justify-center gap-0.5 min-[390px]:gap-1 transition-all w-full whitespace-nowrap">
+                    <i class="fa-solid fa-chart-line text-[10px] sm:text-xs"></i> <span>추천 매물 피드</span>
                 </button>
                 <button id="tab-glossary-btn" onclick="switchMiddleTab('glossary')" 
-                        class="border-b-2 border-transparent text-slate-500 py-1.5 text-[8.5px] min-[360px]:text-[9.5px] min-[400px]:text-[10.5px] sm:text-xs md:text-sm font-black flex flex-col min-[390px]:flex-row items-center justify-center gap-0.5 min-[390px]:gap-1 transition-all hover:text-royalBlue w-full whitespace-nowrap">
-                    <i class="fa-solid fa-book text-[9px] sm:text-xs"></i> <span>법률 용어/리스크 사전</span>
+                        class="border-b-2 border-transparent text-slate-500 py-2 text-[8.5px] min-[360px]:text-[9.5px] min-[400px]:text-[10.5px] sm:text-xs md:text-sm font-black flex flex-col min-[390px]:flex-row items-center justify-center gap-0.5 min-[390px]:gap-1 transition-all hover:text-royalBlue w-full whitespace-nowrap">
+                    <i class="fa-solid fa-book text-[10px] sm:text-xs"></i> <span>법률 용어 사전</span>
                 </button>
                 <button id="tab-guide-btn" onclick="switchMiddleTab('guide')" 
-                        class="border-b-2 border-transparent text-slate-500 py-1.5 text-[8.5px] min-[360px]:text-[9.5px] min-[400px]:text-[10.5px] sm:text-xs md:text-sm font-black flex flex-col min-[390px]:flex-row items-center justify-center gap-0.5 min-[390px]:gap-1 transition-all hover:text-royalBlue w-full whitespace-nowrap">
-                    <i class="fa-solid fa-circle-info text-[9px] sm:text-xs"></i> <span>사용자 가이드</span>
+                        class="border-b-2 border-transparent text-slate-500 py-2 text-[8.5px] min-[360px]:text-[9.5px] min-[400px]:text-[10.5px] sm:text-xs md:text-sm font-black flex flex-col min-[390px]:flex-row items-center justify-center gap-0.5 min-[390px]:gap-1 transition-all hover:text-royalBlue w-full whitespace-nowrap">
+                    <i class="fa-solid fa-circle-info text-[10px] sm:text-xs"></i> <span>사용자 가이드</span>
+                </button>
+                <button id="tab-architecture-btn" onclick="switchMiddleTab('architecture')" 
+                        class="border-b-2 border-transparent text-slate-500 py-2 text-[8.5px] min-[360px]:text-[9.5px] min-[400px]:text-[10.5px] sm:text-xs md:text-sm font-black flex flex-col min-[390px]:flex-row items-center justify-center gap-0.5 min-[390px]:gap-1 transition-all hover:text-royalBlue w-full whitespace-nowrap">
+                    <i class="fa-solid fa-network-wired text-[10px] sm:text-xs"></i> <span>아키텍처 명세</span>
                 </button>
             </div>
 
@@ -677,6 +687,25 @@
                                 <i class="fa-solid fa-cloud-arrow-up"></i> 내 PC 파일 선택 및 업로드
                             </button>
                             <div id="upload-status" class="text-[10px] sm:text-xs font-black text-center mt-3 text-slate-500 hidden"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 🌐 [TAB 4: 시스템 아키텍처 명세서 컨테이너] (기본 숨김) -->
+            <div id="architecture-view" class="hidden flex-1 overflow-y-auto p-5 sm:p-8 custom-scrollbar bg-slate-50 document-view">
+                <div class="max-w-3xl mx-auto w-full space-y-6 py-2">
+                    <div class="bg-white border border-slate-200 rounded-2xl p-4 sm:p-5 shadow-sm space-y-2 text-center lg:text-left">
+                        <strong class="text-xs sm:text-sm font-extrabold text-royalBlue uppercase tracking-wider block flex items-center justify-center lg:justify-start gap-1.5">
+                            <i class="fa-solid fa-network-wired"></i> 📡 시스템 아키텍처 명세서 (실시간 동기화)
+                        </strong>
+                        <p class="text-[10px] sm:text-xs text-slate-500 leading-relaxed font-medium">본 추천 시스템의 100% 클라우드화 설계 사상과 데이터 연동 흐름을 명시한 공식 문서입니다.<br/>Firebase Hosting 서버에 배포된 최신 원본 마크다운 파일을 실시간으로 로드하여 렌더링합니다.</p>
+                    </div>
+                    
+                    <div class="bg-white border border-slate-200 rounded-2xl p-4 sm:p-6 shadow-sm" id="architecture-content-area">
+                        <div class="text-center py-10">
+                            <div class="inline-block w-6 h-6 border-4 border-royalBlue border-t-transparent rounded-full animate-spin mb-2"></div>
+                            <p class="text-xs font-bold text-slate-500">아키텍처 문서를 실시간으로 불러오는 중입니다...</p>
                         </div>
                     </div>
                 </div>
@@ -1052,6 +1081,7 @@
         let currentSortKey = 'score'; // 현재 정렬 기준
         let activeSortChain = [{ key: 'score', direction: 'desc' }]; // 🟢 [복수 정렬 체인 상태 엔진]
         let selectedProperty = null;  // 현재 선택된 활성화 매물 객체
+        let currentTabId = 'dashboard'; // 현재 활성화된 탭 ID
 
         // 🚀 성능 극대화 고도화: 대용량 데이터 지연 로딩(Pagination) 및 디바운싱 데몬 설정
         let currentPage = 1;
@@ -1208,6 +1238,34 @@
                 // 데스크톱 스크롤 바인딩
                 propertiesContainer.addEventListener("scroll", handleFeedScroll);
             }
+
+            // 탭 상태 동기화 (리사이즈 시 hidden 상태 복원)
+            const glossaryView = document.getElementById("glossary-view");
+            const guideView = document.getElementById("guide-view");
+            const architectureView = document.getElementById("architecture-view");
+            if (glossaryView && guideView && architectureView) {
+                if (currentTabId === 'dashboard') {
+                    dashboardView.classList.remove("hidden");
+                    glossaryView.classList.add("hidden");
+                    guideView.classList.add("hidden");
+                    architectureView.classList.add("hidden");
+                } else if (currentTabId === 'glossary') {
+                    dashboardView.classList.add("hidden");
+                    glossaryView.classList.remove("hidden");
+                    guideView.classList.add("hidden");
+                    architectureView.classList.add("hidden");
+                } else if (currentTabId === 'guide') {
+                    dashboardView.classList.add("hidden");
+                    glossaryView.classList.add("hidden");
+                    guideView.classList.remove("hidden");
+                    architectureView.classList.add("hidden");
+                } else if (currentTabId === 'architecture') {
+                    dashboardView.classList.add("hidden");
+                    glossaryView.classList.add("hidden");
+                    guideView.classList.add("hidden");
+                    architectureView.classList.remove("hidden");
+                }
+            }
         }
 
         window.addEventListener("resize", initResponsiveLayout);
@@ -1219,40 +1277,52 @@
         });
 
         let isFirstLoad = true; // 최초 로드 여부 플래그
+        let dbTimeoutTimer = null; // 타임아웃 타이머
+        let propertiesChannel = null; // properties 실시간 채널
 
         // 1. [3중 방어막] 백엔드 데이터 비동기 연동 및 로딩 정지 방지 (전체 건수 모니터링 연동)
         async function fetchDataFromServer() {
             const sensor = document.getElementById("connection-sensor");
-            try {
-                // Firebase SDK 동적 모듈 로드
-                const { initializeApp, getApp } = await import("https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js");
-                const { getFirestore, collection, onSnapshot } = await import("https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js");
-
-                const firebaseConfig = {
-                    apiKey: "demo-api-key-placeholder",
-                    authDomain: "action-b8c75.firebaseapp.com",
-                    projectId: "action-b8c75",
-                    storageBucket: "action-b8c75.appspot.com",
-                    messagingSenderId: "000000000000",
-                    appId: "1:000000000000:web:demoapp"
-                };
-
-                let app;
-                try {
-                    app = getApp();
-                } catch {
-                    app = initializeApp(firebaseConfig);
+            
+            // 2.5초 타임아웃 설정 (2.5초 동안 Supabase 응답이 없으면 강제로 Fallback 로컬 데이터 로드)
+            dbTimeoutTimer = setTimeout(() => {
+                if (isFirstLoad) {
+                    console.warn("⚠️ Supabase 연결 타임아웃(2.5초 초과) - 로컬 오프라인 데이터로 전향합니다.");
+                    loadFallbackData();
+                    isFirstLoad = false;
                 }
-                db = getFirestore(app, "action");
+            }, 2500);
 
-                // onSnapshot 기반 실시간 구독 활성화
-                onSnapshot(collection(db, "properties"), (snapshot) => {
-                    if (!snapshot.empty) {
-                        originalProperties = [];
-                        snapshot.forEach(doc => {
-                            originalProperties.push({ id: doc.id, ...doc.data() });
+            try {
+                // Supabase로부터 전체 매물을 비동기로 가져오는 함수를 정의합니다.
+                const loadData = async () => {
+                    const { data, error } = await supabaseClient
+                        .from('properties')
+                        .select('*');
+                    
+                    if (error) throw error;
+
+                    if (dbTimeoutTimer) {
+                        clearTimeout(dbTimeoutTimer);
+                        dbTimeoutTimer = null;
+                    }
+
+                    if (data && data.length > 0) {
+                        originalProperties = data.map(item => {
+                            let finalId = item.id;
+                            if (!isNaN(Number(finalId))) {
+                                finalId = Number(finalId);
+                            }
+                            return { ...item, id: finalId };
                         });
-                        
+
+                        // 로컬스토리지에 최신 매물 목록 캐싱
+                        try {
+                            localStorage.setItem('cached_properties', JSON.stringify(originalProperties));
+                        } catch (cacheErr) {
+                            console.warn('로컬 캐시 저장 실패', cacheErr);
+                        }
+
                         // 헤더 통계 카운팅 동적 갱신 지원을 위해 전역 상태 데이터 보완
                         const total = originalProperties.length;
                         const court = originalProperties.filter(p => p.source === 'court').length;
@@ -1271,54 +1341,130 @@
                         applyFilters();
                     } else {
                         if (isFirstLoad) {
-                            throw new Error("서버 데이터 응답이 비었습니다.");
+                            console.warn("⚠️ Supabase 데이터 응답이 비어 있어 예비 데이터를 사용합니다.");
+                            loadFallbackData();
                         }
                     }
                     isFirstLoad = false;
-                }, (error) => {
-                    console.error("Firestore properties 리스너 에러:", error);
-                    loadFallbackData();
-                });
+                };
+
+                // 최초 데이터 조회
+                await loadData();
+
+                // 기존 채널이 있다면 정리
+                if (propertiesChannel) {
+                    supabaseClient.removeChannel(propertiesChannel);
+                }
+
+                // Supabase Realtime 채널을 활성화하여 실시간 구독을 가동합니다.
+                propertiesChannel = supabaseClient
+                    .channel('properties-all-changes')
+                    .on(
+                        'postgres_changes',
+                        { event: '*', schema: 'public', table: 'properties' },
+                        () => {
+                            console.log('properties 테이블 변경 감지 - 다시 조회합니다.');
+                            loadData().catch(err => console.error("실시간 데이터 재조회 실패:", err));
+                        }
+                    )
+                    .subscribe();
 
             } catch (error) {
-                console.warn("⚠️ Firestore 연결 실패 - 예비 시뮬레이션 데이터를 안전 탑재합니다.", error);
-                loadFallbackData();
+                console.warn("⚠️ Supabase 연결 실패 - 예비 시뮬레이션 데이터를 안전 탑재합니다.", error);
+                if (dbTimeoutTimer) {
+                    clearTimeout(dbTimeoutTimer);
+                    dbTimeoutTimer = null;
+                }
+                if (isFirstLoad) {
+                    loadFallbackData();
+                    isFirstLoad = false;
+                }
             }
         }
 
         function loadFallbackData() {
             const sensor = document.getElementById("connection-sensor");
             originalProperties = fallbackData;
+            
+            // 로컬스토리지 캐시 데이터 복구 시도
+            try {
+                const cached = localStorage.getItem('cached_properties');
+                if (cached) {
+                    const parsed = JSON.parse(cached);
+                    if (Array.isArray(parsed) && parsed.length > 0) {
+                        originalProperties = parsed;
+                        console.log(`[+] 로컬 캐시에서 ${parsed.length}건의 실제 매물 데이터를 복구하였습니다.`);
+                    }
+                }
+            } catch (cacheErr) {
+                console.warn('로컬 캐시 복구 실패', cacheErr);
+            }
+
             sensor.innerHTML = '<span class="w-2 h-2 rounded-full bg-amber-500"></span><span>🟡 로컬 오프라인 모드 가동 (' + originalProperties.length.toLocaleString() + '건)</span>';
             sensor.className = "flex items-center gap-2 px-3 py-1.5 rounded-full bg-amber-50 border border-amber-200 text-amber-700 text-[10px] font-black shadow-sm cursor-pointer";
             applyFilters();
         }
 
+        let syncChannel = null; // sync_info 실시간 채널
+
         // 수집 트래커 로그 현황 가져오기
         async function fetchSyncStatus() {
             try {
-                const { getApp } = await import("https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js");
-                const { getFirestore, doc, onSnapshot } = await import("https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js");
-                
-                const app = getApp();
-                const dbInstance = getFirestore(app, "action");
-                
-                onSnapshot(doc(dbInstance, "status", "sync_info"), (docSnap) => {
-                    if (docSnap.exists()) {
-                        const data = docSnap.data();
-                        let syncTimeStr = "연동 전";
-                        if (data.last_sync_timestamp) {
-                            const date = data.last_sync_timestamp.toDate ? data.last_sync_timestamp.toDate() : new Date(data.last_sync_timestamp);
-                            syncTimeStr = date.toLocaleString('ko-KR', { hour12: false });
+                const loadSyncData = async () => {
+                    const { data, error } = await supabaseClient
+                        .from('sync_info')
+                        .select('*')
+                        .eq('id', 1)
+                        .single();
+                    
+                    if (error) throw error;
+                    
+                    if (data) {
+                        const logs = data.logs || [];
+                        
+                        // sync_logs의 타임스탬프를 기인하여 법원 경매 및 캠코 온비드의 마지막 동기화 일자를 파싱합니다.
+                        const lastCourtLog = logs.find(l => l.task_name === 'court_scraper');
+                        const lastOnbidLog = logs.find(l => l.task_name === 'onbid_fetcher');
+
+                        let courtTimeStr = "기록 없음";
+                        let onbidTimeStr = "기록 없음";
+
+                        if (lastCourtLog && lastCourtLog.timestamp) {
+                            const date = new Date(lastCourtLog.timestamp);
+                            courtTimeStr = date.toLocaleString('ko-KR', { hour12: false });
                         }
-                        document.getElementById("sync-court-time").innerText = syncTimeStr;
-                        document.getElementById("sync-onbid-time").innerText = syncTimeStr;
+                        if (lastOnbidLog && lastOnbidLog.timestamp) {
+                            const date = new Date(lastOnbidLog.timestamp);
+                            onbidTimeStr = date.toLocaleString('ko-KR', { hour12: false });
+                        }
+
+                        document.getElementById("sync-court-time").innerText = courtTimeStr;
+                        document.getElementById("sync-onbid-time").innerText = onbidTimeStr;
                     }
-                }, (error) => {
-                    console.error("Firestore sync_info 리스너 에러:", error);
-                    setOfflineSyncTime();
-                });
+                };
+
+                await loadSyncData();
+
+                // 기존 채널이 있다면 정리
+                if (syncChannel) {
+                    supabaseClient.removeChannel(syncChannel);
+                }
+
+                // sync_info 테이블의 실시간 변경을 구독합니다.
+                syncChannel = supabaseClient
+                    .channel('sync_info-changes')
+                    .on(
+                        'postgres_changes',
+                        { event: '*', schema: 'public', table: 'sync_info', filter: 'id=eq.1' },
+                        () => {
+                            console.log('sync_info 변경 감지 - 다시 조회합니다.');
+                            loadSyncData().catch(err => console.error("동기화 상태 재조회 실패:", err));
+                        }
+                    )
+                    .subscribe();
+
             } catch (error) {
+                console.error("Supabase sync_info 로드 에러:", error);
                 setOfflineSyncTime();
             }
         }
@@ -2395,36 +2541,76 @@
 
         // 12. [신규 기능] 중앙 탭 탐색 제어 및 연동
         function switchMiddleTab(tabId) {
+            currentTabId = tabId;
             const tabDashboardBtn = document.getElementById("tab-dashboard-btn");
             const tabGlossaryBtn = document.getElementById("tab-glossary-btn");
             const tabGuideBtn = document.getElementById("tab-guide-btn");
+            const tabArchitectureBtn = document.getElementById("tab-architecture-btn");
 
             const dashboardView = document.getElementById("dashboard-view");
             const glossaryView = document.getElementById("glossary-view");
             const guideView = document.getElementById("guide-view");
+            const architectureView = document.getElementById("architecture-view");
 
-            // 버튼 스타일 초기화 (비활성화 상태)
-            const inactiveClass = "border-b-2 border-transparent text-slate-500 py-3 text-sm font-black flex items-center gap-1.5 transition-all hover:text-royalBlue";
-            const activeClass = "border-b-2 border-royalBlue text-royalBlue py-3 text-sm font-black flex items-center gap-1.5 transition-all";
+            // 버튼 클래스 안전 토글 (기존 반응형 레이아웃용 클래스를 보존하기 위함)
+            const buttons = [
+                { btn: tabDashboardBtn, id: 'dashboard' },
+                { btn: tabGlossaryBtn, id: 'glossary' },
+                { btn: tabGuideBtn, id: 'guide' },
+                { btn: tabArchitectureBtn, id: 'architecture' }
+            ];
 
-            tabDashboardBtn.className = inactiveClass;
-            tabGlossaryBtn.className = inactiveClass;
-            tabGuideBtn.className = inactiveClass;
+            buttons.forEach(item => {
+                if (!item.btn) return;
+                if (item.id === tabId) {
+                    item.btn.classList.remove("border-transparent", "text-slate-500");
+                    item.btn.classList.add("border-royalBlue", "text-royalBlue");
+                } else {
+                    item.btn.classList.remove("border-royalBlue", "text-royalBlue");
+                    item.btn.classList.add("border-transparent", "text-slate-500");
+                }
+            });
 
-            dashboardView.classList.add("hidden");
-            glossaryView.classList.add("hidden");
-            guideView.classList.add("hidden");
-
+            // 뷰 표시 제어
             if (tabId === 'dashboard') {
-                tabDashboardBtn.className = activeClass;
                 dashboardView.classList.remove("hidden");
+                glossaryView.classList.add("hidden");
+                guideView.classList.add("hidden");
+                if (architectureView) architectureView.classList.add("hidden");
             } else if (tabId === 'glossary') {
-                tabGlossaryBtn.className = activeClass;
+                dashboardView.classList.add("hidden");
                 glossaryView.classList.remove("hidden");
+                guideView.classList.add("hidden");
+                if (architectureView) architectureView.classList.add("hidden");
             } else if (tabId === 'guide') {
-                tabGuideBtn.className = activeClass;
+                dashboardView.classList.add("hidden");
+                glossaryView.classList.add("hidden");
                 guideView.classList.remove("hidden");
+                if (architectureView) architectureView.classList.add("hidden");
                 loadGuideContent();
+            } else if (tabId === 'architecture') {
+                dashboardView.classList.add("hidden");
+                glossaryView.classList.add("hidden");
+                guideView.classList.add("hidden");
+                if (architectureView) architectureView.classList.remove("hidden");
+                loadArchitectureContent();
+            }
+        }
+
+        // 12-2. [신규 기능] 시스템 아키텍처 문서 동적 마운팅
+        async function loadArchitectureContent() {
+            const area = document.getElementById("architecture-content-area");
+            try {
+                // Firebase Hosting에 호스팅 중인 아키텍처 명세서 파일을 읽어옵니다.
+                const response = await axios.get('/architecture.md', { timeout: 3000 });
+                if (response.data) {
+                    area.innerHTML = convertMarkdownToHtml(response.data);
+                } else {
+                    throw new Error("아키텍처 문서의 내용이 없습니다.");
+                }
+            } catch (error) {
+                console.warn("아키텍처 파일 로드 실패", error);
+                area.innerHTML = `<div class="text-center py-6 text-rose-500 font-bold text-sm">아키텍처 명세서를 불러오지 못했습니다. <br/><span class="text-xs text-slate-400 font-medium">${error.message}</span></div>`;
             }
         }
 
@@ -2807,20 +2993,20 @@
                     
                     <div class="space-y-2.5 text-[9.5px] sm:text-[11px] text-slate-600">
                         <div class="p-3 border border-slate-200 bg-white rounded-xl leading-relaxed text-center lg:text-left shadow-sm">
-                            <strong class="text-blue-600 font-extrabold block mb-0.5"><i class="fa-solid fa-circle-play text-[10px]"></i> Plan A: GitHub Actions (클라우드 스케줄러)</strong>
-                            매일 새벽 3시에 클라우드 인프라(GitHub Actions Runner) 상에서 주기적인 크론 잡이 가동됩니다. 사전에 지정된 크롤러가 작동하여 대법원 법원경매 정보망과 온비드 데이터허브의 주요 신규 물건과 기일 정보를 파싱 및 적재한 후, 데이터베이스에 안전하게 머지하는 자동화 엔진입니다.
+                            <strong class="text-blue-600 font-extrabold block mb-0.5"><i class="fa-solid fa-circle-play text-[10px]"></i> Plan A: GitHub Actions (클라우드 스케줄러 & Firestore 직접 연동)</strong>
+                            매일 새벽 3시에 클라우드 인프라(GitHub Actions Runner) 상에서 주기적인 크론 잡이 가동됩니다. 사전에 지정된 크롤러가 작동하여 대법원 법원경매 정보망과 온비드 데이터허브의 주요 신규 물건과 기일 정보를 수집하고 정제한 뒤, Firebase Admin SDK를 통해 온라인 Firestore 클라우드로 즉시 적재하여 동기화합니다.
                         </div>
                         <div class="p-3 border border-slate-200 bg-white rounded-xl leading-relaxed text-center lg:text-left shadow-sm">
-                            <strong class="text-emerald-600 font-extrabold block mb-0.5"><i class="fa-solid fa-circle-play text-[10px]"></i> Plan B: 공공데이터포털 Open API 실시간 연동</strong>
-                            한국자산관리공사(KAMCO)가 공공데이터포털을 통해 제공하는 온비드 자산정보 OpenAPI와 실시간으로 동기화됩니다. uvicorn 서버 구동 중 백그라운드 스레드 데몬이 1시간 주기로 API를 폴링하여 최신 공매 물건, 저감 비율 및 기일 변동 데이터를 실시간 수집합니다.
+                            <strong class="text-emerald-600 font-extrabold block mb-0.5"><i class="fa-solid fa-circle-play text-[10px]"></i> Plan B: 공공데이터포털 Open API 실시간 연동 (캠코 온비드)</strong>
+                            한국자산관리공사(KAMCO)가 공공데이터포털을 통해 제공하는 온비드 자산정보 OpenAPI와 실시간으로 동기화됩니다. 백그라운드 수집 데몬이 API를 폴링하여 최신 공매 물건, 저감 비율 및 기일 변동 데이터를 실시간 수집하고 클라우드에 업데이트합니다.
                         </div>
                         <div class="p-3 border border-slate-200 bg-white rounded-xl leading-relaxed text-center lg:text-left shadow-sm">
                             <strong class="text-amber-600 font-extrabold block mb-0.5"><i class="fa-solid fa-circle-play text-[10px]"></i> Plan C: 분산 다중 노드 백업 수집 데몬</strong>
-                            클라우드 가상 서버(VPS) 및 로컬 환경에 독립적으로 설치된 2nd/3rd 노드가 12시간마다 교차 구동됩니다. 이를 통해 메인 수집 노드의 하드웨어 고장이나 데이터 유실에 대비하고, 공식 데이터베이스의 무결성과 데이터 정합성을 다중 검증합니다.
+                            클라우드 가상 서버 및 백업 노드가 교차 구동됩니다. 이를 통해 메인 수집 노드의 하드웨어 고장이나 데이터 유실에 대비하고, 공식 데이터베이스의 무결성과 데이터 정합성을 다중 검증합니다.
                         </div>
                         <div class="p-3 border border-slate-200 bg-white rounded-xl leading-relaxed text-center lg:text-left shadow-sm">
-                            <strong class="text-rose-600 font-extrabold block mb-0.5"><i class="fa-solid fa-circle-play text-[10px]"></i> Plan D: 헤드리스 브라우저 Selenium 자동화</strong>
-                            대법원 경매 사이트의 엄격한 스크래핑 차단 정책(Anti-Scraping)이나 웹 요소 변경을 실시간 우회합니다. 서버단에서 가상의 헤드리스 크롬 브라우저(Selenium) 인스턴스를 동적으로 띄워, 인간 사용자의 정상 클릭/탐색 패턴을 모방함으로써 공식 경매매각명세서 원문의 권리 및 임차 정보 하자를 완벽하게 파싱합니다.
+                            <strong class="text-rose-600 font-extrabold block mb-0.5"><i class="fa-solid fa-circle-play text-[10px]"></i> Plan D: requests 세션 기반 API 및 동적 Warmup 통신</strong>
+                            대법원 경매 사이트의 엄격한 스크래핑 차단 정책(Anti-Scraping)이나 웹 요소 변경을 우회합니다. 서버단에서 requests 세션 및 동적 API Warmup 기법을 활용하여, 인간 사용자의 정상 클릭/탐색 통신 패턴을 모의함으로써 공식 경매매각명세서 원문의 권리 및 임차 정보 하자를 완벽하게 파싱합니다.
                         </div>
                         <div class="p-3 border border-slate-200 bg-white rounded-xl leading-relaxed text-center lg:text-left shadow-sm">
                             <strong class="text-indigo-600 font-extrabold block mb-0.5"><i class="fa-solid fa-circle-play text-[10px]"></i> Plan E: AWS Lambda & proxy 동적 우회 가동</strong>

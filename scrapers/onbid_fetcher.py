@@ -128,14 +128,14 @@ def save_to_db(properties_list):
     conn.commit()
     conn.close()
     
-    # SQLite 저장 처리가 종료되면 변경점을 Firestore에 반영하기 위해 전송 함수를 호출합니다.
+    # SQLite 저장 처리가 종료되면 변경점을 Supabase에 반영하기 위해 전송 함수를 호출합니다.
     try:
         import sys
         sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-        from database import sync_sqlite_to_firestore
-        sync_sqlite_to_firestore()
+        from database import sync_sqlite_to_supabase
+        sync_sqlite_to_supabase()
     except Exception as sync_err:
-        print(f"[-] 클라우드 Firestore 동기화 전송 오류: {sync_err}")
+        print(f"[-] 클라우드 Supabase 동기화 전송 과정에서 오류가 발생했습니다. {sync_err}")
         
     return success_count
 

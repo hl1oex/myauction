@@ -11,8 +11,8 @@ import { GlossaryScreen } from './src/screens/GlossaryScreen';
 import { GuideScreen } from './src/screens/GuideScreen';
 import { FavoritesScreen } from './src/screens/FavoritesScreen';
 import { AuthScreen } from './src/screens/AuthScreen';
-import { auth } from './src/utils/firebase';
-import { onAuthStateChanged, signOut, User } from 'firebase/auth';
+import { supabase } from './src/utils/supabase';
+import { User } from '@supabase/supabase-js';
 
 type TabType = 'feed' | 'favorites' | 'glossary' | 'guide';
 
@@ -23,17 +23,22 @@ export default function App() {
   const [showAuthScreen, setShowAuthScreen] = useState<boolean>(false);
 
   useEffect(() => {
-    // 앱이 처음 시작되거나 갱신될 때 Firebase 인증 세션 상태의 변경 사항을 즉각 감지하기 위해 리스너를 구독하였습니다.
-    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
-      setUser(currentUser);
+    // 앱이 처음 시작되거나 갱신될 때 Supabase 인증 세션 상태의 변경 사항을 즉각 감지하기 위해 리스너를 구독하였습니다.
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setUser(session ? session.user : null);
     });
-    return () => unsubscribe();
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      setUser(session ? session.user : null);
+    });
+
+    return () => subscription.unsubscribe();
   }, []);
 
   // 로그아웃을 수행한 후, UI 일관성을 위해 추천 피드 화면으로 강제 이동 처리합니다.
   const handleLogout = async () => {
     try {
-      await signOut(auth);
+      await supabase.auth.signOut();
       setActiveTab('feed');
     } catch (error) {
       console.error('로그아웃 중 오류가 발생했습니다.', error);
@@ -79,8 +84,8 @@ export default function App() {
         }
         return (
           <FavoritesScreen
-            userId={user.uid}
-            userEmail={user.email}
+            userId={user.id}
+            userEmail={user.email || null}
             onSelectProperty={(property) => setSelectedProperty(property)}
             onLogout={handleLogout}
           />

@@ -255,10 +255,10 @@ def scrape_court_data():
         if r_warmup.status_code != 200:
             raise ConnectionError(f"Warmup page access failed (Status Code: {r_warmup.status_code})")
             
-        # 3개월 윈도우 생성
+        # 6개월 윈도우 생성
         query_months = []
         today = datetime.date.today()
-        for i in range(3):
+        for i in range(6):
             y = today.year
             m = today.month + i
             if m > 12:
@@ -269,9 +269,9 @@ def scrape_court_data():
         sessions_list = []
         
         # 대표 법원 위주 추출
-        target_courts = list(COURT_CODES.items())[:10]  # 상위 10개 대표 법원
+        target_courts = list(COURT_CODES.items())  # 전국 모든 법원 대상 전수 수집
         
-        for ymd in query_months[:2]: # 2달치 범위 우선 검색
+        for ymd in query_months: # 3달치 전체 범위 검색
             for court_code, court_name in target_courts:
                 print(f"Fetching scheduled sessions for {ymd} at {court_name} ({court_code})...")
                 payload = {
@@ -299,7 +299,7 @@ def scrape_court_data():
         print(f"Querying details for {len(sessions_list)} sessions...")
         
         # 상세 조회 및 저장
-        for idx, target in enumerate(sessions_list[:15]): # 페이징 제한
+        for idx, target in enumerate(sessions_list): # 전체 기일 세션 정밀 조회
             detail_payload = {
                 "dma_srchGnrlPbanc": {
                     "dspslRealId": target.get("dspslRealId"),
@@ -399,14 +399,14 @@ def scrape_court_data():
             log_sync_status("SUCCESS", success_count)
             print(f"[+] Court data synchronized successfully! Total: {success_count} listings.")
             
-            # SQLite에 데이터 적재가 성공한 후, 온라인 연동을 위해 클라우드 Firestore로 데이터를 일괄 푸시합니다.
+            # SQLite에 데이터 적재가 성공한 후, 온라인 연동을 위해 클라우드 Supabase로 데이터를 일괄 푸시합니다.
             try:
                 import sys
                 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-                from database import sync_sqlite_to_firestore
-                sync_sqlite_to_firestore()
+                from database import sync_sqlite_to_supabase
+                sync_sqlite_to_supabase()
             except Exception as sync_err:
-                print(f"[-] 클라우드 Firestore 동기화 중 에러가 일어났습니다: {sync_err}")
+                print(f"[-] 클라우드 Supabase 동기화 과정에서 에러가 발생했습니다. {sync_err}")
         else:
             log_sync_status("SUCCESS", 0)
             
