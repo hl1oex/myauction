@@ -111,6 +111,9 @@ def sync_sqlite_to_supabase():
         
         for row in rows:
             data = dict(row)
+            # 클라우드 DB의 기본키 충돌을 방지하기 위해 로컬 SQLite의 id 컬럼은 업로드 데이터에서 제외합니다.
+            if "id" in data:
+                del data["id"]
             # D-Day 계산은 모바일/웹 프론트엔드에서 계산하므로 D-Day 컬럼은 업로드하지 않거나 기본값 처리합니다.
             if "remaining_days" in data:
                 del data["remaining_days"]

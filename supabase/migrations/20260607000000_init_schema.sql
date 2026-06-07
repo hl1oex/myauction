@@ -61,3 +61,6 @@ DROP POLICY IF EXISTS "Allow users to insert their own favorites" ON public.user
 CREATE POLICY "Allow users to insert their own favorites" ON public.user_favorites FOR INSERT WITH CHECK (auth.uid() = user_id);
 DROP POLICY IF EXISTS "Allow users to delete their own favorites" ON public.user_favorites;
 CREATE POLICY "Allow users to delete their own favorites" ON public.user_favorites FOR DELETE USING (auth.uid() = user_id);
+
+-- properties 테이블의 id 자동 증가 시퀀스를 최댓값으로 동기화하여 중복 기본키 에러를 예방합니다.
+SELECT setval(pg_get_serial_sequence('public.properties', 'id'), COALESCE(MAX(id), 1)) FROM public.properties;
