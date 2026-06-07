@@ -34,8 +34,8 @@ jobs:
         env:
           DB_PASSWORD: "Totalitceo7270@@"
         run: |
-          # NAT64/DNS64 게이트웨이를 사용하여 IPv6 직접 연결을 IPv4 터널로 전환합니다.
-          echo "nameserver 193.110.157.148" | sudo tee /etc/resolv.conf
+          # /etc/hosts 에 IPv6 주소를 강제 바인딩하여 DNS 해석 실패를 원천 차단합니다.
+          echo "2406:da12:557:f802:4438:9c90:dd3a:9058 db.ubaxyfxcsxsvrryowswb.supabase.co" | sudo tee -a /etc/hosts
           python -c "
           import psycopg2
           conn = psycopg2.connect(host='db.ubaxyfxcsxsvrryowswb.supabase.co', database='postgres', user='postgres', password='${{ env.DB_PASSWORD }}', port=5432)
