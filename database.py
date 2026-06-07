@@ -117,6 +117,18 @@ def sync_sqlite_to_supabase():
             if "updated_at" in data:
                 del data["updated_at"]
                 
+            # PostgreSQL bigint 데이터 형식과 맞추기 위해 실수를 정수형으로 명시적 캐스팅합니다.
+            if "appraised_value" in data and data["appraised_value"] is not None:
+                try:
+                    data["appraised_value"] = int(float(data["appraised_value"]))
+                except Exception:
+                    pass
+            if "minimum_bid" in data and data["minimum_bid"] is not None:
+                try:
+                    data["minimum_bid"] = int(float(data["minimum_bid"]))
+                except Exception:
+                    pass
+                
             batch_data.append(data)
             count += 1
             
