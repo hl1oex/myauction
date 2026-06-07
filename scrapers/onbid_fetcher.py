@@ -103,6 +103,15 @@ def compute_softscore(price, appraisal, address, ptype, close_date_str, desc, no
     return score, grade, remaining_days
 
 def save_to_db(properties_list):
+    # 테이블 미존재 에러 방지를 위해 데이터베이스 초기화를 선행합니다.
+    try:
+        import sys
+        sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+        from database import init_db
+        init_db()
+    except Exception as init_err:
+        print(f"[-] SQLite 초기화 에러: {init_err}")
+
     conn = sqlite3.connect(DB_PATH)
     cursor = conn.cursor()
     success_count = 0
@@ -140,6 +149,15 @@ def save_to_db(properties_list):
     return success_count
 
 def log_sync_status(status, count, error_msg=""):
+    # 테이블 미존재 에러 방지를 위해 데이터베이스 초기화를 선행합니다.
+    try:
+        import sys
+        sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+        from database import init_db
+        init_db()
+    except Exception as init_err:
+        print(f"[-] SQLite 초기화 에러: {init_err}")
+
     conn = sqlite3.connect(DB_PATH)
     cursor = conn.cursor()
     try:
