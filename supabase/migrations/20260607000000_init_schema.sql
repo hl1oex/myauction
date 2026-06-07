@@ -58,6 +58,6 @@ ALTER TABLE public.user_favorites ENABLE ROW LEVEL SECURITY;
 DROP POLICY IF EXISTS "Allow users to read their own favorites" ON public.user_favorites;
 CREATE POLICY "Allow users to read their own favorites" ON public.user_favorites FOR SELECT USING (auth.uid() = user_id);
 DROP POLICY IF EXISTS "Allow users to insert their own favorites" ON public.user_favorites;
-CREATE POLICY "Create policy for insert" ON public.user_favorites FOR INSERT WITH CHECK (auth.uid() = user_id);
+CREATE POLICY "Allow users to insert their own favorites" ON public.user_favorites FOR INSERT WITH CHECK (auth.uid() = user_id);
 DROP POLICY IF EXISTS "Allow users to delete their own favorites" ON public.user_favorites;
 CREATE POLICY "Allow users to delete their own favorites" ON public.user_favorites FOR DELETE USING (auth.uid() = user_id);
