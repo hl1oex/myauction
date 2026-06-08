@@ -1,7 +1,7 @@
 // 모바일 애플리케이션의 탭 상태와 상세 화면 네비게이션을 조율하는 메인 진입점 파일입니다.
 
 import React, { useState, useEffect } from 'react';
-import { StyleSheet, Text, View, TouchableOpacity, SafeAreaView, Modal } from 'react-native';
+import { StyleSheet, Text, View, TouchableOpacity, SafeAreaView, Modal, Platform } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import { COLORS } from './src/components/Theme';
 import { Property } from './src/types';
@@ -35,6 +35,42 @@ export default function App() {
     return () => subscription.unsubscribe();
   }, []);
 
+  // 브라우저 백 버튼 연동 및 뒤로가기 가드 생성
+  useEffect(() => {
+    if (Platform.OS !== 'web') return;
+
+    const handlePopState = (event: PopStateEvent) => {
+      // 뒤로가기 감지 시 모달이 활성화된 상태라면 모달 상태를 종료합니다.
+      setSelectedProperty(null);
+    };
+
+    if (selectedProperty) {
+      // 현재 주소를 명시하여 경로 변경 없이 히스토리에 가상 모달 상태를 삽입합니다.
+      window.history.pushState({ isModal: true }, '', window.location.pathname + window.location.search);
+      window.addEventListener('popstate', handlePopState);
+    }
+
+    return () => {
+      if (Platform.OS === 'web') {
+        window.removeEventListener('popstate', handlePopState);
+      }
+    };
+  }, [selectedProperty]);
+
+  // 상세 페이지 닫기 공통 제어
+  const handleCloseDetail = () => {
+    if (Platform.OS === 'web') {
+      // 히스토리 가드가 활성화된 상태라면 브라우저 뒤로가기를 호출하여 자연스러운 연동을 유도합니다.
+      if (window.history.state?.isModal) {
+        window.history.back();
+      } else {
+        setSelectedProperty(null);
+      }
+    } else {
+      setSelectedProperty(null);
+    }
+  };
+
   // 로그아웃을 수행한 후, UI 일관성을 위해 추천 피드 화면으로 강제 이동 처리합니다.
   const handleLogout = async () => {
     try {
@@ -45,17 +81,8 @@ export default function App() {
     }
   };
 
-  // 선택된 상세 화면이 있는 경우, 상세 화면을 우선 렌더링합니다. (Stack Navigation 시뮬레이션)
+  // 탭 변경 시 해당 탭 화면을 렌더링합니다. (상세 화면은 이제 모달로 렌더링되므로 탭 컨텐츠에서 분리)
   const renderContent = () => {
-    if (selectedProperty) {
-      return (
-        <DetailScreen
-          property={selectedProperty}
-          onBack={() => setSelectedProperty(null)}
-        />
-      );
-    }
-
     switch (activeTab) {
       case 'feed':
         return (
@@ -103,80 +130,90 @@ export default function App() {
     <SafeAreaView style={styles.container}>
       <StatusBar style="dark" />
       
-      {/* 프리미엄 로고 및 글로벌 헤더 (상세 화면에서는 미노출) */}
-      {!selectedProperty && (
-        <View style={styles.header}>
-          <View style={styles.logoIcon}>
-            <Text style={styles.logoIconText}>🏨</Text>
-          </View>
-          <View style={styles.logoTextContainer}>
-            <Text style={styles.logoTitle}>AI 부동산 경시/공매 통합 앱</Text>
-            <Text style={styles.logoSubtitle}>PREMIUM ELEGANT PEARL WHITE</Text>
-          </View>
-          {user ? (
-            <View style={styles.userBadgeHeader}>
-              <Text style={styles.userBadgeText}>LIVE</Text>
-            </View>
-          ) : (
-            <TouchableOpacity 
-              style={styles.loginHeaderButton}
-              onPress={() => setShowAuthScreen(true)}
-            >
-              <Text style={styles.loginHeaderButtonText}>로그인</Text>
-            </TouchableOpacity>
-          )}
+      {/* 프리미엄 로고 및 글로벌 헤더 (상세 모달이 아닐 때 배경 렌더링 일관성 보존) */}
+      <View style={styles.header}>
+        <View style={styles.logoIcon}>
+          <Text style={styles.logoIconText}>🏨</Text>
         </View>
-      )}
+        <View style={styles.logoTextContainer}>
+          <Text style={styles.logoTitle}>AI 부동산 경시/공매 통합 앱</Text>
+          <Text style={styles.logoSubtitle}>PREMIUM ELEGANT PEARL WHITE</Text>
+        </View>
+        {user ? (
+          <View style={styles.userBadgeHeader}>
+            <Text style={styles.userBadgeText}>LIVE</Text>
+          </View>
+        ) : (
+          <TouchableOpacity 
+            style={styles.loginHeaderButton}
+            onPress={() => setShowAuthScreen(true)}
+          >
+            <Text style={styles.loginHeaderButtonText}>로그인</Text>
+          </TouchableOpacity>
+        )}
+      </View>
 
       {/* 메인 콘텐츠 화면 영역 */}
       <View style={styles.content}>
         {renderContent()}
       </View>
 
-      {/* 하단 프리미엄 탭바 (상세 화면에서는 미노출) */}
-      {!selectedProperty && (
-        <View style={styles.tabBar}>
-          <TouchableOpacity
-            style={[styles.tabItem, activeTab === 'feed' && styles.tabItemActive]}
-            onPress={() => setActiveTab('feed')}
-          >
-            <Text style={styles.tabIcon}>{activeTab === 'feed' ? '✨' : '⭐'}</Text>
-            <Text style={[styles.tabLabel, activeTab === 'feed' && styles.tabLabelActive]}>
-              추천 피드
-            </Text>
-          </TouchableOpacity>
+      {/* 하단 프리미엄 탭바 */}
+      <View style={styles.tabBar}>
+        <TouchableOpacity
+          style={[styles.tabItem, activeTab === 'feed' && styles.tabItemActive]}
+          onPress={() => setActiveTab('feed')}
+        >
+          <Text style={styles.tabIcon}>{activeTab === 'feed' ? '✨' : '⭐'}</Text>
+          <Text style={[styles.tabLabel, activeTab === 'feed' && styles.tabLabelActive]}>
+            추천 피드
+          </Text>
+        </TouchableOpacity>
 
-          <TouchableOpacity
-            style={[styles.tabItem, activeTab === 'favorites' && styles.tabItemActive]}
-            onPress={() => setActiveTab('favorites')}
-          >
-            <Text style={styles.tabIcon}>{activeTab === 'favorites' ? '★' : '☆'}</Text>
-            <Text style={[styles.tabLabel, activeTab === 'favorites' && styles.tabLabelActive]}>
-              관심 목록
-            </Text>
-          </TouchableOpacity>
+        <TouchableOpacity
+          style={[styles.tabItem, activeTab === 'favorites' && styles.tabItemActive]}
+          onPress={() => setActiveTab('favorites')}
+        >
+          <Text style={styles.tabIcon}>{activeTab === 'favorites' ? '★' : '☆'}</Text>
+          <Text style={[styles.tabLabel, activeTab === 'favorites' && styles.tabLabelActive]}>
+            관심 목록
+          </Text>
+        </TouchableOpacity>
 
-          <TouchableOpacity
-            style={[styles.tabItem, activeTab === 'glossary' && styles.tabItemActive]}
-            onPress={() => setActiveTab('glossary')}
-          >
-            <Text style={styles.tabIcon}>📖</Text>
-            <Text style={[styles.tabLabel, activeTab === 'glossary' && styles.tabLabelActive]}>
-              용어 사전
-            </Text>
-          </TouchableOpacity>
+        <TouchableOpacity
+          style={[styles.tabItem, activeTab === 'glossary' && styles.tabItemActive]}
+          onPress={() => setActiveTab('glossary')}
+        >
+          <Text style={styles.tabIcon}>📖</Text>
+          <Text style={[styles.tabLabel, activeTab === 'glossary' && styles.tabLabelActive]}>
+            용어 사전
+          </Text>
+        </TouchableOpacity>
 
-          <TouchableOpacity
-            style={[styles.tabItem, activeTab === 'guide' && styles.tabItemActive]}
-            onPress={() => setActiveTab('guide')}
-          >
-            <Text style={styles.tabIcon}>⚙️</Text>
-            <Text style={[styles.tabLabel, activeTab === 'guide' && styles.tabLabelActive]}>
-              연동 가이드
-            </Text>
-          </TouchableOpacity>
-        </View>
-      )}
+        <TouchableOpacity
+          style={[styles.tabItem, activeTab === 'guide' && styles.tabItemActive]}
+          onPress={() => setActiveTab('guide')}
+        >
+          <Text style={styles.tabIcon}>⚙️</Text>
+          <Text style={[styles.tabLabel, activeTab === 'guide' && styles.tabLabelActive]}>
+            연동 가이드
+          </Text>
+        </TouchableOpacity>
+      </View>
+
+      {/* 물건 상세 보기 모달 오버레이 영역 */}
+      <Modal
+        visible={selectedProperty !== null}
+        animationType="slide"
+        onRequestClose={handleCloseDetail}
+      >
+        {selectedProperty && (
+          <DetailScreen
+            property={selectedProperty}
+            onBack={handleCloseDetail}
+          />
+        )}
+      </Modal>
 
       {/* 인증용 모달 오버레이 영역 */}
       <Modal
@@ -185,7 +222,9 @@ export default function App() {
         onRequestClose={() => setShowAuthScreen(false)}
       >
         <AuthScreen 
-          onSuccess={() => setShowAuthScreen(false)}
+          onSuccess={() => {
+            setShowAuthScreen(false);
+          }}
           onCancel={() => setShowAuthScreen(false)}
         />
       </Modal>

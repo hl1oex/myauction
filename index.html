@@ -16,6 +16,7 @@
         })();
     </script>
     <title>AI 부동산 경시/공매 실시간 통합 추천 시스템 v1.1</title>
+    <link rel="icon" type="image/png" href="/favicon.png">
     <!-- 💎 1. 프리미엄 디자인 타이포그래피를 위한 Google Fonts 연동 -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -125,6 +126,29 @@
             }
         }
 
+        /* 📱 모바일 해상도(640px 이하) 계산기 전용 최적화 스타일 */
+        @media (max-width: 640px) {
+            #calc-bid-input {
+                font-size: 16px !important;
+            }
+            .calculator-keypad button {
+                font-size: 14px !important;
+                padding-top: 4px !important;
+                padding-bottom: 4px !important;
+                letter-spacing: -0.5px !important;
+            }
+            /* 가상 키패드 숫자 버튼 글자 크기만 키우기 (규격 크기는 유지) */
+            .calculator-keypad button.font-outfit {
+                font-size: 19px !important;
+            }
+            .calculator-keypad button.font-sans,
+            .calculator-keypad button.font-bold,
+            .calculator-keypad button#preset-minimum-btn,
+            .calculator-keypad button#preset-appraisal-btn {
+                font-size: 10.5px !important;
+            }
+        }
+
         /* 📄 사용자 가이드 & 법률 사전 - 표준 보고서 문서 스타일 (가독성 극대화) */
         .document-view h2 {
             font-size: 1.25rem !important; /* 20px */
@@ -209,6 +233,9 @@
             margin: 0.875rem 0 !important;
             text-align: left !important;
         }
+        .calculator-keypad button.font-outfit {
+            font-size: 16px !important;
+        }
     </style>
 
 </head>
@@ -236,10 +263,11 @@
         <!-- [우측 영역] 실시간 자산 현황판 및 연결 센서 (hidden 해제 및 우측 정밀 배치) -->
         <div class="flex items-center gap-2 ml-auto">
             <div id="connection-sensor" onclick="fetchDataFromServer(); fetchSyncStatus();" 
-                 class="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-slate-50 border border-slate-200 text-slate-705 text-[9.5px] font-black shadow-sm transition-all duration-300 cursor-pointer hover:bg-slate-100 active:scale-95 whitespace-nowrap" 
+                 class="flex items-center gap-1 min-[360px]:gap-1.5 px-1.5 min-[360px]:px-2.5 py-0.5 min-[360px]:py-1 rounded-full bg-slate-50 border border-slate-200 text-slate-705 text-[8.5px] min-[360px]:text-[9.5px] font-black shadow-sm transition-all duration-300 cursor-pointer hover:bg-slate-100 active:scale-95 whitespace-nowrap" 
                  title="클릭하시면 즉시 실시간 데이터 연동 및 동기화를 재시도합니다.">
                 <span class="w-1.5 h-1.5 rounded-full bg-slate-400"></span>
-                <span>연동 대기 중</span>
+                <span class="hidden sm:inline">연동 대기 중</span>
+                <span class="inline sm:hidden">대기 중</span>
             </div>
             
             <div class="hidden md:flex items-center gap-1 px-2.5 py-1 bg-blue-50/80 border border-blue-100 text-royalBlue text-[9.5px] font-black rounded-full shadow-sm whitespace-nowrap">
@@ -250,6 +278,13 @@
             <div class="hidden lg:flex items-center gap-1 text-[9.5px] text-slate-400 font-bold whitespace-nowrap ml-1.5">
                 <i class="fa-solid fa-clock-rotate-left"></i>
                 <span>백그라운드 스케줄 수집 중</span>
+            </div>
+            
+            <!-- [추가] 로그인 / 회원가입 상태 관리 배지 -->
+            <div id="auth-status-container" class="flex items-center gap-1 sm:gap-1.5">
+                <button onclick="openLoginModal()" class="px-1.5 min-[360px]:px-2.5 py-0.5 min-[360px]:py-1 rounded-full border border-royalBlue text-royalBlue bg-white text-[8.5px] min-[360px]:text-[9.5px] font-black shadow-sm transition-all duration-300 cursor-pointer hover:bg-blue-50 active:scale-95 whitespace-nowrap">
+                    <i class="fa-solid fa-user-lock mr-0.5"></i> 로그인 / 회원가입
+                </button>
             </div>
         </div>
     </header>
@@ -379,6 +414,15 @@
                     </label>
                 </div>
 
+                <!-- 내 관심 목록만 보기 토글 스위치 -->
+                <div class="flex items-center justify-between bg-slate-50 border border-slate-200 rounded-xl p-3">
+                    <span class="text-xs font-black text-slate-500 uppercase tracking-wider">★ 내 관심 목록만 보기</span>
+                    <label class="relative inline-flex items-center cursor-pointer">
+                        <input type="checkbox" id="show-favorites-toggle" onchange="toggleFavoritesFilter()" class="sr-only peer">
+                        <div class="w-9 h-5 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-royalBlue"></div>
+                    </label>
+                </div>
+
                 <!-- AI 자산 등급 필터 (안전 / 위험 구분 보기) -->
                 <div class="bg-slate-50 border border-slate-200 rounded-xl p-3.5 space-y-2">
                     <label class="block text-[11px] sm:text-xs font-black text-slate-500 uppercase tracking-wider">⚠️ AI 권리 등급 분류 필터</label>
@@ -485,15 +529,21 @@
             <!-- 🎯 [TAB 1: 추천 매물 피드 컨테이너] -->
             <div id="dashboard-view" class="flex flex-col flex-1 overflow-hidden">
                 <!-- 정렬 및 리스트 필터 바 -->
-                <div class="px-3.5 py-1.5 bg-white border-b border-slate-200 flex justify-between items-center z-10 shadow-sm">
-                    <span class="text-xs font-black text-slate-400 uppercase tracking-wider">정렬 옵션</span>
-                    <div class="flex flex-wrap gap-1">
-                        <button id="sort-score-btn" onclick="sortData('score')" class="bg-royalBlue text-white px-2 py-1 rounded text-[10px] font-black shadow-sm transition-all">✨ 점수순</button>
-                        <button id="sort-date-btn" onclick="sortData('date')" class="bg-white border border-slate-200 text-slate-600 px-2 py-1 rounded text-[10px] font-black hover:bg-slate-50 transition-all">📅 기일순</button>
-                        <button id="sort-price-btn" onclick="sortData('price')" class="bg-white border border-slate-200 text-slate-600 px-2 py-1 rounded text-[10px] font-black hover:bg-slate-50 transition-all">💰 금액순</button>
-                        <button id="sort-discount-btn" onclick="sortData('discount')" class="bg-white border border-slate-200 text-slate-600 px-2 py-1 rounded text-[10px] font-black hover:bg-slate-50 transition-all">📉 저감율순</button>
-                        <button id="sort-failed-btn" onclick="sortData('failed')" class="bg-white border border-slate-200 text-slate-600 px-2 py-1 rounded text-[10px] font-black hover:bg-slate-50 transition-all">🔄 유찰순</button>
+                <div class="px-3.5 py-1.5 bg-white border-b border-slate-200 flex flex-wrap justify-between items-center z-10 shadow-sm gap-2">
+                    <div class="flex items-center gap-2 flex-wrap">
+                        <span class="text-xs font-black text-slate-400 uppercase tracking-wider">정렬 옵션</span>
+                        <div class="flex flex-wrap gap-1">
+                            <button id="sort-score-btn" onclick="sortData('score')" class="bg-royalBlue text-white px-2 py-1 rounded text-[10px] font-black shadow-sm transition-all">✨ 점수순</button>
+                            <button id="sort-date-btn" onclick="sortData('date')" class="bg-white border border-slate-200 text-slate-600 px-2 py-1 rounded text-[10px] font-black hover:bg-slate-50 transition-all">📅 기일순</button>
+                            <button id="sort-price-btn" onclick="sortData('price')" class="bg-white border border-slate-200 text-slate-600 px-2 py-1 rounded text-[10px] font-black hover:bg-slate-50 transition-all">💰 금액순</button>
+                            <button id="sort-discount-btn" onclick="sortData('discount')" class="bg-white border border-slate-200 text-slate-600 px-2 py-1 rounded text-[10px] font-black hover:bg-slate-50 transition-all">📉 저감율순</button>
+                            <button id="sort-failed-btn" onclick="sortData('failed')" class="bg-white border border-slate-200 text-slate-600 px-2 py-1 rounded text-[10px] font-black hover:bg-slate-50 transition-all">🔄 유찰순</button>
+                        </div>
                     </div>
+                    <!-- 🌟 내 관심 목록 바로가기 버튼 (프리미엄 골드/앰버 테마) -->
+                    <button id="fav-filter-btn" onclick="toggleFavoritesFilterBtn()" class="px-2.5 py-1 rounded text-[10px] font-black shadow-sm transition-all duration-300 flex items-center gap-1 cursor-pointer bg-white border border-slate-200 text-slate-400 hover:bg-slate-50 active:scale-95 opacity-60">
+                        <i class="fa-solid fa-star"></i> <span id="fav-filter-btn-text">내 관심 매물</span>
+                    </button>
                 </div>
 
                 <!-- 매물 목록 스크롤 피드 영역 (성능 극대화 데이터 테이블 뷰 탑재) -->
@@ -833,10 +883,10 @@
                         </div>
 
                         <input type="number" id="calc-bid-input" oninput="runCalculator()"
-                               class="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-1.5 text-xs sm:text-sm font-black focus:outline-none focus:border-royalBlue focus:bg-white transition-all text-royalBlue font-outfit mb-1.5">
+                               class="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-1.5 text-base font-black focus:outline-none focus:border-royalBlue focus:bg-white transition-all text-royalBlue font-outfit mb-1.5">
 
                         <!-- 인터랙티브 계산기 그리드 버튼 키패드 -->
-                        <div class="grid grid-cols-4 gap-1 pt-1">
+                        <div class="grid grid-cols-4 gap-1 pt-1 calculator-keypad">
                             <!-- Row 1 -->
                             <button type="button" onclick="pressCalcKey('+1억')" class="bg-royalBlue/5 hover:bg-royalBlue/15 text-royalBlue text-[11px] font-black py-1.5 rounded-md transition-all select-none font-sans">+1억</button>
                             <button type="button" onclick="pressCalcKey('+1천')" class="bg-royalBlue/5 hover:bg-royalBlue/15 text-royalBlue text-[11px] font-black py-1.5 rounded-md transition-all select-none font-sans">+1천만</button>
@@ -1007,7 +1057,7 @@
                     </a>
 
                     <!-- 3. 대법원 인터넷등기소 -->
-                    <a href="https://www.iros.go.kr" target="_blank" class="bg-white border border-slate-200 hover:border-royalBlue hover:shadow-md rounded-xl p-2 flex items-center gap-2.5 transition-all shadow-sm group">
+                    <a href="http://www.iros.go.kr/PMainJ.jsp?main=1" target="_blank" class="bg-white border border-slate-200 hover:border-royalBlue hover:shadow-md rounded-xl p-2 flex items-center gap-2.5 transition-all shadow-sm group">
                         <div class="bg-blue-50 text-royalBlue group-hover:bg-royalBlue group-hover:text-white w-7 h-7 rounded-lg flex items-center justify-center flex-shrink-0 transition-colors">
                             <i class="fa-solid fa-file-signature text-[10px]"></i>
                         </div>
@@ -1018,7 +1068,7 @@
                     </a>
 
                     <!-- 4. 정부24 전입세대확인서 -->
-                    <a href="https://www.gov.kr" target="_blank" class="bg-white border border-slate-200 hover:border-royalBlue hover:shadow-md rounded-xl p-2 flex items-center gap-2.5 transition-all shadow-sm group">
+                    <a href="https://www.gov.kr/main?a=9999&srvcId=131100000021" target="_blank" class="bg-white border border-slate-200 hover:border-royalBlue hover:shadow-md rounded-xl p-2 flex items-center gap-2.5 transition-all shadow-sm group">
                         <div class="bg-blue-50 text-royalBlue group-hover:bg-royalBlue group-hover:text-white w-7 h-7 rounded-lg flex items-center justify-center flex-shrink-0 transition-colors">
                             <i class="fa-solid fa-users text-[10px]"></i>
                         </div>
@@ -1029,7 +1079,7 @@
                     </a>
 
                     <!-- 5. 건축물대장 무료열람 -->
-                    <a href="https://www.gov.kr/portal/main" target="_blank" class="bg-white border border-slate-200 hover:border-royalBlue hover:shadow-md rounded-xl p-2 flex items-center gap-2.5 transition-all shadow-sm group">
+                    <a href="https://www.gov.kr/mw/AA020InfoCappView.do?HighCtgCD=A01004001&CappBizCD=15000000098" target="_blank" class="bg-white border border-slate-200 hover:border-royalBlue hover:shadow-md rounded-xl p-2 flex items-center gap-2.5 transition-all shadow-sm group">
                         <div class="bg-blue-50 text-royalBlue group-hover:bg-royalBlue group-hover:text-white w-7 h-7 rounded-lg flex items-center justify-center flex-shrink-0 transition-colors">
                             <i class="fa-solid fa-building text-[10px]"></i>
                         </div>
@@ -1357,8 +1407,8 @@
                         if (headerCourt) headerCourt.innerText = court;
                         if (headerOnbid) headerOnbid.innerText = onbid;
                         
-                        sensor.innerHTML = '<span class="w-2 h-2 rounded-full bg-[#10b981] animate-ping"></span><span>🟢 실시간 데이터 연동 정상 (' + originalProperties.length.toLocaleString() + '건)</span>';
-                        sensor.className = "flex items-center gap-2 px-3 py-1.5 rounded-full bg-emerald-50 border border-emerald-200 text-emerald-700 text-[10px] font-black shadow-sm cursor-pointer";
+                        sensor.innerHTML = '<span class="w-2 h-2 rounded-full bg-[#10b981] animate-ping"></span><span class="hidden sm:inline">🟢 실시간 데이터 연동 정상 (' + originalProperties.length.toLocaleString() + '건)</span><span class="inline sm:hidden">🟢 ' + originalProperties.length.toLocaleString() + '건</span>';
+                        sensor.className = "flex items-center gap-1.5 sm:gap-2 px-2 sm:px-3 py-1 sm:py-1.5 rounded-full bg-emerald-50 border border-emerald-200 text-emerald-700 text-[9px] sm:text-[10px] font-black shadow-sm cursor-pointer";
                         
                         applyFilters();
                     } else {
@@ -1422,8 +1472,8 @@
                 console.warn('로컬 캐시 복구 실패', cacheErr);
             }
 
-            sensor.innerHTML = '<span class="w-2 h-2 rounded-full bg-amber-500"></span><span>🟡 로컬 오프라인 모드 가동 (' + originalProperties.length.toLocaleString() + '건)</span>';
-            sensor.className = "flex items-center gap-2 px-3 py-1.5 rounded-full bg-amber-50 border border-amber-200 text-amber-700 text-[10px] font-black shadow-sm cursor-pointer";
+            sensor.innerHTML = '<span class="w-2 h-2 rounded-full bg-amber-500"></span><span class="hidden sm:inline">🟡 로컬 오프라인 모드 가동 (' + originalProperties.length.toLocaleString() + '건)</span><span class="inline sm:hidden">🟡 ' + originalProperties.length.toLocaleString() + '건</span>';
+            sensor.className = "flex items-center gap-1.5 sm:gap-2 px-2 sm:px-3 py-1 sm:py-1.5 rounded-full bg-amber-50 border border-amber-200 text-amber-700 text-[9px] sm:text-[10px] font-black shadow-sm cursor-pointer";
             applyFilters();
         }
 
@@ -1744,7 +1794,13 @@
                     }
                 }
                 
-                return matchesKeyword && matchesBudget && matchesSource && matchesDate && matchesPast && matchesSido && matchesSigungu && matchesGrade && matchesPtype;
+                // ❿ 내 관심 목록만 보기 필터
+                let matchesFavorite = true;
+                if (showFavoritesOnly) {
+                    matchesFavorite = favoritePropertyIds.has(item.id);
+                }
+                
+                return matchesKeyword && matchesBudget && matchesSource && matchesDate && matchesPast && matchesSido && matchesSigungu && matchesGrade && matchesPtype && matchesFavorite;
             });
             
             currentPage = 1; // 필터 적용 시 1페이지부터 다시 그리기
@@ -2027,6 +2083,12 @@
                         <!-- Top Badges Row -->
                         <div class="flex justify-between items-center mb-2">
                             <div class="flex gap-1.5 items-center">
+                                <!-- 관심 등록 별표 버튼 -->
+                                <button id="star-btn-${item.id}" onclick="toggleFavoriteProperty(${item.id}, event)" class="p-1 hover:scale-110 active:scale-95 transition-all select-none mr-0.5" title="관심 등록 토글">
+                                    ${favoritePropertyIds.has(item.id) 
+                                        ? `<i class="fa-solid fa-star text-amber-400 text-[13px]"></i>` 
+                                        : `<i class="fa-regular fa-star text-slate-400 text-[13px]"></i>`}
+                                </button>
                                 ${sourceBadge}
                                 <span class="${ddayClass} text-[11.5px] font-black px-1.5 py-0.5 rounded-md">${ddayText}</span>
                             </div>
@@ -3104,9 +3166,440 @@
                             대법원 수신 바이트 인코딩을 UTF-8 표준으로 복구하여, 사건번호의 "타경" 한자나 소재지 동명/도로명이 깨진 문자 없이 매끄러운 한글 상태로 DB에 안전 저장되도록 개선했습니다.
                         </div>
                     </div>
+
+                    <div class="border-t border-slate-200 my-4"></div>
+                    
+                    <!-- 4. Supabase 인증 및 소셜로그인 설정 가이드 -->
+                    <h3 class="text-xs sm:text-sm font-extrabold text-royalBlue mb-2 flex items-center justify-center lg:justify-start gap-1.5">
+                        <i class="fa-solid fa-key"></i> 4. Supabase 인증 및 소셜로그인 활성화 가이드
+                    </h3>
+                    <p class="text-[9.5px] sm:text-[11px] text-slate-655 leading-relaxed mb-3 font-medium">
+                        구글 및 카카오 로그인 연동 실패("Unsupported provider") 시, Supabase 클라우드 대시보드에서 다음과 같은 후속 설정을 진행해야 정상 작동합니다.
+                    </p>
+                    <div class="space-y-2.5 text-[9.5px] sm:text-[11px] text-slate-600">
+                        <div class="p-3 border border-slate-200 bg-white rounded-xl leading-relaxed text-center lg:text-left shadow-sm">
+                            <strong class="text-royalBlue font-extrabold block mb-0.5">🔑 1) Google / Kakao OAuth 제공자 활성화</strong>
+                            Supabase 콘솔(https://supabase.com)에 로그인한 뒤, 해당 프로젝트의 <strong>Authentication -> Providers</strong> 메뉴로 이동하십시오. Google 및 Kakao 제공자를 선택하고 'Enable' 스위치를 켠 뒤, 발급받은 Client ID와 Client Secret을 입력하고 저장해야 소셜로그인 화면이 호출됩니다.
+                        </div>
+                        <div class="p-3 border border-slate-200 bg-white rounded-xl leading-relaxed text-center lg:text-left shadow-sm">
+                            <strong class="text-royalBlue font-extrabold block mb-0.5">📧 2) 이메일 인증 절차 비활성화 (무인증 테스트 팁)</strong>
+                            사용자 <strong>hl1oex@gmail.com</strong> 계정 등으로 가입 즉시 로그인이 가능하도록 하려면, <strong>Authentication -> Providers -> Email</strong> 설정에서 <strong>'Confirm email'</strong> 스위치를 꺼두십시오. 이 설정을 꺼두시면 이메일 수신함에서 인증 링크를 클릭하지 않고도 가입 즉시 로그인이 가능해집니다.
+                        </div>
+                        <div class="p-3 border border-slate-200 bg-white rounded-xl leading-relaxed text-center lg:text-left shadow-sm">
+                            <strong class="text-royalBlue font-extrabold block mb-0.5">🔗 3) 로그인 후 localhost:3000 리다이렉트 현상 해결 (Site URL 설정)</strong>
+                            소셜 로그인 완료 직후 배포된 웹사이트 주소 대신 localhost:3000 주소로 튕겨서 '사이트에 연결할 수 없음' 에러가 발생하는 이유는 Supabase 서버의 리다이렉트 허용 목록에 배포 주소가 빠져있기 때문입니다. <br>
+                            해결 방법: <strong>Authentication -> URL Configuration</strong> 메뉴로 이동하여 <strong>Site URL</strong>을 배포된 웹 주소인 <code>https://action-b8c75.web.app</code>로 변경하십시오. 또한, 하단의 <strong>Redirect URLs</strong> 목록에 <code>https://action-b8c75.web.app/**</code> 및 <code>https://action-b8c75.web.app/mobile/**</code>를 명시하여 등록해야 정상적으로 로그인 후 본 서비스 화면으로 복귀할 수 있습니다.
+                        </div>
+                    </div>
                 </div>
             `;
         }
+
+        // ==========================================
+        // 💎 [신규 통합] 로그인 세션 및 관심 목록 연동 로직
+        // ==========================================
+        let currentUser = null;
+        let favoritePropertyIds = new Set();
+        let showFavoritesOnly = false;
+        let isSignUpMode = false;
+
+        // Supabase 인증 상태 리스너 구독
+        supabaseClient.auth.onAuthStateChange(async (event, session) => {
+            currentUser = session ? session.user : null;
+            updateAuthUI();
+            if (currentUser) {
+                await loadFavoritesFromServer();
+            } else {
+                favoritePropertyIds.clear();
+                showFavoritesOnly = false;
+                const favToggle = document.getElementById("show-favorites-toggle");
+                if (favToggle) favToggle.checked = false;
+            }
+            // 관심 목록 필터 버튼 UI의 개수와 활성화 상태를 업데이트합니다.
+            updateFavoritesButtonUI();
+            applyFilters();
+        });
+
+        // 헤더 로그인 UI 업데이트 함수
+        function updateAuthUI() {
+            const container = document.getElementById("auth-status-container");
+            if (!container) return;
+            
+            if (currentUser) {
+                const emailId = currentUser.email.split('@')[0];
+                container.innerHTML = `
+                    <span class="text-[8.5px] sm:text-[9.5px] font-black text-slate-600 bg-slate-100 px-1.5 sm:px-2.5 py-0.5 sm:py-1 rounded-full border border-slate-200 flex items-center gap-0.5 sm:gap-1 shadow-sm">
+                        <i class="fa-solid fa-user text-[8px] text-royalBlue"></i> <span class="max-w-[50px] sm:max-w-none truncate">${emailId}님</span>
+                    </span>
+                    <button onclick="handleLogout()" class="px-1.5 sm:px-2.5 py-0.5 sm:py-1 rounded-full border border-rose-200 text-rose-600 bg-white text-[8.5px] sm:text-[9.5px] font-black shadow-sm transition-all duration-300 cursor-pointer hover:bg-rose-50 active:scale-95 whitespace-nowrap">
+                        <i class="fa-solid fa-right-from-bracket mr-0.5"></i> 로그아웃
+                    </button>
+                `;
+            } else {
+                container.innerHTML = `
+                    <button onclick="openLoginModal()" class="px-1.5 sm:px-2.5 py-0.5 sm:py-1 rounded-full border border-royalBlue text-royalBlue bg-white text-[8.5px] sm:text-[9.5px] font-black shadow-sm transition-all duration-300 cursor-pointer hover:bg-blue-50 active:scale-95 whitespace-nowrap">
+                        <i class="fa-solid fa-user-lock mr-0.5"></i> 로그인 / 회원가입
+                    </button>
+                `;
+            }
+        }
+
+        // 로그인 모달 열기 함수
+        function openLoginModal() {
+            const modal = document.getElementById("login-modal");
+            if (modal) {
+                modal.classList.remove("hidden");
+                // 애니메이션 렌더링 보정
+                setTimeout(() => {
+                    modal.classList.remove("opacity-0");
+                    modal.querySelector(".transform").classList.remove("scale-95");
+                    modal.querySelector(".transform").classList.add("scale-100");
+                }, 10);
+            }
+        }
+
+        // 로그인 모달 닫기 함수
+        function closeLoginModal() {
+            const modal = document.getElementById("login-modal");
+            if (modal) {
+                modal.classList.add("opacity-0");
+                modal.querySelector(".transform").classList.remove("scale-100");
+                modal.querySelector(".transform").classList.add("scale-95");
+                setTimeout(() => {
+                    modal.classList.add("hidden");
+                    // 모달을 닫을 때 로그인 모드로 상태 복원
+                    if (isSignUpMode) {
+                        toggleAuthMode();
+                    }
+                    // 입력 필드 초기화
+                    document.getElementById("login-email").value = "";
+                    document.getElementById("login-password").value = "";
+                    const confirmInput = document.getElementById("login-confirm-password");
+                    if (confirmInput) confirmInput.value = "";
+                }, 300);
+            }
+        }
+
+        // 로그인/회원가입 모드 전환 함수
+        function toggleAuthMode() {
+            isSignUpMode = !isSignUpMode;
+            const title = document.getElementById("modal-title");
+            const subtitle = document.getElementById("modal-subtitle");
+            const submitBtn = document.getElementById("modal-submit-btn");
+            const switchBtn = document.getElementById("modal-switch-btn");
+            const confirmPasswordContainer = document.getElementById("modal-confirm-password-container");
+            const googleText = document.getElementById("social-text-google");
+            const kakaoText = document.getElementById("social-text-kakao");
+            const naverText = document.getElementById("social-text-naver");
+            
+            // 비밀번호 입력필드 초기화
+            document.getElementById("login-password").value = "";
+            const confirmInput = document.getElementById("login-confirm-password");
+            if (confirmInput) confirmInput.value = "";
+            
+            if (isSignUpMode) {
+                title.innerText = "프리미엄 회원가입";
+                subtitle.innerText = "계정을 생성하여 관심 매물을 클라우드에 연동해 보십시오.";
+                submitBtn.innerHTML = `<span>가입 완료</span>`;
+                switchBtn.innerText = "이미 계정이 있으신가요? 로그인하기";
+                
+                // 비밀번호 확인 입력창 표시
+                if (confirmPasswordContainer) {
+                    confirmPasswordContainer.classList.remove("hidden");
+                }
+                
+                // 소셜 로그인 버튼 텍스트 변경
+                if (googleText) googleText.innerText = "Google 계정으로 회원가입";
+                if (kakaoText) kakaoText.innerText = "카카오 계정으로 회원가입";
+                if (naverText) naverText.innerText = "네이버 계정으로 회원가입";
+            } else {
+                title.innerText = "프리미엄 로그인";
+                subtitle.innerText = "로그인하여 맞춤형 경공매 정보 서비스를 이용해 보십시오.";
+                submitBtn.innerHTML = `<span>로그인</span>`;
+                switchBtn.innerText = "처음이신가요? 회원가입하기";
+                
+                // 비밀번호 확인 입력창 숨김
+                if (confirmPasswordContainer) {
+                    confirmPasswordContainer.classList.add("hidden");
+                }
+                
+                // 소셜 로그인 버튼 텍스트 복원
+                if (googleText) googleText.innerText = "Google 계정으로 로그인";
+                if (kakaoText) kakaoText.innerText = "카카오 계정으로 로그인";
+                if (naverText) naverText.innerText = "네이버 계정으로 로그인";
+            }
+        }
+
+        // 이메일 비밀번호 로그인/회원가입 제출 함수
+        async function submitAuth() {
+            const email = document.getElementById("login-email").value.trim();
+            const password = document.getElementById("login-password").value;
+            
+            if (!email || !password) {
+                alert("이메일과 비밀번호를 모두 입력해 주십시오.");
+                return;
+            }
+            
+            if (password.length < 6) {
+                alert("비밀번호는 최소 6자 이상이어야 합니다.");
+                return;
+            }
+            
+            try {
+                if (isSignUpMode) {
+                    const confirmPassword = document.getElementById("login-confirm-password").value;
+                    if (password !== confirmPassword) {
+                        alert("비밀번호와 비밀번호 확인이 일치하지 않습니다.");
+                        return;
+                    }
+                    
+                    const { error } = await supabaseClient.auth.signUp({ email, password });
+                    if (error) throw error;
+                    alert("회원가입이 완료되었습니다.");
+                } else {
+                    const { error } = await supabaseClient.auth.signInWithPassword({ email, password });
+                    if (error) throw error;
+                }
+                closeLoginModal();
+            } catch (err) {
+                console.error("인증 실패", err);
+                let errMsg = err.message || "인증 처리 중 에러가 발생했습니다.";
+                if (errMsg.includes("already registered") || errMsg.includes("Email already exists")) {
+                    errMsg = "이미 사용 중인 이메일 주소입니다.";
+                } else if (errMsg.includes("Invalid login credentials")) {
+                    errMsg = "이메일 또는 비밀번호가 일치하지 않습니다.";
+                }
+                alert(errMsg);
+            }
+        }
+
+        // 소셜 로그인 트리거 함수
+        async function loginWithSocial(provider) {
+            if (provider === 'naver') {
+                alert("네이버 소셜 로그인은 현재 Supabase 인증 연동 스펙 상 지원 준비 중입니다. 구글 또는 카카오 계정을 이용해 주십시오.");
+                return;
+            }
+            try {
+                // 로컬 file:// 실행 환경을 방어하고 온라인 배포 서버로 항상 안전하게 되돌아가도록 폴백 주소를 세팅합니다.
+                let redirectUrl = 'https://action-b8c75.web.app/';
+                const origin = window.location.origin;
+                if (origin && origin.startsWith('http') && !origin.includes('file:')) {
+                    redirectUrl = origin + '/';
+                }
+
+                const { error } = await supabaseClient.auth.signInWithOAuth({
+                    provider: provider,
+                    options: {
+                        redirectTo: redirectUrl
+                    }
+                });
+                if (error) throw error;
+            } catch (err) {
+                console.error("소셜 로그인 실패", err);
+                let errMsg = err.message || "소셜 로그인 처리 중 에러가 발생했습니다.";
+                if (errMsg.includes("provider is not enabled") || errMsg.includes("Unsupported provider")) {
+                    errMsg = "현재 Supabase 서버 측에 해당 소셜 로그인 제공자(Provider) 설정이 켜져 있지 않습니다.\n\n해결 방법:\n1. Supabase 대시보드(Authentication -> Providers)에서 Google 및 Kakao 스위치를 활성화(Enable)하고 Credentials를 등록해야 합니다.\n2. 테스트를 위해 일반 이메일/비밀번호 가입(hl1oex@gmail.com 등)으로 즉시 로그인하실 수 있습니다.";
+                }
+                alert(errMsg);
+            }
+        }
+
+        // 로그아웃 수행 함수
+        async function handleLogout() {
+            try {
+                const { error } = await supabaseClient.auth.signOut();
+                if (error) throw error;
+                alert("로그아웃되었습니다.");
+            } catch (err) {
+                console.error("로그아웃 실패", err);
+            }
+        }
+
+        // Supabase로부터 로그인 유저의 관심 목록 로드 함수
+        async function loadFavoritesFromServer() {
+            if (!currentUser) return;
+            try {
+                const { data, error } = await supabaseClient
+                    .from('user_favorites')
+                    .select('property_id')
+                    .eq('user_id', currentUser.id);
+                if (error) throw error;
+                
+                favoritePropertyIds = new Set((data || []).map(f => f.property_id));
+            } catch (err) {
+                console.error("관심 목록 동기화 실패", err);
+            }
+        }
+
+        // 매물 카드에서 관심 별표 클릭 시 토글 함수
+        async function toggleFavoriteProperty(propertyId, event) {
+            if (event) event.stopPropagation(); // 카드 상세 서랍 열림 이벤트 방지
+            
+            if (!currentUser) {
+                alert("로그인이 필요한 기능입니다. 로그인 화면으로 안내합니다.");
+                openLoginModal();
+                return;
+            }
+            
+            const id = parseInt(propertyId);
+            const isFav = favoritePropertyIds.has(id);
+            
+            try {
+                if (isFav) {
+                    const { error } = await supabaseClient
+                        .from('user_favorites')
+                        .delete()
+                        .eq('user_id', currentUser.id)
+                        .eq('property_id', id);
+                    if (error) throw error;
+                    favoritePropertyIds.delete(id);
+                } else {
+                    const { error } = await supabaseClient
+                        .from('user_favorites')
+                        .insert({
+                            user_id: currentUser.id,
+                            property_id: id
+                        });
+                    if (error) throw error;
+                    favoritePropertyIds.add(id);
+                }
+                
+                // 해당 카드의 별표 UI 실시간 갱신
+                updateFavoriteStarUI(id);
+                
+                // 관심 매물 필터 버튼 UI 실시간 갱신
+                updateFavoritesButtonUI();
+                
+                // 내 관심 목록만 보기 필터 가동 상태라면 리스트 재렌더링
+                if (showFavoritesOnly) {
+                    applyFilters();
+                }
+            } catch (err) {
+                console.error("관심 등록 실패", err);
+                alert("인증 오류 또는 일시적 네트워크 장애로 관심 목록 변경에 실패했습니다.");
+            }
+        }
+
+        // 단일 별표 UI 상태 실시간 동적 보정
+        function updateFavoriteStarUI(propertyId) {
+            const btn = document.getElementById(`star-btn-${propertyId}`);
+            if (btn) {
+                const isFav = favoritePropertyIds.has(propertyId);
+                btn.innerHTML = isFav 
+                    ? `<i class="fa-solid fa-star text-amber-400 text-[13px]"></i>` 
+                    : `<i class="fa-regular fa-star text-slate-400 text-[13px]"></i>`;
+            }
+        }
+
+        // 관심 목록 토글 스위치 이벤트 핸들러
+        function toggleFavoritesFilter() {
+            const toggle = document.getElementById("show-favorites-toggle");
+            if (toggle.checked && !currentUser) {
+                toggle.checked = false;
+                alert("로그인 후 관심 목록 전용 조회가 가능합니다.");
+                openLoginModal();
+                return;
+            }
+            showFavoritesOnly = toggle.checked;
+            updateFavoritesButtonUI(); // 관심목록 필터 버튼 UI 동기화
+            applyFilters();
+        }
+
+        // 🌟 [신규] 정렬 바 옆 관심 목록 필터 버튼 클릭 핸들러
+        function toggleFavoritesFilterBtn() {
+            if (!currentUser) {
+                alert("로그인 후 관심 목록 조회가 가능합니다.");
+                openLoginModal();
+                return;
+            }
+            showFavoritesOnly = !showFavoritesOnly;
+            
+            // 왼쪽 사이드바 토글 스위치와 상태 동기화
+            const toggle = document.getElementById("show-favorites-toggle");
+            if (toggle) toggle.checked = showFavoritesOnly;
+            
+            updateFavoritesButtonUI();
+            applyFilters();
+        }
+
+        // 🌟 [신규] 관심 목록 버튼 UI 상태 실시간 갱신 함수 (프리미엄 앰버/골드 테마 적용)
+        function updateFavoritesButtonUI() {
+            const btn = document.getElementById("fav-filter-btn");
+            const textSpan = document.getElementById("fav-filter-btn-text");
+            if (!btn || !textSpan) return;
+            
+            if (currentUser) {
+                const favCount = favoritePropertyIds.size;
+                textSpan.textContent = `내 관심 매물 (${favCount})`;
+                
+                if (showFavoritesOnly) {
+                    btn.className = "px-2.5 py-1 rounded text-[10px] font-black shadow-sm transition-all duration-300 flex items-center gap-1 cursor-pointer bg-gradient-to-r from-amber-500 to-yellow-500 text-white hover:brightness-110 active:scale-95";
+                } else {
+                    btn.className = "px-2.5 py-1 rounded text-[10px] font-black shadow-sm transition-all duration-300 flex items-center gap-1 cursor-pointer bg-white border border-amber-300 text-amber-600 hover:bg-amber-50 active:scale-95";
+                }
+            } else {
+                textSpan.textContent = "내 관심 매물";
+                btn.className = "px-2.5 py-1 rounded text-[10px] font-black shadow-sm transition-all duration-300 flex items-center gap-1 cursor-pointer bg-white border border-slate-200 text-slate-400 hover:bg-slate-50 active:scale-95 opacity-60";
+            }
+        }
     </script>
+
+    <!-- 🧮 6. 프리미엄 로그인 및 회원가입 모달 (Elegant Pearl White 테마) -->
+    <div id="login-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center hidden opacity-0 transition-opacity duration-300">
+        <div class="bg-white border border-slate-200 rounded-3xl w-[90%] max-w-[400px] p-6 shadow-2xl transform scale-95 transition-transform duration-300 relative">
+            <button onclick="closeLoginModal()" class="absolute top-4 right-4 text-slate-400 hover:text-rose-500 transition-colors select-none">
+                <i class="fa-solid fa-xmark text-lg"></i>
+            </button>
+            <div class="text-center mb-6">
+                <h3 id="modal-title" class="text-lg font-black text-slate-900">프리미엄 로그인</h3>
+                <p id="modal-subtitle" class="text-[10px] text-slate-500 font-bold mt-1">로그인하여 관심 매물을 클라우드에 연동해 보십시오.</p>
+            </div>
+            
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-[10px] font-black text-slate-400 uppercase tracking-wider mb-1.5">이메일 주소</label>
+                    <input type="email" id="login-email" placeholder="example@email.com" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2 text-sm font-semibold focus:bg-white focus:outline-none focus:ring-2 focus:ring-royalBlue/10 focus:border-royalBlue transition-all">
+                </div>
+                <div>
+                    <label class="block text-[10px] font-black text-slate-400 uppercase tracking-wider mb-1.5">비밀번호</label>
+                    <input type="password" id="login-password" placeholder="6자 이상의 비밀번호" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2 text-sm font-semibold focus:bg-white focus:outline-none focus:ring-2 focus:ring-royalBlue/10 focus:border-royalBlue transition-all">
+                </div>
+                <!-- [추가] 회원가입용 비밀번호 확인 입력필드 -->
+                <div id="modal-confirm-password-container" class="hidden">
+                    <label class="block text-[10px] font-black text-slate-400 uppercase tracking-wider mb-1.5">비밀번호 확인</label>
+                    <input type="password" id="login-confirm-password" placeholder="비밀번호 재입력" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2 text-sm font-semibold focus:bg-white focus:outline-none focus:ring-2 focus:ring-royalBlue/10 focus:border-royalBlue transition-all">
+                </div>
+                
+                <button id="modal-submit-btn" onclick="submitAuth()" class="w-full h-11 bg-royalBlue hover:bg-royalHover text-white font-black rounded-xl text-xs shadow-md shadow-blue-500/10 transition-all active:scale-[0.98] flex items-center justify-center gap-1.5">
+                    <span>로그인</span>
+                </button>
+                
+                <button id="modal-switch-btn" onclick="toggleAuthMode()" class="w-full text-center text-[10.5px] font-black text-royalBlue hover:underline py-1 transition-all">
+                    처음이신가요? 회원가입하기
+                </button>
+                
+                <div class="relative flex items-center justify-center my-4">
+                    <div class="border-t border-slate-200 w-full"></div>
+                    <span class="absolute bg-white px-3 text-[9.5px] font-black text-slate-400 uppercase tracking-wider">간편 소셜 로그인</span>
+                </div>
+                
+                <!-- 소셜 로그인 버튼 3종 (구글, 카카오, 네이버) -->
+                <div class="space-y-2.5">
+                    <button onclick="loginWithSocial('google')" class="w-full h-10 bg-white border border-slate-200 hover:bg-slate-50 text-slate-700 font-extrabold rounded-xl text-[11px] shadow-sm flex items-center justify-center gap-2 transition-all active:scale-[0.98]">
+                        <i class="fa-brands fa-google text-slate-700 text-xs"></i>
+                        <span id="social-text-google">Google 계정으로 로그인</span>
+                    </button>
+                    <button onclick="loginWithSocial('kakao')" class="w-full h-10 bg-[#FEE500] hover:bg-[#FDD000] text-[#191919] font-extrabold rounded-xl text-[11px] shadow-sm flex items-center justify-center gap-2 transition-all active:scale-[0.98]">
+                        <i class="fa-solid fa-comment text-[#191919] text-xs"></i>
+                        <span id="social-text-kakao">카카오 계정으로 로그인</span>
+                    </button>
+                    <button onclick="loginWithSocial('naver')" class="w-full h-10 bg-[#03C75A] hover:bg-[#02B14F] text-white font-extrabold rounded-xl text-[11px] shadow-sm flex items-center justify-center gap-2 transition-all active:scale-[0.98]">
+                        <span class="font-black text-xs">N</span>
+                        <span id="social-text-naver">네이버 계정으로 로그인</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
 </body>
 </html>

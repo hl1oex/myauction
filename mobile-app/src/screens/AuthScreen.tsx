@@ -1,7 +1,7 @@
 // Supabase Auth 서비스를 통해 사용자 회원가입 및 로그인을 처리하는 인증 화면 컴포넌트입니다.
 
 import React, { useState } from 'react';
-import { StyleSheet, Text, View, TextInput, TouchableOpacity, Alert, ActivityIndicator } from 'react-native';
+import { StyleSheet, Text, View, TextInput, TouchableOpacity, Alert, ActivityIndicator, Platform } from 'react-native';
 import { supabase } from '../utils/supabase';
 import { COLORS } from '../components/Theme';
 
@@ -13,6 +13,7 @@ interface AuthScreenProps {
 export function AuthScreen({ onSuccess, onCancel }: AuthScreenProps) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
   const [isSignUp, setIsSignUp] = useState(false);
   const [loading, setLoading] = useState(false);
 
@@ -36,6 +37,11 @@ export function AuthScreen({ onSuccess, onCancel }: AuthScreenProps) {
 
     if (password.length < 6) {
       Alert.alert('알림', '비밀번호는 최소 6자 이상이어야 합니다.');
+      return;
+    }
+
+    if (isSignUp && password !== confirmPassword) {
+      Alert.alert('알림', '비밀번호와 비밀번호 확인이 일치하지 않습니다.');
       return;
     }
 
@@ -69,6 +75,43 @@ export function AuthScreen({ onSuccess, onCancel }: AuthScreenProps) {
       }
       
       Alert.alert('오류', errorMessage);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // 구글, 카카오, 네이버 소셜 OAuth 로그인을 실행합니다.
+  const handleSocialLogin = async (provider: 'google' | 'kakao' | 'naver') => {
+    if (provider === 'naver') {
+      Alert.alert('안내', '네이버 소셜 로그인은 현재 Supabase 인증 연동 스펙 상 지원 준비 중입니다. 구글 또는 카카오 계정을 이용해 주십시오.');
+      return;
+    }
+
+    setLoading(true);
+    try {
+      // 로컬 file:// 접속 환경을 고려하여 안전한 배포 호스팅 주소를 폴백 리다이렉트값으로 사용합니다.
+      let redirectTo = 'https://action-b8c75.web.app/mobile/';
+      if (Platform.OS === 'web') {
+        const origin = window.location.origin;
+        if (origin && origin.startsWith('http') && !origin.includes('file:')) {
+          redirectTo = origin + '/mobile/';
+        }
+      }
+
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider: provider as any,
+        options: {
+          redirectTo,
+        },
+      });
+      if (error) throw error;
+    } catch (error: any) {
+      console.error(`${provider} 로그인 처리 오류`, error);
+      let errMsg = error.message || '로그인 처리 중 에러가 발생했습니다.';
+      if (errMsg.includes('provider is not enabled') || errMsg.includes('Unsupported provider')) {
+        errMsg = '현재 Supabase 서버 측 소셜 로그인 제공자(Provider) 설정이 켜져 있지 않습니다.\n\n해결 방법:\n1. Supabase 대시보드(Authentication -> Providers)에서 Google 및 Kakao를 활성화하고 설정해야 합니다.\n2. 테스트를 위해 일반 이메일/비밀번호 가입(hl1oex@gmail.com 등)으로 즉시 로그인하여 서비스를 이용하실 수도 있습니다.';
+      }
+      Alert.alert('오류', errMsg);
     } finally {
       setLoading(false);
     }
@@ -110,6 +153,21 @@ export function AuthScreen({ onSuccess, onCancel }: AuthScreenProps) {
           />
         </View>
 
+        {isSignUp && (
+          <View style={styles.inputContainer}>
+            <Text style={styles.label}>비밀번호 확인</Text>
+            <TextInput
+              style={styles.input}
+              placeholder="비밀번호 재입력"
+              placeholderTextColor={COLORS.slate400}
+              value={confirmPassword}
+              onChangeText={setConfirmPassword}
+              secureTextEntry
+              autoCapitalize="none"
+            />
+          </View>
+        )}
+
         <TouchableOpacity 
           style={styles.primaryButton} 
           onPress={handleAuthSubmit}
@@ -126,11 +184,52 @@ export function AuthScreen({ onSuccess, onCancel }: AuthScreenProps) {
 
         <TouchableOpacity 
           style={styles.switchButton} 
-          onPress={() => setIsSignUp(!isSignUp)}
+          onPress={() => {
+            setIsSignUp(!isSignUp);
+            setPassword('');
+            setConfirmPassword('');
+          }}
           disabled={loading}
         >
           <Text style={styles.switchButtonText}>
             {isSignUp ? '이미 계정이 있으신가요? 로그인하기' : '처음이신가요? 회원가입하기'}
+          </Text>
+        </TouchableOpacity>
+
+        {/* [추가] 간편 소셜 로그인 구분선 및 버튼 */}
+        <View style={styles.dividerContainer}>
+          <View style={styles.dividerLine} />
+          <Text style={styles.dividerText}>간편 소셜 로그인</Text>
+          <View style={styles.dividerLine} />
+        </View>
+
+        <TouchableOpacity 
+          style={[styles.socialButton, styles.googleButton]} 
+          onPress={() => handleSocialLogin('google')}
+          disabled={loading}
+        >
+          <Text style={styles.googleButtonText}>
+            {isSignUp ? 'Google 계정으로 회원가입' : 'Google 계정으로 로그인'}
+          </Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity 
+          style={[styles.socialButton, styles.kakaoButton]} 
+          onPress={() => handleSocialLogin('kakao')}
+          disabled={loading}
+        >
+          <Text style={styles.kakaoButtonText}>
+            {isSignUp ? '💬 카카오 계정으로 회원가입' : '💬 카카오 계정으로 로그인'}
+          </Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity 
+          style={[styles.socialButton, styles.naverButton]} 
+          onPress={() => handleSocialLogin('naver')}
+          disabled={loading}
+        >
+          <Text style={styles.naverButtonText}>
+            {isSignUp ? '네이버 계정으로 회원가입' : '네이버 계정으로 로그인'}
           </Text>
         </TouchableOpacity>
 
@@ -232,5 +331,57 @@ const styles = StyleSheet.create({
   cancelButtonText: {
     color: COLORS.slate600,
     fontSize: 14,
+  },
+  dividerContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginVertical: 16,
+  },
+  dividerLine: {
+    flex: 1,
+    height: 1,
+    backgroundColor: COLORS.slate200,
+  },
+  dividerText: {
+    marginHorizontal: 12,
+    fontSize: 12,
+    color: COLORS.slate400,
+    fontWeight: 'bold',
+  },
+  socialButton: {
+    height: 48,
+    borderRadius: 8,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 10,
+    borderWidth: 1,
+  },
+  googleButton: {
+    backgroundColor: COLORS.white,
+    borderColor: COLORS.slate200,
+  },
+  googleButtonText: {
+    color: COLORS.slate900,
+    fontSize: 14,
+    fontWeight: 'bold',
+  },
+  kakaoButton: {
+    backgroundColor: '#FEE500',
+    borderColor: '#FEE500',
+  },
+  kakaoButtonText: {
+    color: '#191919',
+    fontSize: 14,
+    fontWeight: 'bold',
+  },
+  naverButton: {
+    backgroundColor: '#03C75A',
+    borderColor: '#03C75A',
+  },
+  naverButtonText: {
+    color: COLORS.white,
+    fontSize: 14,
+    fontWeight: 'bold',
   },
 });

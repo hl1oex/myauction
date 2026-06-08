@@ -30,17 +30,39 @@ export function setApiBaseUrl(url: string): void {
  */
 export async function fetchProperties(source?: string, search?: string): Promise<Property[]> {
   try {
-    let query = supabase.from('properties').select('*');
+    let allData: any[] = [];
+    let from = 0;
+    const pageSize = 1000;
+    let hasMore = true;
 
-    // 소스(court, onbid) 조건이 존재한다면 Supabase 쿼리 필터를 추가 적용합니다.
-    if (source && source !== 'all') {
-      query = query.eq('source', source);
+    while (hasMore) {
+      let query = supabase
+        .from('properties')
+        .select('*')
+        .range(from, from + pageSize - 1);
+
+      // 소스(court, onbid) 조건이 존재한다면 Supabase 쿼리 필터를 추가 적용합니다.
+      if (source && source !== 'all') {
+        query = query.eq('source', source);
+      }
+
+      const { data, error } = await query;
+      if (error) throw error;
+
+      if (data && data.length > 0) {
+        allData = [...allData, ...data];
+        from += pageSize;
+        
+        // 반환된 행 수가 설정된 페이지 크기보다 작다면 모든 데이터를 가져온 것이므로 루프를 종료합니다.
+        if (data.length < pageSize) {
+          hasMore = false;
+        }
+      } else {
+        hasMore = false;
+      }
     }
 
-    const { data, error } = await query;
-    if (error) throw error;
-
-    const results = (data || []).map((item: any) => {
+    const results = allData.map((item: any) => {
       const remainingDays = calculateRemainingDays(item.bidding_date);
       return { ...item, remaining_days: remainingDays } as Property;
     });

@@ -142,6 +142,35 @@ export const GuideScreen: React.FC = () => {
           </View>
         </View>
 
+        {/* 소셜 로그인 트러블슈팅 가이드 */}
+        <View style={styles.card}>
+          <Text style={styles.cardTitle}>🔑 소셜 로그인 트러블슈팅 가이드</Text>
+          <Text style={styles.cardDesc}>
+            구글/카카오 소셜 로그인 완료 후 오류가 발생하거나 로컬 주소(localhost)로 강제 이동하여 접속이 끊기는 현상은 Supabase 서버의 리다이렉트 허용 목록 설정이 완료되지 않아 발생합니다.
+          </Text>
+
+          <View style={styles.guideStep}>
+            <Text style={styles.stepTitle}>1. Google / Kakao OAuth 활성화</Text>
+            <Text style={styles.stepText}>
+              Supabase 대시보드(Authentication - Providers) 메뉴에서 Google 및 Kakao 스위치를 활성화하고 발급받은 ID/Secret을 등록해야 합니다.
+            </Text>
+          </View>
+
+          <View style={styles.guideStep}>
+            <Text style={styles.stepTitle}>2. Site URL 및 Redirect URLs 수정</Text>
+            <Text style={styles.stepText}>
+              Authentication - URL Configuration 메뉴로 이동하여 Site URL을 배포 주소(https://action-b8c75.web.app)로 변경하십시오. 추가로 Redirect URLs 목록에 https://action-b8c75.web.app/mobile/ 주소를 반드시 등록해야 로그인 완료 후 본래 앱으로 정상 복귀할 수 있습니다.
+            </Text>
+          </View>
+
+          <View style={styles.guideStep}>
+            <Text style={styles.stepTitle}>3. 이메일 인증 절차 생략 설정</Text>
+            <Text style={styles.stepText}>
+              Authentication - Providers - Email 메뉴에서 'Confirm email' 스위치를 꺼두시면 이메일 링크 인증 절차 없이 가입 즉시 로그인이 가능합니다.
+            </Text>
+          </View>
+        </View>
+
         <View style={styles.spacer} />
       </ScrollView>
     </SafeAreaView>
