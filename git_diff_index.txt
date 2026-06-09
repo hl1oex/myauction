@@ -1,0 +1,304 @@
+diff --git a/index.html b/index.html
+index 9bf3292..1367f19 100644
+--- a/index.html
++++ b/index.html
+@@ -700,12 +700,7 @@
+                             <div class="bg-white border border-slate-200 rounded-2xl p-4 shadow-sm border-l-4 border-l-rose-500 flex flex-col justify-between">
+                                 <div>
+                                     <strong class="text-xs sm:text-sm font-extrabold text-rose-800 block mb-1">🛠️ 유치권 (Lien)</strong>
+-                                    <p class="text-[11px] sm:text-xs text-slate-600 leading-relaxed font-medium">건물 공사비나 수리비를 받지 못한 건축 업자 등이 돈을 받을 때까지 해당 건물이나 부동산을 점유하고 넘겨주지 않을 수 있는 법적 권리입니다.</p>
+-                                </div>
+-                                <span class="text-[10px] sm:text-[11px] text-rose-700 font-bold block mt-3 pt-2 border-t border-slate-100">🚨 추후 문제: 유치권이 접수된 물건을 낙찰받으면 일반 인도명령이 기각될 수 있으며, 기나긴 명도 소송 및 대위 변제 리스크가 극대화됩니다.</span>
+-                            </div>
+-                            <!-- 대지사용권 없음 -->
+-                            <div class="bg-white border border-slate-200 rounded-2xl p-4 shadow-sm border-l-4 border-l-rose-500 flex flex-col justify-between md:col-span-2">
++<div class="bg-white border border-slate-200 rounded-2xl p-4 shadow-sm border-l-4 border-l-rose-500 flex flex-col justify-between md:col-span-2">
+                                 <div>
+                                     <strong class="text-xs sm:text-sm font-extrabold text-rose-800 block mb-1">🧱 대지사용권 없음 / 대지권 미등기 (No Land Rights)</strong>
+                                     <p class="text-[11px] sm:text-xs text-slate-600 leading-relaxed font-medium">아파트나 빌라 등 집합건물에서 건물 부분만 경매로 나오고, 그 건물이 서 있는 토지(대지)에 대한 지분(대지사용권)은 경매에서 제외되거나 등기되지 않은 상태를 뜻합니다.</p>
+@@ -718,268 +713,27 @@
+                 </div>
+             </div>
+             
+-            <!-- 🏠 [TAB 3: 사용자 가이드 컨테이너] (기본 숨김) --><!-- 🏠 [TAB 3: 사용자 가이드 컨테이너] (기본 숨김) -->
+-            <div id="guide-view" class="hidden flex-1 overflow-y-auto p-5 sm:p-8 custom-scrollbar bg-slate-50 document-view">
+-                <div class="max-w-3xl mx-auto w-full space-y-6 py-2">
+-                    <div id="guide-content-area"></div>
+-                    
+-                    <!-- 📁 사용자 가이드 하단 사설 경매 엑셀/CSV 수동 업로드 및 Mix(병합) 패널 -->
+-                    <div class="bg-white border border-slate-200 rounded-2xl p-4 sm:p-5 space-y-3 shadow-sm my-6 text-center lg:text-left">
+-                        <strong class="text-xs sm:text-sm font-extrabold text-royalBlue uppercase tracking-wider block flex items-center justify-center lg:justify-start gap-1.5">
+-                            <i class="fa-solid fa-file-excel"></i> 📁 사설 경매 파일 수동 업로드 (Mix)
+-                        </strong>
+-                        <p class="text-[10px] sm:text-xs text-slate-500 leading-relaxed font-medium">유료 경매 정보 사이트(마이옥션, 태인 등)에서 다운로드받은 CSV 또는 JSON 형식의 매물 리스트 파일을 업로드합니다.<br/>주소 또는 사건번호를 기준으로 실시간 수집된 공식 데이터와 교차 비교하여 중복을 자동 제거하고, 비고 정보는 하나로 병합(Mix) 처리합니다.</p>
+-                        
+-                        <div class="pt-2">
+-                            <input type="file" id="file-uploader" accept=".csv, .json" class="hidden" onchange="handleFileUpload(this)">
+-                            <button onclick="document.getElementById('file-uploader').click()" 
+-                                    class="w-full sm:w-auto bg-royalBlue text-white hover:bg-royalHover py-2 px-4 rounded-xl text-[10.5px] sm:text-xs font-black shadow-md flex items-center justify-center gap-2 transition-colors mx-auto lg:mx-0">
+-                                <i class="fa-solid fa-cloud-arrow-up"></i> 내 PC 파일 선택 및 업로드
+-                            </button>
+-                            <div id="upload-status" class="text-[10px] sm:text-xs font-black text-center mt-3 text-slate-500 hidden"></div>
+-                        </div>
+-                    </div>
+-                </div>
+-            </div>
+-
+-            <!-- 🌐 [TAB 4: 시스템 아키텍처 명세서 컨테이너] (기본 숨김) -->
+-            <div id="architecture-view" class="hidden flex-1 overflow-y-auto p-5 sm:p-8 custom-scrollbar bg-slate-50 document-view">
+-                <div class="max-w-3xl mx-auto w-full space-y-6 py-2">
+-                    <div class="bg-white border border-slate-200 rounded-2xl p-4 sm:p-5 shadow-sm space-y-2 text-center lg:text-left">
+-                        <strong class="text-xs sm:text-sm font-extrabold text-royalBlue uppercase tracking-wider block flex items-center justify-center lg:justify-start gap-1.5">
+-                            <i class="fa-solid fa-network-wired"></i> 📡 시스템 아키텍처 명세서 (실시간 동기화)
+-                        </strong>
+-                        <p class="text-[10px] sm:text-xs text-slate-500 leading-relaxed font-medium">본 추천 시스템의 100% 클라우드화 설계 사상과 데이터 연동 흐름을 명시한 공식 문서입니다.<br/>Firebase Hosting 서버에 배포된 최신 원본 마크다운 파일을 실시간으로 로드하여 렌더링합니다.</p>
+-                    </div>
+-                    
+-                    <div class="bg-white border border-slate-200 rounded-2xl p-4 sm:p-6 shadow-sm" id="architecture-content-area">
+-                        <div class="text-center py-10">
+-                            <div class="inline-block w-6 h-6 border-4 border-royalBlue border-t-transparent rounded-full animate-spin mb-2"></div>
+-                            <p class="text-xs font-bold text-slate-500">아키텍처 문서를 실시간으로 불러오는 중입니다...</p>
+-                        </div>
+-                    </div>
+-                </div>
+-            </div>
+-        </div>
+-        <!-- 🧮 [SLIDE-OVER DRAWER BACKDROP] 우측 상세 분석 서랍 배경 암전 레이어 -->
+-    <div id="drawer-backdrop" class="fixed inset-0 bg-slate-900/40 z-40 hidden transition-opacity duration-300" onclick="closeDetailDrawer()"></div>
+-
+-    <!-- 🧮 [SLIDE-OVER DRAWER] 우측 상세 분석 슬라이드 서랍 (시안 2: 모던 포털 카드형) -->
+-    <aside id="detail-drawer" class="fixed inset-y-0 right-0 z-50 w-full sm:max-w-[700px] bg-white shadow-2xl border-l border-slate-200 flex flex-col h-full transform translate-x-full transition-transform duration-300 ease-out">
+-        <!-- 상세 헤더 (반응형 모바일 스코어 배치 및 빈칸 여백 줄임) -->
+-        <div class="relative p-3.5 sm:p-4 border-b border-slate-200 bg-slate-50 flex flex-col sm:flex-row justify-between sm:items-start gap-2.5 sm:gap-3 pr-24 sm:pr-5">
+-            <div class="space-y-1 sm:space-y-1.5 flex-1">
+-                <span id="detail-badge" class="inline-block text-[10px] sm:text-xs font-black px-2 py-0.5 sm:px-2.5 sm:py-1 rounded-md"></span>
+-                <h3 id="detail-address" class="text-xs sm:text-lg font-extrabold text-slate-900 leading-snug sm:leading-tight"></h3>
+-                <p id="detail-no" class="text-[10px] sm:text-xs font-bold text-slate-500 mt-1"></p>
+-            </div>
+-            
+-            <!-- 우측 스코어 영역 -->
+-            <div class="flex items-center gap-2 sm:gap-3 absolute top-4 right-14 sm:static flex-shrink-0">
+-                <div id="detail-score-circle" class="w-9 h-9 sm:w-14 sm:h-14 rounded-full border-2 sm:border-4 flex flex-col items-center justify-center font-outfit shadow-sm bg-white">
+-                    <span id="detail-score-val" class="text-xs sm:text-base font-black leading-none"></span>
+-                    <span class="text-[5px] sm:text-[8px] text-slate-400 font-bold leading-none mt-0.5 sm:mt-1">SCORE</span>
+-                </div>
+-            </div>
+-            
+-            <!-- 닫기 버튼: 모바일 absolute 고정 -->
+-            <button onclick="closeDetailDrawer()" class="absolute top-4 right-4 sm:static w-8 h-8 sm:w-10 sm:h-10 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-500 hover:text-slate-700 flex items-center justify-center transition-all select-none" title="닫기 (Esc)">
+-                <i class="fa-solid fa-xmark text-base sm:text-lg"></i>
++            <!-- 💎 상세 분석 4단 프리미엄 탭 바 -->
++        <div class="bg-white border-b border-slate-200 px-4 py-2.5 flex gap-1.5 z-20">
++            <button id="detail-tab-analysis-btn" onclick="changeDetailTab('analysis')" 
++                    class="flex-1 py-1.5 text-center text-xs font-black rounded-xl border border-transparent transition-all select-none bg-royalBlue text-white shadow-sm">
++                권리진단
++            </button>
++            <button id="detail-tab-documents-btn" onclick="changeDetailTab('documents')" 
++                    class="flex-1 py-1.5 text-center text-xs font-black rounded-xl border border-transparent transition-all select-none text-slate-500 hover:text-royalBlue hover:bg-slate-50 bg-slate-50/50">
++                서류/이력
++            </button>
++            <button id="detail-tab-finance-btn" onclick="changeDetailTab('finance')" 
++                    class="flex-1 py-1.5 text-center text-xs font-black rounded-xl border border-transparent transition-all select-none text-slate-500 hover:text-royalBlue hover:bg-slate-50 bg-slate-50/50">
++                입찰/금융
++            </button>
++            <button id="detail-tab-map-btn" onclick="changeDetailTab('map')" 
++                    class="flex-1 py-1.5 text-center text-xs font-black rounded-xl border border-transparent transition-all select-none text-slate-500 hover:text-royalBlue hover:bg-slate-50 bg-slate-50/50">
++                지도/도면
+             </button>
+         </div>
+ 
+         <!-- 상세 내용 스크롤 영역 -->
+-        <div class="flex-1 overflow-y-auto p-4 sm:p-5 space-y-4 sm:space-y-5 custom-scrollbar bg-slate-50/50">
+-            
+-            <!-- 🏠 1. 물건 세부 스펙 분석 -->
+-            <div class="bg-white border border-slate-200 rounded-2xl p-3.5 sm:p-4 space-y-2 shadow-sm">
+-                <h4 class="text-xs sm:text-sm font-black text-slate-800 flex items-center gap-1.5">
+-                    <i class="fa-solid fa-list-check text-royalBlue"></i> 🏠 물건 세부 스펙 분석
+-                </h4>
+-                <div class="grid grid-cols-2 gap-2 text-[11px] sm:text-xs text-slate-750">
+-                    <div class="bg-slate-50 border border-slate-100 p-2 rounded-xl flex justify-between items-center">
+-                        <span class="text-slate-450 font-semibold text-[10px] sm:text-xs">용도 분류</span>
+-                        <span id="detail-spec-ptype" class="font-extrabold text-slate-800"></span>
+-                    </div>
+-                    <div class="bg-slate-50 border border-slate-100 p-2 rounded-xl flex justify-between items-center">
+-                        <span class="text-slate-450 font-semibold text-[10px] sm:text-xs">진행 회차</span>
+-                        <span id="detail-spec-round" class="font-extrabold text-slate-800"></span>
+-                    </div>
+-                    <div class="bg-slate-50 border border-slate-100 p-2 rounded-xl flex justify-between items-center">
+-                        <span class="text-slate-450 font-semibold text-[10px] sm:text-xs">감정 평가액</span>
+-                        <span id="detail-spec-appraisal" class="font-extrabold text-slate-800 font-outfit"></span>
+-                    </div>
+-                    <div class="bg-slate-50 border border-slate-100 p-2 rounded-xl flex justify-between items-center">
+-                        <span class="text-slate-450 font-semibold text-[10px] sm:text-xs">최저 입찰가</span>
+-                        <span id="detail-spec-minimum" class="font-extrabold text-rose-600 font-outfit"></span>
+-                    </div>
+-                    <div class="bg-slate-50 border border-slate-100 p-2 rounded-xl flex justify-between items-center col-span-2">
+-                        <span class="text-slate-450 font-semibold text-[10px] sm:text-xs">매각/입찰 기일</span>
+-                        <span id="detail-spec-date" class="font-extrabold text-slate-800"></span>
+-                    </div>
+-                </div>
+-            </div>
+-
+-            <!-- 📊 2. 인근 낙찰 통계 및 시장 지표 -->
+-            <div class="bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 rounded-2xl p-3.5 sm:p-4 space-y-2.5 shadow-sm">
+-                <h4 class="text-xs sm:text-sm font-black text-royalBlue flex items-center gap-1.5">
+-                    <i class="fa-solid fa-chart-simple"></i> 📊 인근 낙찰 통계 및 시장 지표
+-                </h4>
+-                <div class="grid grid-cols-2 gap-2.5 text-[11px] sm:text-xs font-bold text-slate-700">
+-                    <div class="bg-white/80 p-2.5 rounded-xl border border-blue-100 flex flex-col justify-between">
+-                        <span class="text-slate-455 text-[10px] sm:text-xs">🎯 예상 낙찰 확률 비율</span>
+-                        <span id="detail-ai-bid-rate" class="text-xs sm:text-sm font-black text-royalBlue mt-0.5 font-outfit"></span>
+-                    </div>
+-                    <div class="bg-white/80 p-2.5 rounded-xl border border-blue-100 flex flex-col justify-between">
+-                        <span class="text-slate-455 text-[10px] sm:text-xs">🚪 예상 명도 소요 기간</span>
+-                        <span id="detail-ai-evict-period" class="text-xs sm:text-sm font-black text-amber-600 mt-0.5"></span>
+-                    </div>
+-                    <div class="bg-white/80 p-2.5 rounded-xl border border-blue-100 flex flex-col justify-between col-span-2">
+-                        <span class="text-slate-455 text-[10px] sm:text-xs block mb-0.5">🔍 주변 동종 실거래 시세 대조 분석</span>
+-                        <span id="detail-ai-market-compare" class="text-[11px] sm:text-xs font-black text-emeraldSuccess leading-relaxed"></span>
+-                    </div>
+-                </div>
+-            </div>
+-
+-            <!-- 🛡️ 3. AI 7대 권리 리스크 정밀 하이브리드 리포트 -->
+-            <div>
+-                <h4 class="text-xs sm:text-sm font-black text-slate-500 uppercase tracking-wider mb-2.5 flex items-center gap-1.5">
+-                    <i class="fa-solid fa-shield-halved text-royalBlue"></i> AI 7대 권리 리스크 정밀 하이브리드 리포트
+-                </h4>
+-                <div id="detail-risk-report" class="space-y-3">
+-                    <!-- 지능형 리스크 카드가 주입됨 -->
+-                </div>
+-            </div>
+-
+-            <!-- 📝 4. 공고문 원문 및 집행관 비고 요약 -->
+-            <div>
+-                <h4 class="text-xs sm:text-sm font-black text-slate-500 uppercase tracking-wider mb-2.5 flex items-center gap-1.5">
+-                    <i class="fa-solid fa-align-left text-slate-500"></i> 공고문 원문 및 집행관 비고 요약
+-                </h4>
+-                <div id="detail-desc" class="text-xs sm:text-sm text-slate-650 leading-relaxed bg-white border border-slate-200 rounded-xl p-3.5 shadow-sm max-h-[140px] overflow-y-auto custom-scrollbar"></div>
+-            </div>
+-
+-            <!-- 🧮 5. 세법 스마트 낙찰 계획서 계산기 (시인성 제고 및 컴팩트화) -->
+-            <div class="bg-white border border-slate-200 rounded-2xl p-3.5 sm:p-4 shadow-sm space-y-3">
+-                <div class="flex items-center justify-between pb-2 border-b border-slate-100">
+-                    <h4 class="text-xs sm:text-sm font-black text-slate-800 flex items-center gap-1.5">
+-                        <i class="fa-solid fa-calculator text-royalBlue"></i> 스마트 정밀 소요자금 계획서
+-                    </h4>
+-                    <span id="tax-rate-badge" class="text-[9px] font-black px-2 py-0.5 rounded-full border"></span>
+-                </div>
+-
+-                <div class="space-y-3">
+-                    <!-- 디스플레이 스크린 탑재 및 인터랙티브 계산기 키패드 -->
+-                    <div>
+-                        <label class="block text-[9.5px] font-black text-slate-400 uppercase tracking-wider mb-1">내 예상 입찰 응찰가 입력 및 🧮 디지털 계산기 패드</label>
+-                        
+-                        <!-- 실시간 원화 금액 포맷 디지털 모니터 -->
+-                        <div class="bg-gradient-to-br from-slate-900 via-slate-950 to-slate-900 border border-slate-800 rounded-xl p-2.5 text-right text-emerald-400 font-mono font-black shadow-[inset_0_2px_4px_rgba(0,0,0,0.8),0_1px_1px_rgba(255,255,255,0.05)] flex items-center justify-between h-9 select-none mb-1.5">
+-                            <div class="flex items-center text-[8px] sm:text-[9.5px] text-slate-500 font-bold uppercase tracking-widest gap-1 select-none">
+-                                <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+-                                <span>Display</span>
+-                            </div>
+-                            <span id="calc-display-won" class="text-xs sm:text-sm font-black tracking-wider drop-shadow-[0_0_3px_rgba(52,211,153,0.5)]">0원</span>
+-                        </div>
+-
+-                        <input type="number" id="calc-bid-input" oninput="runCalculator()"
+-                               class="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-1.5 text-base font-black focus:outline-none focus:border-royalBlue focus:bg-white transition-all text-royalBlue font-outfit mb-1.5">
+-
+-                        <!-- 인터랙티브 계산기 그리드 버튼 키패드 -->
+-                        <div class="grid grid-cols-4 gap-1 pt-1 calculator-keypad">
+-                            <!-- Row 1 -->
+-                            <button type="button" onclick="pressCalcKey('+1억')" class="bg-royalBlue/5 hover:bg-royalBlue/15 text-royalBlue text-[11px] font-black py-1.5 rounded-md transition-all select-none font-sans">+1억</button>
+-                            <button type="button" onclick="pressCalcKey('+1천')" class="bg-royalBlue/5 hover:bg-royalBlue/15 text-royalBlue text-[11px] font-black py-1.5 rounded-md transition-all select-none font-sans">+1천만</button>
+-                            <button type="button" onclick="pressCalcKey('+1백')" class="bg-royalBlue/5 hover:bg-royalBlue/15 text-royalBlue text-[11px] font-black py-1.5 rounded-md transition-all select-none font-sans">+1백만</button>
+-                            <button type="button" onclick="pressCalcKey('C')" class="bg-rose-500 hover:bg-rose-600 text-white text-[11px] font-black py-1.5 rounded-md transition-all select-none font-bold">C</button>
+-                            
+-                            <!-- Row 2 -->
+-                            <button type="button" onclick="pressCalcKey('7')" class="bg-slate-100 hover:bg-slate-200 text-slate-800 text-[11px] font-extrabold py-1.5 rounded-md transition-all select-none font-outfit">7</button>
+-                            <button type="button" onclick="pressCalcKey('8')" class="bg-slate-100 hover:bg-slate-200 text-slate-800 text-[11px] font-extrabold py-1.5 rounded-md transition-all select-none font-outfit">8</button>
+-                            <button type="button" onclick="pressCalcKey('9')" class="bg-slate-100 hover:bg-slate-200 text-slate-800 text-[11px] font-extrabold py-1.5 rounded-md transition-all select-none font-outfit">9</button>
+-                            <button type="button" onclick="pressCalcKey('backspace')" class="bg-amber-100 hover:bg-amber-200 text-amber-800 text-[11px] font-black py-1.5 rounded-md transition-all select-none">⌫</button>
+-                            
+-                            <!-- Row 3 -->
+-                            <button type="button" onclick="pressCalcKey('4')" class="bg-slate-100 hover:bg-slate-200 text-slate-800 text-[11px] font-extrabold py-1.5 rounded-md transition-all select-none font-outfit">4</button>
+-                            <button type="button" onclick="pressCalcKey('5')" class="bg-slate-100 hover:bg-slate-200 text-slate-800 text-[11px] font-extrabold py-1.5 rounded-md transition-all select-none font-outfit">5</button>
+-                            <button type="button" onclick="pressCalcKey('6')" class="bg-slate-100 hover:bg-slate-200 text-slate-800 text-[11px] font-extrabold py-1.5 rounded-md transition-all select-none font-outfit">6</button>
+-                            <button type="button" id="preset-minimum-btn" class="bg-indigo-50 hover:bg-indigo-100 text-indigo-700 text-[11px] font-black py-1.5 rounded-md transition-all select-none font-bold">최저가</button>
+-                            
+-                            <!-- Row 4 -->
+-                            <button type="button" onclick="pressCalcKey('1')" class="bg-slate-100 hover:bg-slate-200 text-slate-800 text-[11px] font-extrabold py-1.5 rounded-md transition-all select-none font-outfit">1</button>
+-                            <button type="button" onclick="pressCalcKey('2')" class="bg-slate-100 hover:bg-slate-200 text-slate-800 text-[11px] font-extrabold py-1.5 rounded-md transition-all select-none font-outfit">2</button>
+-                            <button type="button" onclick="pressCalcKey('3')" class="bg-slate-100 hover:bg-slate-200 text-slate-800 text-[11px] font-extrabold py-1.5 rounded-md transition-all select-none font-outfit">3</button>
+-                            <button type="button" id="preset-appraisal-btn" class="bg-indigo-50 hover:bg-indigo-100 text-indigo-700 text-[11px] font-black py-1.5 rounded-md transition-all select-none font-bold">감정가</button>
+-                            
+-                            <!-- Row 5 -->
+-                            <button type="button" onclick="pressCalcKey('0')" class="bg-slate-100 hover:bg-slate-200 text-slate-800 text-[11px] font-extrabold py-1.5 rounded-md transition-all select-none font-outfit">0</button>
+-                            <button type="button" onclick="pressCalcKey('00')" class="bg-slate-100 hover:bg-slate-200 text-slate-800 text-[11px] font-extrabold py-1.5 rounded-md transition-all select-none font-outfit">00</button>
+-                            <button type="button" onclick="pressCalcKey('000')" class="bg-slate-100 hover:bg-slate-200 text-slate-800 text-[11px] font-extrabold py-1.5 rounded-md transition-all select-none font-outfit">000</button>
+-                            <button type="button" onclick="pressCalcKey('enter')" class="bg-emerald-500 hover:bg-emerald-600 text-white text-[11px] font-black py-1.5 rounded-md transition-all select-none flex items-center justify-center"><i class="fa-solid fa-check"></i></button>
+-                        </div>
+-                    </div>
+-
+-                    <!-- 🏦 LTV 대출 및 금리 시뮬레이터 (7단계 선택 복구) -->
+-                    <div class="bg-slate-50/50 rounded-xl p-3 border border-slate-200/80 space-y-2.5">
+-                        <div class="flex items-center justify-between">
+-                            <label class="text-[10px] sm:text-xs font-black text-slate-700 uppercase tracking-wider flex items-center gap-1">
+-                                <i class="fa-solid fa-building-columns text-royalBlue text-[10px]"></i> 경락잔금대출 설정 (LTV)
+-                            </label>
+-                            <span id="ltv-percentage-badge" class="text-[9px] font-black px-2 py-0.5 rounded-full border border-blue-200 bg-blue-50 text-royalBlue font-mono">비대출 (0%)</span>
+-                        </div>
+-                        <div class="flex flex-wrap gap-1 bg-slate-100 p-1 rounded-xl border border-slate-200/60 shadow-inner">
+-                            <label class="flex-1 min-w-[34px] cursor-pointer text-center">
+-                                <input type="radio" name="ltv-select" value="0" checked onchange="runCalculator()" class="sr-only peer">
+-                                <span class="block py-1 text-[10px] sm:text-xs font-extrabold rounded-lg text-slate-500 peer-checked:bg-white peer-checked:text-royalBlue peer-checked:shadow-sm hover:text-slate-700 transition-all select-none">0%</span>
+-                            </label>
+-                            <label class="flex-1 min-w-[34px] cursor-pointer text-center">
+-                                <input type="radio" name="ltv-select" value="30" onchange="runCalculator()" class="sr-only peer">
+-                                <span class="block py-1 text-[10px] sm:text-xs font-extrabold rounded-lg text-slate-500 peer-checked:bg-white peer-checked:text-royalBlue peer-checked:shadow-sm hover:text-slate-700 transition-all select-none">30%</span>
+-                            </label>
+-                            <label class="flex-1 min-w-[34px] cursor-pointer text-center">
+-                                <input type="radio" name="ltv-select" value="40" onchange="runCalculator()" class="sr-only peer">
+-                                <span class="block py-1 text-[10px] sm:text-xs font-extrabold rounded-lg text-slate-500 peer-checked:bg-white peer-checked:text-royalBlue peer-checked:shadow-sm hover:text-slate-700 transition-all select-none">40%</span>
+-                            </label>
+-                            <label class="flex-1 min-w-[34px] cursor-pointer text-center">
+-                                <input type="radio" name="ltv-select" value="50" onchange="runCalculator()" class="sr-only peer">
+-                                <span class="block py-1 text-[10px] sm:text-xs font-extrabold rounded-lg text-slate-500 peer-checked:bg-white peer-checked:text-royalBlue peer-checked:shadow-sm hover:text-slate-700 transition-all select-none">50%</span>
+-                            </label>
+-                            <label class="flex-1 min-w-[34px] cursor-pointer text-center">
+-                                <input type="radio" name="ltv-select" value="60" onchange="runCalculator()" class="sr-only peer">
+-                                <span class="block py-1 text-[10px] sm:text-xs font-extrabold rounded-lg text-slate-500 peer-checked:bg-white peer-checked:text-royalBlue peer-checked:shadow-sm hover:text-slate-700 transition-all select-none">60%</span>
+-                            </label>
+-                            <label class="flex-1 min-w-[34px] cursor-pointer text-center">
+-                                <input type="radio" name="ltv-select" value="70" onchange="runCalculator()" class="sr-only peer">
+-                                <span class="block py-1 text-[10px] sm:text-xs font-extrabold rounded-lg text-slate-500 peer-checked:bg-white peer-checked:text-royalBlue peer-checked:shadow-sm hover:text-slate-700 transition-all select-none">70%</span>
+-                            </label>
+-                            <label class="flex-1 min-w-[34px] cursor-pointer text-center">
+-                                <input type="radio" name="ltv-select" value="80" onchange="runCalculator()" class="sr-only peer">
+-                                <span class="block py-1 text-[10px] sm:text-xs font-extrabold rounded-lg text-slate-500 peer-checked:bg-white peer-checked:text-royalBlue peer-checked:shadow-sm hover:text-slate-700 transition-all select-none">80%</span>
+-                            </label>
+-                        </div>
+-
+-                        <!-- 금리 설정 슬라이더 (LTV > 0 일때만 노출) -->
+-                        <div id="loan-interest-slider-area" class="hidden space-y-1.5 pt-2 border-t border-slate-200/60">
+-                            <div class="flex justify-between items-center">
+-                                <label class="text-[9.5px] sm:text-[10.5px] font-black text-slate-700 uppercase tracking-wider">📈 대출 연 금리 설정</label>
+-                                <span id="interest-rate-label" class="text-[11px] sm:text-xs font-black text-royalBlue font-outfit">4.5%</span>
+-                            </div>
+-                            <input type="range" id="loan-interest-slider" min="2.0" max="8.0" step="0.1" value="4.5" oninput="updateInterestRateLabel(this.value)" 
+-                                   class="w-full accent-royalBlue cursor-pointer">
+-                            <div class="flex justify-between text-[9px] text-slate-400 font-bold font-mono">
+-                                <span>2.0%</span>
+-                                <span>5.0%</span>
+-                                <span>8.0%</span>
+-                            </div>
+-                        </div>
+-                    </div>
+-
+-                    <!-- 상세 세무 영수증 명세표 (시인성 제고 및 대조색 보강) -->
+-                    <div class="bg-white rounded-xl p-3 border border-slate-200 text-[11px] sm:text-xs font-bold text-slate-600 space-y-2">
+-                        <div class="flex justify-between items-center py-0.5">
+-                            <span>지출 1) 낙찰 대금</span>
+-                            <span id="tax-val-bid" class="text-slate-900 font-outfit font-black">0원</span>
+-                        </div>
+                         <div class="flex justify-between items-center py-0.5">
+                             <span class="flex items-center gap-1">지출 2) 예상 취득세 <strong id="tax-rate-display" class="text-[9px] text-royalBlue bg-blue-50 px-1 py-0.2 rounded font-black border border-blue-200/60">1.5%</strong></span>
+                             <span id="tax-val-acquisition" class="text-rose-600 font-outfit font-black">0원</span>

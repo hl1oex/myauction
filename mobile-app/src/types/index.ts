@@ -29,4 +29,5 @@ export interface FilterState {
   budgetLimit: number; // 가용 예산 한도
   hidePast: boolean; // 과거 마감 매물 제외 여부
   gradeFilter: 'all' | 'safe' | 'risk'; // AI 등급 분류 필터
+  investmentType?: 'all' | 'investment' | 'residence'; // AI 자산 투자 성향 필터
 }

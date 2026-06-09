@@ -8,8 +8,149 @@ import sqlite3
 import urllib.parse
 import random
 
-# DB 경로 설정 (부모 폴더의 auction.db)
-DB_PATH = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "auction.db")
+# SQLite 인메모리 데이터베이스를 활용하여 로컬 I/O 생성을 완전히 차단합니다.
+DB_PATH = ":memory:"
+
+def init_db(conn):
+    """메모리 내에 경매 및 공매 물건 테이블 구조를 동적으로 구축합니다."""
+    cursor = conn.cursor()
+    cursor.execute("""
+    CREATE TABLE IF NOT EXISTS properties (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        source TEXT NOT NULL,
+        auction_no TEXT UNIQUE,
+        address TEXT NOT NULL,
+        ptype TEXT,
+        appraised_value REAL,
+        minimum_bid REAL,
+        bidding_date TEXT,
+        round_info TEXT,
+        desc_content TEXT,
+        notes_content TEXT,
+        link_url TEXT,
+        grade TEXT,
+        score INTEGER,
+        remaining_days INTEGER,
+        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    )
+    """)
+    cursor.execute("""
+    CREATE TABLE IF NOT EXISTS sync_logs (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        task_name TEXT NOT NULL,
+        status TEXT NOT NULL,
+        item_count INTEGER DEFAULT 0,
+        error_msg TEXT,
+        timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    )
+    """)
+    conn.commit()
+
+def get_supabase_client_info():
+    """클라우드 업로드에 사용할 Supabase 연결 자격 증명을 로드합니다."""
+    url = os.environ.get("SUPABASE_URL")
+    service_key = os.environ.get("SUPABASE_SERVICE_KEY")
+    if url and service_key:
+        return url, service_key
+        
+    config_path = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "config", "supabase_config.json")
+    if os.path.exists(config_path):
+        try:
+            with open(config_path, "r", encoding="utf-8") as f:
+                config = json.load(f)
+                return config.get("supabase_url"), config.get("supabase_service_key")
+        except Exception as e:
+            print(f"[-] Supabase 설정 파일 파싱 오류: {e}")
+    return None, None
+
+def sync_sqlite_to_supabase(conn):
+    """메모리 SQLite 데이터를 온라인 Supabase PostgreSQL 클라우드로 즉시 업로드합니다."""
+    supabase_url, supabase_key = get_supabase_client_info()
+    if not supabase_url or not supabase_key or "placeholder" in supabase_url:
+        print("[-] Supabase 접속 정보가 누락되었거나 데모 상태입니다. 동기화를 생략합니다.")
+        return
+        
+    print("[*] SQLite -> Supabase PostgreSQL 동기화를 시작합니다.")
+    cursor = conn.cursor()
+    
+    try:
+        cursor.execute("SELECT * FROM properties")
+        rows = cursor.fetchall()
+        
+        headers = {
+            "apikey": supabase_key,
+            "Authorization": f"Bearer {supabase_key}",
+            "Content-Type": "application/json",
+            "Prefer": "resolution=merge-duplicates"
+        }
+        
+        upsert_url = f"{supabase_url}/rest/v1/properties?on_conflict=auction_no"
+        count = 0
+        batch_size = 200
+        batch_data = []
+        
+        for row in rows:
+            data = dict(row)
+            if "id" in data:
+                del data["id"]
+            if "remaining_days" in data:
+                del data["remaining_days"]
+            if "updated_at" in data:
+                del data["updated_at"]
+                
+            if "appraised_value" in data and data["appraised_value"] is not None:
+                try:
+                    data["appraised_value"] = int(float(data["appraised_value"]))
+                except Exception:
+                    pass
+            if "minimum_bid" in data and data["minimum_bid"] is not None:
+                try:
+                    data["minimum_bid"] = int(float(data["minimum_bid"]))
+                except Exception:
+                    pass
+                
+            batch_data.append(data)
+            count += 1
+            
+            if len(batch_data) >= batch_size:
+                res = requests.post(upsert_url, headers=headers, json=batch_data, timeout=15)
+                if res.status_code not in [200, 201]:
+                    print(f"[-] 매물 업로드 실패 ({res.status_code}): {res.text}")
+                    return
+                print(f"[+] {count}개 매물 업로드 완료...")
+                batch_data = []
+
+        if batch_data:
+            res = requests.post(upsert_url, headers=headers, json=batch_data, timeout=15)
+            if res.status_code not in [200, 201]:
+                print(f"[-] 남은 매물 업로드 실패 ({res.status_code}): {res.text}")
+                return
+            print(f"[+] 최종 {count}개 매물 업로드 완료...")
+            
+        print(f"[+] Supabase 동기화 완료: 총 {count}개 매물이 전송되었습니다.")
+        
+        cursor.execute("SELECT * FROM sync_logs ORDER BY timestamp DESC LIMIT 5")
+        log_rows = cursor.fetchall()
+        logs_list = [dict(log) for log in log_rows]
+        
+        status_payload = {
+            "id": 1,
+            "last_sync_timestamp": datetime.datetime.now(datetime.timezone.utc).isoformat(),
+            "total_properties_count": count,
+            "logs": logs_list
+        }
+        
+        status_upsert_url = f"{supabase_url}/rest/v1/sync_info?on_conflict=id"
+        res_status = requests.post(status_upsert_url, headers=headers, json=status_payload, timeout=15)
+        if res_status.status_code not in [200, 201]:
+            print(f"[-] 동기화 상태 로그 업로드 실패 ({res_status.status_code}): {res_status.text}")
+            return
+            
+        print("[+] 동기화 상태 로그 업로드 완료!")
+        
+    except Exception as e:
+        print(f"[-] Supabase 동기화 중 오류 발생: {e}")
+
 
 # 하드필터 제외 단어 규칙 (내장 룰 구조)
 HARDFILTER_RULES = {
@@ -114,17 +255,8 @@ def compute_softscore(price, appraisal, address, ptype, close_date_str, desc, no
         
     return score, grade, remaining_days
 
-def save_to_db(properties_list):
-    # 테이블 미존재 에러 방지를 위해 데이터베이스 초기화를 선행합니다.
-    try:
-        import sys
-        sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-        from database import init_db
-        init_db()
-    except Exception as init_err:
-        print(f"[-] SQLite 초기화 에러: {init_err}")
-
-    conn = sqlite3.connect(DB_PATH)
+def save_to_db(conn, properties_list):
+    """메모리 SQLite 연결 객체를 직접 수령하여 매물 데이터를 대량으로 인서트합니다."""
     cursor = conn.cursor()
     success_count = 0
     
@@ -147,30 +279,10 @@ def save_to_db(properties_list):
             print(f"Error saving Onbid property {p['auction_no']}: {e}")
             
     conn.commit()
-    conn.close()
-    
-    # SQLite 저장 처리가 종료되면 변경점을 Supabase에 반영하기 위해 전송 함수를 호출합니다.
-    try:
-        import sys
-        sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-        from database import sync_sqlite_to_supabase
-        sync_sqlite_to_supabase()
-    except Exception as sync_err:
-        print(f"[-] 클라우드 Supabase 동기화 전송 과정에서 오류가 발생했습니다. {sync_err}")
-        
     return success_count
 
-def log_sync_status(status, count, error_msg=""):
-    # 테이블 미존재 에러 방지를 위해 데이터베이스 초기화를 선행합니다.
-    try:
-        import sys
-        sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-        from database import init_db
-        init_db()
-    except Exception as init_err:
-        print(f"[-] SQLite 초기화 에러: {init_err}")
-
-    conn = sqlite3.connect(DB_PATH)
+def log_sync_status(conn, status, count, error_msg=""):
+    """메모리 SQLite 연결 객체를 수령하여 크롤링 실행 로그를 추가합니다."""
     cursor = conn.cursor()
     try:
         cursor.execute("""
@@ -180,8 +292,6 @@ def log_sync_status(status, count, error_msg=""):
         conn.commit()
     except Exception as e:
         print(f"Error logging sync status: {e}")
-    finally:
-        conn.close()
 
 def generate_simulated_onbid_data():
     """공공데이터 API 실패 시 고품질의 캠코 온비드 공매 시뮬레이션 데이터를 충분히 공급하는 방어 엔진"""
@@ -436,19 +546,42 @@ def fetch_onbid_data():
                 unique_items.append(item)
         items_collected = unique_items
         
+        # 인메모리 SQLite를 가동하고 데이터를 대량으로 인서트합니다.
+        conn = sqlite3.connect(":memory:")
+        conn.row_factory = sqlite3.Row
+        init_db(conn)
+
         if items_collected:
-            success_count = save_to_db(items_collected)
-            log_sync_status("SUCCESS", success_count)
+            success_count = save_to_db(conn, items_collected)
+            log_sync_status(conn, "SUCCESS", success_count)
             print(f"[+] Onbid data synchronized successfully! Total: {success_count} listings.")
+            try:
+                sync_sqlite_to_supabase(conn)
+            except Exception as sync_err:
+                print(f"[-] 클라우드 Supabase 동기화 전송 과정에서 오류가 발생했습니다. {sync_err}")
         else:
             raise Exception("API 응답 물건 리스트가 비어있습니다.")
+        conn.close()
             
     except Exception as e:
         print(f"[!] Onbid API call failed ({e}). Providing premium simulation data fallback.")
-        sim_data = generate_simulated_onbid_data()
-        success_count = save_to_db(sim_data)
-        log_sync_status("SUCCESS", success_count, f"Simulated data fallback: {e}")
-        print(f"[+] Onbid Simulated data fallback loaded successfully! Total: {success_count} listings.")
+        try:
+            conn = sqlite3.connect(":memory:")
+            conn.row_factory = sqlite3.Row
+            init_db(conn)
+            
+            sim_data = generate_simulated_onbid_data()
+            success_count = save_to_db(conn, sim_data)
+            log_sync_status(conn, "SUCCESS", success_count, f"Simulated data fallback: {e}")
+            print(f"[+] Onbid Simulated data fallback loaded successfully! Total: {success_count} listings.")
+            
+            try:
+                sync_sqlite_to_supabase(conn)
+            except Exception as sync_err:
+                print(f"[-] 클라우드 Supabase 동기화 전송 과정에서 오류가 발생했습니다. {sync_err}")
+            conn.close()
+        except Exception as fallback_err:
+            print(f"[-] 폴백 방어막 가동 실패: {fallback_err}")
 
 if __name__ == "__main__":
     fetch_onbid_data()

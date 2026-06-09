@@ -55,6 +55,15 @@ export const PropertyCard: React.FC<PropertyCardProps> = ({ property, onPress, i
     };
   };
 
+  const ptype = (property.ptype || '').toLowerCase();
+  const score = property.score || 50;
+  const isCommercial = ptype.includes('상가') || ptype.includes('근린') || ptype.includes('점포') || ptype.includes('상업') || ptype.includes('빌딩') || ptype.includes('숙박') || ptype.includes('사무') || ptype.includes('생활시설');
+  const isLandOrFactory = ptype.includes('토지') || ptype.includes('대지') || ptype.includes('임야') || ptype.includes('잡종지') || ptype.includes('대') || ptype.includes('전') || ptype.includes('답') || ptype.includes('공장') || ptype.includes('창고') || ptype.includes('산업');
+  const isResidential = ptype.includes('아파트') || ptype.includes('주택') || ptype.includes('다세대') || ptype.includes('빌라') || ptype.includes('오피스텔') || ptype.includes('연립') || ptype.includes('가구') || ptype.includes('단독') || ptype.includes('전원');
+
+  const isInvestment = isCommercial || isLandOrFactory || (isResidential && score >= 85);
+  const isResidence = isResidential;
+
   const gradeStyle = getGradeStyle(property.grade);
   const sourceLabel = property.source === 'court' ? '⚖️ 법원경매' : property.source === 'onbid' ? '🏢 캠코공매' : '📁 사설';
 
@@ -90,6 +99,16 @@ export const PropertyCard: React.FC<PropertyCardProps> = ({ property, onPress, i
             AI 점수: {property.score}점
           </Text>
         </View>
+        {isInvestment && (
+          <View style={styles.investmentBadge}>
+            <Text style={styles.investmentBadgeText}>🏆 투자 추천</Text>
+          </View>
+        )}
+        {isResidence && (
+          <View style={styles.residenceBadge}>
+            <Text style={styles.residenceBadgeText}>🏠 실거주 추천</Text>
+          </View>
+        )}
       </View>
 
       {/* 감정가 및 최저가 금융 수치 정보 */}
@@ -255,5 +274,35 @@ const styles = StyleSheet.create({
   favoriteBadgeText: {
     fontSize: 18,
     color: COLORS.warningGold,
+  },
+  investmentBadge: {
+    backgroundColor: '#fffbeb',
+    borderColor: '#fef3c7',
+    borderWidth: 1,
+    paddingHorizontal: 8,
+    paddingVertical: 3,
+    borderRadius: 6,
+    marginRight: 6,
+    marginBottom: 4,
+  },
+  investmentBadgeText: {
+    fontSize: 14,
+    fontWeight: 'bold',
+    color: '#b45309',
+  },
+  residenceBadge: {
+    backgroundColor: '#eff6ff',
+    borderColor: '#dbeafe',
+    borderWidth: 1,
+    paddingHorizontal: 8,
+    paddingVertical: 3,
+    borderRadius: 6,
+    marginRight: 6,
+    marginBottom: 4,
+  },
+  residenceBadgeText: {
+    fontSize: 14,
+    fontWeight: 'bold',
+    color: '#1d4ed8',
   },
 });

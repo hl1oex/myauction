@@ -181,6 +181,7 @@ export const FeedScreen: React.FC<FeedScreenProps> = ({ onSelectProperty }) => {
     budgetLimit: 2000000000, // 기본 20억 원
     hidePast: true,
     gradeFilter: 'all',
+    investmentType: 'all',
   });
 
   // Firestore properties 실시간 구독 리스너 가동 (실시간 연동 완비)
@@ -302,6 +303,24 @@ export const FeedScreen: React.FC<FeedScreenProps> = ({ onSelectProperty }) => {
       });
     }
 
+    // 7. AI 자산 투자 성향 필터링
+    if (filters.investmentType && filters.investmentType !== 'all') {
+      result = result.filter((item) => {
+        const ptype = (item.ptype || '').toLowerCase();
+        const score = item.score || 50;
+        const isCommercial = ptype.includes('상가') || ptype.includes('근린') || ptype.includes('점포') || ptype.includes('상업') || ptype.includes('빌딩') || ptype.includes('숙박') || ptype.includes('사무') || ptype.includes('생활시설');
+        const isLandOrFactory = ptype.includes('토지') || ptype.includes('대지') || ptype.includes('임야') || ptype.includes('잡종지') || ptype.includes('대') || ptype.includes('전') || ptype.includes('답') || ptype.includes('공장') || ptype.includes('창고') || ptype.includes('산업');
+        const isResidential = ptype.includes('아파트') || ptype.includes('주택') || ptype.includes('다세대') || ptype.includes('빌라') || ptype.includes('오피스텔') || ptype.includes('연립') || ptype.includes('가구') || ptype.includes('단독') || ptype.includes('전원');
+
+        if (filters.investmentType === 'investment') {
+          return isCommercial || isLandOrFactory || (isResidential && score >= 85);
+        } else if (filters.investmentType === 'residence') {
+          return isResidential;
+        }
+        return true;
+      });
+    }
+
     setFilteredProperties(result);
   }, [properties, filters]);
 
@@ -317,6 +336,7 @@ export const FeedScreen: React.FC<FeedScreenProps> = ({ onSelectProperty }) => {
       budgetLimit: 2000000000,
       hidePast: true,
       gradeFilter: 'all',
+      investmentType: 'all',
     });
   };
 
@@ -606,6 +626,34 @@ export const FeedScreen: React.FC<FeedScreenProps> = ({ onSelectProperty }) => {
                       style={[
                         styles.chipText,
                         filters.gradeFilter === item.value && styles.chipTextActive,
+                      ]}
+                    >
+                      {item.label}
+                    </Text>
+                  </TouchableOpacity>
+                ))}
+              </View>
+
+              {/* AI 자산 투자 성향 필터 */}
+              <Text style={styles.filterLabel}>🎯 AI 자산 투자 성향 필터</Text>
+              <View style={styles.chipContainer}>
+                {[
+                  { value: 'all', label: '전체' },
+                  { value: 'investment', label: '🏆 투자형' },
+                  { value: 'residence', label: '🏠 실거주' },
+                ].map((item) => (
+                  <TouchableOpacity
+                    key={item.value}
+                    style={[
+                      styles.chip,
+                      filters.investmentType === item.value && styles.chipActive,
+                    ]}
+                    onPress={() => setFilters((prev) => ({ ...prev, investmentType: item.value as any }))}
+                  >
+                    <Text
+                      style={[
+                        styles.chipText,
+                        filters.investmentType === item.value && styles.chipTextActive,
                       ]}
                     >
                       {item.label}
