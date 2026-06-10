@@ -42,6 +42,10 @@ jobs:
           cp apartment_elegant_facade.png dist/
           cp floorplan_modern_apartment.png dist/
 
+      - name: Apply Relative Path Patch
+        run: |
+          python scratch/relative_path_patch.py
+
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v3
         with:
