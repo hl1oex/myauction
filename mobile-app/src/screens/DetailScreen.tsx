@@ -2282,7 +2282,7 @@ const styles = StyleSheet.create({
   },
   networkSub: {
     fontSize: 11.5,
-    color: COLORS.slate50,
+    color: COLORS.slate500,
     lineHeight: 17,
     marginBottom: 12,
   },

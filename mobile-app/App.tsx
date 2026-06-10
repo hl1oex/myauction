@@ -242,18 +242,14 @@ export default function App() {
       </View>
 
       {/* 물건 상세 보기 모달 오버레이 영역 */}
-      <Modal
-        visible={selectedProperty !== null}
-        animationType="slide"
-        onRequestClose={handleCloseDetail}
-      >
-        {selectedProperty && (
+      {selectedProperty !== null && (
+        <View style={[StyleSheet.absoluteFill, { zIndex: 9999, backgroundColor: COLORS.pearlWhiteBg }]}>
           <DetailScreen
             property={selectedProperty}
             onBack={handleCloseDetail}
           />
-        )}
-      </Modal>
+        </View>
+      )}
 
       {/* 인증용 모달 오버레이 영역 */}
       <Modal
