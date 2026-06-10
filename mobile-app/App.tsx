@@ -4,7 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { StyleSheet, Text, View, TouchableOpacity, SafeAreaView, Modal, Platform } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import { COLORS } from './src/components/Theme';
-import { Property } from './src/types';
+import { Property, FilterState } from './src/types';
 import { FeedScreen } from './src/screens/FeedScreen';
 import { DetailScreen } from './src/screens/DetailScreen';
 import { GlossaryScreen } from './src/screens/GlossaryScreen';
@@ -21,6 +21,19 @@ export default function App() {
   const [selectedProperty, setSelectedProperty] = useState<Property | null>(null);
   const [user, setUser] = useState<User | null>(null);
   const [showAuthScreen, setShowAuthScreen] = useState<boolean>(false);
+  const [filters, setFilters] = useState<FilterState>({
+    search: '',
+    source: 'all',
+    ptype: 'all',
+    sido: 'all',
+    sigungu: 'all',
+    dateLimit: 999,
+    budgetLimit: 2000000000,
+    hidePast: true,
+    gradeFilter: 'all',
+    investmentType: 'all',
+    selectedCourts: [],
+  });
 
   useEffect(() => {
     // 앱이 처음 시작되거나 갱신될 때 Supabase 인증 세션 상태의 변경 사항을 즉각 감지하기 위해 리스너를 구독하였습니다.
@@ -88,6 +101,8 @@ export default function App() {
         return (
           <FeedScreen
             onSelectProperty={(property) => setSelectedProperty(property)}
+            filters={filters}
+            setFilters={setFilters}
           />
         );
       case 'favorites':
@@ -122,7 +137,13 @@ export default function App() {
       case 'guide':
         return <GuideScreen />;
       default:
-        return <FeedScreen onSelectProperty={(p) => setSelectedProperty(p)} />;
+        return (
+          <FeedScreen
+            onSelectProperty={(p) => setSelectedProperty(p)}
+            filters={filters}
+            setFilters={setFilters}
+          />
+        );
     }
   };
 
@@ -135,10 +156,29 @@ export default function App() {
         <View style={styles.logoIcon}>
           <Text style={styles.logoIconText}>🏨</Text>
         </View>
-        <View style={styles.logoTextContainer}>
-          <Text style={styles.logoTitle}>AI 부동산 경시/공매 통합 앱</Text>
+        <TouchableOpacity 
+          style={styles.logoTextContainer}
+          onPress={() => {
+            setActiveTab('feed');
+            setSelectedProperty(null);
+            setFilters({
+              search: '',
+              source: 'all',
+              ptype: 'all',
+              sido: 'all',
+              sigungu: 'all',
+              dateLimit: 999,
+              budgetLimit: 2000000000,
+              hidePast: true,
+              gradeFilter: 'all',
+              investmentType: 'all',
+              selectedCourts: [],
+            });
+          }}
+        >
+          <Text style={styles.logoTitle}>부동산경공매 검색시스템</Text>
           <Text style={styles.logoSubtitle}>PREMIUM ELEGANT PEARL WHITE</Text>
-        </View>
+        </TouchableOpacity>
         {user ? (
           <View style={styles.userBadgeHeader}>
             <Text style={styles.userBadgeText}>LIVE</Text>

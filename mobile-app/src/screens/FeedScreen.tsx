@@ -112,9 +112,11 @@ const fallbackData: Property[] = [
 
 interface FeedScreenProps {
   onSelectProperty: (property: Property) => void;
+  filters: FilterState;
+  setFilters: React.Dispatch<React.SetStateAction<FilterState>>;
 }
 
-export const FeedScreen: React.FC<FeedScreenProps> = ({ onSelectProperty }) => {
+export const FeedScreen: React.FC<FeedScreenProps> = ({ onSelectProperty, filters, setFilters }) => {
   const [properties, setProperties] = useState<Property[]>([]);
   const [filteredProperties, setFilteredProperties] = useState<Property[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
@@ -170,19 +172,7 @@ export const FeedScreen: React.FC<FeedScreenProps> = ({ onSelectProperty }) => {
     }
   }, [userId, loadFavorites]);
 
-  // 필터 상태의 초기값을 설정합니다.
-  const [filters, setFilters] = useState<FilterState>({
-    search: '',
-    source: 'all',
-    ptype: 'all',
-    sido: 'all',
-    sigungu: 'all',
-    dateLimit: 999,
-    budgetLimit: 2000000000, // 기본 20억 원
-    hidePast: true,
-    gradeFilter: 'all',
-    investmentType: 'all',
-  });
+  // 전역 필터 상태 및 데이터 연동을 가동합니다.
 
   // Firestore properties 실시간 구독 리스너 가동 (실시간 연동 완비)
   useEffect(() => {
@@ -321,6 +311,14 @@ export const FeedScreen: React.FC<FeedScreenProps> = ({ onSelectProperty }) => {
       });
     }
 
+    // 8. 관할 법원 다중 필터링
+    if (filters.selectedCourts && filters.selectedCourts.length > 0) {
+      result = result.filter((item) => {
+        const auctionNo = item.auction_no || '';
+        return filters.selectedCourts!.some(court => auctionNo.includes(court));
+      });
+    }
+
     setFilteredProperties(result);
   }, [properties, filters]);
 
@@ -337,6 +335,7 @@ export const FeedScreen: React.FC<FeedScreenProps> = ({ onSelectProperty }) => {
       hidePast: true,
       gradeFilter: 'all',
       investmentType: 'all',
+      selectedCourts: [],
     });
   };
 
@@ -412,6 +411,46 @@ export const FeedScreen: React.FC<FeedScreenProps> = ({ onSelectProperty }) => {
                 <TouchableOpacity onPress={handleResetFilters}>
                   <Text style={styles.resetText}>초기화</Text>
                 </TouchableOpacity>
+              </View>
+
+              {/* 관할 법원 다중 선택 필터 */}
+              <Text style={styles.filterLabel}>⚖️ 관할 법원 다중 필터</Text>
+              <View style={styles.chipContainer}>
+                {[
+                  "서울중앙지방법원", "서울동부지방법원", "서울남부지방법원", "서울북부지방법원", "서울서부지방법원",
+                  "의정부지방법원", "인천지방법원", "수원지방법원", "춘천지방법원", "대전지방법원",
+                  "청주지방법원", "대구지방법원", "부산지방법원", "울산지방법원", "창원지방법원",
+                  "광주지방법원", "전주지방법원", "제주지방법원"
+                ].map((court) => {
+                  const isSelected = filters.selectedCourts?.includes(court) || false;
+                  return (
+                    <TouchableOpacity
+                      key={court}
+                      style={[
+                        styles.chip,
+                        isSelected && styles.chipActive,
+                      ]}
+                      onPress={() => {
+                        setFilters((prev) => {
+                          const currentCourts = prev.selectedCourts || [];
+                          const nextCourts = currentCourts.includes(court)
+                            ? currentCourts.filter(c => c !== court)
+                            : [...currentCourts, court];
+                          return { ...prev, selectedCourts: nextCourts };
+                        });
+                      }}
+                    >
+                      <Text
+                        style={[
+                          styles.chipText,
+                          isSelected && styles.chipTextActive,
+                        ]}
+                      >
+                        {court.replace("지방법원", "")}
+                      </Text>
+                    </TouchableOpacity>
+                  );
+                })}
               </View>
 
               {/* 자산 공급 출처 */}

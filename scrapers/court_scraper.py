@@ -655,7 +655,7 @@ def scrape_court_data():
                             
                         combined_results.append({
                             "source": "court",
-                            "auction_no": cs_no,
+                            "auction_no": f"{court_name} {cs_no}",
                             "address": address,
                             "appraised_value": appraisal,
                             "minimum_bid": price,

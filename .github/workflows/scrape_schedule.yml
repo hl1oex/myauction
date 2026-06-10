@@ -54,15 +54,13 @@ jobs:
           conn.close()
           "
 
-      - name: Execute Onbid API Fetcher
+      - name: Execute Daily Scrapers and Email Report
         env:
           ONBID_SERVICE_KEY: ${{ secrets.ONBID_SERVICE_KEY || '8f25b28707d85a7c657d76d8689bacc8e6d3c87ea74de0330b9048bc7c1f1b98' }}
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
           SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
-        run: python scrapers/onbid_fetcher.py
-
-      - name: Execute Court Scraper
-        env:
-          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
-          SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
-        run: python scrapers/court_scraper.py
+          SMTP_USER: ${{ secrets.SMTP_USER }}
+          SMTP_PASS: ${{ secrets.SMTP_PASS }}
+          SMTP_HOST: ${{ secrets.SMTP_HOST || 'smtp.gmail.com' }}
+          SMTP_PORT: ${{ secrets.SMTP_PORT || '587' }}
+        run: python scrapers/run_daily_scrapers.py

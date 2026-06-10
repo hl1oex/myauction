@@ -1,0 +1,49 @@
+# deploy.yml
+# 깃허브 main 브랜치 푸시 시 웹 및 Expo 모바일 앱을 빌드하여 GitHub Pages로 자동 배포하는 파이프라인 설정 파일입니다.
+name: Deploy to GitHub Pages
+
+on:
+  push:
+    branches:
+      - main
+
+# gh-pages 브랜치로 커밋을 생성하여 푸시하기 위해 쓰기 권한을 명시적으로 획득합니다.
+permissions:
+  contents: write
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18
+
+      - name: Install Mobile App Dependencies
+        run: |
+          cd mobile-app
+          npm install
+
+      - name: Build Mobile Web App (Expo Export)
+        run: |
+          cd mobile-app
+          npx expo export
+
+      - name: Sync Build Directory Structure
+        run: |
+          mkdir -p dist/mobile
+          cp -r mobile-app/dist/* dist/mobile/
+          cp index.html dist/
+          cp favicon.png dist/
+          cp apartment_elegant_facade.png dist/
+          cp floorplan_modern_apartment.png dist/
+
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./dist
