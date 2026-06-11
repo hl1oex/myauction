@@ -280,6 +280,12 @@
                 <span>백그라운드 스케줄 수집 중</span>
             </div>
             
+            <!-- [추가] 백엔드 어드민 바로가기 버튼 -->
+            <a href="/admin.html" class="px-1.5 min-[360px]:px-2.5 py-0.5 min-[360px]:py-1 rounded-full bg-slate-900 hover:bg-slate-800 text-white text-[8.5px] min-[360px]:text-[9.5px] font-black shadow-sm transition-all duration-300 cursor-pointer active:scale-95 whitespace-nowrap flex items-center gap-1">
+                <i class="fa-solid fa-gears text-[10px]"></i>
+                <span>백엔드 관리</span>
+            </a>
+
             <!-- [추가] 로그인 / 회원가입 상태 관리 배지 -->
             <div id="auth-status-container" class="flex items-center gap-1 sm:gap-1.5">
                 <button onclick="openLoginModal()" class="px-1.5 min-[360px]:px-2.5 py-0.5 min-[360px]:py-1 rounded-full border border-royalBlue text-royalBlue bg-white text-[8.5px] min-[360px]:text-[9.5px] font-black shadow-sm transition-all duration-300 cursor-pointer hover:bg-blue-50 active:scale-95 whitespace-nowrap">
@@ -3453,6 +3459,7 @@
         function loadDetailView(item) {
             if (!item) return;
             const extra = analyzePropertyDetailExtra(item);
+            const est = estimateAuctionRounds(item.appraised_value, item.minimum_bid, item.source);
 
             document.getElementById("detail-address").innerText = item.address;
             document.getElementById("detail-no").innerText = `사건번호/관리번호 : ${item.auction_no} (${item.round_info})`;
@@ -3685,7 +3692,6 @@
             riskReportPanel.innerHTML = generateLegalRiskReport(item);
 
             // 🟢 [신규] 동적 가치 평가 및 예상 명도 시뮬레이션 지표 연산
-            const est = estimateAuctionRounds(item.appraised_value, item.minimum_bid, item.source);
             const bidRateEl = document.getElementById("detail-ai-bid-rate");
             const evictEl = document.getElementById("detail-ai-evict-period");
             const marketEl = document.getElementById("detail-ai-market-compare");
