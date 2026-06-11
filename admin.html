@@ -76,6 +76,10 @@
                 </div>
             </div>
             <div class="flex items-center gap-3">
+                <span id="admin-user-badge" class="hidden text-xs font-black text-royalBlue bg-blue-50 border border-blue-200 px-3 py-1.5 rounded-xl"></span>
+                <button id="admin-logout-btn" onclick="adminLogout()" class="hidden bg-rose-50 border border-rose-200 text-rose-600 hover:bg-rose-100 text-[10.5px] sm:text-xs font-black px-3.5 py-2 rounded-xl transition-all select-none">
+                    로그아웃
+                </button>
                 <a href="./index.html" class="bg-slate-100 hover:bg-slate-200 text-slate-600 text-[10.5px] sm:text-xs font-black px-3.5 py-2 rounded-xl border border-slate-200 flex items-center gap-1.5 transition-all select-none">
                     <i class="fa-solid fa-home"></i> 홈 피드로 이동
                 </a>
@@ -160,7 +164,10 @@
                             </div>
                             <div>
                                 <label class="block text-[11px] font-black text-slate-500 mb-1">배너 이미지 파일 주소 (URL)</label>
-                                <input type="text" id="ad-image-url" oninput="updatePreview('direct')" class="w-full text-xs font-bold p-2.5 border border-slate-200 rounded-xl bg-slate-50 focus:bg-white focus:border-royalBlue outline-none" placeholder="예: ./apartment_elegant_facade.png">
+                                <div class="flex gap-2">
+                                    <input type="text" id="ad-image-url" oninput="updatePreview('direct')" class="flex-1 text-xs font-bold p-2.5 border border-slate-200 rounded-xl bg-slate-50 focus:bg-white focus:border-royalBlue outline-none" placeholder="예: ./apartment_elegant_facade.png">
+                                    <button type="button" onclick="openImageExplorer()" class="bg-slate-800 hover:bg-slate-700 text-white text-[10.5px] font-black px-3.5 rounded-xl transition-all select-none">탐색기</button>
+                                </div>
                                 <span class="text-[9.5px] text-slate-400 font-bold block mt-1">💡 권장 이미지 크기: 가로 800px * 세로 260px (또는 3:1 비율) / 대형 카드 렌더링에 최적화되어 있습니다.</span>
                             </div>
                             <div>
@@ -313,8 +320,7 @@ CREATE TRIGGER on_auth_user_created
         let usersList = [];
 
         window.onload = function() {
-            loadAdSettings();
-            loadUsersList();
+            checkAdminAuth();
             document.title = "부동산경공매 검색시스템 - 백엔드 관리자";
         };
 
@@ -597,6 +603,162 @@ CREATE TRIGGER on_auth_user_created
                 console.error("복사 실패", err);
             });
         }
+
+        // 🔑 어드민 로그인 보안 관리
+        function checkAdminAuth() {
+            const logged = localStorage.getItem("admin_logged");
+            if (logged === "true") {
+                const overlay = document.getElementById("admin-login-overlay");
+                if (overlay) overlay.classList.add("hidden");
+                const badge = document.getElementById("admin-user-badge");
+                if (badge) {
+                    badge.innerText = "hl1oex@gmail.com (시스템관리자)";
+                    badge.classList.remove("hidden");
+                }
+                const logoutBtn = document.getElementById("admin-logout-btn");
+                if (logoutBtn) logoutBtn.classList.remove("hidden");
+                loadAdSettings();
+                loadUsersList();
+            } else {
+                const overlay = document.getElementById("admin-login-overlay");
+                if (overlay) overlay.classList.remove("hidden");
+                const badge = document.getElementById("admin-user-badge");
+                if (badge) badge.classList.add("hidden");
+                const logoutBtn = document.getElementById("admin-logout-btn");
+                if (logoutBtn) logoutBtn.classList.add("hidden");
+            }
+        }
+
+        function adminLogin() {
+            const email = document.getElementById("login-email").value.trim();
+            const pw = document.getElementById("login-password").value;
+            
+            if (email === "hl1oex@gmail.com" && pw === "1234") {
+                localStorage.setItem("admin_logged", "true");
+                checkAdminAuth();
+            } else {
+                alert("관리자 계정명 또는 비밀번호가 올바르지 않습니다.");
+            }
+        }
+
+        function adminLogout() {
+            localStorage.removeItem("admin_logged");
+            window.location.reload();
+        }
+
+        // 🎨 배너 이미지 리소스 탐색기
+        let tempSelectedImage = "";
+
+        function openImageExplorer() {
+            tempSelectedImage = "";
+            const items = document.querySelectorAll(".explorer-item");
+            items.forEach(el => el.className = "border border-slate-200 rounded-2xl overflow-hidden bg-slate-50 cursor-pointer hover:border-royalBlue hover:shadow-sm p-1.5 space-y-1 explorer-item");
+            const modal = document.getElementById("image-explorer-modal");
+            if (modal) modal.classList.remove("hidden");
+        }
+
+        function closeImageExplorer() {
+            const modal = document.getElementById("image-explorer-modal");
+            if (modal) modal.classList.add("hidden");
+        }
+
+        function selectExplorerImage(path) {
+            tempSelectedImage = path;
+            const items = document.querySelectorAll(".explorer-item");
+            items.forEach(el => el.className = "border border-slate-200 rounded-2xl overflow-hidden bg-slate-50 cursor-pointer hover:border-royalBlue hover:shadow-sm p-1.5 space-y-1 explorer-item");
+            
+            let targetId = "explorer-img-1";
+            if (path.includes("floorplan")) targetId = "explorer-img-2";
+            else if (path.includes("favicon")) targetId = "explorer-img-3";
+            
+            const el = document.getElementById(targetId);
+            if (el) {
+                el.className = "border border-royalBlue ring-2 ring-royalBlue/15 bg-blue-50/20 rounded-2xl overflow-hidden cursor-pointer p-1.5 space-y-1 explorer-item";
+            }
+        }
+
+        function applyExplorerImage(path) {
+            const input = document.getElementById("ad-image-url");
+            if (input) input.value = path;
+            const type = document.querySelector('input[name="ad_type"]:checked').value;
+            updatePreview(type);
+            closeImageExplorer();
+        }
+
+        function confirmExplorerImage() {
+            if (!tempSelectedImage) {
+                alert("적용할 배너 이미지를 먼저 선택해 주십시오.");
+                return;
+            }
+            applyExplorerImage(tempSelectedImage);
+        }
     </script>
+
+    <!-- 🔑 어드민 전용 로그인 인증 모달 오버레이 (다크-골드 믹스 프리미엄 스타일) -->
+    <div id="admin-login-overlay" class="fixed inset-0 bg-slate-950/90 z-50 flex items-center justify-center hidden">
+        <div class="bg-slate-900 border border-amber-500/30 rounded-3xl p-6 sm:p-8 max-w-sm w-full mx-4 shadow-2xl shadow-amber-500/5 text-center space-y-6 animate-pulse-once">
+            <div class="space-y-2">
+                <div class="inline-flex w-14 h-14 bg-gradient-to-tr from-amber-500 to-yellow-400 rounded-2xl items-center justify-center text-slate-950 text-2xl font-black shadow-lg">
+                    <i class="fa-solid fa-lock"></i>
+                </div>
+                <h2 class="text-lg font-black text-amber-400">ADMIN CONTROL CENTER</h2>
+                <p class="text-[10.5px] text-slate-400 font-bold uppercase tracking-wider">시스템 보안 관리자 로그인</p>
+            </div>
+            
+            <div class="space-y-3.5 text-left">
+                <div>
+                    <label class="block text-[10.5px] font-black text-slate-400 mb-1">관리자 이메일 계정</label>
+                    <input type="email" id="login-email" class="w-full text-xs font-bold p-3 border border-slate-700 rounded-xl bg-slate-800 text-white focus:border-amber-400 outline-none" placeholder="example@email.com">
+                </div>
+                <div>
+                    <label class="block text-[10.5px] font-black text-slate-400 mb-1">관리자 비밀번호</label>
+                    <input type="password" id="login-password" class="w-full text-xs font-bold p-3 border border-slate-700 rounded-xl bg-slate-800 text-white focus:border-amber-400 outline-none" placeholder="••••••••">
+                </div>
+            </div>
+            
+            <button onclick="adminLogin()" class="w-full bg-gradient-to-r from-amber-500 to-yellow-400 hover:from-amber-600 hover:to-yellow-500 text-slate-950 text-xs font-black py-3 px-4 rounded-xl shadow-lg transition-all active:scale-[0.98]">
+                안전 보안 로그인
+            </button>
+        </div>
+    </div>
+
+    <!-- 🎨 배너 이미지 리소스 탐색기 모달 팝업 -->
+    <div id="image-explorer-modal" class="fixed inset-0 bg-slate-900/60 z-50 flex items-center justify-center hidden">
+        <div class="bg-white border border-slate-200 rounded-3xl p-5 max-w-lg w-full mx-4 shadow-2xl flex flex-col space-y-4">
+            <div class="flex items-center justify-between border-b border-slate-100 pb-2.5">
+                <h3 class="text-sm font-black text-slate-800 flex items-center gap-1.5">
+                    <i class="fa-solid fa-images text-royalBlue"></i> 서버 배너 이미지 탐색기
+                </h3>
+                <button onclick="closeImageExplorer()" class="text-slate-400 hover:text-rose-500 transition-colors"><i class="fa-solid fa-xmark text-lg"></i></button>
+            </div>
+            <p class="text-[10px] text-slate-400 font-bold leading-normal">
+                더블클릭하거나 아래 이미지를 선택한 후 '선택 완료'를 누르시면 입력창에 이미지 주소가 자동 기입됩니다.
+            </p>
+            <div class="grid grid-cols-3 gap-2.5 p-1">
+                <div onclick="selectExplorerImage('./apartment_elegant_facade.png')" ondblclick="applyExplorerImage('./apartment_elegant_facade.png')" class="border border-slate-200 rounded-2xl overflow-hidden bg-slate-50 cursor-pointer hover:border-royalBlue hover:shadow-sm p-1.5 space-y-1 explorer-item" id="explorer-img-1">
+                    <div class="h-16 w-full rounded-xl overflow-hidden bg-white">
+                        <img src="./apartment_elegant_facade.png" class="w-full h-full object-cover">
+                    </div>
+                    <span class="text-[9.5px] font-black text-slate-600 text-center block truncate">facade.png</span>
+                </div>
+                <div onclick="selectExplorerImage('./floorplan_modern_apartment.png')" ondblclick="applyExplorerImage('./floorplan_modern_apartment.png')" class="border border-slate-200 rounded-2xl overflow-hidden bg-slate-50 cursor-pointer hover:border-royalBlue hover:shadow-sm p-1.5 space-y-1 explorer-item" id="explorer-img-2">
+                    <div class="h-16 w-full rounded-xl overflow-hidden bg-white">
+                        <img src="./floorplan_modern_apartment.png" class="w-full h-full object-cover">
+                    </div>
+                    <span class="text-[9.5px] font-black text-slate-600 text-center block truncate">floorplan.png</span>
+                </div>
+                <div onclick="selectExplorerImage('./favicon.png')" ondblclick="applyExplorerImage('./favicon.png')" class="border border-slate-200 rounded-2xl overflow-hidden bg-slate-50 cursor-pointer hover:border-royalBlue hover:shadow-sm p-1.5 space-y-1 explorer-item" id="explorer-img-3">
+                    <div class="h-16 w-full rounded-xl overflow-hidden bg-white">
+                        <img src="./favicon.png" class="w-full h-full object-cover">
+                    </div>
+                    <span class="text-[9.5px] font-black text-slate-600 text-center block truncate">favicon.png</span>
+                </div>
+            </div>
+            <div class="flex gap-2 justify-end pt-2">
+                <button onclick="closeImageExplorer()" class="px-3.5 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-600 text-[10.5px] font-black transition-all">취소</button>
+                <button onclick="confirmExplorerImage()" class="px-3.5 py-2 rounded-xl bg-royalBlue hover:bg-royalHover text-white text-[10.5px] font-black transition-all">선택 완료</button>
+            </div>
+        </div>
+    </div>
 </body>
 </html>

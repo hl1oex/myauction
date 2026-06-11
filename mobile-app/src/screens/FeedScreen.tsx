@@ -127,6 +127,7 @@ export const FeedScreen: React.FC<FeedScreenProps> = ({ onSelectProperty, filter
   const [userId, setUserId] = useState<string | null>(null);
   const [isOffline, setIsOffline] = useState<boolean>(false);
   const [adSettings, setAdSettings] = useState<any[]>([]);
+  const [activeFilterTab, setActiveFilterTab] = useState<string>('court');
   const [expandedAccordion, setExpandedAccordion] = useState<Record<string, boolean>>({
     search: false,
     source: false,
@@ -390,11 +391,11 @@ export const FeedScreen: React.FC<FeedScreenProps> = ({ onSelectProperty, filter
     });
   };
 
-  // 광고 데이터를 사이에 삽입한 리스트 데이터 생성
+  // 광고 데이터를 사이에 삽입한 리스트 데이터 생성 (매 4번째 위치에 광고 카드 노출)
   const getListWithAds = useCallback(() => {
     const listWithAds: any[] = [];
     filteredProperties.forEach((item, index) => {
-      if (index > 0 && index % 3 === 0) {
+      if (listWithAds.length > 0 && listWithAds.length % 4 === 3) {
         listWithAds.push({
           id: `ad-${index}`,
           isAd: true,
@@ -471,7 +472,8 @@ export const FeedScreen: React.FC<FeedScreenProps> = ({ onSelectProperty, filter
         {/* 상세 필터 설정 패널 영역 */}
         {showFilterPanel && (
           <View style={styles.filterWrapper}>
-            <ScrollView style={styles.filterPanel} nestedScrollEnabled={true}>
+            <View style={styles.filterPanel}>
+              {/* 필터 헤더 */}
               <View style={styles.filterHeaderRow}>
                 <Text style={styles.filterPanelTitle}>지능형 필터링 센터</Text>
                 <TouchableOpacity onPress={handleResetFilters}>
@@ -479,426 +481,352 @@ export const FeedScreen: React.FC<FeedScreenProps> = ({ onSelectProperty, filter
                 </TouchableOpacity>
               </View>
 
-              {/* 관할 법원 다중 선택 필터 */}
-              <TouchableOpacity onPress={() => toggleAccordion('court')} style={styles.accordionHeader}>
-                <Text style={styles.filterLabel}>⚖️ 관할 법원 다중 필터</Text>
-                <Text style={styles.accordionIcon}>{expandedAccordion['court'] ? '▲' : '▼'}</Text>
-              </TouchableOpacity>
-              {expandedAccordion['court'] && (
-                <View style={styles.accordionContent}>
-                  <View style={styles.selectionActions}>
-                    <TouchableOpacity onPress={() => {
-                      setFilters(prev => ({
-                        ...prev,
-                        selectedCourts: [
-                          "서울중앙지방법원", "서울동부지방법원", "서울남부지방법원", "서울북부지방법원", "서울서부지방법원",
-                          "의정부지방법원", "인천지방법원", "수원지방법원", "춘천지방법원", "대전지방법원",
-                          "청주지방법원", "대구지방법원", "부산지방법원", "울산지방법원", "창원지방법원",
-                          "광주지방법원", "전주지방법원", "제주지방법원"
-                        ]
-                      }));
-                    }}>
-                      <Text style={styles.actionText}>전체 선택</Text>
-                    </TouchableOpacity>
-                    <Text style={styles.actionDivider}>|</Text>
-                    <TouchableOpacity onPress={() => setFilters(prev => ({ ...prev, selectedCourts: [] }))}>
-                      <Text style={styles.actionText}>전체 해제</Text>
-                    </TouchableOpacity>
-                  </View>
-                  <View style={styles.chipContainer}>
-                    {[
-                      "서울중앙지방법원", "서울동부지방법원", "서울남부지방법원", "서울북부지방법원", "서울서부지방법원",
-                      "의정부지방법원", "인천지방법원", "수원지방법원", "춘천지방법원", "대전지방법원",
-                      "청주지방법원", "대구지방법원", "부산지방법원", "울산지방법원", "창원지방법원",
-                      "광주지방법원", "전주지방법원", "제주지방법원"
-                    ].map((court) => {
-                      const isSelected = filters.selectedCourts?.includes(court) || false;
-                      return (
-                        <TouchableOpacity
-                          key={court}
-                          style={[
-                            styles.chip,
-                            isSelected && styles.chipActive,
-                          ]}
-                          onPress={() => {
-                            setFilters((prev) => {
-                              const currentCourts = prev.selectedCourts || [];
-                              const nextCourts = currentCourts.includes(court)
-                                ? currentCourts.filter(c => c !== court)
-                                : [...currentCourts, court];
-                              return { ...prev, selectedCourts: nextCourts };
-                            });
-                          }}
-                        >
-                          <Text
-                            style={[
-                              styles.chipText,
-                              isSelected && styles.chipTextActive,
-                            ]}
-                          >
-                            {court.replace("지방법원", "")}
-                          </Text>
-                        </TouchableOpacity>
-                      );
-                    })}
-                  </View>
-                </View>
-              )}
+              {/* 💻 가로 탭 아코디언 바 */}
+              <ScrollView horizontal={true} showsHorizontalScrollIndicator={false} style={styles.filterTabScroll} contentContainerStyle={styles.filterTabScrollContent}>
+                {[
+                  { key: 'court', label: '⚖️ 관할 법원' },
+                  { key: 'source', label: '🏷️ 공급 출처' },
+                  { key: 'ptype', label: '🏡 물건 종류' },
+                  { key: 'sido', label: '📍 지역 대분류' },
+                  { key: 'budget', label: '💰 가용 예산' },
+                  { key: 'date', label: '📅 매각 기일' },
+                  { key: 'investment', label: '🏆 투자 성향' },
+                  { key: 'grade', label: '🛡️ AI 등급' },
+                ].map(tab => (
+                  <TouchableOpacity
+                    key={tab.key}
+                    style={[styles.filterTabBtn, activeFilterTab === tab.key && styles.filterTabBtnActive]}
+                    onPress={() => setActiveFilterTab(tab.key)}
+                  >
+                    <Text style={[styles.filterTabBtnText, activeFilterTab === tab.key && styles.filterTabBtnTextActive]}>
+                      {tab.label}
+                    </Text>
+                  </TouchableOpacity>
+                ))}
+              </ScrollView>
 
-              {/* 자산 공급 출처 */}
-              <TouchableOpacity onPress={() => toggleAccordion('source')} style={styles.accordionHeader}>
-                <Text style={styles.filterLabel}>🏷️ 자산 공급 출처 (다중)</Text>
-                <Text style={styles.accordionIcon}>{expandedAccordion['source'] ? '▲' : '▼'}</Text>
-              </TouchableOpacity>
-              {expandedAccordion['source'] && (
-                <View style={styles.accordionContent}>
-                  <View style={styles.selectionActions}>
-                    <TouchableOpacity onPress={() => setFilters(prev => ({ ...prev, source: ['court', 'onbid', 'private'] }))}>
-                      <Text style={styles.actionText}>전체 선택</Text>
-                    </TouchableOpacity>
-                    <Text style={styles.actionDivider}>|</Text>
-                    <TouchableOpacity onPress={() => setFilters(prev => ({ ...prev, source: [] }))}>
-                      <Text style={styles.actionText}>전체 해제</Text>
-                    </TouchableOpacity>
-                  </View>
-                  <View style={styles.chipContainer}>
-                    {[
-                      { value: 'court', label: '법원 경매' },
-                      { value: 'onbid', label: '캠코 공매' },
-                      { value: 'private', label: '사설 매물' },
-                    ].map((item) => {
-                      const isSelected = filters.source.includes(item.value as any);
-                      return (
-                        <TouchableOpacity
-                          key={item.value}
-                          style={[
-                            styles.chip,
-                            isSelected && styles.chipActive,
-                          ]}
-                          onPress={() => {
-                            setFilters((prev) => {
-                              const next = prev.source.includes(item.value as any)
-                                ? prev.source.filter(s => s !== item.value)
-                                : [...prev.source, item.value as any];
-                              return { ...prev, source: next };
-                            });
-                          }}
-                        >
-                          <Text
-                            style={[
-                              styles.chipText,
-                              isSelected && styles.chipTextActive,
-                            ]}
-                          >
-                            {item.label}
-                          </Text>
-                        </TouchableOpacity>
-                      );
-                    })}
-                  </View>
-                </View>
-              )}
-
-              {/* 물건 종류 */}
-              <TouchableOpacity onPress={() => toggleAccordion('ptype')} style={styles.accordionHeader}>
-                <Text style={styles.filterLabel}>🏡 물건 종류 (용도 다중)</Text>
-                <Text style={styles.accordionIcon}>{expandedAccordion['ptype'] ? '▲' : '▼'}</Text>
-              </TouchableOpacity>
-              {expandedAccordion['ptype'] && (
-                <View style={styles.accordionContent}>
-                  <View style={styles.selectionActions}>
-                    <TouchableOpacity onPress={() => setFilters(prev => ({ ...prev, ptype: ['apart', 'officetel', 'villa', 'house', 'store', 'land', 'factory'] }))}>
-                      <Text style={styles.actionText}>전체 선택</Text>
-                    </TouchableOpacity>
-                    <Text style={styles.actionDivider}>|</Text>
-                    <TouchableOpacity onPress={() => setFilters(prev => ({ ...prev, ptype: [] }))}>
-                      <Text style={styles.actionText}>전체 해제</Text>
-                    </TouchableOpacity>
-                  </View>
-                  <View style={styles.chipContainer}>
-                    {[
-                      { value: 'apart', label: '아파트' },
-                      { value: 'officetel', label: '오피스텔' },
-                      { value: 'villa', label: '다세대/빌라' },
-                      { value: 'house', label: '단독/다가구' },
-                      { value: 'store', label: '상가/점포' },
-                      { value: 'land', label: '토지/임야' },
-                      { value: 'factory', label: '공장/창고' },
-                    ].map((item) => {
-                      const isSelected = filters.ptype.includes(item.value as any);
-                      return (
-                        <TouchableOpacity
-                          key={item.value}
-                          style={[
-                            styles.chip,
-                            isSelected && styles.chipActive,
-                          ]}
-                          onPress={() => {
-                            setFilters((prev) => {
-                              const next = prev.ptype.includes(item.value as any)
-                                ? prev.ptype.filter(p => p !== item.value)
-                                : [...prev.ptype, item.value as any];
-                              return { ...prev, ptype: next };
-                            });
-                          }}
-                        >
-                          <Text
-                            style={[
-                              styles.chipText,
-                              isSelected && styles.chipTextActive,
-                            ]}
-                          >
-                            {item.label}
-                          </Text>
-                        </TouchableOpacity>
-                      );
-                    })}
-                  </View>
-                </View>
-              )}
-
-              {/* 지역 필터 */}
-              <TouchableOpacity onPress={() => toggleAccordion('sido')} style={styles.accordionHeader}>
-                <Text style={styles.filterLabel}>📍 지역 대분류 (시도 다중)</Text>
-                <Text style={styles.accordionIcon}>{expandedAccordion['sido'] ? '▲' : '▼'}</Text>
-              </TouchableOpacity>
-              {expandedAccordion['sido'] && (
-                <View style={styles.accordionContent}>
-                  <View style={styles.selectionActions}>
-                    <TouchableOpacity onPress={() => setFilters(prev => ({ ...prev, sido: ['서울', '경기', '인천', '부산', '대구', '광주', '대전', '울산', '세종', '강원', '충북', '충남', '전북', '전남', '경북', '경남', '제주'] }))}>
-                      <Text style={styles.actionText}>전체 선택</Text>
-                    </TouchableOpacity>
-                    <Text style={styles.actionDivider}>|</Text>
-                    <TouchableOpacity onPress={() => setFilters(prev => ({ ...prev, sido: [] }))}>
-                      <Text style={styles.actionText}>전체 해제</Text>
-                    </TouchableOpacity>
-                  </View>
-                  <View style={styles.chipContainer}>
-                    {[
-                      '서울', '경기', '인천', '부산', '대구', '광주', '대전', '울산', '세종', '강원', '충북', '충남', '전북', '전남', '경북', '경남', '제주'
-                    ].map((sd) => {
-                      const isSelected = filters.sido.includes(sd);
-                      return (
-                        <TouchableOpacity
-                          key={sd}
-                          style={[
-                            styles.chip,
-                            isSelected && styles.chipActive,
-                          ]}
-                          onPress={() => {
-                            setFilters((prev) => {
-                              const next = prev.sido.includes(sd)
-                                ? prev.sido.filter(s => s !== sd)
-                                : [...prev.sido, sd];
-                              return { ...prev, sido: next, sigungu: 'all' };
-                            });
-                          }}
-                        >
-                          <Text
-                            style={[
-                              styles.chipText,
-                              isSelected && styles.chipTextActive,
-                            ]}
-                          >
-                            {sd}
-                          </Text>
-                        </TouchableOpacity>
-                      );
-                    })}
-                  </View>
-                </View>
-              )}
-
-              {/* 시군구 상세 필터 (시도가 단 하나만 지정된 경우 활성화) */}
-              {filters.sido && filters.sido.length === 1 && FULL_REGIONS[filters.sido[0]] && (
-                <>
-                  <Text style={styles.filterLabel}>📍 상세 지역구분 (시/군/구)</Text>
-                  <View style={styles.chipContainer}>
-                    <TouchableOpacity
-                      style={[
-                        styles.chip,
-                        filters.sigungu === 'all' && styles.chipActive,
-                      ]}
-                      onPress={() => setFilters((prev) => ({ ...prev, sigungu: 'all' }))}
-                    >
-                      <Text
-                        style={[
-                          styles.chipText,
-                          filters.sigungu === 'all' && styles.chipTextActive,
-                        ]}
-                      >
-                        전체
-                      </Text>
-                    </TouchableOpacity>
-                    {FULL_REGIONS[filters.sido[0]].map((sgg) => (
-                      <TouchableOpacity
-                        key={sgg}
-                        style={[
-                          styles.chip,
-                          filters.sigungu === sgg && styles.chipActive,
-                        ]}
-                        onPress={() => setFilters((prev) => ({ ...prev, sigungu: sgg }))}
-                      >
-                        <Text
-                          style={[
-                            styles.chipText,
-                            filters.sigungu === sgg && styles.chipTextActive,
-                          ]}
-                        >
-                          {sgg}
-                        </Text>
+              {/* 📋 활성 탭 하위 옵션 영역 (다중선택 체크박스 & 스크롤) */}
+              <ScrollView style={styles.filterOptionsScroll} nestedScrollEnabled={true}>
+                {/* 1. 관할 법원 */}
+                {activeFilterTab === 'court' && (
+                  <View style={styles.tabContent}>
+                    <View style={styles.selectionActions}>
+                      <TouchableOpacity onPress={() => {
+                        setFilters(prev => ({
+                          ...prev,
+                          selectedCourts: [
+                            "서울중앙지방법원", "서울동부지방법원", "서울남부지방법원", "서울북부지방법원", "서울서부지방법원",
+                            "의정부지방법원", "인천지방법원", "수원지방법원", "춘천지방법원", "대전지방법원",
+                            "청주지방법원", "대구지방법원", "부산지방법원", "울산지방법원", "창원지방법원",
+                            "광주지방법원", "전주지방법원", "제주지방법원"
+                          ]
+                        }));
+                      }}>
+                        <Text style={styles.actionText}>전체 선택</Text>
                       </TouchableOpacity>
-                    ))}
+                      <Text style={styles.actionDivider}>|</Text>
+                      <TouchableOpacity onPress={() => setFilters(prev => ({ ...prev, selectedCourts: [] }))}>
+                        <Text style={styles.actionText}>전체 해제</Text>
+                      </TouchableOpacity>
+                    </View>
+                    
+                    <View style={styles.checkboxGrid}>
+                      {[
+                        "서울중앙지방법원", "서울동부지방법원", "서울남부지방법원", "서울북부지방법원", "서울서부지방법원",
+                        "의정부지방법원", "인천지방법원", "수원지방법원", "춘천지방법원", "대전지방법원",
+                        "청주지방법원", "대구지방법원", "부산지방법원", "울산지방법원", "창원지방법원",
+                        "광주지방법원", "전주지방법원", "제주지방법원"
+                      ].map((court) => {
+                        const isSelected = filters.selectedCourts?.includes(court) || false;
+                        return (
+                          <TouchableOpacity
+                            key={court}
+                            style={styles.checkboxItem}
+                            onPress={() => {
+                              setFilters((prev) => {
+                                const currentCourts = prev.selectedCourts || [];
+                                const nextCourts = currentCourts.includes(court)
+                                  ? currentCourts.filter(c => c !== court)
+                                  : [...currentCourts, court];
+                                return { ...prev, selectedCourts: nextCourts };
+                              });
+                            }}
+                          >
+                            <Text style={[styles.checkboxIcon, isSelected && styles.checkboxIconActive]}>{isSelected ? '\u2611' : '\u2610'}</Text>
+                            <Text style={styles.checkboxLabel}>{court.replace("지방법원", "")}</Text>
+                          </TouchableOpacity>
+                        );
+                      })}
+                    </View>
                   </View>
-                </>
-              )}
+                )}
 
-              {/* 내 가용 예산 한도 설정 */}
-              <TouchableOpacity onPress={() => toggleAccordion('budget')} style={styles.accordionHeader}>
-                <Text style={styles.filterLabel}>💰 내 가용 예산 한도 ({getBudgetText(filters.budgetLimit)})</Text>
-                <Text style={styles.accordionIcon}>{expandedAccordion['budget'] ? '▲' : '▼'}</Text>
-              </TouchableOpacity>
-              {expandedAccordion['budget'] && (
-                <View style={styles.chipContainer}>
-                  {[
-                    { value: 50000000, label: '5천만' },
-                    { value: 100000000, label: '1억' },
-                    { value: 300000000, label: '3억' },
-                    { value: 500000000, label: '5억' },
-                    { value: 1000000000, label: '10억' },
-                    { value: 2000000000, label: '무제한' },
-                  ].map((item) => (
-                    <TouchableOpacity
-                      key={item.value}
-                      style={[
-                        styles.chip,
-                        filters.budgetLimit === item.value && styles.chipActive,
-                      ]}
-                      onPress={() => setFilters((prev) => ({ ...prev, budgetLimit: item.value }))}
-                    >
-                      <Text
-                        style={[
-                          styles.chipText,
-                          filters.budgetLimit === item.value && styles.chipTextActive,
-                        ]}
-                      >
-                        {item.label}
-                      </Text>
-                    </TouchableOpacity>
-                  ))}
-                </View>
-              )}
+                {/* 2. 공급 출처 */}
+                {activeFilterTab === 'source' && (
+                  <View style={styles.tabContent}>
+                    <View style={styles.selectionActions}>
+                      <TouchableOpacity onPress={() => setFilters(prev => ({ ...prev, source: ['court', 'onbid', 'private'] }))}>
+                        <Text style={styles.actionText}>전체 선택</Text>
+                      </TouchableOpacity>
+                      <Text style={styles.actionDivider}>|</Text>
+                      <TouchableOpacity onPress={() => setFilters(prev => ({ ...prev, source: [] }))}>
+                        <Text style={styles.actionText}>전체 해제</Text>
+                      </TouchableOpacity>
+                    </View>
+                    
+                    <View style={styles.checkboxList}>
+                      {[
+                        { value: 'court', label: '법원 경매 물건' },
+                        { value: 'onbid', label: '캠코 온비드 공매' },
+                        { value: 'private', label: '업로드한 사설 매물' },
+                      ].map((item) => {
+                        const isSelected = filters.source.includes(item.value as any);
+                        return (
+                          <TouchableOpacity
+                            key={item.value}
+                            style={styles.checkboxItem}
+                            onPress={() => {
+                              setFilters((prev) => {
+                                const next = prev.source.includes(item.value as any)
+                                  ? prev.source.filter(s => s !== item.value)
+                                  : [...prev.source, item.value as any];
+                                return { ...prev, source: next };
+                              });
+                            }}
+                          >
+                            <Text style={[styles.checkboxIcon, isSelected && styles.checkboxIconActive]}>{isSelected ? '\u2611' : '\u2610'}</Text>
+                            <Text style={styles.checkboxLabel}>{item.label}</Text>
+                          </TouchableOpacity>
+                        );
+                      })}
+                    </View>
+                  </View>
+                )}
 
-              {/* 매각 기일 임박 */}
-              <TouchableOpacity onPress={() => toggleAccordion('date')} style={styles.accordionHeader}>
-                <Text style={styles.filterLabel}>📅 매각/입찰 기일 범위</Text>
-                <Text style={styles.accordionIcon}>{expandedAccordion['date'] ? '▲' : '▼'}</Text>
-              </TouchableOpacity>
-              {expandedAccordion['date'] && (
-                <View style={styles.chipContainer}>
-                  {[
-                    { value: 999, label: '기한 제한 없음' },
-                    { value: 30, label: '30일 이내 임박' },
-                    { value: 90, label: '90일 이내' },
-                  ].map((item) => (
-                    <TouchableOpacity
-                      key={item.value}
-                      style={[
-                        styles.chip,
-                        filters.dateLimit === item.value && styles.chipActive,
-                      ]}
-                      onPress={() => setFilters((prev) => ({ ...prev, dateLimit: item.value }))}
-                    >
-                      <Text
-                        style={[
-                          styles.chipText,
-                          filters.dateLimit === item.value && styles.chipTextActive,
-                        ]}
-                      >
-                        {item.label}
-                      </Text>
-                    </TouchableOpacity>
-                  ))}
-                </View>
-              )}
+                {/* 3. 물건 종류 */}
+                {activeFilterTab === 'ptype' && (
+                  <View style={styles.tabContent}>
+                    <View style={styles.selectionActions}>
+                      <TouchableOpacity onPress={() => setFilters(prev => ({ ...prev, ptype: ['apart', 'officetel', 'villa', 'house', 'store', 'land', 'factory'] }))}>
+                        <Text style={styles.actionText}>전체 선택</Text>
+                      </TouchableOpacity>
+                      <Text style={styles.actionDivider}>|</Text>
+                      <TouchableOpacity onPress={() => setFilters(prev => ({ ...prev, ptype: [] }))}>
+                        <Text style={styles.actionText}>전체 해제</Text>
+                      </TouchableOpacity>
+                    </View>
+                    
+                    <View style={styles.checkboxGrid}>
+                      {[
+                        { value: 'apart', label: '아파트' },
+                        { value: 'officetel', label: '오피스텔' },
+                        { value: 'villa', label: '다세대/빌라' },
+                        { value: 'house', label: '단독/다가구' },
+                        { value: 'store', label: '상가/점포' },
+                        { value: 'land', label: '토지/임야' },
+                        { value: 'factory', label: '공장/창고' },
+                      ].map((item) => {
+                        const isSelected = filters.ptype.includes(item.value as any);
+                        return (
+                          <TouchableOpacity
+                            key={item.value}
+                            style={styles.checkboxItem}
+                            onPress={() => {
+                              setFilters((prev) => {
+                                const next = prev.ptype.includes(item.value as any)
+                                  ? prev.ptype.filter(p => p !== item.value)
+                                  : [...prev.ptype, item.value as any];
+                                return { ...prev, ptype: next };
+                              });
+                            }}
+                          >
+                            <Text style={[styles.checkboxIcon, isSelected && styles.checkboxIconActive]}>{isSelected ? '\u2611' : '\u2610'}</Text>
+                            <Text style={styles.checkboxLabel}>{item.label}</Text>
+                          </TouchableOpacity>
+                        );
+                      })}
+                    </View>
+                  </View>
+                )}
 
-              {/* AI 권리 분류 필터 */}
-              <TouchableOpacity onPress={() => toggleAccordion('grade')} style={styles.accordionHeader}>
-                <Text style={styles.filterLabel}>⚠️ AI 권리 등급 분류 필터</Text>
-                <Text style={styles.accordionIcon}>{expandedAccordion['grade'] ? '▲' : '▼'}</Text>
-              </TouchableOpacity>
-              {expandedAccordion['grade'] && (
-                <View style={styles.chipContainer}>
-                  {[
-                    { value: 'all', label: '전체 등급' },
-                    { value: 'safe', label: '🟢 우량 등급' },
-                    { value: 'risk', label: '🚨 위험 등급' },
-                  ].map((item) => (
-                    <TouchableOpacity
-                      key={item.value}
-                      style={[
-                        styles.chip,
-                        filters.gradeFilter === item.value && styles.chipActive,
-                      ]}
-                      onPress={() => setFilters((prev) => ({ ...prev, gradeFilter: item.value as any }))}
-                    >
-                      <Text
-                        style={[
-                          styles.chipText,
-                          filters.gradeFilter === item.value && styles.chipTextActive,
-                        ]}
-                      >
-                        {item.label}
-                      </Text>
-                    </TouchableOpacity>
-                  ))}
-                </View>
-              )}
+                {/* 4. 지역 대분류 */}
+                {activeFilterTab === 'sido' && (
+                  <View style={styles.tabContent}>
+                    <View style={styles.selectionActions}>
+                      <TouchableOpacity onPress={() => setFilters(prev => ({ ...prev, sido: ['서울', '경기', '인천', '부산', '대구', '광주', '대전', '울산', '세종', '강원', '충북', '충남', '전북', '전남', '경북', '경남', '제주'] }))}>
+                        <Text style={styles.actionText}>전체 선택</Text>
+                      </TouchableOpacity>
+                      <Text style={styles.actionDivider}>|</Text>
+                      <TouchableOpacity onPress={() => setFilters(prev => ({ ...prev, sido: [] }))}>
+                        <Text style={styles.actionText}>전체 해제</Text>
+                      </TouchableOpacity>
+                    </View>
+                    
+                    <View style={styles.checkboxGrid}>
+                      {[
+                        '서울', '경기', '인천', '부산', '대구', '광주', '대전', '울산', '세종', '강원', '충북', '충남', '전북', '전남', '경북', '경남', '제주'
+                      ].map((sd) => {
+                        const isSelected = filters.sido.includes(sd);
+                        return (
+                          <TouchableOpacity
+                            key={sd}
+                            style={styles.checkboxItem}
+                            onPress={() => {
+                              setFilters((prev) => {
+                                const next = prev.sido.includes(sd)
+                                  ? prev.sido.filter(s => s !== sd)
+                                  : [...prev.sido, sd];
+                                return { ...prev, sido: next, sigungu: 'all' };
+                              });
+                            }}
+                          >
+                            <Text style={[styles.checkboxIcon, isSelected && styles.checkboxIconActive]}>{isSelected ? '\u2611' : '\u2610'}</Text>
+                            <Text style={styles.checkboxLabel}>{sd}</Text>
+                          </TouchableOpacity>
+                        );
+                      })}
+                    </View>
 
-              {/* AI 자산 투자 성향 필터 */}
-              <TouchableOpacity onPress={() => toggleAccordion('investment')} style={styles.accordionHeader}>
-                <Text style={styles.filterLabel}>🎯 AI 자산 투자 성향 필터</Text>
-                <Text style={styles.accordionIcon}>{expandedAccordion['investment'] ? '▲' : '▼'}</Text>
-              </TouchableOpacity>
-              {expandedAccordion['investment'] && (
-                <View style={styles.chipContainer}>
-                  {[
-                    { value: 'all', label: '전체' },
-                    { value: 'investment', label: '🏆 투자형' },
-                    { value: 'residence', label: '🏠 실거주' },
-                  ].map((item) => (
-                    <TouchableOpacity
-                      key={item.value}
-                      style={[
-                        styles.chip,
-                        filters.investmentType === item.value && styles.chipActive,
-                      ]}
-                      onPress={() => setFilters((prev) => ({ ...prev, investmentType: item.value as any }))}
-                    >
-                      <Text
-                        style={[
-                          styles.chipText,
-                          filters.investmentType === item.value && styles.chipTextActive,
-                        ]}
-                      >
-                        {item.label}
-                      </Text>
-                    </TouchableOpacity>
-                  ))}
-                </View>
-              )}
+                    {/* 시도가 단 하나만 선택된 경우 상세 시군구 체크박스 추가 */}
+                    {filters.sido && filters.sido.length === 1 && FULL_REGIONS[filters.sido[0]] && (
+                      <View style={[styles.tabContent, { borderTopWidth: 1, borderTopColor: COLORS.slate200, marginTop: 12, paddingTop: 12 }]}>
+                        <Text style={styles.subFilterTitle}>🏙️ 상세 관할 구역 ({filters.sido[0]})</Text>
+                        <View style={styles.checkboxGrid}>
+                          <TouchableOpacity
+                            style={styles.checkboxItem}
+                            onPress={() => setFilters((prev) => ({ ...prev, sigungu: 'all' }))}
+                          >
+                            <Text style={[styles.checkboxIcon, filters.sigungu === 'all' && styles.checkboxIconActive]}>{filters.sigungu === 'all' ? '\u2611' : '\u2610'}</Text>
+                            <Text style={styles.checkboxLabel}>전체 구역</Text>
+                          </TouchableOpacity>
+                          {FULL_REGIONS[filters.sido[0]].map((sgg) => {
+                            const isSelected = filters.sigungu === sgg;
+                            return (
+                              <TouchableOpacity
+                                key={sgg}
+                                style={styles.checkboxItem}
+                                onPress={() => setFilters((prev) => ({ ...prev, sigungu: sgg }))}
+                              >
+                                <Text style={[styles.checkboxIcon, isSelected && styles.checkboxIconActive]}>{isSelected ? '\u2611' : '\u2610'}</Text>
+                                <Text style={styles.checkboxLabel}>{sgg}</Text>
+                              </TouchableOpacity>
+                            );
+                          })}
+                        </View>
+                      </View>
+                    )}
+                  </View>
+                )}
 
-              {/* 마감 매물 제외 스위치 버튼 */}
-              <View style={styles.switchRow}>
-                <Text style={styles.switchLabel}>🚫 과거 마감 매물 제외</Text>
-                <TouchableOpacity
-                  style={[styles.switchToggle, filters.hidePast && styles.switchToggleActive]}
-                  onPress={() => setFilters((prev) => ({ ...prev, hidePast: !prev.hidePast }))}
-                >
-                  <Text style={styles.switchToggleText}>{filters.hidePast ? 'ON' : 'OFF'}</Text>
-                </TouchableOpacity>
-              </View>
-            </ScrollView>
+                {/* 5. 가용 예산 */}
+                {activeFilterTab === 'budget' && (
+                  <View style={styles.tabContent}>
+                    <Text style={styles.subFilterTitle}>💰 내 가용 예산 한도 설정 ({getBudgetText(filters.budgetLimit)})</Text>
+                    <View style={styles.checkboxList}>
+                      {[
+                        { value: 50000000, label: '5천만 원 이하' },
+                        { value: 100000000, label: '1억 원 이하' },
+                        { value: 300000000, label: '3억 원 이하' },
+                        { value: 500000000, label: '5억 원 이하' },
+                        { value: 1000000000, label: '10억 원 이하' },
+                        { value: 2000000000, label: '금액 제한 없음' },
+                      ].map((item) => {
+                        const isSelected = filters.budgetLimit === item.value;
+                        return (
+                          <TouchableOpacity
+                            key={item.value}
+                            style={styles.checkboxItem}
+                            onPress={() => setFilters((prev) => ({ ...prev, budgetLimit: item.value }))}
+                          >
+                            <Text style={[styles.checkboxIcon, isSelected && styles.checkboxIconActive]}>{isSelected ? '\u2611' : '\u2610'}</Text>
+                            <Text style={styles.checkboxLabel}>{item.label}</Text>
+                          </TouchableOpacity>
+                        );
+                      })}
+                    </View>
+                  </View>
+                )}
+
+                {/* 6. 매각 기일 */}
+                {activeFilterTab === 'date' && (
+                  <View style={styles.tabContent}>
+                    <Text style={styles.subFilterTitle}>📅 매각/입찰 기일 범위 설정</Text>
+                    <View style={styles.checkboxList}>
+                      {[
+                        { value: 999, label: '기한 제한 없음' },
+                        { value: 30, label: '30일 이내 임박 매물' },
+                        { value: 90, label: '90일 이내 (3달)' },
+                        { value: 180, label: '180일 이내 (6달 / 권장)' },
+                      ].map((item) => {
+                        const isSelected = filters.dateLimit === item.value;
+                        return (
+                          <TouchableOpacity
+                            key={item.value}
+                            style={styles.checkboxItem}
+                            onPress={() => setFilters((prev) => ({ ...prev, dateLimit: item.value }))}
+                          >
+                            <Text style={[styles.checkboxIcon, isSelected && styles.checkboxIconActive]}>{isSelected ? '\u2611' : '\u2610'}</Text>
+                            <Text style={styles.checkboxLabel}>{item.label}</Text>
+                          </TouchableOpacity>
+                        );
+                      })}
+                    </View>
+                  </View>
+                )}
+
+                {/* 7. 투자 성향 */}
+                {activeFilterTab === 'investment' && (
+                  <View style={styles.tabContent}>
+                    <Text style={styles.subFilterTitle}>🏆 자산 투자 성향 필터링</Text>
+                    <View style={styles.checkboxList}>
+                      {[
+                        { value: 'all', label: '전체 자산 보기' },
+                        { value: 'investment', label: '🏆 투자형 자산 추천 (상가/토지/공장 및 A급 아파트)' },
+                        { value: 'residence', label: '🏠 실거주용 자산 추천 (주거용 부동산 전반)' },
+                      ].map((item) => {
+                        const isSelected = filters.investmentType === item.value;
+                        return (
+                          <TouchableOpacity
+                            key={item.value}
+                            style={styles.checkboxItem}
+                            onPress={() => setFilters((prev) => ({ ...prev, investmentType: item.value as any }))}
+                          >
+                            <Text style={[styles.checkboxIcon, isSelected && styles.checkboxIconActive]}>{isSelected ? '\u2611' : '\u2610'}</Text>
+                            <Text style={styles.checkboxLabel}>{item.label}</Text>
+                          </TouchableOpacity>
+                        );
+                      })}
+                    </View>
+                  </View>
+                )}
+
+                {/* 8. AI 등급 */}
+                {activeFilterTab === 'grade' && (
+                  <View style={styles.tabContent}>
+                    <Text style={styles.subFilterTitle}>🛡️ AI 권리 진단 등급 필터링</Text>
+                    <View style={styles.checkboxList}>
+                      {[
+                        { value: 'all', label: '전체 등급 보기' },
+                        { value: 'safe', label: '🟢 권리 분석 안전 매물 (A~B 등급)' },
+                        { value: 'risk', label: '🚨 인수 리스크 주의 매물 (X 등급)' },
+                      ].map((item) => {
+                        const isSelected = filters.gradeFilter === item.value;
+                        return (
+                          <TouchableOpacity
+                            key={item.value}
+                            style={styles.checkboxItem}
+                            onPress={() => setFilters((prev) => ({ ...prev, gradeFilter: item.value as any }))}
+                          >
+                            <Text style={[styles.checkboxIcon, isSelected && styles.checkboxIconActive]}>{isSelected ? '\u2611' : '\u2610'}</Text>
+                            <Text style={styles.checkboxLabel}>{item.label}</Text>
+                          </TouchableOpacity>
+                        );
+                      })}
+                    </View>
+                  </View>
+                )}
+              </ScrollView>
+            </View>
           </View>
         )}
 
@@ -1168,8 +1096,8 @@ const styles = StyleSheet.create({
   kpiContainer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    marginBottom: 8,
-    gap: 5,
+    marginBottom: 6,
+    gap: 4,
   },
   kpiCard: {
     flex: 1,
@@ -1177,7 +1105,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: COLORS.slate200,
     borderRadius: 8,
-    paddingVertical: 5,
+    paddingVertical: 3.5,
     alignItems: 'center',
     shadowColor: COLORS.slate900,
     shadowOffset: { width: 0, height: 1 },
@@ -1186,15 +1114,87 @@ const styles = StyleSheet.create({
     elevation: 1,
   },
   kpiTitle: {
-    fontSize: 9.5,
+    fontSize: 7.5,
     color: COLORS.slate400,
     fontWeight: 'bold',
-    marginBottom: 2,
+    marginBottom: 1,
   },
   kpiValue: {
-    fontSize: 12.5,
+    fontSize: 10,
     color: COLORS.slate900,
     fontWeight: '800',
+  },
+  filterTabScroll: {
+    flexDirection: 'row',
+    borderBottomWidth: 1,
+    borderBottomColor: COLORS.slate200,
+    marginVertical: 4,
+  },
+  filterTabScrollContent: {
+    paddingHorizontal: 4,
+    paddingVertical: 4,
+    gap: 6,
+  },
+  filterTabBtn: {
+    paddingHorizontal: 10,
+    paddingVertical: 5,
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: COLORS.slate200,
+    backgroundColor: COLORS.slate50,
+  },
+  filterTabBtnActive: {
+    backgroundColor: COLORS.royalBlue,
+    borderColor: COLORS.royalBlue,
+  },
+  filterTabBtnText: {
+    fontSize: 11,
+    fontWeight: 'bold',
+    color: COLORS.slate600,
+  },
+  filterTabBtnTextActive: {
+    color: COLORS.white,
+  },
+  filterOptionsScroll: {
+    maxHeight: 180,
+    marginTop: 4,
+  },
+  tabContent: {
+    paddingVertical: 6,
+  },
+  subFilterTitle: {
+    fontSize: 11.5,
+    fontWeight: 'bold',
+    color: COLORS.slate700,
+    marginBottom: 6,
+  },
+  checkboxGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 8,
+  },
+  checkboxList: {
+    flexDirection: 'column',
+    gap: 6,
+  },
+  checkboxItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: 4,
+    paddingHorizontal: 6,
+    gap: 4,
+  },
+  checkboxIcon: {
+    fontSize: 14,
+    color: COLORS.slate400,
+  },
+  checkboxIconActive: {
+    color: COLORS.royalBlue,
+  },
+  checkboxLabel: {
+    fontSize: 11.5,
+    fontWeight: 'bold',
+    color: COLORS.slate600,
   },
   centerContainer: {
     flex: 1,

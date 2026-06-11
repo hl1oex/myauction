@@ -17,6 +17,10 @@ export interface Property {
   score: number;
   remaining_days: number;
   updated_at?: string;
+  land_area?: number;
+  building_area?: number;
+  owner?: string;
+  debtor?: string;
 }
 
 export interface FilterState {
