@@ -16,7 +16,7 @@ import {
 import { Property, FilterState } from '../types';
 import { COLORS } from '../components/Theme';
 import { PropertyCard } from '../components/PropertyCard';
-import { subscribeProperties } from '../utils/api';
+import { subscribeProperties, fetchProperties, fetchSyncStatus } from '../utils/api';
 import { supabase } from '../utils/supabase';
 
 
@@ -128,6 +128,8 @@ export const FeedScreen: React.FC<FeedScreenProps> = ({ onSelectProperty, filter
   const [isOffline, setIsOffline] = useState<boolean>(false);
   const [adSettings, setAdSettings] = useState<any[]>([]);
   const [activeFilterTab, setActiveFilterTab] = useState<string>('court');
+  const [refreshing, setRefreshing] = useState<boolean>(false);
+  const [updateNeeded, setUpdateNeeded] = useState<boolean>(false);
   const [expandedAccordion, setExpandedAccordion] = useState<Record<string, boolean>>({
     search: false,
     source: false,
@@ -156,6 +158,82 @@ export const FeedScreen: React.FC<FeedScreenProps> = ({ onSelectProperty, filter
       }
     };
     fetchAds();
+  }, []);
+
+  // 🚀 성능 최적화: 수동 당겨서 새로고침(Pull-to-Refresh) 기능을 구현하여 서버 최신 데이터를 호출합니다.
+  const onRefresh = useCallback(async () => {
+    setRefreshing(true);
+    try {
+      const data = await fetchProperties('all', filters.search);
+      setProperties(data);
+      setIsOffline(false);
+      
+      // 업데이트 완료 시 알림 해제
+      setUpdateNeeded(false);
+      
+      // 로컬 스토리지에 캐시와 타임스탬프 동시 저장 (용량 한도 초과 예방을 위해 상위 3000건만 슬라이싱 저장)
+      try {
+        if (typeof window !== 'undefined' && window.localStorage) {
+          const slicedForCache = data.slice(0, 3000);
+          localStorage.setItem('cached_properties', JSON.stringify(slicedForCache));
+          
+          const syncStatus = await fetchSyncStatus();
+          if (syncStatus && syncStatus.success) {
+            const logs = syncStatus.logs || [];
+            const courtTime = logs.find((l: any) => l.task_name === 'court_scraper')?.timestamp;
+            const onbidTime = logs.find((l: any) => l.task_name === 'onbid_fetcher')?.timestamp;
+            const times = [courtTime, onbidTime].filter(Boolean).map(t => new Date(t!).getTime());
+            if (times.length > 0) {
+              const maxTime = new Date(Math.max(...times)).toISOString();
+              localStorage.setItem('cached_properties_timestamp', maxTime);
+            }
+          }
+        }
+      } catch (cacheErr) {
+        console.warn('로컬 캐시 저장 실패', cacheErr);
+      }
+    } catch (err) {
+      console.warn('모바일 수동 새로고침 실패', err);
+      setIsOffline(true);
+    } finally {
+      setRefreshing(false);
+    }
+  }, [filters.search]);
+
+  // 서버의 마지막 동기화 시간과 로컬 캐시 시간을 비교하여 업데이트 유무를 판별합니다.
+  useEffect(() => {
+    const checkServerUpdate = async () => {
+      try {
+        const syncStatus = await fetchSyncStatus();
+        if (syncStatus && syncStatus.success) {
+          const logs = syncStatus.logs || [];
+          const lastCourtLog = logs.find((l: any) => l.task_name === 'court_scraper');
+          const lastOnbidLog = logs.find((l: any) => l.task_name === 'onbid_fetcher');
+          
+          const courtTime = lastCourtLog ? new Date(lastCourtLog.timestamp).getTime() : 0;
+          const onbidTime = lastOnbidLog ? new Date(lastOnbidLog.timestamp).getTime() : 0;
+          const serverMaxTime = Math.max(courtTime, onbidTime);
+          
+          if (serverMaxTime > 0) {
+            let clientCachedTime = 0;
+            if (typeof window !== 'undefined' && window.localStorage) {
+              const cachedTimeStr = localStorage.getItem('cached_properties_timestamp');
+              if (cachedTimeStr) {
+                clientCachedTime = new Date(cachedTimeStr).getTime();
+              }
+            }
+            
+            // 서버 타임스탬프가 더 최신이면 업데이트 필요로 상태를 변경합니다.
+            if (clientCachedTime < serverMaxTime) {
+              setUpdateNeeded(true);
+            }
+          }
+        }
+      } catch (err) {
+        console.warn('업데이트 체크 실패', err);
+      }
+    };
+    checkServerUpdate();
   }, []);
 
   const toggleAccordion = (key: string) => {
@@ -220,7 +298,8 @@ export const FeedScreen: React.FC<FeedScreenProps> = ({ onSelectProperty, filter
         setIsOffline(false);
         try {
           if (typeof window !== 'undefined' && window.localStorage) {
-            localStorage.setItem('cached_properties', JSON.stringify(data));
+            const slicedForCache = data.slice(0, 3000);
+            localStorage.setItem('cached_properties', JSON.stringify(slicedForCache));
           }
         } catch (cacheErr) {
           console.warn('로컬 캐시 저장 실패', cacheErr);
@@ -830,6 +909,12 @@ export const FeedScreen: React.FC<FeedScreenProps> = ({ onSelectProperty, filter
           </View>
         )}
 
+        {updateNeeded && (
+          <View style={styles.updateBadgeContainer}>
+            <Text style={styles.updateBadgeText}>⚠️ 최신 경매 정보 업데이트 필요 (화면을 아래로 당겨 새로고침)</Text>
+          </View>
+        )}
+
         {/* 중단 KPI 통계 대시보드 (기존 60% 축소 적용) */}
         <View style={styles.kpiContainer}>
           <View style={styles.kpiCard}>
@@ -869,6 +954,8 @@ export const FeedScreen: React.FC<FeedScreenProps> = ({ onSelectProperty, filter
           <FlatList
             data={getListWithAds()}
             keyExtractor={(item) => item.id.toString()}
+            refreshing={refreshing}
+            onRefresh={onRefresh}
             renderItem={({ item, index }) => {
               if (item.isAd) {
                 // 실시간 광고 렌더링
@@ -935,6 +1022,22 @@ const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
     backgroundColor: COLORS.pearlWhiteBg,
+  },
+  updateBadgeContainer: {
+    backgroundColor: '#fffbeb',
+    borderColor: '#fde68a',
+    borderWidth: 1,
+    borderRadius: 8,
+    paddingVertical: 8,
+    paddingHorizontal: 12,
+    marginBottom: 8,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  updateBadgeText: {
+    color: '#b45309',
+    fontSize: 13,
+    fontWeight: 'bold',
   },
   container: {
     flex: 1,
