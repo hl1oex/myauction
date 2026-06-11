@@ -38,6 +38,7 @@ jobs:
           mkdir -p dist/mobile
           cp -r mobile-app/dist/* dist/mobile/
           cp index.html dist/
+          cp admin.html dist/
           cp favicon.png dist/
           cp apartment_elegant_facade.png dist/
           cp floorplan_modern_apartment.png dist/

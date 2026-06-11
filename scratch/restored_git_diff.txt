@@ -1,469 +1,469 @@
-﻿diff --git a/index.html b/index.html
+diff --git a/index.html b/index.html
 index 932bf2a..ab2997e 100644
 --- a/index.html
 +++ b/index.html
 @@ -310,216 +310,354 @@
              </div>
  
-             <!-- ?ㅽ겕濡?媛?ν븳 ?꾪꽣 ??-->
+             <!-- ?�크�?�?�한 ?�터 ??-->
 -            <div class="flex-1 overflow-y-auto p-3.5 space-y-3.5 custom-scrollbar">
 +            <div class="flex-1 overflow-y-auto p-3 space-y-2.5 custom-scrollbar text-xs">
-                 <!-- ?ㅼ썙??寃??-->
+                 <!-- ?�워??�??-->
 -                <div>
--                    <label class="block text-[11px] sm:text-xs font-black text-slate-500 uppercase tracking-wider mb-1.5">?뵇 ?듯빀 寃???ㅼ썙??/label>
--                    <input type="text" id="search-input" oninput="debouncedApplyFilters()" placeholder="?ш굔踰덊샇, 二쇱냼, ?⑸룄 ?낅젰..." 
+-                    <label class="block text-[11px] sm:text-xs font-black text-slate-500 uppercase tracking-wider mb-1.5">?�� ?�합 �???�워??/label>
+-                    <input type="text" id="search-input" oninput="debouncedApplyFilters()" placeholder="?�건번호, 주소, ?�도 ?�력..." 
 -                           class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-sm font-semibold focus:bg-white focus:outline-none focus:ring-2 focus:ring-royalBlue/10 focus:border-royalBlue transition-all">
 -                </div>
 -
--                <!-- ?먯궛 怨듦툒 異쒖쿂 -->
+-                <!-- ?�산 공급 출처 -->
 -                <div>
--                    <label class="block text-[11px] sm:text-xs font-black text-slate-500 uppercase tracking-wider mb-1.5">?뽳툘 ?먯궛 怨듦툒 異쒖쿂</label>
+-                    <label class="block text-[11px] sm:text-xs font-black text-slate-500 uppercase tracking-wider mb-1.5">?�️ ?�산 공급 출처</label>
 -                    <select id="source-filter" onchange="applyFilters()"
 -                            class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-sm font-semibold focus:bg-white focus:outline-none focus:ring-2 focus:ring-royalBlue/10 focus:border-royalBlue transition-all">
--                        <option value="all">?꾩껜 ?먯궛 (寃쎈ℓ + 怨듬ℓ + ?ъ꽕)</option>
--                        <option value="court">?뽳툘 踰뺤썝 寃쎈ℓ 臾쇨굔</option>
--                        <option value="onbid">?룫 罹좎퐫 ?⑤퉬??怨듬ℓ</option>
--                        <option value="private">?뱚 ?낅줈???ъ꽕 留ㅻЪ</option>
+-                        <option value="all">?�체 ?�산 (경매 + 공매 + ?�설)</option>
+-                        <option value="court">?�️ 법원 경매 물건</option>
+-                        <option value="onbid">?�� 캠코 ?�비??공매</option>
+-                        <option value="private">?�� ?�로???�설 매물</option>
 -                    </select>
 +                <div class="border-b border-slate-100 pb-1.5">
 +                    <button type="button" onclick="toggleAccordion('accordion-search')" class="w-full flex justify-between items-center text-[10px] sm:text-xs font-black text-slate-700 py-1 select-none">
-+                        <span>?뵇 ?듯빀 寃???ㅼ썙??/span>
++                        <span>?�� ?�합 �???�워??/span>
 +                        <i id="accordion-search-icon" class="fa-solid fa-chevron-down text-[8px] text-slate-400"></i>
 +                    </button>
 +                    <div id="accordion-search" class="hidden mt-1">
-+                        <input type="text" id="search-input" oninput="debouncedApplyFilters()" placeholder="?ш굔踰덊샇, 二쇱냼, ?⑸룄 ?낅젰..." 
++                        <input type="text" id="search-input" oninput="debouncedApplyFilters()" placeholder="?�건번호, 주소, ?�도 ?�력..." 
 +                               class="w-full bg-slate-50 border border-slate-200 rounded-xl px-2.5 py-1.5 text-xs font-semibold focus:bg-white focus:outline-none focus:ring-2 focus:ring-royalBlue/10 focus:border-royalBlue transition-all">
 +                    </div>
                  </div>
  
--                <!-- 愿??踰뺤썝 ?ㅼ쨷 ?좏깮 ?꾪꽣 -->
+-                <!-- �??법원 ?�중 ?�택 ?�터 -->
 -                <div class="bg-slate-50 border border-slate-200 rounded-xl p-3">
--                    <label class="block text-[11px] sm:text-xs font-black text-slate-500 uppercase tracking-wider mb-1.5">?뽳툘 愿??踰뺤썝 (?ㅼ쨷 ?좏깮)</label>
+-                    <label class="block text-[11px] sm:text-xs font-black text-slate-500 uppercase tracking-wider mb-1.5">?�️ �??법원 (?�중 ?�택)</label>
 -                    <div class="max-h-[120px] overflow-y-auto space-y-1.5 custom-scrollbar text-xs font-bold text-slate-600 p-1.5 bg-white rounded-lg border border-slate-100">
 -                        <label class="flex items-center gap-2 cursor-pointer select-none">
--                            <input type="checkbox" name="court-check" value="?쒖슱以묒븰吏諛⑸쾿?? onchange="applyFilters()" class="accent-royalBlue">
--                            <span>?쒖슱以묒븰吏踰?/span>
+-                            <input type="checkbox" name="court-check" value="?�울중앙�방법?? onchange="applyFilters()" class="accent-royalBlue">
+-                            <span>?�울중앙��?/span>
 -                        </label>
 -                        <label class="flex items-center gap-2 cursor-pointer select-none">
--                            <input type="checkbox" name="court-check" value="?쒖슱?숇?吏諛⑸쾿?? onchange="applyFilters()" class="accent-royalBlue">
--                            <span>?쒖슱?숇?吏踰?/span>
+-                            <input type="checkbox" name="court-check" value="?�울?��?�방법?? onchange="applyFilters()" class="accent-royalBlue">
+-                            <span>?�울?��?��?/span>
 -                        </label>
 -                        <label class="flex items-center gap-2 cursor-pointer select-none">
--                            <input type="checkbox" name="court-check" value="?쒖슱?⑤?吏諛⑸쾿?? onchange="applyFilters()" class="accent-royalBlue">
--                            <span>?쒖슱?⑤?吏踰?/span>
+-                            <input type="checkbox" name="court-check" value="?�울?��?�방법?? onchange="applyFilters()" class="accent-royalBlue">
+-                            <span>?�울?��?��?/span>
 -                        </label>
 -                        <label class="flex items-center gap-2 cursor-pointer select-none">
--                            <input type="checkbox" name="court-check" value="?쒖슱遺곷?吏諛⑸쾿?? onchange="applyFilters()" class="accent-royalBlue">
--                            <span>?쒖슱遺곷?吏踰?/span>
+-                            <input type="checkbox" name="court-check" value="?�울북�?�방법?? onchange="applyFilters()" class="accent-royalBlue">
+-                            <span>?�울북�?��?/span>
 -                        </label>
 -                        <label class="flex items-center gap-2 cursor-pointer select-none">
--                            <input type="checkbox" name="court-check" value="?쒖슱?쒕?吏諛⑸쾿?? onchange="applyFilters()" class="accent-royalBlue">
--                            <span>?쒖슱?쒕?吏踰?/span>
+-                            <input type="checkbox" name="court-check" value="?�울?��?�방법?? onchange="applyFilters()" class="accent-royalBlue">
+-                            <span>?�울?��?��?/span>
 -                        </label>
 -                        <label class="flex items-center gap-2 cursor-pointer select-none">
--                            <input type="checkbox" name="court-check" value="?섏젙遺吏諛⑸쾿?? onchange="applyFilters()" class="accent-royalBlue">
--                            <span>?섏젙遺吏踰?/span>
+-                            <input type="checkbox" name="court-check" value="?�정��방법?? onchange="applyFilters()" class="accent-royalBlue">
+-                            <span>?�정���?/span>
 -                        </label>
 -                        <label class="flex items-center gap-2 cursor-pointer select-none">
--                            <input type="checkbox" name="court-check" value="?몄쿇吏諛⑸쾿?? onchange="applyFilters()" class="accent-royalBlue">
--                            <span>?몄쿇吏踰?/span>
+-                            <input type="checkbox" name="court-check" value="?�천�방법?? onchange="applyFilters()" class="accent-royalBlue">
+-                            <span>?�천��?/span>
 -                        </label>
 -                        <label class="flex items-center gap-2 cursor-pointer select-none">
--                            <input type="checkbox" name="court-check" value="?섏썝吏諛⑸쾿?? onchange="applyFilters()" class="accent-royalBlue">
--                            <span>?섏썝吏踰?/span>
+-                            <input type="checkbox" name="court-check" value="?�원�방법?? onchange="applyFilters()" class="accent-royalBlue">
+-                            <span>?�원��?/span>
 -                        </label>
 -                        <label class="flex items-center gap-2 cursor-pointer select-none">
--                            <input type="checkbox" name="court-check" value="異섏쿇吏諛⑸쾿?? onchange="applyFilters()" class="accent-royalBlue">
--                            <span>異섏쿇吏踰?/span>
+-                            <input type="checkbox" name="court-check" value="춘천�방법?? onchange="applyFilters()" class="accent-royalBlue">
+-                            <span>춘천��?/span>
 -                        </label>
 -                        <label class="flex items-center gap-2 cursor-pointer select-none">
--                            <input type="checkbox" name="court-check" value="??꾩?諛⑸쾿?? onchange="applyFilters()" class="accent-royalBlue">
--                            <span>??꾩?踰?/span>
+-                            <input type="checkbox" name="court-check" value="??��?방법?? onchange="applyFilters()" class="accent-royalBlue">
+-                            <span>??��?�?/span>
 -                        </label>
 -                        <label class="flex items-center gap-2 cursor-pointer select-none">
--                            <input type="checkbox" name="court-check" value="泥?＜吏諛⑸쾿?? onchange="applyFilters()" class="accent-royalBlue">
--                            <span>泥?＜吏踰?/span>
-+                <!-- ?먯궛 怨듦툒 異쒖쿂 (?ㅼ쨷?좏깮) -->
+-                            <input type="checkbox" name="court-check" value="�?���방법?? onchange="applyFilters()" class="accent-royalBlue">
+-                            <span>�?����?/span>
++                <!-- ?�산 공급 출처 (?�중?�택) -->
 +                <div class="border-b border-slate-100 pb-1.5">
 +                    <button type="button" onclick="toggleAccordion('accordion-source')" class="w-full flex justify-between items-center text-[10px] sm:text-xs font-black text-slate-700 py-1 select-none">
-+                        <span>?뽳툘 ?먯궛 怨듦툒 異쒖쿂 (?ㅼ쨷)</span>
++                        <span>?�️ ?�산 공급 출처 (?�중)</span>
 +                        <i id="accordion-source-icon" class="fa-solid fa-chevron-down text-[8px] text-slate-400"></i>
 +                    </button>
 +                    <div id="accordion-source" class="hidden mt-1 space-y-1 pl-1">
 +                        <div class="flex gap-2 mb-1">
-+                            <button type="button" onclick="checkAllFilter('source-check', true)" class="text-[9.5px] text-royalBlue font-extrabold hover:underline">?꾩껜 ?좏깮</button>
++                            <button type="button" onclick="checkAllFilter('source-check', true)" class="text-[9.5px] text-royalBlue font-extrabold hover:underline">?�체 ?�택</button>
 +                            <span class="text-[9.5px] text-slate-300">|</span>
-+                            <button type="button" onclick="checkAllFilter('source-check', false)" class="text-[9.5px] text-slate-400 font-extrabold hover:underline">?꾩껜 ?댁젣</button>
++                            <button type="button" onclick="checkAllFilter('source-check', false)" class="text-[9.5px] text-slate-400 font-extrabold hover:underline">?�체 ?�제</button>
 +                        </div>
 +                        <label class="flex items-center gap-2 cursor-pointer select-none text-xs font-bold text-slate-600">
 +                            <input type="checkbox" name="source-check" value="court" checked onchange="applyFilters()" class="accent-royalBlue">
-+                            <span>?뽳툘 踰뺤썝 寃쎈ℓ 臾쇨굔</span>
++                            <span>?�️ 법원 경매 물건</span>
                          </label>
 -                        <label class="flex items-center gap-2 cursor-pointer select-none">
--                            <input type="checkbox" name="court-check" value="?援ъ?諛⑸쾿?? onchange="applyFilters()" class="accent-royalBlue">
--                            <span>?援ъ?踰?/span>
+-                            <input type="checkbox" name="court-check" value="?구�?방법?? onchange="applyFilters()" class="accent-royalBlue">
+-                            <span>?구�?�?/span>
 +                        <label class="flex items-center gap-2 cursor-pointer select-none text-xs font-bold text-slate-600">
 +                            <input type="checkbox" name="source-check" value="onbid" checked onchange="applyFilters()" class="accent-royalBlue">
-+                            <span>?룫 罹좎퐫 ?⑤퉬??怨듬ℓ</span>
++                            <span>?�� 캠코 ?�비??공매</span>
                          </label>
 -                        <label class="flex items-center gap-2 cursor-pointer select-none">
--                            <input type="checkbox" name="court-check" value="遺?곗?諛⑸쾿?? onchange="applyFilters()" class="accent-royalBlue">
--                            <span>遺?곗?踰?/span>
+-                            <input type="checkbox" name="court-check" value="�?��?방법?? onchange="applyFilters()" class="accent-royalBlue">
+-                            <span>�?��?�?/span>
 +                        <label class="flex items-center gap-2 cursor-pointer select-none text-xs font-bold text-slate-600">
 +                            <input type="checkbox" name="source-check" value="private" checked onchange="applyFilters()" class="accent-royalBlue">
-+                            <span>?뱚 ?낅줈???ъ꽕 留ㅻЪ</span>
++                            <span>?�� ?�로???�설 매물</span>
                          </label>
 -                        <label class="flex items-center gap-2 cursor-pointer select-none">
--                            <input type="checkbox" name="court-check" value="?몄궛吏諛⑸쾿?? onchange="applyFilters()" class="accent-royalBlue">
--                            <span>?몄궛吏踰?/span>
+-                            <input type="checkbox" name="court-check" value="?�산�방법?? onchange="applyFilters()" class="accent-royalBlue">
+-                            <span>?�산��?/span>
 +                    </div>
 +                </div>
 +
-+                <!-- 愿??踰뺤썝 ?ㅼ쨷 ?좏깮 ?꾪꽣 -->
++                <!-- �??법원 ?�중 ?�택 ?�터 -->
 +                <div class="border-b border-slate-100 pb-1.5">
 +                    <button type="button" onclick="toggleAccordion('accordion-court')" class="w-full flex justify-between items-center text-[10px] sm:text-xs font-black text-slate-700 py-1 select-none">
-+                        <span>?뽳툘 愿??踰뺤썝 (?ㅼ쨷)</span>
++                        <span>?�️ �??법원 (?�중)</span>
 +                        <i id="accordion-court-icon" class="fa-solid fa-chevron-down text-[8px] text-slate-400"></i>
 +                    </button>
 +                    <div id="accordion-court" class="hidden mt-1 space-y-1 pl-1">
 +                        <div class="flex gap-2 mb-1">
-+                            <button type="button" onclick="checkAllFilter('court-check', true)" class="text-[9.5px] text-royalBlue font-extrabold hover:underline">?꾩껜 ?좏깮</button>
++                            <button type="button" onclick="checkAllFilter('court-check', true)" class="text-[9.5px] text-royalBlue font-extrabold hover:underline">?�체 ?�택</button>
 +                            <span class="text-[9.5px] text-slate-300">|</span>
-+                            <button type="button" onclick="checkAllFilter('court-check', false)" class="text-[9.5px] text-slate-400 font-extrabold hover:underline">?꾩껜 ?댁젣</button>
++                            <button type="button" onclick="checkAllFilter('court-check', false)" class="text-[9.5px] text-slate-400 font-extrabold hover:underline">?�체 ?�제</button>
 +                        </div>
 +                        <div class="max-h-[100px] overflow-y-auto space-y-1 custom-scrollbar text-xs font-bold text-slate-600 p-1.5 bg-white rounded-lg border border-slate-150">
 +                            <label class="flex items-center gap-2 cursor-pointer select-none">
-+                                <input type="checkbox" name="court-check" value="?쒖슱以묒븰吏諛⑸쾿?? onchange="applyFilters()" class="accent-royalBlue">
-+                                <span>?쒖슱以묒븰吏踰?/span>
++                                <input type="checkbox" name="court-check" value="?�울중앙�방법?? onchange="applyFilters()" class="accent-royalBlue">
++                                <span>?�울중앙��?/span>
 +                            </label>
 +                            <label class="flex items-center gap-2 cursor-pointer select-none">
-+                                <input type="checkbox" name="court-check" value="?쒖슱?숇?吏諛⑸쾿?? onchange="applyFilters()" class="accent-royalBlue">
-+                                <span>?쒖슱?숇?吏踰?/span>
++                                <input type="checkbox" name="court-check" value="?�울?��?�방법?? onchange="applyFilters()" class="accent-royalBlue">
++                                <span>?�울?��?��?/span>
 +                            </label>
 +                            <label class="flex items-center gap-2 cursor-pointer select-none">
-+                                <input type="checkbox" name="court-check" value="?쒖슱?⑤?吏諛⑸쾿?? onchange="applyFilters()" class="accent-royalBlue">
-+                                <span>?쒖슱?⑤?吏踰?/span>
++                                <input type="checkbox" name="court-check" value="?�울?��?�방법?? onchange="applyFilters()" class="accent-royalBlue">
++                                <span>?�울?��?��?/span>
 +                            </label>
 +                            <label class="flex items-center gap-2 cursor-pointer select-none">
-+                                <input type="checkbox" name="court-check" value="?쒖슱遺곷?吏諛⑸쾿?? onchange="applyFilters()" class="accent-royalBlue">
-+                                <span>?쒖슱遺곷?吏踰?/span>
++                                <input type="checkbox" name="court-check" value="?�울북�?�방법?? onchange="applyFilters()" class="accent-royalBlue">
++                                <span>?�울북�?��?/span>
 +                            </label>
 +                            <label class="flex items-center gap-2 cursor-pointer select-none">
-+                                <input type="checkbox" name="court-check" value="?쒖슱?쒕?吏諛⑸쾿?? onchange="applyFilters()" class="accent-royalBlue">
-+                                <span>?쒖슱?쒕?吏踰?/span>
++                                <input type="checkbox" name="court-check" value="?�울?��?�방법?? onchange="applyFilters()" class="accent-royalBlue">
++                                <span>?�울?��?��?/span>
 +                            </label>
 +                            <label class="flex items-center gap-2 cursor-pointer select-none">
-+                                <input type="checkbox" name="court-check" value="?섏젙遺吏諛⑸쾿?? onchange="applyFilters()" class="accent-royalBlue">
-+                                <span>?섏젙遺吏踰?/span>
++                                <input type="checkbox" name="court-check" value="?�정��방법?? onchange="applyFilters()" class="accent-royalBlue">
++                                <span>?�정���?/span>
 +                            </label>
 +                            <label class="flex items-center gap-2 cursor-pointer select-none">
-+                                <input type="checkbox" name="court-check" value="?몄쿇吏諛⑸쾿?? onchange="applyFilters()" class="accent-royalBlue">
-+                                <span>?몄쿇吏踰?/span>
++                                <input type="checkbox" name="court-check" value="?�천�방법?? onchange="applyFilters()" class="accent-royalBlue">
++                                <span>?�천��?/span>
 +                            </label>
 +                            <label class="flex items-center gap-2 cursor-pointer select-none">
-+                                <input type="checkbox" name="court-check" value="?섏썝吏諛⑸쾿?? onchange="applyFilters()" class="accent-royalBlue">
-+                                <span>?섏썝吏踰?/span>
++                                <input type="checkbox" name="court-check" value="?�원�방법?? onchange="applyFilters()" class="accent-royalBlue">
++                                <span>?�원��?/span>
 +                            </label>
 +                            <label class="flex items-center gap-2 cursor-pointer select-none">
-+                                <input type="checkbox" name="court-check" value="異섏쿇吏諛⑸쾿?? onchange="applyFilters()" class="accent-royalBlue">
-+                                <span>異섏쿇吏踰?/span>
++                                <input type="checkbox" name="court-check" value="춘천�방법?? onchange="applyFilters()" class="accent-royalBlue">
++                                <span>춘천��?/span>
 +                            </label>
 +                            <label class="flex items-center gap-2 cursor-pointer select-none">
-+                                <input type="checkbox" name="court-check" value="??꾩?諛⑸쾿?? onchange="applyFilters()" class="accent-royalBlue">
-+                                <span>??꾩?踰?/span>
++                                <input type="checkbox" name="court-check" value="??��?방법?? onchange="applyFilters()" class="accent-royalBlue">
++                                <span>??��?�?/span>
 +                            </label>
 +                            <label class="flex items-center gap-2 cursor-pointer select-none">
-+                                <input type="checkbox" name="court-check" value="泥?＜吏諛⑸쾿?? onchange="applyFilters()" class="accent-royalBlue">
-+                                <span>泥?＜吏踰?/span>
++                                <input type="checkbox" name="court-check" value="�?���방법?? onchange="applyFilters()" class="accent-royalBlue">
++                                <span>�?����?/span>
 +                            </label>
 +                            <label class="flex items-center gap-2 cursor-pointer select-none">
-+                                <input type="checkbox" name="court-check" value="?援ъ?諛⑸쾿?? onchange="applyFilters()" class="accent-royalBlue">
-+                                <span>?援ъ?踰?/span>
++                                <input type="checkbox" name="court-check" value="?구�?방법?? onchange="applyFilters()" class="accent-royalBlue">
++                                <span>?구�?�?/span>
 +                            </label>
 +                            <label class="flex items-center gap-2 cursor-pointer select-none">
-+                                <input type="checkbox" name="court-check" value="遺?곗?諛⑸쾿?? onchange="applyFilters()" class="accent-royalBlue">
-+                                <span>遺?곗?踰?/span>
++                                <input type="checkbox" name="court-check" value="�?��?방법?? onchange="applyFilters()" class="accent-royalBlue">
++                                <span>�?��?�?/span>
 +                            </label>
 +                            <label class="flex items-center gap-2 cursor-pointer select-none">
-+                                <input type="checkbox" name="court-check" value="?몄궛吏諛⑸쾿?? onchange="applyFilters()" class="accent-royalBlue">
-+                                <span>?몄궛吏踰?/span>
++                                <input type="checkbox" name="court-check" value="?�산�방법?? onchange="applyFilters()" class="accent-royalBlue">
++                                <span>?�산��?/span>
 +                            </label>
 +                            <label class="flex items-center gap-2 cursor-pointer select-none">
-+                                <input type="checkbox" name="court-check" value="李쎌썝吏諛⑸쾿?? onchange="applyFilters()" class="accent-royalBlue">
-+                                <span>李쎌썝吏踰?/span>
++                                <input type="checkbox" name="court-check" value="창원�방법?? onchange="applyFilters()" class="accent-royalBlue">
++                                <span>창원��?/span>
 +                            </label>
 +                            <label class="flex items-center gap-2 cursor-pointer select-none">
-+                                <input type="checkbox" name="court-check" value="愿묒＜吏諛⑸쾿?? onchange="applyFilters()" class="accent-royalBlue">
-+                                <span>愿묒＜吏踰?/span>
++                                <input type="checkbox" name="court-check" value="광주�방법?? onchange="applyFilters()" class="accent-royalBlue">
++                                <span>광주��?/span>
 +                            </label>
 +                            <label class="flex items-center gap-2 cursor-pointer select-none">
-+                                <input type="checkbox" name="court-check" value="?꾩＜吏諛⑸쾿?? onchange="applyFilters()" class="accent-royalBlue">
-+                                <span>?꾩＜吏踰?/span>
++                                <input type="checkbox" name="court-check" value="?�주�방법?? onchange="applyFilters()" class="accent-royalBlue">
++                                <span>?�주��?/span>
 +                            </label>
 +                            <label class="flex items-center gap-2 cursor-pointer select-none">
-+                                <input type="checkbox" name="court-check" value="?쒖＜吏諛⑸쾿?? onchange="applyFilters()" class="accent-royalBlue">
-+                                <span>?쒖＜吏踰?/span>
++                                <input type="checkbox" name="court-check" value="?�주�방법?? onchange="applyFilters()" class="accent-royalBlue">
++                                <span>?�주��?/span>
 +                            </label>
 +                        </div>
 +                    </div>
 +                </div>
 +
-+                <!-- 臾쇨굔 醫낅쪟 (?⑸룄 ?ㅼ쨷?좏깮) -->
++                <!-- 물건 종류 (?�도 ?�중?�택) -->
 +                <div class="border-b border-slate-100 pb-1.5">
 +                    <button type="button" onclick="toggleAccordion('accordion-ptype')" class="w-full flex justify-between items-center text-[10px] sm:text-xs font-black text-slate-700 py-1 select-none">
-+                        <span>?룪 臾쇨굔 醫낅쪟 (?⑸룄 ?ㅼ쨷)</span>
++                        <span>?�� 물건 종류 (?�도 ?�중)</span>
 +                        <i id="accordion-ptype-icon" class="fa-solid fa-chevron-down text-[8px] text-slate-400"></i>
 +                    </button>
 +                    <div id="accordion-ptype" class="hidden mt-1 space-y-1 pl-1">
 +                        <div class="flex gap-2 mb-1">
-+                            <button type="button" onclick="checkAllFilter('ptype-check', true)" class="text-[9.5px] text-royalBlue font-extrabold hover:underline">?꾩껜 ?좏깮</button>
++                            <button type="button" onclick="checkAllFilter('ptype-check', true)" class="text-[9.5px] text-royalBlue font-extrabold hover:underline">?�체 ?�택</button>
 +                            <span class="text-[9.5px] text-slate-300">|</span>
-+                            <button type="button" onclick="checkAllFilter('ptype-check', false)" class="text-[9.5px] text-slate-400 font-extrabold hover:underline">?꾩껜 ?댁젣</button>
++                            <button type="button" onclick="checkAllFilter('ptype-check', false)" class="text-[9.5px] text-slate-400 font-extrabold hover:underline">?�체 ?�제</button>
 +                        </div>
 +                        <label class="flex items-center gap-2 cursor-pointer select-none text-xs font-bold text-slate-600">
 +                            <input type="checkbox" name="ptype-check" value="apart" checked onchange="applyFilters()" class="accent-royalBlue">
-+                            <span>?룫 ?꾪뙆??二쇳깮/?ㅽ뵾?ㅽ뀛</span>
++                            <span>?�� ?�파??주택/?�피?�텔</span>
                          </label>
 -                        <label class="flex items-center gap-2 cursor-pointer select-none">
--                            <input type="checkbox" name="court-check" value="李쎌썝吏諛⑸쾿?? onchange="applyFilters()" class="accent-royalBlue">
--                            <span>李쎌썝吏踰?/span>
+-                            <input type="checkbox" name="court-check" value="창원�방법?? onchange="applyFilters()" class="accent-royalBlue">
+-                            <span>창원��?/span>
 +                        <label class="flex items-center gap-2 cursor-pointer select-none text-xs font-bold text-slate-600">
 +                            <input type="checkbox" name="ptype-check" value="store" checked onchange="applyFilters()" class="accent-royalBlue">
-+                            <span>?썚截??곴?/?먰룷/洹쇰┛?곴?</span>
++                            <span>?���??��?/?�포/근린?��?</span>
                          </label>
 -                        <label class="flex items-center gap-2 cursor-pointer select-none">
--                            <input type="checkbox" name="court-check" value="愿묒＜吏諛⑸쾿?? onchange="applyFilters()" class="accent-royalBlue">
--                            <span>愿묒＜吏踰?/span>
+-                            <input type="checkbox" name="court-check" value="광주�방법?? onchange="applyFilters()" class="accent-royalBlue">
+-                            <span>광주��?/span>
 +                        <label class="flex items-center gap-2 cursor-pointer select-none text-xs font-bold text-slate-600">
 +                            <input type="checkbox" name="ptype-check" value="house" checked onchange="applyFilters()" class="accent-royalBlue">
-+                            <span>?룪 ?⑤룆/?ㅺ?援??꾩썝二쇳깮</span>
++                            <span>?�� ?�독/?��?�??�원주택</span>
                          </label>
 -                        <label class="flex items-center gap-2 cursor-pointer select-none">
--                            <input type="checkbox" name="court-check" value="?꾩＜吏諛⑸쾿?? onchange="applyFilters()" class="accent-royalBlue">
--                            <span>?꾩＜吏踰?/span>
+-                            <input type="checkbox" name="court-check" value="?�주�방법?? onchange="applyFilters()" class="accent-royalBlue">
+-                            <span>?�주��?/span>
 +                        <label class="flex items-center gap-2 cursor-pointer select-none text-xs font-bold text-slate-600">
 +                            <input type="checkbox" name="ptype-check" value="land" checked onchange="applyFilters()" class="accent-royalBlue">
-+                            <span>?뙮 ?좎?/?꾩빞/?吏</span>
++                            <span>?�� ?��?/?�야/?�</span>
                          </label>
 -                        <label class="flex items-center gap-2 cursor-pointer select-none">
--                            <input type="checkbox" name="court-check" value="?쒖＜吏諛⑸쾿?? onchange="applyFilters()" class="accent-royalBlue">
--                            <span>?쒖＜吏踰?/span>
+-                            <input type="checkbox" name="court-check" value="?�주�방법?? onchange="applyFilters()" class="accent-royalBlue">
+-                            <span>?�주��?/span>
 +                        <label class="flex items-center gap-2 cursor-pointer select-none text-xs font-bold text-slate-600">
 +                            <input type="checkbox" name="ptype-check" value="factory" checked onchange="applyFilters()" class="accent-royalBlue">
-+                            <span>?룺 怨듭옣/李쎄퀬/湲고?</span>
++                            <span>?�� 공장/창고/기�?</span>
                          </label>
                      </div>
                  </div>
  
--                <!-- 臾쇨굔 醫낅쪟 (?⑸룄 ?꾪꽣) -->
+-                <!-- 물건 종류 (?�도 ?�터) -->
 -                <div>
--                    <label class="block text-[11px] sm:text-xs font-black text-slate-500 uppercase tracking-wider mb-1.5">?룪 臾쇨굔 醫낅쪟 (?⑸룄)</label>
+-                    <label class="block text-[11px] sm:text-xs font-black text-slate-500 uppercase tracking-wider mb-1.5">?�� 물건 종류 (?�도)</label>
 -                    <select id="ptype-filter" onchange="applyFilters()"
 -                            class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-sm font-semibold focus:bg-white focus:outline-none focus:ring-2 focus:ring-royalBlue/10 focus:border-royalBlue transition-all">
--                        <option value="all">?꾩껜 ?⑸룄</option>
--                        <option value="apart">?룫 ?꾪뙆??二쇳깮/?ㅽ뵾?ㅽ뀛</option>
--                        <option value="store">?썚截??곴?/?먰룷/洹쇰┛?곴?</option>
--                        <option value="house">?룪 ?⑤룆/?ㅺ?援??꾩썝二쇳깮</option>
--                        <option value="land">?뙮 ?좎?/?꾩빞/?吏</option>
--                        <option value="factory">?룺 怨듭옣/李쎄퀬/湲고?</option>
+-                        <option value="all">?�체 ?�도</option>
+-                        <option value="apart">?�� ?�파??주택/?�피?�텔</option>
+-                        <option value="store">?���??��?/?�포/근린?��?</option>
+-                        <option value="house">?�� ?�독/?��?�??�원주택</option>
+-                        <option value="land">?�� ?��?/?�야/?�</option>
+-                        <option value="factory">?�� 공장/창고/기�?</option>
 -                    </select>
 -                </div>
 -
--                <!-- [?좉퇋 湲곕뒫 1] ?ㅼ씠?대? 吏???쒕룄 ?꾪꽣 -->
+-                <!-- [?�규 기능 1] ?�이?��? �???�도 ?�터 -->
 -                <div>
--                    <label class="block text-[11px] sm:text-xs font-black text-slate-500 uppercase tracking-wider mb-1.5">?뱧 吏???遺꾨쪟 (????</label>
+-                    <label class="block text-[11px] sm:text-xs font-black text-slate-500 uppercase tracking-wider mb-1.5">?�� �???분류 (????</label>
 -                    <select id="sido-filter" onchange="updateSigunguFilter()"
 -                            class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-sm font-semibold focus:bg-white focus:outline-none focus:ring-2 focus:ring-royalBlue/10 focus:border-royalBlue transition-all">
--                        <option value="all">?꾧뎅 ?⑥쐞</option>
--                        <option value="?쒖슱">?쒖슱?밸퀎??/option>
--                        <option value="寃쎄린">寃쎄린??/option>
--                        <option value="?몄쿇">?몄쿇愿묒뿭??/option>
--                        <option value="遺??>遺?곌킅??떆</option>
--                        <option value="?援?>?援ш킅??떆</option>
--                        <option value="愿묒＜">愿묒＜愿묒뿭??/option>
--                        <option value="???>??꾧킅??떆</option>
--                        <option value="?몄궛">?몄궛愿묒뿭??/option>
--                        <option value="?몄쥌">?몄쥌??/option>
--                        <option value="媛뺤썝">媛뺤썝??/option>
--                        <option value="異⑸턿">異⑹껌遺곷룄</option>
--                        <option value="異⑸궓">異⑹껌?⑤룄</option>
--                        <option value="?꾨턿">?꾨씪遺곷룄</option>
--                        <option value="?꾨궓">?꾨씪?⑤룄</option>
--                        <option value="寃쎈턿">寃쎌긽遺곷룄</option>
--                        <option value="寃쎈궓">寃쎌긽?⑤룄</option>
--                        <option value="?쒖＜">?쒖＜??/option>
+-                        <option value="all">?�국 ?�위</option>
+-                        <option value="?�울">?�울?�별??/option>
+-                        <option value="경기">경기??/option>
+-                        <option value="?�천">?�천광역??/option>
+-                        <option value="�??>�?�광??��</option>
+-                        <option value="?�?>?구광??��</option>
+-                        <option value="광주">광주광역??/option>
+-                        <option value="???>??�광??��</option>
+-                        <option value="?�산">?�산광역??/option>
+-                        <option value="?�종">?�종??/option>
+-                        <option value="강원">강원??/option>
+-                        <option value="충북">충청북도</option>
+-                        <option value="충남">충청?�도</option>
+-                        <option value="?�북">?�라북도</option>
+-                        <option value="?�남">?�라?�도</option>
+-                        <option value="경북">경상북도</option>
+-                        <option value="경남">경상?�도</option>
+-                        <option value="?�주">?�주??/option>
 -                    </select>
-+                <!-- 吏???遺꾨쪟 (?쒕룄 ?ㅼ쨷?좏깮) -->
++                <!-- �???분류 (?�도 ?�중?�택) -->
 +                <div class="border-b border-slate-100 pb-1.5">
 +                    <button type="button" onclick="toggleAccordion('accordion-sido')" class="w-full flex justify-between items-center text-[10px] sm:text-xs font-black text-slate-700 py-1 select-none">
-+                        <span>?뱧 吏???遺꾨쪟 (?????ㅼ쨷)</span>
++                        <span>?�� �???분류 (?????�중)</span>
 +                        <i id="accordion-sido-icon" class="fa-solid fa-chevron-down text-[8px] text-slate-400"></i>
 +                    </button>
 +                    <div id="accordion-sido" class="hidden mt-1 space-y-1 pl-1">
 +                        <div class="flex gap-2 mb-1">
-+                            <button type="button" onclick="checkAllFilter('sido-check', true)" class="text-[9.5px] text-royalBlue font-extrabold hover:underline">?꾩껜 ?좏깮</button>
++                            <button type="button" onclick="checkAllFilter('sido-check', true)" class="text-[9.5px] text-royalBlue font-extrabold hover:underline">?�체 ?�택</button>
 +                            <span class="text-[9.5px] text-slate-300">|</span>
-+                            <button type="button" onclick="checkAllFilter('sido-check', false)" class="text-[9.5px] text-slate-400 font-extrabold hover:underline">?꾩껜 ?댁젣</button>
++                            <button type="button" onclick="checkAllFilter('sido-check', false)" class="text-[9.5px] text-slate-400 font-extrabold hover:underline">?�체 ?�제</button>
 +                        </div>
 +                        <div class="max-h-[100px] overflow-y-auto space-y-1 custom-scrollbar text-xs font-bold text-slate-600 p-1.5 bg-white rounded-lg border border-slate-150">
 +                            <label class="flex items-center gap-2 cursor-pointer select-none">
-+                                <input type="checkbox" name="sido-check" value="?쒖슱" onchange="updateSigunguFilter()" class="accent-royalBlue">
-+                                <span>?쒖슱?밸퀎??/span>
++                                <input type="checkbox" name="sido-check" value="?�울" onchange="updateSigunguFilter()" class="accent-royalBlue">
++                                <span>?�울?�별??/span>
 +                            </label>
 +                            <label class="flex items-center gap-2 cursor-pointer select-none">
-+                                <input type="checkbox" name="sido-check" value="寃쎄린" onchange="updateSigunguFilter()" class="accent-royalBlue">
-+                                <span>寃쎄린??/span>
++                                <input type="checkbox" name="sido-check" value="경기" onchange="updateSigunguFilter()" class="accent-royalBlue">
++                                <span>경기??/span>
 +                            </label>
 +                            <label class="flex items-center gap-2 cursor-pointer select-none">
-+                                <input type="checkbox" name="sido-check" value="?몄쿇" onchange="updateSigunguFilter()" class="accent-royalBlue">
-+                                <span>?몄쿇愿묒뿭??/span>
++                                <input type="checkbox" name="sido-check" value="?�천" onchange="updateSigunguFilter()" class="accent-royalBlue">
++                                <span>?�천광역??/span>
 +                            </label>
 +                            <label class="flex items-center gap-2 cursor-pointer select-none">
-+                                <input type="checkbox" name="sido-check" value="遺?? onchange="updateSigunguFilter()" class="accent-royalBlue">
-+                                <span>遺?곌킅??떆</span>
++                                <input type="checkbox" name="sido-check" value="�?? onchange="updateSigunguFilter()" class="accent-royalBlue">
++                                <span>�?�광??��</span>
 +                            </label>
 +                            <label class="flex items-center gap-2 cursor-pointer select-none">
-+                                <input type="checkbox" name="sido-check" value="?援? onchange="updateSigunguFilter()" class="accent-royalBlue">
-+                                <span>?援ш킅??떆</span>
++                                <input type="checkbox" name="sido-check" value="?�? onchange="updateSigunguFilter()" class="accent-royalBlue">
++                                <span>?구광??��</span>
 +                            </label>
 +                            <label class="flex items-center gap-2 cursor-pointer select-none">
-+                                <input type="checkbox" name="sido-check" value="愿묒＜" onchange="updateSigunguFilter()" class="accent-royalBlue">
-+                                <span>愿묒＜愿묒뿭??/span>
++                                <input type="checkbox" name="sido-check" value="광주" onchange="updateSigunguFilter()" class="accent-royalBlue">
++                                <span>광주광역??/span>
 +                            </label>
 +                            <label class="flex items-center gap-2 cursor-pointer select-none">
-+                                <input type="checkbox" name="sido-check" value="??? onchange="updateSigunguFilter()" class="accent-royalBlue">
-+                                <span>??꾧킅??떆</span>
++                                <input type="checkbox" name="sido-check" value="??? onchange="updateSigunguFilter()" class="accent-royalBlue">
++                                <span>??�광??��</span>
 +                            </label>
 +                            <label class="flex items-center gap-2 cursor-pointer select-none">
-+                                <input type="checkbox" name="sido-check" value="?몄궛" onchange="updateSigunguFilter()" class="accent-royalBlue">
-+                                <span>?몄궛愿묒뿭??/span>
++                                <input type="checkbox" name="sido-check" value="?�산" onchange="updateSigunguFilter()" class="accent-royalBlue">
++                                <span>?�산광역??/span>
 +                            </label>
 +                            <label class="flex items-center gap-2 cursor-pointer select-none">
-+                                <input type="checkbox" name="sido-check" value="?몄쥌" onchange="updateSigunguFilter()" class="accent-royalBlue">
-+                                <span>?몄쥌??/span>
++                                <input type="checkbox" name="sido-check" value="?�종" onchange="updateSigunguFilter()" class="accent-royalBlue">
++                                <span>?�종??/span>
 +                            </label>
 +                            <label class="flex items-center gap-2 cursor-pointer select-none">
-+                                <input type="checkbox" name="sido-check" value="媛뺤썝" onchange="updateSigunguFilter()" class="accent-royalBlue">
-+                                <span>媛뺤썝??/span>
++                                <input type="checkbox" name="sido-check" value="강원" onchange="updateSigunguFilter()" class="accent-royalBlue">
++                                <span>강원??/span>
 +                            </label>
 +                            <label class="flex items-center gap-2 cursor-pointer select-none">
-+                                <input type="checkbox" name="sido-check" value="異⑸턿" onchange="updateSigunguFilter()" class="accent-royalBlue">
-+                                <span>異⑹껌遺곷룄</span>
++                                <input type="checkbox" name="sido-check" value="충북" onchange="updateSigunguFilter()" class="accent-royalBlue">
++                                <span>충청북도</span>
 +                            </label>
 +                            <label class="flex items-center gap-2 cursor-pointer select-none">
-+                                <input type="checkbox" name="sido-check" value="異⑸궓" onchange="updateSigunguFilter()" class="accent-royalBlue">
-+                                <span>異⑹껌?⑤룄</span>
++                                <input type="checkbox" name="sido-check" value="충남" onchange="updateSigunguFilter()" class="accent-royalBlue">
++                                <span>충청?�도</span>
 +                            </label>
 +                            <label class="flex items-center gap-2 cursor-pointer select-none">
-+                                <input type="checkbox" name="sido-check" value="?꾨턿" onchange="updateSigunguFilter()" class="accent-royalBlue">
-+                                <span>?꾨씪遺곷룄</span>
++                                <input type="checkbox" name="sido-check" value="?�북" onchange="updateSigunguFilter()" class="accent-royalBlue">
++                                <span>?�라북도</span>
 +                            </label>
 +                            <label class="flex items-center gap-2 cursor-pointer select-none">
-+                                <input type="checkbox" name="sido-check" value="?꾨궓" onchange="updateSigunguFilter()" class="accent-royalBlue">
-+                                <span>?꾨씪?⑤룄</span>
++                                <input type="checkbox" name="sido-check" value="?�남" onchange="updateSigunguFilter()" class="accent-royalBlue">
++                                <span>?�라?�도</span>
 +                            </label>
 +                            <label class="flex items-center gap-2 cursor-pointer select-none">
-+                                <input type="checkbox" name="sido-check" value="寃쎈턿" onchange="updateSigunguFilter()" class="accent-royalBlue">
-+                                <span>寃쎌긽遺곷룄</span>
++                                <input type="checkbox" name="sido-check" value="경북" onchange="updateSigunguFilter()" class="accent-royalBlue">
++                                <span>경상북도</span>
 +                            </label>
 +                            <label class="flex items-center gap-2 cursor-pointer select-none">
-+                                <input type="checkbox" name="sido-check" value="寃쎈궓" onchange="updateSigunguFilter()" class="accent-royalBlue">
-+                                <span>寃쎌긽?⑤룄</span>
++                                <input type="checkbox" name="sido-check" value="경남" onchange="updateSigunguFilter()" class="accent-royalBlue">
++                                <span>경상?�도</span>
 +                            </label>
 +                            <label class="flex items-center gap-2 cursor-pointer select-none">
-+                                <input type="checkbox" name="sido-check" value="?쒖＜" onchange="updateSigunguFilter()" class="accent-royalBlue">
-+                                <span>?쒖＜??/span>
++                                <input type="checkbox" name="sido-check" value="?�주" onchange="updateSigunguFilter()" class="accent-royalBlue">
++                                <span>?�주??/span>
 +                            </label>
 +                        </div>
 +                    </div>
                  </div>
  
--                <!-- [?좉퇋 湲곕뒫 2] ?ㅼ씠?대? ?쒓뎔援??뚮텇瑜??ㅼ쨷 ?좏깮 ?먮꽟 -->
+-                <!-- [?�규 기능 2] ?�이?��? ?�군�??�분�??�중 ?�택 ?�넬 -->
 -                <div id="sigungu-panel" class="hidden bg-slate-50 border border-slate-200 rounded-xl p-3">
--                    <label class="block text-xs font-black text-slate-500 uppercase tracking-wider mb-2">?뱧 ?곸꽭 愿??援ъ뿭 (??援?援?</label>
+-                    <label class="block text-xs font-black text-slate-500 uppercase tracking-wider mb-2">?�� ?�세 �??구역 (??�?�?</label>
 -                    <div id="sigungu-container" class="max-h-[110px] overflow-y-auto space-y-1.5 custom-scrollbar text-xs font-bold text-slate-600">
-+                <!-- ?곸꽭 愿??援ъ뿭 (?쒓뎔援? -->
++                <!-- ?�세 �??구역 (?�군�? -->
 +                <div id="sigungu-panel" class="hidden bg-slate-50 border border-slate-200 rounded-xl p-2.5">
-+                    <label class="block text-[10.5px] font-black text-slate-500 uppercase tracking-wider mb-1.5">?뱧 ?곸꽭 愿??援ъ뿭 (??援?援?</label>
++                    <label class="block text-[10.5px] font-black text-slate-500 uppercase tracking-wider mb-1.5">?�� ?�세 �??구역 (??�?�?</label>
 +                    <div id="sigungu-container" class="max-h-[100px] overflow-y-auto space-y-1 custom-scrollbar text-xs font-bold text-slate-600">
-                         <!-- ?숈쟻?쇰줈 二쇱엯??-->
+                         <!-- ?�적?�로 주입??-->
                      </div>
                  </div>
  
--                <!-- 湲곗씪 踰붿쐞 ?좏깮 -->
+-                <!-- 기일 범위 ?�택 -->
 -                <div>
--                    <label class="block text-[11px] sm:text-xs font-black text-slate-500 uppercase tracking-wider mb-1.5">?뱟 留ㅺ컖/?낆같 湲곗씪 踰붿쐞</label>
+-                    <label class="block text-[11px] sm:text-xs font-black text-slate-500 uppercase tracking-wider mb-1.5">?�� 매각/?�찰 기일 범위</label>
 -                    <select id="date-filter" onchange="applyFilters()"
 -                            class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-sm font-semibold focus:bg-white focus:outline-none focus:ring-2 focus:ring-royalBlue/10 focus:border-royalBlue transition-all">
--                        <option value="999">湲고븳 ?쒗븳 ?놁쓬</option>
--                        <option value="30">30???대궡 ?꾨컯 留ㅻЪ</option>
--                        <option value="90">90???대궡 (3??</option>
--                        <option value="180" selected>180???대궡 (6??/ 沅뚯옣)</option>
+-                        <option value="999">기한 ?�한 ?�음</option>
+-                        <option value="30">30???�내 ?�박 매물</option>
+-                        <option value="90">90???�내 (3??</option>
+-                        <option value="180" selected>180???�내 (6??/ 권장)</option>
 -                    </select>
-+                <!-- 留ㅺ컖/?낆같 湲곗씪 踰붿쐞 -->
++                <!-- 매각/?�찰 기일 범위 -->
 +                <div class="border-b border-slate-100 pb-1.5">
 +                    <button type="button" onclick="toggleAccordion('accordion-date')" class="w-full flex justify-between items-center text-[10px] sm:text-xs font-black text-slate-700 py-1 select-none">
-+                        <span>?뱟 留ㅺ컖/?낆같 湲곗씪 踰붿쐞</span>
++                        <span>?�� 매각/?�찰 기일 범위</span>
 +                        <i id="accordion-date-icon" class="fa-solid fa-chevron-down text-[8px] text-slate-400"></i>
 +                    </button>
 +                    <div id="accordion-date" class="hidden mt-1">
 +                        <select id="date-filter" onchange="applyFilters()"
 +                                class="w-full bg-slate-50 border border-slate-200 rounded-xl px-2.5 py-1.5 text-xs font-semibold focus:bg-white focus:outline-none focus:ring-2 focus:ring-royalBlue/10 focus:border-royalBlue transition-all">
-+                            <option value="999">湲고븳 ?쒗븳 ?놁쓬</option>
-+                            <option value="30">30???대궡 ?꾨컯 留ㅻЪ</option>
-+                            <option value="90">90???대궡 (3??</option>
-+                            <option value="180" selected>180???대궡 (6??/ 沅뚯옣)</option>
++                            <option value="999">기한 ?�한 ?�음</option>
++                            <option value="30">30???�내 ?�박 매물</option>
++                            <option value="90">90???�내 (3??</option>
++                            <option value="180" selected>180???�내 (6??/ 권장)</option>
 +                        </select>
 +                    </div>
                  </div>
  
--                <!-- 媛???덉궛 ?щ씪?대뜑 -->
+-                <!-- �???�산 ?�라?�더 -->
 -                <div class="bg-slate-50 border border-slate-200 rounded-xl p-3">
 -                    <div class="flex justify-between items-center mb-1.5">
--                        <label class="text-xs font-black text-slate-500 uppercase tracking-wider">?뮥 ??媛???덉궛 ?쒕룄</label>
--                        <span id="budget-label" class="text-xs font-black text-royalBlue font-outfit">?쒗븳 ?놁쓬</span>
+-                        <label class="text-xs font-black text-slate-500 uppercase tracking-wider">?�� ??�???�산 ?�도</label>
+-                        <span id="budget-label" class="text-xs font-black text-royalBlue font-outfit">?�한 ?�음</span>
 -                    </div>
 -                    <input type="range" id="budget-slider" min="10000000" max="2000000000" step="10000000" value="2000000000" oninput="updateBudgetLabel(this.value)" 
 -                           class="w-full accent-royalBlue cursor-pointer">
 -                    <div class="flex justify-between text-[10px] text-slate-400 font-bold mt-1">
--                        <span>1泥쒕쭔</span>
+-                        <span>1천만</span>
 -                        <span>10????/span>
--                        <span>20??(?쒗븳?놁쓬)</span>
-+                <!-- 媛???덉궛 ?쒕룄 -->
+-                        <span>20??(?�한?�음)</span>
++                <!-- �???�산 ?�도 -->
 +                <div class="border-b border-slate-100 pb-1.5">
 +                    <button type="button" onclick="toggleAccordion('accordion-budget')" class="w-full flex justify-between items-center text-[10px] sm:text-xs font-black text-slate-700 py-1 select-none">
-+                        <span>?뮥 ??媛???덉궛 ?쒕룄</span>
++                        <span>?�� ??�???�산 ?�도</span>
 +                        <i id="accordion-budget-icon" class="fa-solid fa-chevron-down text-[8px] text-slate-400"></i>
 +                    </button>
 +                    <div id="accordion-budget" class="hidden mt-1 space-y-1 pl-1">
 +                        <div class="flex justify-between items-center mb-1">
-+                            <span id="budget-label" class="text-xs font-black text-royalBlue font-outfit">?쒗븳 ?놁쓬</span>
++                            <span id="budget-label" class="text-xs font-black text-royalBlue font-outfit">?�한 ?�음</span>
 +                        </div>
 +                        <input type="range" id="budget-slider" min="10000000" max="2000000000" step="10000000" value="2000000000" oninput="updateBudgetLabel(this.value)" 
 +                               class="w-full accent-royalBlue cursor-pointer">
 +                        <div class="flex justify-between text-[9px] text-slate-400 font-bold mt-1">
-+                            <span>1泥쒕쭔</span>
++                            <span>1천만</span>
 +                            <span>10????/span>
-+                            <span>20??(?쒗븳?놁쓬)</span>
++                            <span>20??(?�한?�음)</span>
 +                        </div>
                      </div>
                  </div>
  
--                <!-- 怨쇨굅 醫낃껐 留ㅻЪ ?④린湲??좉? -->
+-                <!-- 과거 종결 매물 ?�기�??��? -->
 -                <div class="flex items-center justify-between bg-slate-50 border border-slate-200 rounded-xl p-3">
--                    <span class="text-xs font-black text-slate-500 uppercase tracking-wider">?슟 怨쇨굅 留덇컧 留ㅻЪ ?쒖쇅</span>
+-                    <span class="text-xs font-black text-slate-500 uppercase tracking-wider">?�� 과거 마감 매물 ?�외</span>
 -                    <label class="relative inline-flex items-center cursor-pointer">
 -                        <input type="checkbox" id="hide-past-toggle" checked onchange="applyFilters()" class="sr-only peer">
 -                        <div class="w-9 h-5 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-royalBlue"></div>
 -                    </label>
-+                <!-- 怨쇨굅 留덇컧 留ㅻЪ ?쒖쇅 -->
++                <!-- 과거 마감 매물 ?�외 -->
 +                <div class="border-b border-slate-100 pb-1.5">
 +                    <button type="button" onclick="toggleAccordion('accordion-past')" class="w-full flex justify-between items-center text-[10px] sm:text-xs font-black text-slate-700 py-1 select-none">
-+                        <span>?슟 怨쇨굅 留덇컧 留ㅻЪ ?쒖쇅</span>
++                        <span>?�� 과거 마감 매물 ?�외</span>
 +                        <i id="accordion-past-icon" class="fa-solid fa-chevron-down text-[8px] text-slate-400"></i>
 +                    </button>
 +                    <div id="accordion-past" class="hidden mt-1 flex items-center justify-between pl-1">
-+                        <span class="text-xs font-bold text-slate-500">留덇컧 留ㅻЪ ?꾪꽣</span>
++                        <span class="text-xs font-bold text-slate-500">마감 매물 ?�터</span>
 +                        <label class="relative inline-flex items-center cursor-pointer">
 +                            <input type="checkbox" id="hide-past-toggle" checked onchange="applyFilters()" class="sr-only peer">
 +                            <div class="w-9 h-5 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-royalBlue"></div>
@@ -471,21 +471,21 @@ index 932bf2a..ab2997e 100644
 +                    </div>
                  </div>
  
--                <!-- ??愿??紐⑸줉留?蹂닿린 ?좉? ?ㅼ쐞移?-->
+-                <!-- ??�??목록�?보기 ?��? ?�위�?-->
 -                <div class="flex items-center justify-between bg-slate-50 border border-slate-200 rounded-xl p-3">
--                    <span class="text-xs font-black text-slate-500 uppercase tracking-wider">????愿??紐⑸줉留?蹂닿린</span>
+-                    <span class="text-xs font-black text-slate-500 uppercase tracking-wider">????�??목록�?보기</span>
 -                    <label class="relative inline-flex items-center cursor-pointer">
 -                        <input type="checkbox" id="show-favorites-toggle" onchange="toggleFavoritesFilter()" class="sr-only peer">
 -                        <div class="w-9 h-5 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-royalBlue"></div>
 -                    </label>
-+                <!-- ??愿??紐⑸줉留?蹂닿린 -->
++                <!-- ??�??목록�?보기 -->
 +                <div class="border-b border-slate-100 pb-1.5">
 +                    <button type="button" onclick="toggleAccordion('accordion-favorites')" class="w-full flex justify-between items-center text-[10px] sm:text-xs font-black text-slate-700 py-1 select-none">
-+                        <span>????愿??紐⑸줉留?蹂닿린</span>
++                        <span>????�??목록�?보기</span>
 +                        <i id="accordion-favorites-icon" class="fa-solid fa-chevron-down text-[8px] text-slate-400"></i>
 +                    </button>
 +                    <div id="accordion-favorites" class="hidden mt-1 flex items-center justify-between pl-1">
-+                        <span class="text-xs font-bold text-slate-500">愿??紐⑸줉 ?꾩슜</span>
++                        <span class="text-xs font-bold text-slate-500">�??목록 ?�용</span>
 +                        <label class="relative inline-flex items-center cursor-pointer">
 +                            <input type="checkbox" id="show-favorites-toggle" onchange="toggleFavoritesFilter()" class="sr-only peer">
 +                            <div class="w-9 h-5 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-royalBlue"></div>
@@ -493,41 +493,41 @@ index 932bf2a..ab2997e 100644
 +                    </div>
                  </div>
  
--                <!-- AI ?먯궛 ?깃툒 ?꾪꽣 (?덉쟾 / ?꾪뿕 援щ텇 蹂닿린) -->
+-                <!-- AI ?�산 ?�급 ?�터 (?�전 / ?�험 구분 보기) -->
 -                <div class="bg-slate-50 border border-slate-200 rounded-xl p-3.5 space-y-2">
--                    <label class="block text-[11px] sm:text-xs font-black text-slate-500 uppercase tracking-wider">?좑툘 AI 沅뚮━ ?깃툒 遺꾨쪟 ?꾪꽣</label>
+-                    <label class="block text-[11px] sm:text-xs font-black text-slate-500 uppercase tracking-wider">?�️ AI 권리 ?�급 분류 ?�터</label>
 -                    <div class="grid grid-cols-3 gap-1 bg-white p-1 rounded-lg border border-slate-200 text-[10px] font-bold text-center">
 -                        <label class="cursor-pointer py-1.5 rounded transition-all select-none">
 -                            <input type="radio" name="grade-filter" value="all" onchange="applyFilters()" class="hidden">
--                            <span id="grade-filter-all" class="block rounded py-1 bg-slate-100 text-slate-700 font-extrabold">?꾩껜</span>
+-                            <span id="grade-filter-all" class="block rounded py-1 bg-slate-100 text-slate-700 font-extrabold">?�체</span>
 -                        </label>
 -                        <label class="cursor-pointer py-1.5 rounded transition-all select-none">
 -                            <input type="radio" name="grade-filter" value="safe" checked onchange="applyFilters()" class="hidden">
--                            <span id="grade-filter-safe" class="block rounded py-1 font-extrabold text-slate-500">?윟 ?곕웾</span>
+-                            <span id="grade-filter-safe" class="block rounded py-1 font-extrabold text-slate-500">?�� ?�량</span>
 -                        </label>
 -                        <label class="cursor-pointer py-1.5 rounded transition-all select-none">
 -                            <input type="radio" name="grade-filter" value="risk" onchange="applyFilters()" class="hidden">
--                            <span id="grade-filter-risk" class="block rounded py-1 font-extrabold text-slate-500">?슚 ?꾪뿕</span>
+-                            <span id="grade-filter-risk" class="block rounded py-1 font-extrabold text-slate-500">?�� ?�험</span>
 -                        </label>
-+                <!-- AI 沅뚮━ ?깃툒 遺꾨쪟 ?꾪꽣 -->
++                <!-- AI 권리 ?�급 분류 ?�터 -->
 +                <div class="border-b border-slate-100 pb-1.5">
 +                    <button type="button" onclick="toggleAccordion('accordion-grade')" class="w-full flex justify-between items-center text-[10px] sm:text-xs font-black text-slate-700 py-1 select-none">
-+                        <span>?좑툘 AI 沅뚮━ ?깃툒 遺꾨쪟 ?꾪꽣</span>
++                        <span>?�️ AI 권리 ?�급 분류 ?�터</span>
 +                        <i id="accordion-grade-icon" class="fa-solid fa-chevron-down text-[8px] text-slate-400"></i>
 +                    </button>
 +                    <div id="accordion-grade" class="hidden mt-1 space-y-1.5 pl-1">
 +                        <div class="grid grid-cols-3 gap-1 bg-white p-1 rounded-lg border border-slate-200 text-[9px] font-bold text-center">
 +                            <label class="cursor-pointer py-1 rounded transition-all select-none">
 +                                <input type="radio" name="grade-filter" value="all" onchange="applyFilters()" class="hidden">
-+                                <span id="grade-filter-all" class="block rounded py-0.5 bg-slate-100 text-slate-700 font-extrabold">?꾩껜</span>
++                                <span id="grade-filter-all" class="block rounded py-0.5 bg-slate-100 text-slate-700 font-extrabold">?�체</span>
 +                            </label>
 +                            <label class="cursor-pointer py-1 rounded transition-all select-none">
 +                                <input type="radio" name="grade-filter" value="safe" checked onchange="applyFilters()" class="hidden">
-+                                <span id="grade-filter-safe" class="block rounded py-0.5 font-extrabold text-slate-500">?윟 ?곕웾</span>
++                                <span id="grade-filter-safe" class="block rounded py-0.5 font-extrabold text-slate-500">?�� ?�량</span>
 +                            </label>
 +                            <label class="cursor-pointer py-1 rounded transition-all select-none">
 +                                <input type="radio" name="grade-filter" value="risk" onchange="applyFilters()" class="hidden">
-+                                <span id="grade-filter-risk" class="block rounded py-0.5 font-extrabold text-slate-500">?슚 ?꾪뿕</span>
++                                <span id="grade-filter-risk" class="block rounded py-0.5 font-extrabold text-slate-500">?�� ?�험</span>
 +                            </label>
 +                        </div>
                      </div>

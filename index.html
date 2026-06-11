@@ -310,218 +310,361 @@
             </div>
 
             <!-- 스크롤 가능한 필터 폼 -->
-            <div class="flex-1 overflow-y-auto p-3.5 space-y-3.5 custom-scrollbar">
-                <!-- 키워드 검색 -->
-                <div>
-                    <label class="block text-[11px] sm:text-xs font-black text-slate-500 uppercase tracking-wider mb-1.5">🔍 통합 검색 키워드</label>
-                    <input type="text" id="search-input" oninput="debouncedApplyFilters()" placeholder="사건번호, 주소, 용도 입력..." 
-                           class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-sm font-semibold focus:bg-white focus:outline-none focus:ring-2 focus:ring-royalBlue/10 focus:border-royalBlue transition-all">
+            <div class="flex-1 overflow-y-auto p-3 space-y-2.5 custom-scrollbar text-xs">
+                <!-- 통합 검색 -->
+                <div class="border-b border-slate-100 pb-1.5">
+                    <button type="button" onclick="toggleAccordion('accordion-search')" class="w-full flex justify-between items-center text-[10px] sm:text-xs font-black text-slate-700 py-1 select-none">
+                        <span>🔍 통합 검색 키워드</span>
+                        <i id="accordion-search-icon" class="fa-solid fa-chevron-down text-[8px] text-slate-400"></i>
+                    </button>
+                    <div id="accordion-search" class="hidden mt-1">
+                        <input type="text" id="search-input" oninput="debouncedApplyFilters()" placeholder="사건번호, 주소, 용도 입력..." 
+                               class="w-full bg-slate-50 border border-slate-200 rounded-xl px-2.5 py-1.5 text-xs font-semibold focus:bg-white focus:outline-none focus:ring-2 focus:ring-royalBlue/10 focus:border-royalBlue transition-all">
+                    </div>
                 </div>
 
-                <!-- 자산 공급 출처 -->
-                <div>
-                    <label class="block text-[11px] sm:text-xs font-black text-slate-500 uppercase tracking-wider mb-1.5">⚖️ 자산 공급 출처</label>
-                    <select id="source-filter" onchange="applyFilters()"
-                            class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-sm font-semibold focus:bg-white focus:outline-none focus:ring-2 focus:ring-royalBlue/10 focus:border-royalBlue transition-all">
-                        <option value="all">전체 자산 (경매 + 공매 + 사설)</option>
-                        <option value="court">⚖️ 법원 경매 물건</option>
-                        <option value="onbid">🏢 캠코 온비드 공매</option>
-                        <option value="private">📁 업로드 사설 매물</option>
-                    </select>
-                </div>
-
-                <!-- 관할 법원 다중 선택 필터 -->
-                <div class="bg-slate-50 border border-slate-200 rounded-xl p-3">
-                    <label class="block text-[11px] sm:text-xs font-black text-slate-500 uppercase tracking-wider mb-1.5">⚖️ 관할 법원 (다중 선택)</label>
-                    <div class="max-h-[120px] overflow-y-auto space-y-1.5 custom-scrollbar text-xs font-bold text-slate-600 p-1.5 bg-white rounded-lg border border-slate-100">
-                        <label class="flex items-center gap-2 cursor-pointer select-none">
-                            <input type="checkbox" name="court-check" value="서울중앙지방법원" onchange="applyFilters()" class="accent-royalBlue">
-                            <span>서울중앙지법</span>
+                <!-- 자산 공급 출처 (다중선택) -->
+                <div class="border-b border-slate-100 pb-1.5">
+                    <button type="button" onclick="toggleAccordion('accordion-source')" class="w-full flex justify-between items-center text-[10px] sm:text-xs font-black text-slate-700 py-1 select-none">
+                        <span>🏷️ 자산 공급 출처 (다중)</span>
+                        <i id="accordion-source-icon" class="fa-solid fa-chevron-down text-[8px] text-slate-400"></i>
+                    </button>
+                    <div id="accordion-source" class="hidden mt-1 space-y-1 pl-1">
+                        <div class="flex gap-2 mb-1">
+                            <button type="button" onclick="checkAllFilter('source-check', true)" class="text-[9.5px] text-royalBlue font-extrabold hover:underline">전체 선택</button>
+                            <span class="text-[9.5px] text-slate-300">|</span>
+                            <button type="button" onclick="checkAllFilter('source-check', false)" class="text-[9.5px] text-slate-400 font-extrabold hover:underline">전체 해제</button>
+                        </div>
+                        <label class="flex items-center gap-2 cursor-pointer select-none text-xs font-bold text-slate-600">
+                            <input type="checkbox" name="source-check" value="court" checked onchange="applyFilters()" class="accent-royalBlue">
+                            <span>법원 경매 물건</span>
                         </label>
-                        <label class="flex items-center gap-2 cursor-pointer select-none">
-                            <input type="checkbox" name="court-check" value="서울동부지방법원" onchange="applyFilters()" class="accent-royalBlue">
-                            <span>서울동부지법</span>
+                        <label class="flex items-center gap-2 cursor-pointer select-none text-xs font-bold text-slate-600">
+                            <input type="checkbox" name="source-check" value="onbid" checked onchange="applyFilters()" class="accent-royalBlue">
+                            <span>캠코 온비드 공매</span>
                         </label>
-                        <label class="flex items-center gap-2 cursor-pointer select-none">
-                            <input type="checkbox" name="court-check" value="서울남부지방법원" onchange="applyFilters()" class="accent-royalBlue">
-                            <span>서울남부지법</span>
-                        </label>
-                        <label class="flex items-center gap-2 cursor-pointer select-none">
-                            <input type="checkbox" name="court-check" value="서울북부지방법원" onchange="applyFilters()" class="accent-royalBlue">
-                            <span>서울북부지법</span>
-                        </label>
-                        <label class="flex items-center gap-2 cursor-pointer select-none">
-                            <input type="checkbox" name="court-check" value="서울서부지방법원" onchange="applyFilters()" class="accent-royalBlue">
-                            <span>서울서부지법</span>
-                        </label>
-                        <label class="flex items-center gap-2 cursor-pointer select-none">
-                            <input type="checkbox" name="court-check" value="의정부지방법원" onchange="applyFilters()" class="accent-royalBlue">
-                            <span>의정부지법</span>
-                        </label>
-                        <label class="flex items-center gap-2 cursor-pointer select-none">
-                            <input type="checkbox" name="court-check" value="인천지방법원" onchange="applyFilters()" class="accent-royalBlue">
-                            <span>인천지법</span>
-                        </label>
-                        <label class="flex items-center gap-2 cursor-pointer select-none">
-                            <input type="checkbox" name="court-check" value="수원지방법원" onchange="applyFilters()" class="accent-royalBlue">
-                            <span>수원지법</span>
-                        </label>
-                        <label class="flex items-center gap-2 cursor-pointer select-none">
-                            <input type="checkbox" name="court-check" value="춘천지방법원" onchange="applyFilters()" class="accent-royalBlue">
-                            <span>춘천지법</span>
-                        </label>
-                        <label class="flex items-center gap-2 cursor-pointer select-none">
-                            <input type="checkbox" name="court-check" value="대전지방법원" onchange="applyFilters()" class="accent-royalBlue">
-                            <span>대전지법</span>
-                        </label>
-                        <label class="flex items-center gap-2 cursor-pointer select-none">
-                            <input type="checkbox" name="court-check" value="청주지방법원" onchange="applyFilters()" class="accent-royalBlue">
-                            <span>청주지법</span>
-                        </label>
-                        <label class="flex items-center gap-2 cursor-pointer select-none">
-                            <input type="checkbox" name="court-check" value="대구지방법원" onchange="applyFilters()" class="accent-royalBlue">
-                            <span>대구지법</span>
-                        </label>
-                        <label class="flex items-center gap-2 cursor-pointer select-none">
-                            <input type="checkbox" name="court-check" value="부산지방법원" onchange="applyFilters()" class="accent-royalBlue">
-                            <span>부산지법</span>
-                        </label>
-                        <label class="flex items-center gap-2 cursor-pointer select-none">
-                            <input type="checkbox" name="court-check" value="울산지방법원" onchange="applyFilters()" class="accent-royalBlue">
-                            <span>울산지법</span>
-                        </label>
-                        <label class="flex items-center gap-2 cursor-pointer select-none">
-                            <input type="checkbox" name="court-check" value="창원지방법원" onchange="applyFilters()" class="accent-royalBlue">
-                            <span>창원지법</span>
-                        </label>
-                        <label class="flex items-center gap-2 cursor-pointer select-none">
-                            <input type="checkbox" name="court-check" value="광주지방법원" onchange="applyFilters()" class="accent-royalBlue">
-                            <span>광주지법</span>
-                        </label>
-                        <label class="flex items-center gap-2 cursor-pointer select-none">
-                            <input type="checkbox" name="court-check" value="전주지방법원" onchange="applyFilters()" class="accent-royalBlue">
-                            <span>전주지법</span>
-                        </label>
-                        <label class="flex items-center gap-2 cursor-pointer select-none">
-                            <input type="checkbox" name="court-check" value="제주지방법원" onchange="applyFilters()" class="accent-royalBlue">
-                            <span>제주지법</span>
+                        <label class="flex items-center gap-2 cursor-pointer select-none text-xs font-bold text-slate-600">
+                            <input type="checkbox" name="source-check" value="private" checked onchange="applyFilters()" class="accent-royalBlue">
+                            <span>업로드한 사설 매물</span>
                         </label>
                     </div>
                 </div>
 
-                <!-- 물건 종류 (용도 필터) -->
-                <div>
-                    <label class="block text-[11px] sm:text-xs font-black text-slate-500 uppercase tracking-wider mb-1.5">🏡 물건 종류 (용도)</label>
-                    <select id="ptype-filter" onchange="applyFilters()"
-                            class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-sm font-semibold focus:bg-white focus:outline-none focus:ring-2 focus:ring-royalBlue/10 focus:border-royalBlue transition-all">
-                        <option value="all">전체 용도</option>
-                        <option value="apart">🏢 아파트/주택/오피스텔</option>
-                        <option value="store">🛍️ 상가/점포/근린상가</option>
-                        <option value="house">🏡 단독/다가구/전원주택</option>
-                        <option value="land">🌱 토지/임야/대지</option>
-                        <option value="factory">🏭 공장/창고/기타</option>
-                    </select>
+                <!-- 관할 법원 (다중선택) -->
+                <div class="border-b border-slate-100 pb-1.5">
+                    <button type="button" onclick="toggleAccordion('accordion-court')" class="w-full flex justify-between items-center text-[10px] sm:text-xs font-black text-slate-700 py-1 select-none">
+                        <span>⚖️ 관할 법원 (다중)</span>
+                        <i id="accordion-court-icon" class="fa-solid fa-chevron-down text-[8px] text-slate-400"></i>
+                    </button>
+                    <div id="accordion-court" class="hidden mt-1 space-y-1 pl-1">
+                        <div class="flex gap-2 mb-1">
+                            <button type="button" onclick="checkAllFilter('court-check', true)" class="text-[9.5px] text-royalBlue font-extrabold hover:underline">전체 선택</button>
+                            <span class="text-[9.5px] text-slate-300">|</span>
+                            <button type="button" onclick="checkAllFilter('court-check', false)" class="text-[9.5px] text-slate-400 font-extrabold hover:underline">전체 해제</button>
+                        </div>
+                        <div class="max-h-[100px] overflow-y-auto space-y-1 custom-scrollbar text-xs font-bold text-slate-600 p-1.5 bg-white rounded-lg border border-slate-150">
+                            <label class="flex items-center gap-2 cursor-pointer select-none">
+                                <input type="checkbox" name="court-check" value="서울중앙지방법원" onchange="applyFilters()" class="accent-royalBlue">
+                                <span>서울중앙지법</span>
+                            </label>
+                            <label class="flex items-center gap-2 cursor-pointer select-none">
+                                <input type="checkbox" name="court-check" value="서울동부지방법원" onchange="applyFilters()" class="accent-royalBlue">
+                                <span>서울동부지법</span>
+                            </label>
+                            <label class="flex items-center gap-2 cursor-pointer select-none">
+                                <input type="checkbox" name="court-check" value="서울남부지방법원" onchange="applyFilters()" class="accent-royalBlue">
+                                <span>서울남부지법</span>
+                            </label>
+                            <label class="flex items-center gap-2 cursor-pointer select-none">
+                                <input type="checkbox" name="court-check" value="서울북부지방법원" onchange="applyFilters()" class="accent-royalBlue">
+                                <span>서울북부지법</span>
+                            </label>
+                            <label class="flex items-center gap-2 cursor-pointer select-none">
+                                <input type="checkbox" name="court-check" value="서울서부지방법원" onchange="applyFilters()" class="accent-royalBlue">
+                                <span>서울서부지법</span>
+                            </label>
+                            <label class="flex items-center gap-2 cursor-pointer select-none">
+                                <input type="checkbox" name="court-check" value="의정부지방법원" onchange="applyFilters()" class="accent-royalBlue">
+                                <span>의정부지법</span>
+                            </label>
+                            <label class="flex items-center gap-2 cursor-pointer select-none">
+                                <input type="checkbox" name="court-check" value="인천지방법원" onchange="applyFilters()" class="accent-royalBlue">
+                                <span>인천지법</span>
+                            </label>
+                            <label class="flex items-center gap-2 cursor-pointer select-none">
+                                <input type="checkbox" name="court-check" value="수원지방법원" onchange="applyFilters()" class="accent-royalBlue">
+                                <span>수원지법</span>
+                            </label>
+                            <label class="flex items-center gap-2 cursor-pointer select-none">
+                                <input type="checkbox" name="court-check" value="춘천지방법원" onchange="applyFilters()" class="accent-royalBlue">
+                                <span>춘천지법</span>
+                            </label>
+                            <label class="flex items-center gap-2 cursor-pointer select-none">
+                                <input type="checkbox" name="court-check" value="대전지방법원" onchange="applyFilters()" class="accent-royalBlue">
+                                <span>대전지법</span>
+                            </label>
+                            <label class="flex items-center gap-2 cursor-pointer select-none">
+                                <input type="checkbox" name="court-check" value="청주지방법원" onchange="applyFilters()" class="accent-royalBlue">
+                                <span>청주지법</span>
+                            </label>
+                            <label class="flex items-center gap-2 cursor-pointer select-none">
+                                <input type="checkbox" name="court-check" value="대구지방법원" onchange="applyFilters()" class="accent-royalBlue">
+                                <span>대구지법</span>
+                            </label>
+                            <label class="flex items-center gap-2 cursor-pointer select-none">
+                                <input type="checkbox" name="court-check" value="부산지방법원" onchange="applyFilters()" class="accent-royalBlue">
+                                <span>부산지법</span>
+                            </label>
+                            <label class="flex items-center gap-2 cursor-pointer select-none">
+                                <input type="checkbox" name="court-check" value="울산지방법원" onchange="applyFilters()" class="accent-royalBlue">
+                                <span>울산지법</span>
+                            </label>
+                            <label class="flex items-center gap-2 cursor-pointer select-none">
+                                <input type="checkbox" name="court-check" value="창원지방법원" onchange="applyFilters()" class="accent-royalBlue">
+                                <span>창원지법</span>
+                            </label>
+                            <label class="flex items-center gap-2 cursor-pointer select-none">
+                                <input type="checkbox" name="court-check" value="광주지방법원" onchange="applyFilters()" class="accent-royalBlue">
+                                <span>광주지법</span>
+                            </label>
+                            <label class="flex items-center gap-2 cursor-pointer select-none">
+                                <input type="checkbox" name="court-check" value="전주지방법원" onchange="applyFilters()" class="accent-royalBlue">
+                                <span>전주지법</span>
+                            </label>
+                            <label class="flex items-center gap-2 cursor-pointer select-none">
+                                <input type="checkbox" name="court-check" value="제주지방법원" onchange="applyFilters()" class="accent-royalBlue">
+                                <span>제주지법</span>
+                            </label>
+                        </div>
+                    </div>
                 </div>
 
-                <!-- [신규 기능 1] 다이내믹 지역 시도 필터 -->
-                <div>
-                    <label class="block text-[11px] sm:text-xs font-black text-slate-500 uppercase tracking-wider mb-1.5">📍 지역 대분류 (시/도)</label>
-                    <select id="sido-filter" onchange="updateSigunguFilter()"
-                            class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-sm font-semibold focus:bg-white focus:outline-none focus:ring-2 focus:ring-royalBlue/10 focus:border-royalBlue transition-all">
-                        <option value="all">전국 단위</option>
-                        <option value="서울">서울특별시</option>
-                        <option value="경기">경기도</option>
-                        <option value="인천">인천광역시</option>
-                        <option value="부산">부산광역시</option>
-                        <option value="대구">대구광역시</option>
-                        <option value="광주">광주광역시</option>
-                        <option value="대전">대전광역시</option>
-                        <option value="울산">울산광역시</option>
-                        <option value="세종">세종시</option>
-                        <option value="강원">강원도</option>
-                        <option value="충북">충청북도</option>
-                        <option value="충남">충청남도</option>
-                        <option value="전북">전라북도</option>
-                        <option value="전남">전라남도</option>
-                        <option value="경북">경상북도</option>
-                        <option value="경남">경상남도</option>
-                        <option value="제주">제주도</option>
-                    </select>
+                <!-- 물건 종류 (다중선택) -->
+                <div class="border-b border-slate-100 pb-1.5">
+                    <button type="button" onclick="toggleAccordion('accordion-ptype')" class="w-full flex justify-between items-center text-[10px] sm:text-xs font-black text-slate-700 py-1 select-none">
+                        <span>🏠 물건 종류 (용도 다중)</span>
+                        <i id="accordion-ptype-icon" class="fa-solid fa-chevron-down text-[8px] text-slate-400"></i>
+                    </button>
+                    <div id="accordion-ptype" class="hidden mt-1 space-y-1 pl-1">
+                        <div class="flex gap-2 mb-1">
+                            <button type="button" onclick="checkAllFilter('ptype-check', true)" class="text-[9.5px] text-royalBlue font-extrabold hover:underline">전체 선택</button>
+                            <span class="text-[9.5px] text-slate-300">|</span>
+                            <button type="button" onclick="checkAllFilter('ptype-check', false)" class="text-[9.5px] text-slate-400 font-extrabold hover:underline">전체 해제</button>
+                        </div>
+                        <label class="flex items-center gap-2 cursor-pointer select-none text-xs font-bold text-slate-600">
+                            <input type="checkbox" name="ptype-check" value="apart" checked onchange="applyFilters()" class="accent-royalBlue">
+                            <span>아파트</span>
+                        </label>
+                        <label class="flex items-center gap-2 cursor-pointer select-none text-xs font-bold text-slate-600">
+                            <input type="checkbox" name="ptype-check" value="officetel" checked onchange="applyFilters()" class="accent-royalBlue">
+                            <span>오피스텔</span>
+                        </label>
+                        <label class="flex items-center gap-2 cursor-pointer select-none text-xs font-bold text-slate-600">
+                            <input type="checkbox" name="ptype-check" value="villa" checked onchange="applyFilters()" class="accent-royalBlue">
+                            <span>다세대/빌라</span>
+                        </label>
+                        <label class="flex items-center gap-2 cursor-pointer select-none text-xs font-bold text-slate-600">
+                            <input type="checkbox" name="ptype-check" value="house" checked onchange="applyFilters()" class="accent-royalBlue">
+                            <span>단독/다가구</span>
+                        </label>
+                        <label class="flex items-center gap-2 cursor-pointer select-none text-xs font-bold text-slate-600">
+                            <input type="checkbox" name="ptype-check" value="store" checked onchange="applyFilters()" class="accent-royalBlue">
+                            <span>상가/점포</span>
+                        </label>
+                        <label class="flex items-center gap-2 cursor-pointer select-none text-xs font-bold text-slate-600">
+                            <input type="checkbox" name="ptype-check" value="land" checked onchange="applyFilters()" class="accent-royalBlue">
+                            <span>토지/임야</span>
+                        </label>
+                        <label class="flex items-center gap-2 cursor-pointer select-none text-xs font-bold text-slate-600">
+                            <input type="checkbox" name="ptype-check" value="factory" checked onchange="applyFilters()" class="accent-royalBlue">
+                            <span>공장/창고</span>
+                        </label>
+                    </div>
                 </div>
 
-                <!-- [신규 기능 2] 다이내믹 시군구 소분류 다중 선택 판넬 -->
-                <div id="sigungu-panel" class="hidden bg-slate-50 border border-slate-200 rounded-xl p-3">
-                    <label class="block text-xs font-black text-slate-500 uppercase tracking-wider mb-2">📍 상세 관할 구역 (시/군/구)</label>
-                    <div id="sigungu-container" class="max-h-[110px] overflow-y-auto space-y-1.5 custom-scrollbar text-xs font-bold text-slate-600">
+                <!-- 지역 대분류 (다중선택) -->
+                <div class="border-b border-slate-100 pb-1.5">
+                    <button type="button" onclick="toggleAccordion('accordion-sido')" class="w-full flex justify-between items-center text-[10px] sm:text-xs font-black text-slate-700 py-1 select-none">
+                        <span>📍 지역 대분류 (시도 다중)</span>
+                        <i id="accordion-sido-icon" class="fa-solid fa-chevron-down text-[8px] text-slate-400"></i>
+                    </button>
+                    <div id="accordion-sido" class="hidden mt-1 space-y-1 pl-1">
+                        <div class="flex gap-2 mb-1">
+                            <button type="button" onclick="checkAllFilter('sido-check', true)" class="text-[9.5px] text-royalBlue font-extrabold hover:underline">전체 선택</button>
+                            <span class="text-[9.5px] text-slate-300">|</span>
+                            <button type="button" onclick="checkAllFilter('sido-check', false)" class="text-[9.5px] text-slate-400 font-extrabold hover:underline">전체 해제</button>
+                        </div>
+                        <div class="max-h-[100px] overflow-y-auto space-y-1 custom-scrollbar text-xs font-bold text-slate-600 p-1.5 bg-white rounded-lg border border-slate-150">
+                            <label class="flex items-center gap-2 cursor-pointer select-none">
+                                <input type="checkbox" name="sido-check" value="서울" onchange="updateSigunguFilter()" class="accent-royalBlue">
+                                <span>서울특별시</span>
+                            </label>
+                            <label class="flex items-center gap-2 cursor-pointer select-none">
+                                <input type="checkbox" name="sido-check" value="경기" onchange="updateSigunguFilter()" class="accent-royalBlue">
+                                <span>경기도</span>
+                            </label>
+                            <label class="flex items-center gap-2 cursor-pointer select-none">
+                                <input type="checkbox" name="sido-check" value="인천" onchange="updateSigunguFilter()" class="accent-royalBlue">
+                                <span>인천광역시</span>
+                            </label>
+                            <label class="flex items-center gap-2 cursor-pointer select-none">
+                                <input type="checkbox" name="sido-check" value="부산" onchange="updateSigunguFilter()" class="accent-royalBlue">
+                                <span>부산광역시</span>
+                            </label>
+                            <label class="flex items-center gap-2 cursor-pointer select-none">
+                                <input type="checkbox" name="sido-check" value="대구" onchange="updateSigunguFilter()" class="accent-royalBlue">
+                                <span>대구광역시</span>
+                            </label>
+                            <label class="flex items-center gap-2 cursor-pointer select-none">
+                                <input type="checkbox" name="sido-check" value="광주" onchange="updateSigunguFilter()" class="accent-royalBlue">
+                                <span>광주광역시</span>
+                            </label>
+                            <label class="flex items-center gap-2 cursor-pointer select-none">
+                                <input type="checkbox" name="sido-check" value="대전" onchange="updateSigunguFilter()" class="accent-royalBlue">
+                                <span>대전광역시</span>
+                            </label>
+                            <label class="flex items-center gap-2 cursor-pointer select-none">
+                                <input type="checkbox" name="sido-check" value="울산" onchange="updateSigunguFilter()" class="accent-royalBlue">
+                                <span>울산광역시</span>
+                            </label>
+                            <label class="flex items-center gap-2 cursor-pointer select-none">
+                                <input type="checkbox" name="sido-check" value="세종" onchange="updateSigunguFilter()" class="accent-royalBlue">
+                                <span>세종시</span>
+                            </label>
+                            <label class="flex items-center gap-2 cursor-pointer select-none">
+                                <input type="checkbox" name="sido-check" value="강원" onchange="updateSigunguFilter()" class="accent-royalBlue">
+                                <span>강원도</span>
+                            </label>
+                            <label class="flex items-center gap-2 cursor-pointer select-none">
+                                <input type="checkbox" name="sido-check" value="충북" onchange="updateSigunguFilter()" class="accent-royalBlue">
+                                <span>충청북도</span>
+                            </label>
+                            <label class="flex items-center gap-2 cursor-pointer select-none">
+                                <input type="checkbox" name="sido-check" value="충남" onchange="updateSigunguFilter()" class="accent-royalBlue">
+                                <span>충청남도</span>
+                            </label>
+                            <label class="flex items-center gap-2 cursor-pointer select-none">
+                                <input type="checkbox" name="sido-check" value="전북" onchange="updateSigunguFilter()" class="accent-royalBlue">
+                                <span>전라북도</span>
+                            </label>
+                            <label class="flex items-center gap-2 cursor-pointer select-none">
+                                <input type="checkbox" name="sido-check" value="전남" onchange="updateSigunguFilter()" class="accent-royalBlue">
+                                <span>전라남도</span>
+                            </label>
+                            <label class="flex items-center gap-2 cursor-pointer select-none">
+                                <input type="checkbox" name="sido-check" value="경북" onchange="updateSigunguFilter()" class="accent-royalBlue">
+                                <span>경상북도</span>
+                            </label>
+                            <label class="flex items-center gap-2 cursor-pointer select-none">
+                                <input type="checkbox" name="sido-check" value="경남" onchange="updateSigunguFilter()" class="accent-royalBlue">
+                                <span>경상남도</span>
+                            </label>
+                            <label class="flex items-center gap-2 cursor-pointer select-none">
+                                <input type="checkbox" name="sido-check" value="제주" onchange="updateSigunguFilter()" class="accent-royalBlue">
+                                <span>제주도</span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 상세 관할 구역 (시군구) -->
+                <div id="sigungu-panel" class="hidden bg-slate-50 border border-slate-200 rounded-xl p-2.5">
+                    <label class="block text-[10.5px] font-black text-slate-500 uppercase tracking-wider mb-1.5">🏙️ 상세 관할 구역 (시/군/구)</label>
+                    <div id="sigungu-container" class="max-h-[100px] overflow-y-auto space-y-1 custom-scrollbar text-xs font-bold text-slate-600">
                         <!-- 동적으로 주입됨 -->
                     </div>
                 </div>
 
-                <!-- 기일 범위 선택 -->
-                <div>
-                    <label class="block text-[11px] sm:text-xs font-black text-slate-500 uppercase tracking-wider mb-1.5">📅 매각/입찰 기일 범위</label>
-                    <select id="date-filter" onchange="applyFilters()"
-                            class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-sm font-semibold focus:bg-white focus:outline-none focus:ring-2 focus:ring-royalBlue/10 focus:border-royalBlue transition-all">
-                        <option value="999">기한 제한 없음</option>
-                        <option value="30">30일 이내 임박 매물</option>
-                        <option value="90">90일 이내 (3달)</option>
-                        <option value="180" selected>180일 이내 (6달 / 권장)</option>
-                    </select>
-                </div>
-
-                <!-- 가용 예산 슬라이더 -->
-                <div class="bg-slate-50 border border-slate-200 rounded-xl p-3">
-                    <div class="flex justify-between items-center mb-1.5">
-                        <label class="text-xs font-black text-slate-500 uppercase tracking-wider">💰 내 가용 예산 한도</label>
-                        <span id="budget-label" class="text-xs font-black text-royalBlue font-outfit">제한 없음</span>
-                    </div>
-                    <input type="range" id="budget-slider" min="10000000" max="2000000000" step="10000000" value="2000000000" oninput="updateBudgetLabel(this.value)" 
-                           class="w-full accent-royalBlue cursor-pointer">
-                    <div class="flex justify-between text-[10px] text-slate-400 font-bold mt-1">
-                        <span>1천만</span>
-                        <span>10억 원</span>
-                        <span>20억 (제한없음)</span>
+                <!-- 매각/입찰 기일 범위 -->
+                <div class="border-b border-slate-100 pb-1.5">
+                    <button type="button" onclick="toggleAccordion('accordion-date')" class="w-full flex justify-between items-center text-[10px] sm:text-xs font-black text-slate-700 py-1 select-none">
+                        <span>📅 매각/입찰 기일 범위</span>
+                        <i id="accordion-date-icon" class="fa-solid fa-chevron-down text-[8px] text-slate-400"></i>
+                    </button>
+                    <div id="accordion-date" class="hidden mt-1">
+                        <select id="date-filter" onchange="applyFilters()"
+                                class="w-full bg-slate-50 border border-slate-200 rounded-xl px-2.5 py-1.5 text-xs font-semibold focus:bg-white focus:outline-none focus:ring-2 focus:ring-royalBlue/10 focus:border-royalBlue transition-all">
+                            <option value="999">기한 제한 없음</option>
+                            <option value="30">30일 이내 임박 매물</option>
+                            <option value="90">90일 이내 (3달)</option>
+                            <option value="180" selected>180일 이내 (6달 / 권장)</option>
+                        </select>
                     </div>
                 </div>
 
-                <!-- 과거 종결 매물 숨기기 토글 -->
-                <div class="flex items-center justify-between bg-slate-50 border border-slate-200 rounded-xl p-3">
-                    <span class="text-xs font-black text-slate-500 uppercase tracking-wider">🚫 과거 마감 매물 제외</span>
-                    <label class="relative inline-flex items-center cursor-pointer">
-                        <input type="checkbox" id="hide-past-toggle" checked onchange="applyFilters()" class="sr-only peer">
-                        <div class="w-9 h-5 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-royalBlue"></div>
-                    </label>
+                <!-- 예산 세도 -->
+                <div class="border-b border-slate-100 pb-1.5">
+                    <button type="button" onclick="toggleAccordion('accordion-budget')" class="w-full flex justify-between items-center text-[10px] sm:text-xs font-black text-slate-700 py-1 select-none">
+                        <span>💸 감정/최저 예산 한도</span>
+                        <i id="accordion-budget-icon" class="fa-solid fa-chevron-down text-[8px] text-slate-400"></i>
+                    </button>
+                    <div id="accordion-budget" class="hidden mt-1 space-y-1 pl-1">
+                        <div class="flex justify-between items-center mb-1">
+                            <span id="budget-label" class="text-xs font-black text-royalBlue font-outfit">제한 없음</span>
+                        </div>
+                        <input type="range" id="budget-slider" min="10000000" max="2000000000" step="10000000" value="2000000000" oninput="updateBudgetLabel(this.value)" 
+                               class="w-full accent-royalBlue cursor-pointer">
+                        <div class="flex justify-between text-[9px] text-slate-400 font-bold mt-1">
+                            <span>1천만</span>
+                            <span>10억</span>
+                            <span>20억(제한없음)</span>
+                        </div>
+                    </div>
                 </div>
 
-                <!-- 내 관심 목록만 보기 토글 스위치 -->
-                <div class="flex items-center justify-between bg-slate-50 border border-slate-200 rounded-xl p-3">
-                    <span class="text-xs font-black text-slate-500 uppercase tracking-wider">★ 내 관심 목록만 보기</span>
-                    <label class="relative inline-flex items-center cursor-pointer">
-                        <input type="checkbox" id="show-favorites-toggle" onchange="toggleFavoritesFilter()" class="sr-only peer">
-                        <div class="w-9 h-5 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-royalBlue"></div>
-                    </label>
-                </div>
-
-                <!-- AI 자산 등급 필터 (안전 / 위험 구분 보기) -->
-                <div class="bg-slate-50 border border-slate-200 rounded-xl p-3.5 space-y-2">
-                    <label class="block text-[11px] sm:text-xs font-black text-slate-500 uppercase tracking-wider">⚠️ AI 권리 등급 분류 필터</label>
-                    <div class="grid grid-cols-3 gap-1 bg-white p-1 rounded-lg border border-slate-200 text-[10px] font-bold text-center">
-                        <label class="cursor-pointer py-1.5 rounded transition-all select-none">
-                            <input type="radio" name="grade-filter" value="all" onchange="applyFilters()" class="hidden">
-                            <span id="grade-filter-all" class="block rounded py-1 bg-slate-100 text-slate-700 font-extrabold">전체</span>
-                        </label>
-                        <label class="cursor-pointer py-1.5 rounded transition-all select-none">
-                            <input type="radio" name="grade-filter" value="safe" checked onchange="applyFilters()" class="hidden">
-                            <span id="grade-filter-safe" class="block rounded py-1 font-extrabold text-slate-500">🟢 우량</span>
-                        </label>
-                        <label class="cursor-pointer py-1.5 rounded transition-all select-none">
-                            <input type="radio" name="grade-filter" value="risk" onchange="applyFilters()" class="hidden">
-                            <span id="grade-filter-risk" class="block rounded py-1 font-extrabold text-slate-500">🚨 위험</span>
+                <!-- 과거 마감 매물 제외 -->
+                <div class="border-b border-slate-100 pb-1.5">
+                    <button type="button" onclick="toggleAccordion('accordion-past')" class="w-full flex justify-between items-center text-[10px] sm:text-xs font-black text-slate-700 py-1 select-none">
+                        <span>📅 과거 종결/마감 매물 제외</span>
+                        <i id="accordion-past-icon" class="fa-solid fa-chevron-down text-[8px] text-slate-400"></i>
+                    </button>
+                    <div id="accordion-past" class="hidden mt-1 flex items-center justify-between pl-1">
+                        <span class="text-xs font-bold text-slate-500">마감 매물 필터</span>
+                        <label class="relative inline-flex items-center cursor-pointer">
+                            <input type="checkbox" id="hide-past-toggle" checked onchange="applyFilters()" class="sr-only peer">
+                            <div class="w-9 h-5 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-royalBlue"></div>
                         </label>
                     </div>
                 </div>
 
+                <!-- 내 관심 목록만 보기 -->
+                <div class="border-b border-slate-100 pb-1.5">
+                    <button type="button" onclick="toggleAccordion('accordion-favorites')" class="w-full flex justify-between items-center text-[10px] sm:text-xs font-black text-slate-700 py-1 select-none">
+                        <span>⭐ 내 관심 목록 매물만 보기</span>
+                        <i id="accordion-favorites-icon" class="fa-solid fa-chevron-down text-[8px] text-slate-400"></i>
+                    </button>
+                    <div id="accordion-favorites" class="hidden mt-1 flex items-center justify-between pl-1">
+                        <span class="text-xs font-bold text-slate-500">관심 목록 전용</span>
+                        <label class="relative inline-flex items-center cursor-pointer">
+                            <input type="checkbox" id="show-favorites-toggle" onchange="toggleFavoritesFilter()" class="sr-only peer">
+                            <div class="w-9 h-5 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-royalBlue"></div>
+                        </label>
+                    </div>
+                </div>
 
+                <!-- AI 권리 등급 분류 필터 -->
+                <div class="border-b border-slate-100 pb-1.5">
+                    <button type="button" onclick="toggleAccordion('accordion-grade')" class="w-full flex justify-between items-center text-[10px] sm:text-xs font-black text-slate-700 py-1 select-none">
+                        <span>🛡️ AI 권리 등급 분류 필터</span>
+                        <i id="accordion-grade-icon" class="fa-solid fa-chevron-down text-[8px] text-slate-400"></i>
+                    </button>
+                    <div id="accordion-grade" class="hidden mt-1 space-y-1.5 pl-1">
+                        <div class="grid grid-cols-3 gap-1 bg-white p-1 rounded-lg border border-slate-200 text-[9px] font-bold text-center">
+                            <label class="cursor-pointer py-1 rounded transition-all select-none">
+                                <input type="radio" name="grade-filter" value="all" onchange="applyFilters()" class="hidden">
+                                <span id="grade-filter-all" class="block rounded py-0.5 bg-slate-100 text-slate-700 font-extrabold">전체</span>
+                            </label>
+                            <label class="cursor-pointer py-1 rounded transition-all select-none">
+                                <input type="radio" name="grade-filter" value="safe" checked onchange="applyFilters()" class="hidden">
+                                <span id="grade-filter-safe" class="block rounded py-0.5 font-extrabold text-slate-500">🟢 우량</span>
+                            </label>
+                            <label class="cursor-pointer py-1 rounded transition-all select-none">
+                                <input type="radio" name="grade-filter" value="risk" onchange="applyFilters()" class="hidden">
+                                <span id="grade-filter-risk" class="block rounded py-0.5 font-extrabold text-slate-500">🚨 위험</span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
             </div>
 
             <!-- 하단 수집 동기화 메타 현황 -->
@@ -549,38 +692,38 @@
             <div class="bg-white border-b border-slate-200 p-2 z-10 shadow-sm">
                 <!-- 📱 모바일 전용: 3열 구조의 미니 그리드 카드로 개편하여 가독성 밸런스 극대화 (1024px 미만 lg:hidden) -->
                 <div class="lg:hidden bg-white z-10">
-                    <div class="grid grid-cols-3 gap-1.5 text-center">
-                        <div class="bg-blue-50/40 border border-blue-100/60 rounded-xl py-1 px-1.5">
-                            <p class="text-[8px] min-[360px]:text-[9px] font-black text-royalBlue mb-0.5 whitespace-nowrap">추천 적합 매물</p>
-                            <h3 class="text-[9.5px] min-[360px]:text-[11px] font-black text-slate-900 font-outfit leading-none">
+                    <div class="grid grid-cols-3 gap-1 text-center">
+                        <div class="bg-blue-50/40 border border-blue-100/60 rounded-lg py-0.5 px-1">
+                            <p class="text-[6.5px] min-[360px]:text-[7.5px] font-black text-royalBlue mb-0.2 whitespace-nowrap">추천 적합 매물</p>
+                            <h3 class="text-[7.5px] min-[360px]:text-[8.5px] font-black text-slate-900 font-outfit leading-none">
                                 <span id="kpi-recommended-count-mob">0건</span>
-                                <span class="text-[8px] font-bold text-slate-400 font-sans">(전체 <span id="kpi-total-count-mob">0</span>)</span>
+                                <span class="text-[6.5px] font-bold text-slate-400 font-sans">(전체 <span id="kpi-total-count-mob">0</span>)</span>
                             </h3>
                         </div>
-                        <div class="bg-emerald-50/40 border border-emerald-100/60 rounded-xl py-1 px-1.5">
-                            <p class="text-[8px] min-[360px]:text-[9px] font-black text-emeraldSuccess mb-0.5 whitespace-nowrap">🟢 고적합 (A~B)</p>
-                            <h3 id="kpi-high-count-mob" class="text-[9.5px] min-[360px]:text-[11px] font-black text-emeraldSuccess font-outfit leading-none">0건</h3>
+                        <div class="bg-emerald-50/40 border border-emerald-100/60 rounded-lg py-0.5 px-1">
+                            <p class="text-[6.5px] min-[360px]:text-[7.5px] font-black text-emeraldSuccess mb-0.2 whitespace-nowrap">🟢 고적합 (A~B)</p>
+                            <h3 id="kpi-high-count-mob" class="text-[7.5px] min-[360px]:text-[8.5px] font-black text-emeraldSuccess font-outfit leading-none">0건</h3>
                         </div>
-                        <div class="bg-rose-50/40 border border-rose-100/60 rounded-xl py-1 px-1.5">
-                            <p class="text-[8px] min-[360px]:text-[9px] font-black text-crimsonAlert mb-0.5 whitespace-nowrap">🚨 위험 탈락 (X)</p>
-                            <h3 id="kpi-risk-count-mob" class="text-[9.5px] min-[360px]:text-[11px] font-black text-crimsonAlert font-outfit leading-none">0건</h3>
+                        <div class="bg-rose-50/40 border border-rose-100/60 rounded-lg py-0.5 px-1">
+                            <p class="text-[6.5px] min-[360px]:text-[7.5px] font-black text-crimsonAlert mb-0.2 whitespace-nowrap">🚨 위험 탈락 (X)</p>
+                            <h3 id="kpi-risk-count-mob" class="text-[7.5px] min-[360px]:text-[8.5px] font-black text-crimsonAlert font-outfit leading-none">0건</h3>
                         </div>
                     </div>
                 </div>
                 
                 <!-- 💻 PC/태블릿 전용: 기존 3개 칸 나누기 구조 -->
-                <div class="hidden lg:grid grid-cols-3 gap-2">
-                    <div class="bg-blue-50/50 border border-blue-100 rounded-xl p-1.5 text-center">
-                        <p class="text-[10px] sm:text-xs font-black text-royalBlue uppercase tracking-wider mb-0.5">추천 적합 매물 (전체 <span id="kpi-total-count" class="font-outfit text-slate-500 font-bold">0</span>건 중)</p>
-                        <h3 id="kpi-recommended-count" class="text-xs sm:text-sm font-black text-slate-900 font-outfit">0건</h3>
+                <div class="hidden lg:grid grid-cols-3 gap-1">
+                    <div class="bg-blue-50/50 border border-blue-100 rounded-lg p-1 text-center">
+                        <p class="text-[8px] sm:text-[9.5px] font-black text-royalBlue uppercase tracking-wider mb-0.2">추천 적합 매물 (전체 <span id="kpi-total-count" class="font-outfit text-slate-500 font-bold">0</span>건 중)</p>
+                        <h3 id="kpi-recommended-count" class="text-[10px] sm:text-[11px] font-black text-slate-900 font-outfit">0건</h3>
                     </div>
-                    <div class="bg-emerald-50/50 border border-emerald-100 rounded-xl p-1.5 text-center">
-                        <p class="text-[10px] sm:text-xs font-black text-emeraldSuccess uppercase tracking-wider mb-0.5">고적합 (A~B등급)</p>
-                        <h3 id="kpi-high-count" class="text-xs sm:text-sm font-black text-emeraldSuccess font-outfit">0건</h3>
+                    <div class="bg-emerald-50/50 border border-emerald-100 rounded-lg p-1 text-center">
+                        <p class="text-[8px] sm:text-[9.5px] font-black text-emeraldSuccess uppercase tracking-wider mb-0.2">고적합 (A~B등급)</p>
+                        <h3 id="kpi-high-count" class="text-[10px] sm:text-[11px] font-black text-emeraldSuccess font-outfit">0건</h3>
                     </div>
-                    <div class="bg-rose-50/50 border border-rose-100 rounded-xl p-1.5 text-center">
-                        <p class="text-[10px] sm:text-xs font-black text-crimsonAlert uppercase tracking-wider mb-0.5">위험 탈락 매물 (X)</p>
-                        <h3 id="kpi-risk-count" class="text-xs sm:text-sm font-black text-crimsonAlert font-outfit">0건</h3>
+                    <div class="bg-rose-50/50 border border-rose-100 rounded-lg p-1 text-center">
+                        <p class="text-[8px] sm:text-[9.5px] font-black text-crimsonAlert uppercase tracking-wider mb-0.2">위험 탈락 매물 (X)</p>
+                        <h3 id="kpi-risk-count" class="text-[10px] sm:text-[11px] font-black text-crimsonAlert font-outfit">0건</h3>
                     </div>
                 </div>
             </div>
@@ -867,24 +1010,17 @@
             </button>
         </div>
 
-        <!-- 💎 상세 Drawer 12단 프리미엄 탭 메뉴 바 -->
+        
+        <!-- 💎 상세 Drawer 4대 대분류 프리미엄 탭 메뉴 바 -->
         <div class="flex overflow-x-auto whitespace-nowrap bg-white p-2 gap-1.5 z-10 flex-shrink-0 custom-scrollbar border-b border-slate-200">
-            <button id="detail-tab-summary-btn" onclick="changeDetailTab('summary')" class="inline-block py-1.5 px-3.5 text-center text-[10.5px] sm:text-xs font-black rounded-xl border border-transparent transition-all select-none bg-royalBlue text-white shadow-sm">종합 정보</button>
-            <button id="detail-tab-analysis-btn" onclick="changeDetailTab('analysis')" class="inline-block py-1.5 px-3.5 text-center text-[10.5px] sm:text-xs font-black rounded-xl border border-transparent transition-all select-none text-slate-500 hover:text-royalBlue hover:bg-slate-50 bg-slate-50/50">권리분석</button>
-            <button id="detail-tab-bid-btn" onclick="changeDetailTab('bid')" class="inline-block py-1.5 px-3.5 text-center text-[10.5px] sm:text-xs font-black rounded-xl border border-transparent transition-all select-none text-slate-500 hover:text-royalBlue hover:bg-slate-50 bg-slate-50/50">입찰분석</button>
-            <button id="detail-tab-dividend-btn" onclick="changeDetailTab('dividend')" class="inline-block py-1.5 px-3.5 text-center text-[10.5px] sm:text-xs font-black rounded-xl border border-transparent transition-all select-none text-slate-500 hover:text-royalBlue hover:bg-slate-50 bg-slate-50/50">예상배당표</button>
-            <button id="detail-tab-takeover-btn" onclick="changeDetailTab('takeover')" class="inline-block py-1.5 px-3.5 text-center text-[10.5px] sm:text-xs font-black rounded-xl border border-transparent transition-all select-none text-slate-500 hover:text-royalBlue hover:bg-slate-50 bg-slate-50/50">인수분석</button>
-            <button id="detail-tab-occupancy-btn" onclick="changeDetailTab('occupancy')" class="inline-block py-1.5 px-3.5 text-center text-[10.5px] sm:text-xs font-black rounded-xl border border-transparent transition-all select-none text-slate-500 hover:text-royalBlue hover:bg-slate-50 bg-slate-50/50">점유현황</button>
-            <button id="detail-tab-registry-btn" onclick="changeDetailTab('registry')" class="inline-block py-1.5 px-3.5 text-center text-[10.5px] sm:text-xs font-black rounded-xl border border-transparent transition-all select-none text-slate-500 hover:text-royalBlue hover:bg-slate-50 bg-slate-50/50">등기현황</button>
-            <button id="detail-tab-statistics-btn" onclick="changeDetailTab('statistics')" class="inline-block py-1.5 px-3.5 text-center text-[10.5px] sm:text-xs font-black rounded-xl border border-transparent transition-all select-none text-slate-500 hover:text-royalBlue hover:bg-slate-50 bg-slate-50/50">매각통계</button>
-            <button id="detail-tab-market-btn" onclick="changeDetailTab('market')" class="inline-block py-1.5 px-3.5 text-center text-[10.5px] sm:text-xs font-black rounded-xl border border-transparent transition-all select-none text-slate-500 hover:text-royalBlue hover:bg-slate-50 bg-slate-50/50">시세/실거래가</button>
-            <button id="detail-tab-complex-btn" onclick="changeDetailTab('complex')" class="inline-block py-1.5 px-3.5 text-center text-[10.5px] sm:text-xs font-black rounded-xl border border-transparent transition-all select-none text-slate-500 hover:text-royalBlue hover:bg-slate-50 bg-slate-50/50">단지정보</button>
-            <button id="detail-tab-map-btn" onclick="changeDetailTab('map')" class="inline-block py-1.5 px-3.5 text-center text-[10.5px] sm:text-xs font-black rounded-xl border border-transparent transition-all select-none text-slate-500 hover:text-royalBlue hover:bg-slate-50 bg-slate-50/50">지도</button>
-            <button id="detail-tab-floorplan-btn" onclick="changeDetailTab('floorplan')" class="inline-block py-1.5 px-3.5 text-center text-[10.5px] sm:text-xs font-black rounded-xl border border-transparent transition-all select-none text-slate-500 hover:text-royalBlue hover:bg-slate-50 bg-slate-50/50">내부 평면도 / 구조도</button>
+            <button id="detail-group-tab-1-btn" onclick="changeDetailGroupTab(1)" class="inline-block py-1.5 px-3.5 text-center text-[10.5px] sm:text-xs font-black rounded-xl border border-transparent transition-all select-none bg-royalBlue text-white shadow-sm">1. 종합 분석</button>
+            <button id="detail-group-tab-2-btn" onclick="changeDetailGroupTab(2)" class="inline-block py-1.5 px-3.5 text-center text-[10.5px] sm:text-xs font-black rounded-xl border border-transparent transition-all select-none text-slate-500 hover:text-royalBlue hover:bg-slate-50 bg-slate-50/50">2. 권리 & 등기 분석</button>
+            <button id="detail-group-tab-3-btn" onclick="changeDetailGroupTab(3)" class="inline-block py-1.5 px-3.5 text-center text-[10.5px] sm:text-xs font-black rounded-xl border border-transparent transition-all select-none text-slate-500 hover:text-royalBlue hover:bg-slate-50 bg-slate-50/50">3. 입찰 & 금융 분석</button>
+            <button id="detail-group-tab-4-btn" onclick="changeDetailGroupTab(4)" class="inline-block py-1.5 px-3.5 text-center text-[10.5px] sm:text-xs font-black rounded-xl border border-transparent transition-all select-none text-slate-500 hover:text-royalBlue hover:bg-slate-50 bg-slate-50/50">4. 위치 & 시세 분석</button>
         </div>
-
-        <!-- 🏠 [1] 종합 정보 탭 패널 (기본 노출) -->
-        <div id="detail-panel-summary" class="flex-1 overflow-y-auto p-4 sm:p-5 space-y-4 sm:space-y-5 custom-scrollbar bg-slate-50/50">
+        <div id="detail-group-panel-1" class="flex-1 overflow-y-auto p-4 sm:p-5 space-y-4 sm:space-y-5 custom-scrollbar bg-slate-50/50">
+            <div id="group-content-1" class="space-y-4 sm:space-y-5">
+                <div id="detail-panel-summary" class="space-y-4 sm:space-y-5">
             <!-- 대표 이미지 영역 -->
             <div class="bg-white border border-slate-200 rounded-2xl p-3.5 sm:p-4 shadow-sm">
                 <h4 class="text-xs sm:text-sm font-black text-slate-800 flex items-center gap-1.5 mb-2.5">
@@ -913,6 +1049,30 @@
                         <div class="bg-slate-50 border border-slate-100 p-2 rounded-xl flex justify-between items-center">
                             <span class="text-slate-450 font-semibold text-[10px] sm:text-xs">진행 회차</span>
                             <span id="detail-spec-round" class="font-extrabold text-slate-800"></span>
+                        </div>
+                        <div class="bg-slate-50 border border-slate-100 p-2 rounded-xl flex justify-between items-center">
+                            <span class="text-slate-450 font-semibold text-[10px] sm:text-xs">소유자</span>
+                            <span id="detail-owner" class="font-extrabold text-slate-800"></span>
+                        </div>
+                        <div class="bg-slate-50 border border-slate-100 p-2 rounded-xl flex justify-between items-center">
+                            <span class="text-slate-450 font-semibold text-[10px] sm:text-xs">채무자</span>
+                            <span id="detail-debtor" class="font-extrabold text-slate-800"></span>
+                        </div>
+                        <div class="bg-slate-50 border border-slate-100 p-2 rounded-xl flex justify-between items-center">
+                            <span class="text-slate-450 font-semibold text-[10px] sm:text-xs">전용 면적</span>
+                            <span id="detail-spec-exclusive-py" class="font-extrabold text-slate-800 font-mono"></span>
+                        </div>
+                        <div class="bg-slate-50 border border-slate-100 p-2 rounded-xl flex justify-between items-center">
+                            <span class="text-slate-450 font-semibold text-[10px] sm:text-xs">공급 면적 (추정)</span>
+                            <span id="detail-spec-supply-py" class="font-extrabold text-slate-800 font-mono"></span>
+                        </div>
+                        <div class="bg-slate-50 border border-slate-100 p-2 rounded-xl flex justify-between items-center">
+                            <span class="text-slate-450 font-semibold text-[10px] sm:text-xs">토지 대지권</span>
+                            <span id="detail-spec-land-py" class="font-extrabold text-slate-800 font-mono"></span>
+                        </div>
+                        <div class="bg-slate-50 border border-slate-100 p-2 rounded-xl flex justify-between items-center">
+                            <span class="text-slate-450 font-semibold text-[10px] sm:text-xs">건물 전용</span>
+                            <span id="detail-spec-building-py" class="font-extrabold text-slate-800 font-mono"></span>
                         </div>
                         <div class="bg-slate-50 border border-slate-100 p-2 rounded-xl flex justify-between items-center">
                             <span class="text-slate-450 font-semibold text-[10px] sm:text-xs">감정평가액</span>
@@ -1032,7 +1192,98 @@
         </div>
 
         <!-- 🛡️ [2] 권리분석 탭 패널 (기본 숨김) -->
-        <div id="detail-panel-analysis" class="flex-1 overflow-y-auto p-4 sm:p-5 space-y-4 sm:space-y-5 custom-scrollbar bg-slate-50/50 hidden">
+                
+            <!-- 📅 경매 진행 기일 이력 -->
+            <div class="bg-white border border-slate-200 rounded-2xl p-3.5 sm:p-4 space-y-2 shadow-sm">
+                <h4 class="text-xs sm:text-sm font-black text-slate-800 flex items-center gap-1.5 mb-2.5">
+                    <i class="fa-solid fa-calendar-days text-royalBlue"></i> 📅 경매 진행 기일 이력
+                </h4>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse">
+                        <thead>
+                            <tr class="border-b border-slate-200 text-[10px] sm:text-xs text-slate-400 font-extrabold">
+                                <th class="p-2 w-1/4">회차</th>
+                                <th class="p-2 w-1/3">입찰 기일</th>
+                                <th class="p-2 text-right">최저 매각 가격</th>
+                                <th class="p-2 text-center">결과</th>
+                            </tr>
+                        </thead>
+                        <tbody id="detail-giiil-tbody" class="text-xs">
+                            <!-- 동적 주입 -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+                <div id="detail-panel-complex" class="space-y-4 sm:space-y-5">
+            <div class="bg-white border border-slate-200 rounded-2xl p-3.5 sm:p-4 shadow-sm space-y-3">
+                <h4 class="text-xs sm:text-sm font-black text-slate-800 flex items-center gap-1.5 pb-2 border-b border-slate-100">
+                    <i class="fa-solid fa-circle-info text-royalBlue"></i> 단지 기본 정보 및 시설 명세
+                </h4>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse text-[11px] document-view">
+                        <tbody id="detail-complex-tbody" class="text-slate-600 font-medium">
+                            <!-- 동적 생성 -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- 🗺️ [11] 지도 탭 패널 (기본 숨김) -->
+                <div id="detail-panel-floorplan" class="space-y-4 sm:space-y-5">
+            <!-- 내부 평면 이미지 영역 -->
+            <div class="bg-white border border-slate-200 rounded-2xl p-3.5 sm:p-4 shadow-sm">
+                <h4 class="text-xs sm:text-sm font-black text-slate-800 flex items-center gap-1.5 mb-2.5">
+                    <i class="fa-solid fa-compass text-royalBlue"></i> 📐 부동산 내부 추정 평면도
+                </h4>
+                <div class="w-full h-[220px] rounded-xl overflow-hidden border border-slate-200 bg-slate-100 flex items-center justify-center relative">
+                    <img src="./floorplan_modern_apartment.png" alt="부동산 평면도" class="w-full h-full object-contain">
+                </div>
+                <div class="mt-3">
+                    <a id="btn-naver-floorplan-link" href="#" target="_blank" class="w-full bg-royalBlue hover:bg-royalHover text-white text-[10.5px] font-black py-2.5 px-4 rounded-xl shadow-sm transition-all flex items-center justify-center gap-2 select-none">
+                        <i class="fa-solid fa-arrow-up-right-from-square"></i> 네이버부동산 단지 실제 평면도 바로 확인하기
+                    </a>
+                </div>
+            </div>
+
+            <!-- 평면 정보 가이드 및 도면 발급 안내 -->
+            <div class="bg-white border border-slate-200 rounded-2xl p-3.5 sm:p-4 space-y-3 shadow-sm">
+                <h4 class="text-xs sm:text-sm font-black text-slate-800 flex items-center gap-1.5 pb-2 border-b border-slate-100">
+                    <i class="fa-solid fa-file-pdf text-royalBlue"></i> 공식 건축물대장 현황도면 발급 안내
+                </h4>
+                <p class="text-[9.5px] text-slate-500 leading-relaxed font-medium">
+                    본 평면도는 매물 타입(아파트/오피스텔)에 따른 표준형 3-Bay 구조 추정 도면입니다. 실제 내부 구조와 다를 수 있으므로 정밀 확인을 권장합니다.
+                </p>
+                <div class="bg-slate-50 border border-slate-100 p-3 rounded-xl text-slate-655 space-y-1.5 text-[10px] sm:text-[11px] leading-relaxed font-bold">
+                    <div class="flex items-start gap-1">
+                        <span class="text-royalBlue font-black flex-shrink-0">•</span>
+                        <span>낙찰 전 이해관계인(소유주, 임차인 등)에 한해 현장 동행 하에 주민센터에서 도면 열람 및 발급이 가능합니다.</span>
+                    </div>
+                    <div class="flex items-start gap-1">
+                        <span class="text-royalBlue font-black flex-shrink-0">•</span>
+                        <span>낙찰 후에는 낙찰증명서를 지참하여 전국 주민센터 및 정부24를 통해 해당 물건의 '건축물대장 현황도면(평면도)'을 정식 무료 발급/출력할 수 있습니다.</span>
+                    </div>
+                </div>
+                <a href="https://www.gov.kr/mw/AA020InfoCappView.do?HighCtgCD=A01004001&CappBizCD=15000000098" target="_blank" class="w-full bg-royalBlue text-white py-2 rounded-xl text-xs font-black hover:bg-royalHover transition-all flex items-center justify-center gap-1 select-none cursor-pointer text-center">
+                    정부24 건축물대장 현황도면 신청 바로가기
+                </a>
+            </div>
+        </div>
+                
+            <!-- 🤝 주변 유사 물건 추천 섹션 -->
+            <div class="bg-white border border-slate-200 rounded-2xl p-3.5 sm:p-4 space-y-3 shadow-sm">
+                <h4 class="text-xs sm:text-sm font-black text-slate-800 flex items-center gap-1.5 pb-2 border-b border-slate-100">
+                    <i class="fa-solid fa-handshake text-royalBlue"></i> 🤝 동일 용도/지역 기반 유사 추천 매물
+                </h4>
+                <div id="detail-similar-container" class="grid grid-cols-3 gap-2">
+                    <!-- 동적 렌더링 카드 3개 -->
+                </div>
+            </div>
+            </div>
+        </div>
+        <div id="detail-group-panel-2" class="flex-1 overflow-y-auto p-4 sm:p-5 space-y-4 sm:space-y-5 custom-scrollbar bg-slate-50/50 hidden relative">
+            <div id="group-content-2" class="space-y-4 sm:space-y-5">
+                <div id="detail-panel-analysis" class="space-y-4 sm:space-y-5">
             <!-- AI 7대 권리 리스크 정밀 하이브리드 리포트 -->
             <div>
                 <h4 class="text-xs sm:text-sm font-black text-slate-500 uppercase tracking-wider mb-2.5 flex items-center gap-1.5">
@@ -1053,7 +1304,93 @@
         </div>
 
         <!-- 💸 [3] 입찰분석 탭 패널 (기본 숨김) -->
-        <div id="detail-panel-bid" class="flex-1 overflow-y-auto p-4 sm:p-5 space-y-4 sm:space-y-5 custom-scrollbar bg-slate-50/50 hidden">
+                <div id="detail-panel-takeover" class="space-y-4 sm:space-y-5">
+            <div class="bg-white border border-slate-200 rounded-2xl p-3.5 sm:p-4 shadow-sm space-y-3">
+                <h4 class="text-xs sm:text-sm font-black text-slate-800 flex items-center gap-1.5 pb-2 border-b border-slate-100">
+                    <i class="fa-solid fa-triangle-exclamation text-rose-600"></i> 낙찰자 인수 리스크 분석
+                </h4>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse text-[11px] document-view">
+                        <thead>
+                            <tr class="bg-slate-50 border-b border-slate-200 text-slate-705 font-extrabold">
+                                <th class="p-2 border-b">위험 항목</th>
+                                <th class="p-2 border-b">권리 내용</th>
+                                <th class="p-2 border-b text-right">예상 인수액</th>
+                                <th class="p-2 border-b">진단 및 의견</th>
+                            </tr>
+                        </thead>
+                        <tbody id="detail-takeover-tbody" class="text-slate-600 font-medium">
+                            <!-- 동적 생성 -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- 🚪 [6] 점유현황 탭 패널 (기본 숨김) -->
+                <div id="detail-panel-occupancy" class="space-y-4 sm:space-y-5">
+            <div class="bg-white border border-slate-200 rounded-2xl p-3.5 sm:p-4 shadow-sm space-y-3">
+                <h4 class="text-xs sm:text-sm font-black text-slate-800 flex items-center gap-1.5 pb-2 border-b border-slate-100">
+                    <i class="fa-solid fa-door-closed text-royalBlue"></i> 임차인 및 점유자 관계 명세
+                </h4>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse text-[11px] document-view">
+                        <thead>
+                            <tr class="bg-slate-50 border-b border-slate-200 text-slate-705 font-extrabold">
+                                <th class="p-2 border-b">점유자 구분</th>
+                                <th class="p-2 border-b">전입일자</th>
+                                <th class="p-2 border-b">확정일자</th>
+                                <th class="p-2 border-b text-right">보증금/차임</th>
+                                <th class="p-2 border-b text-center">대항력</th>
+                            </tr>
+                        </thead>
+                        <tbody id="detail-occupancy-tbody" class="text-slate-600 font-medium">
+                            <!-- 동적 생성 -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- 📝 [7] 등기현황 탭 패널 (기본 숨김) -->
+                <div id="detail-panel-registry" class="space-y-4 sm:space-y-5">
+            <div class="bg-white border border-slate-200 rounded-2xl p-3.5 sm:p-4 shadow-sm space-y-3">
+                <h4 class="text-xs sm:text-sm font-black text-slate-800 flex items-center gap-1.5 pb-2 border-b border-slate-100">
+                    <i class="fa-solid fa-book-open text-royalBlue"></i> 등기부등본 주요 권리 설정 요약
+                </h4>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse text-[11px] document-view">
+                        <thead>
+                            <tr class="bg-slate-50 border-b border-slate-200 text-slate-705 font-extrabold">
+                                <th class="p-2 border-b">구분</th>
+                                <th class="p-2 border-b">등기목적</th>
+                                <th class="p-2 border-b">접수일자</th>
+                                <th class="p-2 border-b">권리자 및 채권액</th>
+                                <th class="p-2 border-b text-center">낙찰후 효력</th>
+                            </tr>
+                        </thead>
+                        <tbody id="detail-registry-tbody" class="text-slate-600 font-medium">
+                            <!-- 동적 생성 -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- 📈 [8] 매각통계 탭 패널 (기본 숨김) -->
+            </div>
+            <div id="group-mask-2" class="absolute inset-0 bg-slate-900/60 backdrop-blur-sm z-30 flex flex-col items-center justify-center text-center p-6 hidden">
+                <div class="bg-white border border-slate-200 rounded-2xl p-6 max-w-sm shadow-2xl space-y-3">
+                    <i class="fa-solid fa-lock text-rose-500 text-3xl"></i>
+                    <h4 class="text-slate-800 text-sm font-black">🔒 권리 & 등기 분석 열람 제한</h4>
+                    <p class="text-slate-500 text-[10.5px] leading-relaxed font-semibold">본 매물의 권리 & 등기 정보는 우수 회원 등급 전용 콘텐츠입니다. 등급을 상향하여 심층 AI 권리진단을 확인해 보세요.</p>
+                    <button onclick="alert('등급 상향은 관리자 권한으로 즉시 조정 가능합니다.')" class="w-full bg-royalBlue text-white font-extrabold text-xs py-2 rounded-xl shadow-md hover:bg-royalHover transition-all">등급 상향 신청하기</button>
+                </div>
+            </div>
+        </div>
+        <div id="detail-group-panel-3" class="flex-1 overflow-y-auto p-4 sm:p-5 space-y-4 sm:space-y-5 custom-scrollbar bg-slate-50/50 hidden relative">
+            <div id="group-content-3" class="space-y-4 sm:space-y-5">
+                <div id="detail-panel-bid" class="space-y-4 sm:space-y-5">
             <!-- AI 낙찰 시뮬레이션 지표 분석 -->
             <div class="bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 rounded-2xl p-3.5 sm:p-4 space-y-2.5 shadow-sm mb-4">
                 <h4 class="text-xs sm:text-sm font-black text-royalBlue flex items-center gap-1.5">
@@ -1230,7 +1567,7 @@
                 </div>
             </div>
         <!-- 📊 [4] 예상배당표 탭 패널 (기본 숨김) -->
-        <div id="detail-panel-dividend" class="flex-1 overflow-y-auto p-4 sm:p-5 space-y-4 sm:space-y-5 custom-scrollbar bg-slate-50/50 hidden">
+                <div id="detail-panel-dividend" class="space-y-4 sm:space-y-5">
             <div class="bg-white border border-slate-200 rounded-2xl p-3.5 sm:p-4 shadow-sm space-y-3">
                 <h4 class="text-xs sm:text-sm font-black text-slate-800 flex items-center gap-1.5 pb-2 border-b border-slate-100">
                     <i class="fa-solid fa-table-list text-royalBlue"></i> 예상 배당액 시뮬레이션 표
@@ -1258,81 +1595,7 @@
         </div>
 
         <!-- 📑 [5] 인수분석 탭 패널 (기본 숨김) -->
-        <div id="detail-panel-takeover" class="flex-1 overflow-y-auto p-4 sm:p-5 space-y-4 sm:space-y-5 custom-scrollbar bg-slate-50/50 hidden">
-            <div class="bg-white border border-slate-200 rounded-2xl p-3.5 sm:p-4 shadow-sm space-y-3">
-                <h4 class="text-xs sm:text-sm font-black text-slate-800 flex items-center gap-1.5 pb-2 border-b border-slate-100">
-                    <i class="fa-solid fa-triangle-exclamation text-rose-600"></i> 낙찰자 인수 리스크 분석
-                </h4>
-                <div class="overflow-x-auto">
-                    <table class="w-full text-left border-collapse text-[11px] document-view">
-                        <thead>
-                            <tr class="bg-slate-50 border-b border-slate-200 text-slate-705 font-extrabold">
-                                <th class="p-2 border-b">위험 항목</th>
-                                <th class="p-2 border-b">권리 내용</th>
-                                <th class="p-2 border-b text-right">예상 인수액</th>
-                                <th class="p-2 border-b">진단 및 의견</th>
-                            </tr>
-                        </thead>
-                        <tbody id="detail-takeover-tbody" class="text-slate-600 font-medium">
-                            <!-- 동적 생성 -->
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
-
-        <!-- 🚪 [6] 점유현황 탭 패널 (기본 숨김) -->
-        <div id="detail-panel-occupancy" class="flex-1 overflow-y-auto p-4 sm:p-5 space-y-4 sm:space-y-5 custom-scrollbar bg-slate-50/50 hidden">
-            <div class="bg-white border border-slate-200 rounded-2xl p-3.5 sm:p-4 shadow-sm space-y-3">
-                <h4 class="text-xs sm:text-sm font-black text-slate-800 flex items-center gap-1.5 pb-2 border-b border-slate-100">
-                    <i class="fa-solid fa-door-closed text-royalBlue"></i> 임차인 및 점유자 관계 명세
-                </h4>
-                <div class="overflow-x-auto">
-                    <table class="w-full text-left border-collapse text-[11px] document-view">
-                        <thead>
-                            <tr class="bg-slate-50 border-b border-slate-200 text-slate-705 font-extrabold">
-                                <th class="p-2 border-b">점유자 구분</th>
-                                <th class="p-2 border-b">전입일자</th>
-                                <th class="p-2 border-b">확정일자</th>
-                                <th class="p-2 border-b text-right">보증금/차임</th>
-                                <th class="p-2 border-b text-center">대항력</th>
-                            </tr>
-                        </thead>
-                        <tbody id="detail-occupancy-tbody" class="text-slate-600 font-medium">
-                            <!-- 동적 생성 -->
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
-
-        <!-- 📝 [7] 등기현황 탭 패널 (기본 숨김) -->
-        <div id="detail-panel-registry" class="flex-1 overflow-y-auto p-4 sm:p-5 space-y-4 sm:space-y-5 custom-scrollbar bg-slate-50/50 hidden">
-            <div class="bg-white border border-slate-200 rounded-2xl p-3.5 sm:p-4 shadow-sm space-y-3">
-                <h4 class="text-xs sm:text-sm font-black text-slate-800 flex items-center gap-1.5 pb-2 border-b border-slate-100">
-                    <i class="fa-solid fa-book-open text-royalBlue"></i> 등기부등본 주요 권리 설정 요약
-                </h4>
-                <div class="overflow-x-auto">
-                    <table class="w-full text-left border-collapse text-[11px] document-view">
-                        <thead>
-                            <tr class="bg-slate-50 border-b border-slate-200 text-slate-705 font-extrabold">
-                                <th class="p-2 border-b">구분</th>
-                                <th class="p-2 border-b">등기목적</th>
-                                <th class="p-2 border-b">접수일자</th>
-                                <th class="p-2 border-b">권리자 및 채권액</th>
-                                <th class="p-2 border-b text-center">낙찰후 효력</th>
-                            </tr>
-                        </thead>
-                        <tbody id="detail-registry-tbody" class="text-slate-600 font-medium">
-                            <!-- 동적 생성 -->
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
-
-        <!-- 📈 [8] 매각통계 탭 패널 (기본 숨김) -->
-        <div id="detail-panel-statistics" class="flex-1 overflow-y-auto p-4 sm:p-5 space-y-4 sm:space-y-5 custom-scrollbar bg-slate-50/50 hidden">
+                <div id="detail-panel-statistics" class="space-y-4 sm:space-y-5">
             <div class="bg-white border border-slate-200 rounded-2xl p-3.5 sm:p-4 shadow-sm space-y-3">
                 <h4 class="text-xs sm:text-sm font-black text-slate-800 flex items-center gap-1.5 pb-2 border-b border-slate-100">
                     <i class="fa-solid fa-chart-bar text-royalBlue"></i> 해당 법원/용도 최근 1년 매각 통계
@@ -1344,53 +1607,53 @@
         </div>
 
         <!-- 💰 [9] 시세/실거래가 탭 패널 (기본 숨김) -->
-        <div id="detail-panel-market" class="flex-1 overflow-y-auto p-4 sm:p-5 space-y-4 sm:space-y-5 custom-scrollbar bg-slate-50/50 hidden">
-            <div class="bg-white border border-slate-200 rounded-2xl p-3.5 sm:p-4 shadow-sm space-y-3">
-                <div class="flex items-center justify-between pb-2 border-b border-slate-100">
-                    <h4 class="text-xs sm:text-sm font-black text-slate-800 flex items-center gap-1.5">
-                        <i class="fa-solid fa-tags text-royalBlue"></i> 주변 아파트 실거래 시세 대조
-                    </h4>
-                    <button onclick="copyAddressToClipboardAndOpenSeeReal()" class="px-2 py-1 bg-amber-50 hover:bg-amber-100 border border-amber-200 text-amber-700 text-[10px] font-black rounded-lg transition-all flex items-center gap-1">
-                        <i class="fa-solid fa-copy"></i> 주소복사 & 시세확인 (씨리얼)
-                    </button>
-                </div>
-                <div class="overflow-x-auto">
-                    <table class="w-full text-left border-collapse text-[11px] document-view">
-                        <thead>
-                            <tr class="bg-slate-50 border-b border-slate-200 text-slate-750 font-extrabold">
-                                <th class="p-2 border-b">거래일자</th>
-                                <th class="p-2 border-b">면적 (전용)</th>
-                                <th class="p-2 border-b text-center">층수</th>
-                                <th class="p-2 border-b text-right">거래금액</th>
-                                <th class="p-2 border-b text-center">변동률</th>
-                            </tr>
-                        </thead>
-                        <tbody id="detail-market-tbody" class="text-slate-600 font-medium">
-                            <!-- 동적 생성 -->
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
-
-        <!-- 🏢 [10] 단지정보 탭 패널 (기본 숨김) -->
-        <div id="detail-panel-complex" class="flex-1 overflow-y-auto p-4 sm:p-5 space-y-4 sm:space-y-5 custom-scrollbar bg-slate-50/50 hidden">
-            <div class="bg-white border border-slate-200 rounded-2xl p-3.5 sm:p-4 shadow-sm space-y-3">
+                
+            <!-- 🏆 시나리오별 입찰 수익성 시뮬레이터 -->
+            <div class="bg-white border border-slate-200 rounded-2xl p-3.5 sm:p-4 space-y-2.5 shadow-sm">
                 <h4 class="text-xs sm:text-sm font-black text-slate-800 flex items-center gap-1.5 pb-2 border-b border-slate-100">
-                    <i class="fa-solid fa-circle-info text-royalBlue"></i> 단지 기본 정보 및 시설 명세
+                    <i class="fa-solid fa-chart-line text-royalBlue"></i> 🏆 시나리오별 입찰 수익성 시뮬레이션
                 </h4>
                 <div class="overflow-x-auto">
-                    <table class="w-full text-left border-collapse text-[11px] document-view">
-                        <tbody id="detail-complex-tbody" class="text-slate-600 font-medium">
-                            <!-- 동적 생성 -->
+                    <table class="w-full text-left border-collapse text-[10px] sm:text-xs">
+                        <thead>
+                            <tr class="border-b border-slate-200 text-slate-400 font-extrabold">
+                                <th class="p-2">구분 (입찰가율)</th>
+                                <th class="p-2 text-right">예상 입찰가</th>
+                                <th class="p-2 text-right">대출 (70%)</th>
+                                <th class="p-2 text-right">필요 자본금</th>
+                                <th class="p-2 text-right">연 이자 (4.5%)</th>
+                                <th class="p-2 text-right text-rose-600">예측 ROI</th>
+                            </tr>
+                        </thead>
+                        <tbody id="detail-scenario-tbody">
+                            <!-- 동적 주입 -->
                         </tbody>
                     </table>
                 </div>
             </div>
-        </div>
 
-        <!-- 🗺️ [11] 지도 탭 패널 (기본 숨김) -->
-        <div id="detail-panel-map" class="flex-1 overflow-y-auto p-4 sm:p-5 space-y-4 sm:space-y-5 custom-scrollbar bg-slate-50/50 hidden">
+            <!-- 🧠 AI 실전 투자 분석 총평 -->
+            <div class="bg-amber-50/30 border border-amber-200/60 rounded-2xl p-3.5 sm:p-4 space-y-2 shadow-sm">
+                <h4 class="text-xs sm:text-sm font-black text-slate-800 flex items-center gap-1.5">
+                    <i class="fa-solid fa-brain text-amber-600"></i> 🧠 AI 실전 투자 분석 총평
+                </h4>
+                <div id="detail-ai-comment" class="text-xs sm:text-sm text-slate-700 leading-relaxed font-semibold">
+                    <!-- 동적 코멘트 줄글 주입 -->
+                </div>
+            </div>
+            </div>
+            <div id="group-mask-3" class="absolute inset-0 bg-slate-900/60 backdrop-blur-sm z-30 flex flex-col items-center justify-center text-center p-6 hidden">
+                <div class="bg-white border border-slate-200 rounded-2xl p-6 max-w-sm shadow-2xl space-y-3">
+                    <i class="fa-solid fa-lock text-rose-500 text-3xl"></i>
+                    <h4 class="text-slate-800 text-sm font-black">🔒 입찰 & 금융 분석 열람 제한</h4>
+                    <p class="text-slate-500 text-[10.5px] leading-relaxed font-semibold">본 매물의 입찰 & 금융 상세 시뮬레이션은 프리미엄 회원 등급 전용 콘텐츠입니다. 등급을 상향하여 정밀 ROI 분석을 확인해 보세요.</p>
+                    <button onclick="alert('등급 상향은 관리자 권한으로 즉시 조정 가능합니다.')" class="w-full bg-royalBlue text-white font-extrabold text-xs py-2 rounded-xl shadow-md hover:bg-royalHover transition-all">등급 상향 신청하기</button>
+                </div>
+            </div>
+        </div>
+        <div id="detail-group-panel-4" class="flex-1 overflow-y-auto p-4 sm:p-5 space-y-4 sm:space-y-5 custom-scrollbar bg-slate-50/50 hidden relative">
+            <div id="group-content-4" class="space-y-4 sm:space-y-5">
+                <div id="detail-panel-map" class="space-y-4 sm:space-y-5">
             <!-- 📍 물건지 실시간 위치 지도 -->
             <div class="bg-white border border-slate-200 rounded-2xl p-3.5 sm:p-4 space-y-2.5 shadow-sm">
                 <h4 class="text-xs sm:text-sm font-black text-slate-800 flex items-center gap-1.5">
@@ -1476,38 +1739,44 @@
         </div>
 
         <!-- 📐 [12] 내부 평면도 / 구조도 탭 패널 -->
-        <div id="detail-panel-floorplan" class="flex-1 overflow-y-auto p-4 sm:p-5 space-y-4 sm:space-y-5 custom-scrollbar bg-slate-50/50 hidden">
-            <!-- 내부 평면 이미지 영역 -->
-            <div class="bg-white border border-slate-200 rounded-2xl p-3.5 sm:p-4 shadow-sm">
-                <h4 class="text-xs sm:text-sm font-black text-slate-800 flex items-center gap-1.5 mb-2.5">
-                    <i class="fa-solid fa-compass text-royalBlue"></i> 📐 부동산 내부 추정 평면도
-                </h4>
-                <div class="w-full h-[220px] rounded-xl overflow-hidden border border-slate-200 bg-slate-100 flex items-center justify-center relative">
-                    <img src="./floorplan_modern_apartment.png" alt="부동산 평면도" class="w-full h-full object-contain">
+                <div id="detail-panel-market" class="space-y-4 sm:space-y-5">
+            <div class="bg-white border border-slate-200 rounded-2xl p-3.5 sm:p-4 shadow-sm space-y-3">
+                <div class="flex items-center justify-between pb-2 border-b border-slate-100">
+                    <h4 class="text-xs sm:text-sm font-black text-slate-800 flex items-center gap-1.5">
+                        <i class="fa-solid fa-tags text-royalBlue"></i> 주변 아파트 실거래 시세 대조
+                    </h4>
+                    <button onclick="copyAddressToClipboardAndOpenSeeReal()" class="px-2 py-1 bg-amber-50 hover:bg-amber-100 border border-amber-200 text-amber-700 text-[10px] font-black rounded-lg transition-all flex items-center gap-1">
+                        <i class="fa-solid fa-copy"></i> 주소복사 & 시세확인 (씨리얼)
+                    </button>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse text-[11px] document-view">
+                        <thead>
+                            <tr class="bg-slate-50 border-b border-slate-200 text-slate-750 font-extrabold">
+                                <th class="p-2 border-b">거래일자</th>
+                                <th class="p-2 border-b">면적 (전용)</th>
+                                <th class="p-2 border-b text-center">층수</th>
+                                <th class="p-2 border-b text-right">거래금액</th>
+                                <th class="p-2 border-b text-center">변동률</th>
+                            </tr>
+                        </thead>
+                        <tbody id="detail-market-tbody" class="text-slate-600 font-medium">
+                            <!-- 동적 생성 -->
+                        </tbody>
+                    </table>
                 </div>
             </div>
+        </div>
 
-            <!-- 평면 정보 가이드 및 도면 발급 안내 -->
-            <div class="bg-white border border-slate-200 rounded-2xl p-3.5 sm:p-4 space-y-3 shadow-sm">
-                <h4 class="text-xs sm:text-sm font-black text-slate-800 flex items-center gap-1.5 pb-2 border-b border-slate-100">
-                    <i class="fa-solid fa-file-pdf text-royalBlue"></i> 공식 건축물대장 현황도면 발급 안내
-                </h4>
-                <p class="text-[9.5px] text-slate-500 leading-relaxed font-medium">
-                    본 평면도는 매물 타입(아파트/오피스텔)에 따른 표준형 3-Bay 구조 추정 도면입니다. 실제 내부 구조와 다를 수 있으므로 정밀 확인을 권장합니다.
-                </p>
-                <div class="bg-slate-50 border border-slate-100 p-3 rounded-xl text-slate-655 space-y-1.5 text-[10px] sm:text-[11px] leading-relaxed font-bold">
-                    <div class="flex items-start gap-1">
-                        <span class="text-royalBlue font-black flex-shrink-0">•</span>
-                        <span>낙찰 전 이해관계인(소유주, 임차인 등)에 한해 현장 동행 하에 주민센터에서 도면 열람 및 발급이 가능합니다.</span>
-                    </div>
-                    <div class="flex items-start gap-1">
-                        <span class="text-royalBlue font-black flex-shrink-0">•</span>
-                        <span>낙찰 후에는 낙찰증명서를 지참하여 전국 주민센터 및 정부24를 통해 해당 물건의 '건축물대장 현황도면(평면도)'을 정식 무료 발급/출력할 수 있습니다.</span>
-                    </div>
+        <!-- 🏢 [10] 단지정보 탭 패널 (기본 숨김) -->
+            </div>
+            <div id="group-mask-4" class="absolute inset-0 bg-slate-900/60 backdrop-blur-sm z-30 flex flex-col items-center justify-center text-center p-6 hidden">
+                <div class="bg-white border border-slate-200 rounded-2xl p-6 max-w-sm shadow-2xl space-y-3">
+                    <i class="fa-solid fa-lock text-rose-500 text-3xl"></i>
+                    <h4 class="text-slate-800 text-sm font-black">🔒 위치 & 시세 분석 열람 제한</h4>
+                    <p class="text-slate-500 text-[10.5px] leading-relaxed font-semibold">본 매물의 지도 및 인근 실거래 시세 추이는 프리미엄 회원 등급 전용 콘텐츠입니다. 등급을 상향하여 실시간 위치분석 정보를 확인해 보세요.</p>
+                    <button onclick="alert('등급 상향은 관리자 권한으로 즉시 조정 가능합니다.')" class="w-full bg-royalBlue text-white font-extrabold text-xs py-2 rounded-xl shadow-md hover:bg-royalHover transition-all">등급 상향 신청하기</button>
                 </div>
-                <a href="https://www.gov.kr/mw/AA020InfoCappView.do?HighCtgCD=A01004001&CappBizCD=15000000098" target="_blank" class="w-full bg-royalBlue text-white py-2 rounded-xl text-xs font-black hover:bg-royalHover transition-all flex items-center justify-center gap-1 select-none cursor-pointer text-center">
-                    정부24 건축물대장 현황도면 신청 바로가기
-                </a>
             </div>
         </div>
     </aside>
@@ -1542,9 +1811,9 @@
             
             const filters = {
                 search: document.getElementById("search-input").value,
-                source: document.getElementById("source-filter").value,
-                ptype: document.getElementById("ptype-filter").value,
-                sido: document.getElementById("sido-filter").value,
+                selectedSources: Array.from(document.querySelectorAll('input[name="source-check"]:checked')).map(cb => cb.value),
+                selectedPtypes: Array.from(document.querySelectorAll('input[name="ptype-check"]:checked')).map(cb => cb.value),
+                selectedSidos: Array.from(document.querySelectorAll('input[name="sido-check"]:checked')).map(cb => cb.value),
                 dateLimit: document.getElementById("date-filter").value,
                 budgetLimit: document.getElementById("budget-slider").value,
                 hidePast: document.getElementById("hide-past-toggle").checked,
@@ -1563,13 +1832,23 @@
             try {
                 const filters = JSON.parse(cached);
                 document.getElementById("search-input").value = filters.search || "";
-                document.getElementById("source-filter").value = filters.source || "all";
-                document.getElementById("ptype-filter").value = filters.ptype || "all";
                 
-                const sidoFilter = document.getElementById("sido-filter");
-                sidoFilter.value = filters.sido || "all";
+                if (filters.selectedSources) {
+                    document.querySelectorAll('input[name="source-check"]').forEach(cb => {
+                        cb.checked = filters.selectedSources.indexOf(cb.value) > -1;
+                    });
+                }
+                if (filters.selectedPtypes) {
+                    document.querySelectorAll('input[name="ptype-check"]').forEach(cb => {
+                        cb.checked = filters.selectedPtypes.indexOf(cb.value) > -1;
+                    });
+                }
+                if (filters.selectedSidos) {
+                    document.querySelectorAll('input[name="sido-check"]').forEach(cb => {
+                        cb.checked = filters.selectedSidos.indexOf(cb.value) > -1;
+                    });
+                }
                 
-                // 시군구 업데이트 (필터 렌더링 무한루프 방지)
                 updateSigunguFilter(false);
                 if (filters.selectedSigungus && filters.selectedSigungus.length > 0) {
                     filters.selectedSigungus.forEach(val => {
@@ -1588,7 +1867,6 @@
                 document.getElementById("show-favorites-toggle").checked = filters.showFavorites === true;
                 showFavoritesOnly = filters.showFavorites === true;
                 
-                // 법원 복원
                 if (filters.selectedCourts && filters.selectedCourts.length > 0) {
                     filters.selectedCourts.forEach(val => {
                         const cb = document.querySelector(`input[name="court-check"][value="${val}"]`);
@@ -1596,7 +1874,6 @@
                     });
                 }
                 
-                // 등급 복원
                 const gradeVal = filters.gradeFilter || "all";
                 const radio = document.querySelector(`input[name="grade-filter"][value="${gradeVal}"]`);
                 if (radio) radio.checked = true;
@@ -2060,32 +2337,45 @@
 
         // [신규 기능 1] 다이내믹 시군구 소분류 체크박스 업데이트 (DOM 쓰기 최적화 완료)
         function updateSigunguFilter(apply = true) {
-            const sido = document.getElementById("sido-filter").value;
+            const sidoCheckBoxes = document.querySelectorAll('input[name="sido-check"]:checked');
+            const selectedSidos = Array.from(sidoCheckBoxes).map(cb => cb.value);
             const panel = document.getElementById("sigungu-panel");
             const container = document.getElementById("sigungu-container");
             
-            container.innerHTML = "";
-            
-            if (sido === "all") {
-                panel.classList.add("hidden");
+            if (selectedSidos.length === 0) {
+                if (panel) panel.classList.add("hidden");
+                if (container) container.innerHTML = "";
                 if (apply) applyFilters();
                 return;
             }
             
-            panel.classList.remove("hidden");
-            const sigungus = FULL_REGIONS[sido] || [];
+            if (panel) panel.classList.remove("hidden");
             
-            let htmlBuffer = [];
-            sigungus.forEach(sg => {
-                htmlBuffer.push(`
-                    <label class="flex items-center gap-2 cursor-pointer select-none">
-                        <input type="checkbox" name="sigungu-check" value="${sido} ${sg}" onchange="applyFilters()" class="accent-royalBlue">
-                        <span>${sg}</span>
-                    </label>
-                `);
+            let sigungus = [];
+            selectedSidos.forEach(sido => {
+                if (FULL_REGIONS[sido]) {
+                    FULL_REGIONS[sido].forEach(sg => {
+                        sigungus.push({ sido: sido, name: sg });
+                    });
+                }
             });
-            container.innerHTML = htmlBuffer.join("");
             
+            sigungus.sort((a, b) => a.name.localeCompare(b.name, "ko"));
+            
+            const checkedVals = Array.from(document.querySelectorAll('input[name="sigungu-check"]:checked')).map(cb => cb.value);
+            
+            let html = sigungus.map(item => {
+                const fullVal = `${item.sido} ${item.name}`;
+                const checked = checkedVals.includes(fullVal) ? "checked" : "";
+                return `
+                    <label class="flex items-center gap-2 cursor-pointer select-none text-[11px] font-semibold text-slate-600 py-0.5">
+                        <input type="checkbox" name="sigungu-check" value="${fullVal}" ${checked} onchange="applyFilters()" class="accent-royalBlue">
+                        <span>[${item.sido}] ${item.name}</span>
+                    </label>
+                `;
+            }).join("");
+            
+            if (container) container.innerHTML = html;
             if (apply) applyFilters();
         }
 
@@ -2200,13 +2490,20 @@
         // 4. [신규 로직 통합] 실시간 다차원 지역/출처/일정 검색 필터 엔진 (페이지네이션 연동)
         function applyFilters() {
             const searchQuery = document.getElementById("search-input").value.trim().toLowerCase();
-            const sourceFilter = document.getElementById("source-filter").value;
-            const ptypeFilter = document.getElementById("ptype-filter").value;
+            
+            const sourceCheckBoxes = document.querySelectorAll('input[name="source-check"]:checked');
+            const selectedSources = Array.from(sourceCheckBoxes).map(cb => cb.value);
+            
+            const ptypeCheckBoxes = document.querySelectorAll('input[name="ptype-check"]:checked');
+            const selectedPtypes = Array.from(ptypeCheckBoxes).map(cb => cb.value);
+            
+            const sidoCheckBoxes = document.querySelectorAll('input[name="sido-check"]:checked');
+            const selectedSidos = Array.from(sidoCheckBoxes).map(cb => cb.value);
+
             const dateLimit = parseInt(document.getElementById("date-filter").value);
             const budgetLimit = parseInt(document.getElementById("budget-slider").value);
             const hidePast = document.getElementById("hide-past-toggle").checked;
             
-            // 등급 라디오 필터 3단 판정 및 Active 탭 UI 하이라이팅
             const gradeFilterEl = document.querySelector('input[name="grade-filter"]:checked');
             const gradeVal = gradeFilterEl ? gradeFilterEl.value : "safe";
             
@@ -2214,20 +2511,17 @@
                 const el = document.getElementById(`grade-filter-${g}`);
                 if (el) {
                     if (g === gradeVal) {
-                        el.className = "block rounded py-1 bg-royalBlue text-white font-extrabold shadow-sm";
+                        el.className = "block rounded py-0.5 bg-royalBlue text-white font-extrabold shadow-sm";
                     } else {
-                        el.className = "block rounded py-1 text-slate-500 hover:bg-slate-100 font-bold";
+                        el.className = "block rounded py-0.5 text-slate-500 hover:bg-slate-100 font-bold";
                     }
                 }
             });
 
-            // 시도 및 시군구 체크박스 데이터 추출
-            const selectedSido = document.getElementById("sido-filter").value;
             const sigunguCheckBoxes = document.querySelectorAll('input[name="sigungu-check"]:checked');
             const selectedSigungus = Array.from(sigunguCheckBoxes).map(cb => cb.value);
 
             filteredProperties = originalProperties.filter(item => {
-                // ❶ 키워드 검색
                 const addressStr = item.address || "";
                 const matchesKeyword = !searchQuery || 
                     addressStr.toLowerCase().includes(searchQuery) ||
@@ -2236,31 +2530,28 @@
                     (item.notes_content && item.notes_content.toLowerCase().includes(searchQuery)) ||
                     (item.ptype && item.ptype.toLowerCase().includes(searchQuery));
                 
-                // ❷ 예산 제한
                 const matchesBudget = budgetLimit >= 2000000000 || item.minimum_bid <= budgetLimit;
                 
-                // ❸ 자산 출처 분류
-                const matchesSource = sourceFilter === 'all' || item.source === sourceFilter;
+                const matchesSource = selectedSources.length === 0 || selectedSources.includes(item.source);
                 
-                // ❹ 기일 디데이 필터
                 const matchesDate = dateLimit === 999 || (item.remaining_days && item.remaining_days <= dateLimit);
                 
-                // ❺ 과거 기일 마감 필터
                 const matchesPast = !hidePast || (item.remaining_days && item.remaining_days >= 0);
                 
-                // ❻ 시/도 필터 매칭
-                let matchesSido = true;
-                if (selectedSido !== "all") {
-                    matchesSido = false;
-                    const aliases = [selectedSido];
-                    if (selectedSido === "서울") aliases.push("특별시");
-                    if (selectedSido === "경기") aliases.push("경기도");
-                    aliases.forEach(al => {
-                        if (addressStr.includes(al)) matchesSido = true;
-                    });
+                let matchesSido = selectedSidos.length === 0;
+                if (selectedSidos.length > 0) {
+                    for (const sido of selectedSidos) {
+                        const aliases = [sido];
+                        if (sido === "서울") aliases.push("특별시");
+                        if (sido === "경기") aliases.push("경기도");
+                        let matched = false;
+                        aliases.forEach(al => {
+                            if (addressStr.includes(al)) matched = true;
+                        });
+                        if (matched) { matchesSido = true; break; }
+                    }
                 }
                 
-                // ❼ 시/군/구 다중 필터 매칭 (동적 연동)
                 let matchesSigungu = true;
                 if (selectedSigungus.length > 0) {
                     matchesSigungu = false;
@@ -2270,7 +2561,6 @@
                     });
                 }
 
-                // ❽ AI 위험 등급(X등급) 분류 매칭
                 let matchesGrade = true;
                 if (gradeVal === 'safe') {
                     matchesGrade = item.grade !== 'X';
@@ -2278,30 +2568,33 @@
                     matchesGrade = item.grade === 'X';
                 }
 
-                // ❾ 물건 종류 (용도) 필터 매칭
-                let matchesPtype = true;
-                if (ptypeFilter !== "all") {
+                let matchesPtype = selectedPtypes.length === 0;
+                if (selectedPtypes.length > 0) {
                     const type = (item.ptype || "").toLowerCase();
-                    if (ptypeFilter === "apart") {
-                        matchesPtype = type.includes("아파트") || type.includes("오피스텔") || type.includes("다세대") || type.includes("빌라") || type.includes("연립");
-                    } else if (ptypeFilter === "store") {
-                        matchesPtype = type.includes("상가") || type.includes("점포") || type.includes("근린") || type.includes("근생") || type.includes("생활시설") || type.includes("상업") || type.includes("빌딩") || type.includes("사무실");
-                    } else if (ptypeFilter === "house") {
-                        matchesPtype = (type.includes("주택") || type.includes("가구") || type.includes("단독") || type.includes("전원")) && !type.includes("아파트") && !type.includes("다세대") && !type.includes("연립");
-                    } else if (ptypeFilter === "land") {
-                        matchesPtype = type.includes("토지") || type.includes("대지") || type.includes("임야") || type.includes("잡종지") || type.includes("대") || type.includes("전") || type.includes("답");
-                    } else if (ptypeFilter === "factory") {
-                        matchesPtype = type.includes("공장") || type.includes("창고") || type.includes("산업");
+                    for (const val of selectedPtypes) {
+                        if (val === "apart") {
+                            if (type.includes("아파트")) { matchesPtype = true; break; }
+                        } else if (val === "officetel") {
+                            if (type.includes("오피스텔")) { matchesPtype = true; break; }
+                        } else if (val === "villa") {
+                            if (type.includes("다세대") || type.includes("빌라") || type.includes("연립")) { matchesPtype = true; break; }
+                        } else if (val === "house") {
+                            if ((type.includes("주택") || type.includes("가구") || type.includes("단독") || type.includes("전원")) && !type.includes("아파트") && !type.includes("오피스텔") && !type.includes("다세대") && !type.includes("빌라") && !type.includes("연립")) { matchesPtype = true; break; }
+                        } else if (val === "store") {
+                            if (type.includes("상가") || type.includes("점포") || type.includes("근린") || type.includes("근생") || type.includes("생활시설") || type.includes("상업") || type.includes("빌딩") || type.includes("사무실")) { matchesPtype = true; break; }
+                        } else if (val === "land") {
+                            if (type.includes("토지") || type.includes("대지") || type.includes("임야") || type.includes("잡종지") || type.includes("대") || type.includes("전") || type.includes("답")) { matchesPtype = true; break; }
+                        } else if (val === "factory") {
+                            if (type.includes("공장") || type.includes("창고") || type.includes("산업")) { matchesPtype = true; break; }
+                        }
                     }
                 }
                 
-                // ❿ 내 관심 목록만 보기 필터
                 let matchesFavorite = true;
                 if (showFavoritesOnly) {
                     matchesFavorite = favoritePropertyIds.has(item.id);
                 }
                 
-                // ❿ 관할 법원 다중 필터 매칭
                 let matchesCourt = true;
                 const courtCheckBoxes = document.querySelectorAll('input[name="court-check"]:checked');
                 const selectedCourts = Array.from(courtCheckBoxes).map(cb => cb.value);
@@ -2318,7 +2611,7 @@
                 return matchesKeyword && matchesBudget && matchesSource && matchesDate && matchesPast && matchesSido && matchesSigungu && matchesGrade && matchesPtype && matchesFavorite && matchesCourt;
             });
             
-            currentPage = 1; // 필터 적용 시 1페이지부터 다시 그리기
+            currentPage = 1;
             sortData('score');
             saveFiltersToCache();
         }
@@ -2457,27 +2750,24 @@
 
         function resetFilters() {
             document.getElementById("search-input").value = "";
-            document.getElementById("source-filter").value = "all";
-            document.getElementById("ptype-filter").value = "all";
-            document.getElementById("sido-filter").value = "all";
+            document.querySelectorAll('input[name="source-check"]').forEach(cb => cb.checked = true);
+            document.querySelectorAll('input[name="ptype-check"]').forEach(cb => cb.checked = true);
+            document.querySelectorAll('input[name="sido-check"]').forEach(cb => cb.checked = false);
             document.getElementById("date-filter").value = "180";
             document.getElementById("budget-slider").value = "2000000000";
             document.getElementById("hide-past-toggle").checked = true;
             document.getElementById("show-favorites-toggle").checked = false;
             showFavoritesOnly = false;
             
-            // 3단 라디오 권리등급 필터를 'safe'(우량)으로 안전하게 초기화
             const safeRadio = document.querySelector('input[name="grade-filter"][value="safe"]');
             if (safeRadio) safeRadio.checked = true;
             
-            // 법원 체크박스 전체 해제
             document.querySelectorAll('input[name="court-check"]').forEach(cb => cb.checked = false);
-            
             document.getElementById("upload-status").classList.add("hidden");
             
             updateSigunguFilter(false);
             updateBudgetLabel(2000000000);
-            applyFilters(); // 필터 즉시 적용 및 UI 동적 리렌더링
+            applyFilters();
         }
 
         // [신규 기능 3] 유찰 회차 및 정확한 저감율 실시간 추정 계산기
@@ -2549,7 +2839,18 @@
             const pageItems = filteredProperties.slice(startIndex, endIndex);
             let htmlBuffer = [];
             
+            if (currentPage === 1) {
+                renderedCount = 0;
+            }
+            
             pageItems.forEach((item, idx) => {
+                // 매 4번째 위치에 광고 카드 동적 주입
+                if (renderedCount > 0 && renderedCount % 4 === 3) {
+                    const adHtml = renderAdCard(renderedCount);
+                    htmlBuffer.push(adHtml);
+                    renderedCount++;
+                }
+                renderedCount++;
                 let sourceBadge = "";
                 
                 if (item.source === 'court') {
@@ -3079,11 +3380,14 @@
             // 데이터 바인딩 로드
             loadDetailView(selectedProperty);
 
-            // 🎴 상세 창 열릴 때 첫 번째 탭(권리진단)을 기본 활성화로 지정합니다.
-            changeDetailTab('analysis');
+            // 🎴 상세 창 열릴 때 첫 번째 그룹 탭(1.종합분석) 활성화 지정
+            changeDetailGroupTab(1);
 
             // 🎴 서랍 열기 구동 (Slide-over Drawer Open)
             openDetailDrawer();
+            
+            // 브라우저 타이틀 싱크
+            updateDynamicBrowserTitle();
         }
 
         // 서랍 열기 함수
@@ -3124,6 +3428,9 @@
                     window.history.back();
                 }
             }
+            
+            // 브라우저 타이틀 홈 복원
+            updateDynamicBrowserTitle();
         }
 
         // ESC 키 입력 시 우측 서랍(Drawer) 자동 닫기 기능 바인딩
@@ -3200,6 +3507,118 @@
             document.getElementById("detail-spec-appraisal").innerText = formatKRW(item.appraised_value);
             document.getElementById("detail-spec-minimum").innerText = formatKRW(item.minimum_bid);
             document.getElementById("detail-spec-date").innerText = `${item.bidding_date || "미상"} (${calculateRemainingDays(item.bidding_date) >= 0 ? 'D-' + calculateRemainingDays(item.bidding_date) : '종결'})`;
+
+            // 👤 가상 소유주 및 채무자 매핑
+            const virtualOwner = item.owner || "홍길동";
+            const virtualDebtor = item.debtor || "김채무";
+            document.getElementById("detail-owner").innerText = virtualOwner;
+            document.getElementById("detail-debtor").innerText = virtualDebtor;
+
+            // 📐 평수 분할 및 추정 공급 면적 계산
+            const exclusiveArea = item.exclusive_area || 0;
+            const landArea = item.land_area || (exclusiveArea * 0.4);
+            const buildingArea = item.building_area || exclusiveArea;
+            
+            const exclusivePy = (exclusiveArea * 0.3025).toFixed(1);
+            const supplyPy = (exclusiveArea * 1.3 * 0.3025).toFixed(1);
+            const landPy = (landArea * 0.3025).toFixed(1);
+            const buildingPy = (buildingArea * 0.3025).toFixed(1);
+
+            document.getElementById("detail-spec-exclusive-py").innerText = `${exclusiveArea} ㎡ (${exclusivePy} 평)`;
+            document.getElementById("detail-spec-supply-py").innerText = `${(exclusiveArea * 1.3).toFixed(1)} ㎡ (${supplyPy} 평)`;
+            document.getElementById("detail-spec-land-py").innerText = `${landArea.toFixed(1)} ㎡ (${landPy} 평)`;
+            document.getElementById("detail-spec-building-py").innerText = `${buildingArea.toFixed(1)} ㎡ (${buildingPy} 평)`;
+
+            // 📅 기일 진행 이력 표 렌더링
+            const giilTbody = document.getElementById("detail-giiil-tbody");
+            if (giilTbody) {
+                let html = "";
+                const maxRounds = est.failedCount;
+                for (let i = 0; i <= maxRounds; i++) {
+                    let roundPrice = item.appraised_value;
+                    if (item.source === "court") {
+                        roundPrice = Math.floor(item.appraised_value * Math.pow(0.8, i));
+                    } else {
+                        roundPrice = Math.floor(item.appraised_value * Math.pow(0.9, i));
+                    }
+                    const isLast = (i === maxRounds);
+                    const status = isLast ? "진행" : "유찰";
+                    
+                    const dateOffset = (maxRounds - i) * 30;
+                    const baseDate = new Date(item.bidding_date || new Date());
+                    baseDate.setDate(baseDate.getDate() - dateOffset);
+                    const dateStr = baseDate.toISOString().split("T")[0];
+
+                    html += `
+                        <tr class="border-b border-slate-100 text-xs hover:bg-slate-50/50">
+                            <td class="p-2 text-slate-500 font-extrabold">${i + 1}차 기일</td>
+                            <td class="p-2 text-slate-700 font-mono">${dateStr}</td>
+                            <td class="p-2 text-right font-mono text-slate-600">${formatKRW(roundPrice)}</td>
+                            <td class="p-2 text-center font-extrabold ${isLast ? "text-rose-600 animate-pulse" : "text-slate-400"}">${status}</td>
+                        </tr>
+                    `;
+                }
+                giilTbody.innerHTML = html;
+            }
+
+            // 🏆 시나리오별 입찰 수익성 시뮬레이터 연산
+            const scenarioTbody = document.getElementById("detail-scenario-tbody");
+            if (scenarioTbody) {
+                const basePrice = item.minimum_bid;
+                const scenarios = [
+                    { name: "단독 입찰 (최저가 100%)", rate: 1.0 },
+                    { name: "보수 입찰 (적정 105%)", rate: 1.05 },
+                    { name: "공격 입찰 (공격 115%)", rate: 1.15 }
+                ];
+                
+                let scenarioHtml = "";
+                scenarios.forEach(sc => {
+                    const bidPrice = Math.floor(basePrice * sc.rate);
+                    const loan = Math.floor(bidPrice * 0.7);
+                    const agencyFee = Math.floor(bidPrice * 0.03);
+                    const cashNeeded = bidPrice - loan + agencyFee;
+                    const annualInterest = Math.floor(loan * 0.045);
+                    
+                    const marketCompareDiff = item.appraised_value - bidPrice - annualInterest;
+                    const roi = cashNeeded > 0 ? ((marketCompareDiff / cashNeeded) * 100).toFixed(1) : "0.0";
+                    
+                    scenarioHtml += `
+                        <tr class="border-b border-slate-100 hover:bg-slate-50/50 text-[10px] sm:text-xs">
+                            <td class="p-2 text-slate-700 font-bold">${sc.name}</td>
+                            <td class="p-2 text-right font-mono text-slate-800">${formatKRW(bidPrice)}</td>
+                            <td class="p-2 text-right font-mono text-slate-500">${formatKRW(loan)}</td>
+                            <td class="p-2 text-right font-mono text-royalBlue font-bold">${formatKRW(cashNeeded)}</td>
+                            <td class="p-2 text-right font-mono text-rose-500">${formatKRW(annualInterest)}</td>
+                            <td class="p-2 text-right font-mono text-rose-600 font-black">${roi}%</td>
+                        </tr>
+                    `;
+                });
+                scenarioTbody.innerHTML = scenarioHtml;
+            }
+
+            // 🧠 계산 결과 싱크 정밀 AI의 실전 투자 분석 총평 줄글 코멘트 동적 생성
+            const commentEl = document.getElementById("detail-ai-comment");
+            if (commentEl) {
+                const singlePrice = item.minimum_bid;
+                const loan70 = Math.floor(singlePrice * 0.7);
+                const cash70 = Math.floor(singlePrice * 0.3 + singlePrice * 0.03);
+                const interest45 = Math.floor(loan70 * 0.045);
+                const roiRate = cash70 > 0 ? (((item.appraised_value - singlePrice - interest45) / cash70) * 100).toFixed(1) : "0.0";
+                
+                let opinion = `본 매물은 감정가 ${formatKRW(item.appraised_value)} 대비 ${est.discount}% 저감된 최저 매각가 ${formatKRW(item.minimum_bid)}에 매각 진행 중인 물건입니다. `;
+                opinion += `단독 입찰 낙찰 시, 대출 LTV 70%(${formatKRW(loan70)})를 가정한 최소 필요 자기자본금은 약 ${formatKRW(cash70)} 수준으로 예상됩니다. 연 4.5% 금리 적용 시 연간 이자 비용 부담은 약 ${formatKRW(interest45)}으로 월 평균 이자 비용은 약 ${formatKRW(Math.floor(interest45/12))}가 발생합니다. `;
+                opinion += `감정평가액 기반 시세 차익과 금융 비용을 대조하여 세후 예측 ROI를 도출한 결과 약 ${roiRate}%의 유의미한 수익률을 기록할 것으로 전망됩니다. `;
+                
+                if (item.grade === "A" || item.grade === "B") {
+                    opinion += `권리분석 상 소멸되지 않는 악성 채무나 점유 리스크 등 법적 위해 요소가 감지되지 않아 투자의 안전성이 우수한 우량 등급의 자산입니다. 시뮬레이션 표의 시나리오를 참고하여 보수적(105%) 및 공격적(115%) 입찰가 조정을 거쳐 적극 응찰할 것을 강력히 권고합니다.`;
+                } else {
+                    opinion += `다만 권리 등급 분류 상 위험(X등급) 판정을 받은 자산으로, 유치권 내지 대항력 있는 임차보증금 등의 추가 인수 부담 위험이 매우 큽니다. 시뮬레이션 수치 상의 수익률에 현혹되지 마시고, 보수적인 추가 유찰 시점까지 입찰을 미루시거나 전문 법률 분석을 선행하시기를 권장합니다.`;
+                }
+                commentEl.innerHTML = `<p class="leading-relaxed font-bold text-slate-700">${opinion}</p>`;
+            }
+
+            // 하단 주변 유사 매물 추천 렌더링 호출
+            renderSimilarProperties(item);
 
             // 📂 [서류/이력] 탭 내의 기본 명세 동적 바인딩
             const docAddressEl = document.getElementById("detail-doc-address");
@@ -3297,6 +3716,11 @@
             document.getElementById("btn-naver-map").href = `https://map.naver.com/v5/search/${encodeURIComponent(item.address)}`;
             document.getElementById("btn-official-site").href = item.link_url || "https://www.courtauction.go.kr";
             document.getElementById("btn-naver-land-price").href = `https://land.naver.com/search/search.naver?query=${encodeURIComponent(item.address)}`;
+            
+            const floorplanLink = document.getElementById("btn-naver-floorplan-link");
+            if (floorplanLink) {
+                floorplanLink.href = `https://land.naver.com/search/search.naver?query=${encodeURIComponent(item.address)}`;
+            }
  
             // 공식 서류 아웃링크 동적 바인딩.
             const onbidDetailUrl = `https://www.onbid.co.kr/op/dts/cltr/cltrDtLink.do?cltrMngNo=${item.auction_no}`;
@@ -3334,10 +3758,10 @@
                 }
             });
 
-            // 네이버 지도 레이어 이동 링크 바인딩.
-            const mapEditUrl = `https://map.naver.com/v5/search/${encodeURIComponent(item.address)}?lCd=lnd`;
-            const mapSatUrl = `https://map.naver.com/v5/search/${encodeURIComponent(item.address)}?lCd=sky`;
-            const mapRoadUrl = `https://map.naver.com/v5/search/${encodeURIComponent(item.address)}?lCd=rv`;
+            // 네이버 지도 레이어 이동 링크 바인딩 (v5 최신 스펙 적용).
+            const mapEditUrl = `https://map.naver.com/v5/search/${encodeURIComponent(item.address)}/address?c=15,0,0,0,lnd,dh`;
+            const mapSatUrl = `https://map.naver.com/v5/search/${encodeURIComponent(item.address)}/address?c=15,0,0,0,sky,dh`;
+            const mapRoadUrl = `https://map.naver.com/v5/search/${encodeURIComponent(item.address)}/address?c=15,0,0,0,rv,dh`;
 
             const btnMapEdit = document.getElementById("btn-naver-map-edit");
             if (btnMapEdit) btnMapEdit.href = mapEditUrl;
@@ -3368,10 +3792,26 @@
                 officialEumBtn.href = `https://www.eum.go.kr/web/mp/mpMapSearch.jsp?searchKeyword=${encodeURIComponent(item.address)}`;
             }
 
-            // 📍 구글 지도 동적 iframe 임베딩
+            // 📍 네이버 지도 프리미엄 뷰 연동
             const mapContainer = document.getElementById("detail-map-container");
             if (mapContainer && item.address) {
-                mapContainer.innerHTML = `<iframe width="100%" height="100%" style="border:0;" loading="lazy" allowfullscreen src="https://maps.google.com/maps?q=${encodeURIComponent(item.address)}&t=&z=16&ie=UTF8&iwloc=&output=embed"></iframe>`;
+                mapContainer.innerHTML = `
+                    <div class="w-full h-full bg-slate-50 border border-slate-200 rounded-xl flex flex-col items-center justify-center p-4 relative group overflow-hidden">
+                        <div class="absolute inset-0 bg-cover bg-center filter blur-[1px] opacity-10" style="background-image: url('./apartment_elegant_facade.png');"></div>
+                        <div class="relative z-10 flex flex-col items-center text-center space-y-3">
+                            <div class="bg-emerald-50 text-emeraldSuccess w-11 h-11 rounded-full flex items-center justify-center shadow-sm">
+                                <i class="fa-solid fa-map-location-dot text-base"></i>
+                            </div>
+                            <div class="space-y-0.5">
+                                <strong class="text-xs font-black text-slate-800">네이버 지도로 위치 확인</strong>
+                                <p class="text-[9.5px] text-slate-400 font-bold max-w-[260px] truncate">${item.address}</p>
+                            </div>
+                            <a href="https://map.naver.com/v5/search/${encodeURIComponent(item.address)}" target="_blank" class="bg-emeraldSuccess hover:bg-emerald-700 text-white text-[10px] font-black py-2 px-3 rounded-lg shadow transition-all flex items-center gap-1.5 select-none">
+                                <i class="fa-solid fa-arrow-up-right-from-square"></i> 네이버 지도 열기
+                            </a>
+                        </div>
+                    </div>
+                `;
             }
 
             // 계산기 디폴트 입력값 세팅 (사용자가 타이핑 중인 경우 덮어쓰기 차단)
@@ -3632,6 +4072,68 @@
                         <td class="p-2 text-slate-800">현대건설 주식회사</td>
                     </tr>
                 `;
+            }
+        }
+
+        // 🧠 주변 유사 추천 매물 미터(m) 단위 동적 연산 렌더러
+        function renderSimilarProperties(currentItem) {
+            const container = document.getElementById("detail-similar-container");
+            if (!container) return;
+
+            const currentPtype = currentItem.ptype || "";
+            const currentSido = (currentItem.address || "").substring(0, 2);
+
+            let similarList = originalProperties.filter(p => p.id !== currentItem.id);
+            similarList.sort((a, b) => {
+                const aPtypeMatch = (a.ptype === currentPtype) ? 1 : 0;
+                const bPtypeMatch = (b.ptype === currentPtype) ? 1 : 0;
+                if (aPtypeMatch !== bPtypeMatch) return bPtypeMatch - aPtypeMatch;
+
+                const aSidoMatch = (a.address || "").startsWith(currentSido) ? 1 : 0;
+                const bSidoMatch = (b.address || "").startsWith(currentSido) ? 1 : 0;
+                return bSidoMatch - aSidoMatch;
+            });
+
+            const targetList = similarList.slice(0, 3);
+            if (targetList.length === 0) {
+                container.innerHTML = `<div class="col-span-3 text-center text-[10px] text-slate-400 py-6">유사 추천 매물이 없습니다.</div>`;
+                return;
+            }
+
+            container.innerHTML = targetList.map((item, index) => {
+                // ID 기반으로 500m~2000m 이내 고유 가상 거리 연산
+                const distance = 400 + ((item.id * 17) % 1500);
+                const distanceText = `${distance}m 이내`;
+
+                return `
+                    <div onclick="switchDetailProperty(${item.id})" class="bg-white border border-slate-200 rounded-2xl p-3 cursor-pointer hover:border-royalBlue/40 hover:shadow-sm transition-all flex flex-col justify-between h-full group text-left">
+                        <div class="space-y-1">
+                            <div class="flex justify-between items-center">
+                                <span class="bg-blue-50 text-royalBlue text-[8.5px] font-black px-1.5 py-0.5 rounded border border-blue-200">
+                                    ${item.ptype || '부동산'}
+                                </span>
+                                <span class="text-[9px] text-slate-450 font-black"><i class="fa-solid fa-location-dot text-royalBlue/70"></i> ${distanceText}</span>
+                            </div>
+                            <h5 class="text-[10px] font-extrabold text-slate-800 line-clamp-2 leading-snug group-hover:text-royalBlue transition-colors mt-1.5">
+                                ${item.address}
+                            </h5>
+                        </div>
+                        <div class="mt-2.5 pt-2 border-t border-slate-100 flex flex-col">
+                            <span class="text-[8.5px] text-slate-400 font-bold">최저가</span>
+                            <span class="text-[10.5px] font-black text-rose-600">${formatKRW(item.minimum_bid)}</span>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // 유사 매물 클릭 시 상세 뷰 강제 전환 지원
+        function switchDetailProperty(id) {
+            const prop = originalProperties.find(p => p.id === id);
+            if (prop) {
+                loadDetailView(prop);
+                const drawerPanel = document.getElementById("detail-group-panel-1");
+                if (drawerPanel) drawerPanel.scrollTop = 0;
             }
         }
 
@@ -4347,10 +4849,16 @@
         let favoritePropertyIds = new Set();
         let showFavoritesOnly = false;
         let isSignUpMode = false;
+        let userGrade = "C";
+        let isUpgradeRequested = false;
+        let adSettings = null;
+        let renderedCount = 0;
+        let currentDetailGroupTab = 1;
 
         // Supabase 인증 상태 리스너 구독
         supabaseClient.auth.onAuthStateChange(async (event, session) => {
             currentUser = session ? session.user : null;
+            await fetchUserGrade(); // 고객 등급 실시간 동기화
             updateAuthUI();
             if (currentUser) {
                 await loadFavoritesFromServer();
@@ -4372,11 +4880,24 @@
             
             if (currentUser) {
                 const emailId = currentUser.email.split('@')[0];
+                const gradeBadge = `<span class="bg-yellow-100 text-yellow-800 text-[8.5px] sm:text-[9.5px] font-black px-1.5 sm:px-2.5 py-0.5 sm:py-1 rounded-full border border-yellow-300 ml-1 flex items-center gap-0.5 shadow-sm"><i class="fa-solid fa-crown text-[8px] text-yellow-500"></i> ${userGrade}등급</span>`;
+                
+                let upgradeBtn = "";
+                if (userGrade !== "A") {
+                    if (isUpgradeRequested) {
+                        upgradeBtn = `<button disabled class="px-1.5 sm:px-2.5 py-0.5 sm:py-1 rounded-full border border-slate-200 text-slate-400 bg-slate-50 text-[8.5px] sm:text-[9.5px] font-bold cursor-not-allowed whitespace-nowrap ml-1">신청 대기 중</button>`;
+                    } else {
+                        upgradeBtn = `<button onclick="requestUpgrade()" class="px-1.5 sm:px-2.5 py-0.5 sm:py-1 rounded-full border border-amber-300 text-amber-800 bg-amber-50 text-[8.5px] sm:text-[9.5px] font-black shadow-sm transition-all duration-300 cursor-pointer hover:bg-amber-100 active:scale-95 whitespace-nowrap ml-1"><i class="fa-solid fa-arrow-up mr-0.5"></i> 등급 업그레이드</button>`;
+                    }
+                }
+
                 container.innerHTML = `
                     <span class="text-[8.5px] sm:text-[9.5px] font-black text-slate-600 bg-slate-100 px-1.5 sm:px-2.5 py-0.5 sm:py-1 rounded-full border border-slate-200 flex items-center gap-0.5 sm:gap-1 shadow-sm">
                         <i class="fa-solid fa-user text-[8px] text-royalBlue"></i> <span class="max-w-[50px] sm:max-w-none truncate">${emailId}님</span>
                     </span>
-                    <button onclick="handleLogout()" class="px-1.5 sm:px-2.5 py-0.5 sm:py-1 rounded-full border border-rose-200 text-rose-600 bg-white text-[8.5px] sm:text-[9.5px] font-black shadow-sm transition-all duration-300 cursor-pointer hover:bg-rose-50 active:scale-95 whitespace-nowrap">
+                    ${gradeBadge}
+                    ${upgradeBtn}
+                    <button onclick="handleLogout()" class="px-1.5 sm:px-2.5 py-0.5 sm:py-1 rounded-full border border-rose-200 text-rose-600 bg-white text-[8.5px] sm:text-[9.5px] font-black shadow-sm transition-all duration-300 cursor-pointer hover:bg-rose-50 active:scale-95 whitespace-nowrap ml-1">
                         <i class="fa-solid fa-right-from-bracket mr-0.5"></i> 로그아웃
                     </button>
                 `;
@@ -4557,6 +5078,235 @@
                 alert("로그아웃되었습니다.");
             } catch (err) {
                 console.error("로그아웃 실패", err);
+            }
+        }
+
+        // 📱 검색 필터 아코디언 패널 토글 함수
+        function toggleAccordion(id) {
+            const el = document.getElementById(id);
+            const icon = document.getElementById(id + "-icon");
+            if (el) {
+                if (el.classList.contains("hidden")) {
+                    el.classList.remove("hidden");
+                    if (icon) {
+                        icon.classList.remove("fa-chevron-down");
+                        icon.classList.add("fa-chevron-up");
+                    }
+                } else {
+                    el.classList.add("hidden");
+                    if (icon) {
+                        icon.classList.remove("fa-chevron-up");
+                        icon.classList.add("fa-chevron-down");
+                    }
+                }
+            }
+        }
+
+        // 📱 다중 필터 전체 선택 / 전체 해제 함수
+        function checkAllFilter(name, checked) {
+            const checkboxes = document.querySelectorAll(`input[name="${name}"]`);
+            checkboxes.forEach(cb => {
+                cb.checked = checked;
+            });
+            if (name === "sido-check") {
+                updateSigunguFilter();
+            } else {
+                applyFilters();
+            }
+        }
+
+        // 🔒 Supabase user_profiles 고객 등급 조회 함수
+        async function fetchUserGrade() {
+            if (!currentUser) {
+                userGrade = "C";
+                isUpgradeRequested = false;
+                return;
+            }
+            try {
+                const { data, error } = await supabaseClient
+                    .from("user_profiles")
+                    .select("grade, upgrade_requested")
+                    .eq("id", currentUser.id)
+                    .maybeSingle();
+                
+                if (error) throw error;
+                
+                if (data) {
+                    userGrade = data.grade || "C";
+                    isUpgradeRequested = !!data.upgrade_requested;
+                } else {
+                    // 기본 C등급으로 신규 프로필 생성
+                    await supabaseClient
+                        .from("user_profiles")
+                        .insert({ id: currentUser.id, grade: "C", email: currentUser.email, upgrade_requested: false });
+                    userGrade = "C";
+                    isUpgradeRequested = false;
+                }
+            } catch (err) {
+                console.error("고객 등급 조회 실패 (C등급으로 설정):", err);
+                userGrade = "C";
+                isUpgradeRequested = false;
+            }
+        }
+
+        // 🔒 등급 업그레이드 신청 API 연동
+        async function requestUpgrade() {
+            if (!currentUser) {
+                alert("등급 업그레이드 신청을 위해 먼저 로그인해 주십시오.");
+                return;
+            }
+            try {
+                const { error } = await supabaseClient
+                    .from("user_profiles")
+                    .update({ upgrade_requested: true })
+                    .eq("id", currentUser.id);
+                if (error) throw error;
+                alert("등급 업그레이드 신청이 완료되었습니다. 관리자 승인 대기 상태로 전환됩니다.");
+                isUpgradeRequested = true;
+                updateAuthUI();
+            } catch (err) {
+                console.error("등급 업그레이드 신청 실패:", err);
+                alert("업그레이드 신청 중 오류가 발생했습니다. 다시 시도해 주십시오.");
+            }
+        }
+
+        // 📢 Supabase ads 광고 연동 로드 함수
+        async function loadAdSettings() {
+            try {
+                const { data, error } = await supabaseClient
+                    .from("ads")
+                    .select("*")
+                    .eq("active", true)
+                    .order("id", { ascending: false });
+                if (error) throw error;
+                adSettings = data || [];
+            } catch (err) {
+                console.error("광고 연동 실패:", err);
+                adSettings = [];
+            }
+        }
+
+        // 📢 광고 카드 동적 렌더러 함수
+        function renderAdCard(index) {
+            let ad = null;
+            if (adSettings && adSettings.length > 0) {
+                ad = adSettings[index % adSettings.length];
+            }
+            
+            const defaultAd = {
+                title: "★ 프리미엄 경공매 투자 VIP 멤버십 모집",
+                desc: "오직 1%를 위한 NPL 부실채권 및 지분 경매 핵심 노하우 단독 공개. 지금 가입 시 30% 한정 할인 적용!",
+                image_url: "./apartment_elegant_facade.png",
+                link_url: "https://action-b8c75.web.app",
+                type: "banner"
+            };
+            
+            const currentAd = ad || defaultAd;
+            
+            let contentHtml = "";
+            if (currentAd.type === "adsense" && currentAd.ad_code) {
+                contentHtml = `<div class="w-full h-full flex items-center justify-center overflow-hidden font-mono text-[9px] text-slate-400">${currentAd.ad_code}</div>`;
+            } else {
+                contentHtml = `
+                    <a href="${currentAd.link_url || "#"}" target="_blank" class="flex flex-col justify-between h-full space-y-2 group">
+                        <div class="relative w-full h-[110px] rounded-xl overflow-hidden bg-slate-100 border border-slate-200/60">
+                            <img src="${currentAd.image_url || "./apartment_elegant_facade.png"}" alt="광고" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300">
+                            <span class="absolute top-1.5 left-1.5 bg-slate-900/60 text-white text-[8px] font-black px-1.5 py-0.5 rounded uppercase">AD</span>
+                        </div>
+                        <div class="space-y-1 flex-1 flex flex-col justify-between">
+                            <div>
+                                <h4 class="text-xs font-black text-slate-800 line-clamp-2 leading-snug group-hover:text-royalBlue transition-colors">
+                                    ${currentAd.title}
+                                </h4>
+                                <p class="text-[10px] text-slate-400 font-bold line-clamp-2 mt-1 leading-normal">
+                                    ${currentAd.desc}
+                                </p>
+                            </div>
+                            <div class="text-[10.5px] font-black text-royalBlue pt-1 border-t border-slate-100 flex items-center justify-between">
+                                <span>자세히 보기</span>
+                                <i class="fa-solid fa-arrow-right text-[9px] group-hover:translate-x-1 transition-transform"></i>
+                            </div>
+                        </div>
+                    </a>
+                `;
+            }
+            
+            return `
+                <div class="bg-amber-50/20 border-amber-200/80 border rounded-2xl p-3 flex flex-col justify-between transition-all duration-300 transform hover:-translate-y-1 shadow-sm select-none min-h-[300px]">
+                    ${contentHtml}
+                </div>
+            `;
+        }
+
+        // 📱 4대 대분류 그룹 탭 스위칭 및 등급 블러 마스크 제어 함수
+        function changeDetailGroupTab(tabNum) {
+            currentDetailGroupTab = tabNum;
+            for (let i = 1; i <= 4; i++) {
+                const btn = document.getElementById(`detail-group-tab-${i}-btn`);
+                const panel = document.getElementById(`detail-group-panel-${i}`);
+                if (btn) {
+                    if (i === tabNum) {
+                        btn.className = "inline-block py-1.5 px-3.5 text-center text-[10.5px] sm:text-xs font-black rounded-xl border border-transparent transition-all select-none bg-royalBlue text-white shadow-sm";
+                    } else {
+                        btn.className = "inline-block py-1.5 px-3.5 text-center text-[10.5px] sm:text-xs font-black rounded-xl border border-transparent transition-all select-none text-slate-500 hover:text-royalBlue hover:bg-slate-50 bg-slate-50/50";
+                    }
+                }
+                if (panel) {
+                    if (i === tabNum) {
+                        panel.classList.remove("hidden");
+                    } else {
+                        panel.classList.add("hidden");
+                    }
+                }
+            }
+
+            const mask2 = document.getElementById("group-mask-2");
+            const mask3 = document.getElementById("group-mask-3");
+            const mask4 = document.getElementById("group-mask-4");
+            const content2 = document.getElementById("group-content-2");
+            const content3 = document.getElementById("group-content-3");
+            const content4 = document.getElementById("group-content-4");
+
+            if (mask2) mask2.classList.add("hidden");
+            if (mask3) mask3.classList.add("hidden");
+            if (mask4) mask4.classList.add("hidden");
+            if (content2) content2.style.filter = "none";
+            if (content3) content3.style.filter = "none";
+            if (content4) content4.style.filter = "none";
+
+            if (userGrade === "B") {
+                if (mask3) mask3.classList.remove("hidden");
+                if (mask4) mask4.classList.remove("hidden");
+                if (content3) content3.style.filter = "blur(8px)";
+                if (content4) content4.style.filter = "blur(8px)";
+            } else if (userGrade === "C") {
+                if (mask2) mask2.classList.remove("hidden");
+                if (mask3) mask3.classList.remove("hidden");
+                if (mask4) mask4.classList.remove("hidden");
+                if (content2) content2.style.filter = "blur(8px)";
+                if (content3) content3.style.filter = "blur(8px)";
+                if (content4) content4.style.filter = "blur(8px)";
+            }
+
+            updateDynamicBrowserTitle();
+        }
+
+        // 📱 실시간 브라우저 타이틀 동적 전환 함수
+        function updateDynamicBrowserTitle() {
+            const drawer = document.getElementById("detail-drawer");
+            if (drawer && !drawer.classList.contains("translate-x-full")) {
+                const auctionNo = document.getElementById("detail-no") ? document.getElementById("detail-no").innerText : "";
+                const cleanNo = auctionNo.replace("사건번호: ", "").trim();
+                const tabNames = {
+                    1: "종합분석",
+                    2: "권리분석",
+                    3: "수익분석",
+                    4: "위치분석"
+                };
+                const tabLabel = tabNames[currentDetailGroupTab] || "상세";
+                document.title = `부동산경공매 검색시스템 - ${cleanNo} [${tabLabel}]`;
+            } else {
+                document.title = "부동산경공매 검색시스템 - 실시간 추천";
             }
         }
 

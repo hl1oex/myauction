@@ -23,9 +23,9 @@ export default function App() {
   const [showAuthScreen, setShowAuthScreen] = useState<boolean>(false);
   const [filters, setFilters] = useState<FilterState>({
     search: '',
-    source: 'all',
-    ptype: 'all',
-    sido: 'all',
+    source: ['court', 'onbid', 'private'],
+    ptype: ['apart', 'officetel', 'villa', 'house', 'store', 'land', 'factory'],
+    sido: [],
     sigungu: 'all',
     dateLimit: 999,
     budgetLimit: 2000000000,
@@ -163,9 +163,9 @@ export default function App() {
             setSelectedProperty(null);
             setFilters({
               search: '',
-              source: 'all',
-              ptype: 'all',
-              sido: 'all',
+              source: ['court', 'onbid', 'private'],
+              ptype: ['apart', 'officetel', 'villa', 'house', 'store', 'land', 'factory'],
+              sido: [],
               sigungu: 'all',
               dateLimit: 999,
               budgetLimit: 2000000000,

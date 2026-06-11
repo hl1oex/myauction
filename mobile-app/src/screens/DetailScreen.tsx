@@ -24,7 +24,7 @@ interface DetailScreenProps {
   onBack: () => void;
 }
 
-type TabType = 'summary' | 'analysis' | 'bid' | 'dividend' | 'takeover' | 'occupancy' | 'registry' | 'statistics' | 'market' | 'complex' | 'map' | 'floorplan';
+type TabType = 'general' | 'rights' | 'bidding' | 'location';
 
 const estimateAuctionRounds = (appraisal: number, price: number, source: string) => {
   if (!appraisal || !price || appraisal <= 0 || price <= 0) {
@@ -55,9 +55,13 @@ const estimateAuctionRounds = (appraisal: number, price: number, source: string)
 };
 
 export const DetailScreen: React.FC<DetailScreenProps> = ({ property, onBack }) => {
+  const [currentProperty, setCurrentProperty] = useState<Property>(property);
   const [isFavorite, setIsFavorite] = useState<boolean>(false);
   const [userId, setUserId] = useState<string | null>(null);
-  const [activeTab, setActiveTab] = useState<TabType>('summary');
+  const [userGrade, setUserGrade] = useState<'A' | 'B' | 'C'>('C');
+  const [similarProperties, setSimilarProperties] = useState<Property[]>([]);
+  const [activeTab, setActiveTab] = useState<TabType>('general');
+  const scrollViewRef = React.useRef<ScrollView>(null);
 
   // 🧮 계산기 관련 상태 이식
   const [bidValue, setBidValue] = useState<number>(property.minimum_bid || 0);
@@ -83,20 +87,75 @@ export const DetailScreen: React.FC<DetailScreenProps> = ({ property, onBack }) 
     })
   ).current;
 
-  // 화면 진입 시 로그인된 사용자의 관심 물건 등록 상태를 실시간으로 확인하여 UI에 동기화합니다.
+  // 🔒 Supabase user_profiles 고객 등급 조회 함수
+  const fetchUserGrade = async (uid: string) => {
+    try {
+      const { data, error } = await supabase
+        .from('user_profiles')
+        .select('grade')
+        .eq('id', uid)
+        .maybeSingle();
+      if (error) throw error;
+      if (data && data.grade) {
+        setUserGrade(data.grade as 'A' | 'B' | 'C');
+      } else {
+        setUserGrade('C');
+      }
+    } catch (err) {
+      console.error('고객 등급 조회 실패:', err);
+      setUserGrade('C');
+    }
+  };
+
+  // 🔍 주변 유사 매물 3개 로드 함수
+  const loadSimilarProperties = async (prop: Property) => {
+    try {
+      const sidoVal = prop.address ? prop.address.split(' ')[0] : '';
+      const ptypeVal = prop.ptype || '';
+      
+      let query = supabase
+        .from('properties')
+        .select('*')
+        .neq('id', prop.id);
+        
+      if (sidoVal) {
+        query = query.like('address', `${sidoVal}%`);
+      }
+      if (ptypeVal) {
+        query = query.eq('ptype', ptypeVal);
+      }
+      
+      const { data, error } = await query.limit(3);
+      if (error) throw error;
+      setSimilarProperties(data || []);
+    } catch (err) {
+      console.error('유사 매물 조회 실패:', err);
+      setSimilarProperties([]);
+    }
+  };
+
+  // property props가 변경되면 currentProperty 동기화
   useEffect(() => {
-    // 매물 변경 시 계산기 상태 리셋
-    setBidValue(property.minimum_bid || 0);
+    setCurrentProperty(property);
+  }, [property]);
+
+  // currentProperty 변경 시 상태 초기화 및 데이터 로딩
+  useEffect(() => {
+    setBidValue(currentProperty.minimum_bid || 0);
     setLtvPercent(0);
     setInterestRate(4.5);
+
+    loadSimilarProperties(currentProperty);
 
     supabase.auth.getSession().then(({ data: { session } }) => {
       if (session && session.user) {
         setUserId(session.user.id);
         checkFavoriteStatus(session.user.id);
+        fetchUserGrade(session.user.id);
       } else {
         setUserId(null);
         setIsFavorite(false);
+        setUserGrade('C');
       }
     });
 
@@ -104,16 +163,18 @@ export const DetailScreen: React.FC<DetailScreenProps> = ({ property, onBack }) 
       if (session && session.user) {
         setUserId(session.user.id);
         checkFavoriteStatus(session.user.id);
+        fetchUserGrade(session.user.id);
       } else {
         setUserId(null);
         setIsFavorite(false);
+        setUserGrade('C');
       }
     });
 
     return () => {
       subscription.unsubscribe();
     };
-  }, [property.id]);
+  }, [currentProperty.id]);
 
   // Supabase에서 즐겨찾기 목록을 조회해 현재 매물이 등록되어 있는 상태인지 검증합니다.
   const checkFavoriteStatus = async (uid: string) => {
@@ -407,6 +468,10 @@ export const DetailScreen: React.FC<DetailScreenProps> = ({ property, onBack }) 
   const discountRate = calculateDiscountRate();
   const sourceLabel = property.source === 'court' ? '⚖️ 대법원 법원경매' : property.source === 'onbid' ? '🏢 캠코 온비드 공매' : '📁 업로드 사설';
 
+  // currentProperty.id 기반 가상 전용면적을 산출합니다. (59 ~ 119㎡ 사이)
+  const estimatedArea = 59 + (currentProperty.id % 5) * 15;
+  const pyeong = (estimatedArea / 3.3058).toFixed(1);
+
   // ❶ 지방세법 실거래 보정 수식 (용도분기 적용)
   const ptype = (property.ptype || "").toLowerCase();
   let taxRate = 0.015;
@@ -587,9 +652,6 @@ export const DetailScreen: React.FC<DetailScreenProps> = ({ property, onBack }) 
     };
   };
 
-  const score = property.score || 50;
-  const isCommercial = ptype.includes('상가') || ptype.includes('근린') || ptype.includes('점포') || ptype.includes('상업') || ptype.includes('빌딩') || ptype.includes('숙박') || ptype.includes('사무') || ptype.includes('생활시설');
-  const isLandOrFactory = ptype.includes('토지') || ptype.includes('대지') || ptype.includes('임야') || ptype.includes('잡종지') || ptype.includes('대') || ptype.includes('전') || ptype.includes('답') || ptype.includes('공장') || ptype.includes('창고') || ptype.includes('산업');
   const isResidential = ptype.includes('아파트') || ptype.includes('주택') || ptype.includes('다세대') || ptype.includes('빌라') || ptype.includes('오피스텔') || ptype.includes('연립') || ptype.includes('가구') || ptype.includes('단독') || ptype.includes('전원');
 
   const isInvestment = isCommercial || isLandOrFactory || (isResidential && score >= 85);
@@ -698,7 +760,7 @@ export const DetailScreen: React.FC<DetailScreenProps> = ({ property, onBack }) 
           </View>
         </View>
 
-        {/* 12단 프리미엄 가로 스크롤 탭 바 */}
+        {/* 번호식 4대 대분류 가로 탭 바 */}
         <ScrollView 
           horizontal 
           showsHorizontalScrollIndicator={false} 
@@ -706,18 +768,10 @@ export const DetailScreen: React.FC<DetailScreenProps> = ({ property, onBack }) 
           contentContainerStyle={styles.tabBarContainer}
         >
           {[
-            { key: 'summary', label: '종합 정보' },
-            { key: 'analysis', label: '권리분석' },
-            { key: 'bid', label: '입찰분석' },
-            { key: 'dividend', label: '예상배당표' },
-            { key: 'takeover', label: '인수분석' },
-            { key: 'occupancy', label: '점유현황' },
-            { key: 'registry', label: '등기현황' },
-            { key: 'statistics', label: '매각통계' },
-            { key: 'market', label: '시세/실거래가' },
-            { key: 'complex', label: '단지정보' },
-            { key: 'map', label: '지도' },
-            { key: 'floorplan', label: '평면/구조도' },
+            { key: 'general', label: '1. 기본 정보' },
+            { key: 'rights', label: '2. 권리분석' },
+            { key: 'bidding', label: '3. 입찰분석' },
+            { key: 'location', label: '4. 입지분석' },
           ].map((tab) => (
             <TouchableOpacity 
               key={tab.key}
@@ -731,573 +785,139 @@ export const DetailScreen: React.FC<DetailScreenProps> = ({ property, onBack }) 
           ))}
         </ScrollView>
 
-        {/* [1] 종합 정보 탭 */}
-        {activeTab === 'summary' && (
+        {/* 1. 기본 정보 탭 */}
+        {activeTab === 'general' && (
           <View>
+            {/* 기본 매물 명세 정보 */}
             <View style={styles.sectionCard}>
-              <Text style={styles.sectionTitle}>📋 기본 매물 명세 정보</Text>
+              <View style={styles.sectionTitleRow}>
+                <Text style={styles.sectionTitle}>📋 기본 매물 명세 정보</Text>
+                <View style={styles.gradeBadgeContainer}>
+                  <Text style={styles.gradeBadgeText}>내 등급: {userGrade === 'A' ? '🥇 Premium A' : userGrade === 'B' ? '🥈 VIP B' : '🥉 일반 C'}</Text>
+                  <TouchableOpacity
+                    style={styles.gradeUpgradeBtn}
+                    onPress={async () => {
+                      if (!userId) {
+                        Alert.alert('로그인 필요', '회원 등급을 변경하려면 로그인이 필요합니다.');
+                        return;
+                      }
+                      try {
+                        const { error } = await supabase
+                          .from('user_profiles')
+                          .update({ upgrade_requested: true })
+                          .eq('id', userId);
+                        if (error) throw error;
+                        Alert.alert('신청 완료', '등급 업그레이드 신청이 완료되었습니다. 관리자 승인 후 변경됩니다.');
+                      } catch (err) {
+                        Alert.alert('신청 실패', '업그레이드 신청 중 오류가 발생했습니다.');
+                      }
+                    }}
+                  >
+                    <Text style={styles.gradeUpgradeBtnText}>업그레이드 요청</Text>
+                  </TouchableOpacity>
+                </View>
+              </View>
               <View style={styles.infoTable}>
                 <View style={styles.infoRow}>
                   <Text style={styles.infoLabel}>사건/관리번호</Text>
-                  <Text style={styles.infoValue}>{property.auction_no}</Text>
+                  <Text style={styles.infoValue}>{currentProperty.auction_no}</Text>
                 </View>
                 <View style={styles.infoRow}>
                   <Text style={styles.infoLabel}>감정평가금액</Text>
-                  <Text style={styles.infoValue}>{formatCurrency(property.appraised_value)}</Text>
+                  <Text style={styles.infoValue}>{formatCurrency(currentProperty.appraised_value)}</Text>
                 </View>
                 <View style={styles.infoRow}>
                   <Text style={styles.infoLabel}>최저입찰금액</Text>
-                  <Text style={[styles.infoValue, { color: COLORS.crimsonAlert }]}>{formatCurrency(property.minimum_bid)}</Text>
+                  <Text style={[styles.infoValue, { color: COLORS.crimsonAlert, fontWeight: '800' }]}>
+                    {formatCurrency(currentProperty.minimum_bid)} ({discountRate}% 저감)
+                  </Text>
                 </View>
                 <View style={styles.infoRow}>
                   <Text style={styles.infoLabel}>매각 입찰 기일</Text>
-                  <Text style={styles.infoValue}>{property.bidding_date || '미정'}</Text>
+                  <Text style={styles.infoValue}>{currentProperty.bidding_date || '미정'}</Text>
                 </View>
                 <View style={styles.infoRow}>
                   <Text style={styles.infoLabel}>차수 정보 및 상태</Text>
-                  <Text style={styles.infoValue}>{property.round_info || '신건'}</Text>
+                  <Text style={styles.infoValue}>{currentProperty.round_info || '신건'}</Text>
                 </View>
-              </View>
-            </View>
-
-            <View style={styles.sectionCard}>
-              <Text style={styles.sectionTitle}>🏆 AI 분석 핵심 의견</Text>
-              <View style={[styles.gradeRow, { backgroundColor: gradeStyle.bg }]}>
-                <Text style={[styles.gradeLabel, { color: gradeStyle.text }]}>{gradeStyle.label}</Text>
-                <Text style={[styles.gradeValue, { color: gradeStyle.text }]}>{property.grade}등급</Text>
-              </View>
-              <Text style={styles.analysisContent}>{property.notes_content || '검출된 권리 하자 없음.'}</Text>
-            </View>
-          </View>
-        )}
-
-        {/* [2] 권리분석 탭 */}
-        {activeTab === 'analysis' && (
-          <View>
-            <View style={styles.sectionCard}>
-              <Text style={styles.sectionTitle}>📜 AI 권리분석 정밀 진단</Text>
-              <Text style={styles.analysisContent}>
-                {property.notes_content || '권리분석 특이사항이 기재되지 않았습니다. 말소기준권리를 기준으로 대항력 유무를 다시 점검하십시오.'}
-              </Text>
-              
-              <View style={styles.rightsTimelineContainer}>
-                <Text style={styles.timelineHeader}>⛓️ 등기부 권리 계층 구조도 (말소기준선)</Text>
-                <View style={styles.timelineBody}>
-                  <View style={styles.timelineNode}>
-                    <View style={[styles.nodePoint, { backgroundColor: (property.notes_content || "").includes("인수") || (property.notes_content || "").includes("선순위") || (property.notes_content || "").includes("대항력") ? COLORS.crimsonAlert : COLORS.emeraldSuccess }]} />
-                    <View style={[styles.nodeCard, { backgroundColor: (property.notes_content || "").includes("인수") || (property.notes_content || "").includes("선순위") || (property.notes_content || "").includes("대항력") ? COLORS.crimsonLight : COLORS.emeraldLight, borderColor: (property.notes_content || "").includes("인수") || (property.notes_content || "").includes("선순위") || (property.notes_content || "").includes("대항력") ? COLORS.crimsonAlert : COLORS.emeraldSuccess, borderWidth: 0.5 }]}>
-                      <Text style={[styles.nodeTitle, { color: (property.notes_content || "").includes("인수") || (property.notes_content || "").includes("선순위") || (property.notes_content || "").includes("대항력") ? COLORS.crimsonAlert : COLORS.emeraldSuccess }]}>
-                        {(property.notes_content || "").includes("인수") || (property.notes_content || "").includes("선순위") || (property.notes_content || "").includes("대항력") ? "⚠️ 선순위 인수 리스크" : "🟢 선순위 안전 구역"}
-                      </Text>
-                      <Text style={styles.nodeDesc}>
-                        {(property.notes_content || "").includes("인수") || (property.notes_content || "").includes("선순위") || (property.notes_content || "").includes("대항력") 
-                          ? "선순위 임차권 혹은 미상 전입자가 존재하여 낙찰 후 낙찰자 부담으로 보증금 등이 인수될 위험이 있습니다." 
-                          : "말소기준권리보다 앞서는 선순위 임차인이 없거나 대항력을 포기하여 인수할 금액이 없는 상태입니다."}
-                      </Text>
-                    </View>
-                  </View>
-                  
-                  <View style={styles.timelineNode}>
-                    <View style={[styles.nodePoint, { backgroundColor: COLORS.warningGold }]} />
-                    <View style={[styles.nodeCard, { backgroundColor: COLORS.warningLight, borderColor: COLORS.warningGold, borderWidth: 0.5 }]}>
-                      <Text style={[styles.nodeTitle, { color: COLORS.warningGold }]}>🔑 말소기준권리 (기준점)</Text>
-                      <Text style={styles.nodeDesc}>매각 물건의 최우선 담보물권(압류, 근저당 등)이 설정된 날짜가 권리 말소의 기준선이 됩니다.</Text>
-                    </View>
-                  </View>
-                  
-                  <View style={styles.timelineNode}>
-                    <View style={[styles.nodePoint, { backgroundColor: COLORS.slate400 }]} />
-                    <View style={[styles.nodeCard, { backgroundColor: COLORS.slate100, borderColor: COLORS.slate300, borderWidth: 0.5 }]}>
-                      <Text style={[styles.nodeTitle, { color: COLORS.slate600 }]}>🧹 후순위 권리 소멸구간</Text>
-                      <Text style={styles.nodeDesc}>말소기준권리 이후에 등기된 가압류, 임차권, 저당권 등은 경매 매각절차 종료와 함께 100% 소멸합니다.</Text>
-                    </View>
-                  </View>
-                </View>
-              </View>
-            </View>
-
-            <View style={styles.sectionCard}>
-              <Text style={styles.sectionTitle}>📂 법원 비고 및 공고 상세</Text>
-              <Text style={styles.descContent}>
-                {property.desc_content || '해당 매물의 추가 설명 또는 법원 비고 원문이 존재하지 않습니다.'}
-              </Text>
-            </View>
-          </View>
-        )}
-
-        {/* [3] 입찰분석 탭 */}
-        {activeTab === 'bid' && (
-          <View>
-            <View style={styles.sectionCard}>
-              <Text style={styles.sectionTitle}>💰 금융 및 입찰 금액 시뮬레이션</Text>
-              <View style={styles.priceDetailRow}>
-                <View style={styles.priceDetailItem}>
-                  <Text style={styles.priceDetailLabel}>감정평가액</Text>
-                  <Text style={styles.priceDetailVal}>{formatCurrencyKorean(property.appraised_value)}</Text>
-                  <Text style={styles.priceDetailSub}>{formatCurrency(property.appraised_value)}</Text>
-                </View>
-                <View style={styles.priceDetailItem}>
-                  <Text style={styles.priceDetailLabel}>최저입찰가</Text>
-                  <Text style={[styles.priceDetailVal, { color: COLORS.crimsonAlert }]}>{formatCurrencyKorean(property.minimum_bid)}</Text>
-                  <Text style={styles.priceDetailSub}>{formatCurrency(property.minimum_bid)}</Text>
-                </View>
-              </View>
-
-              {discountRate > 0 ? (
-                <View style={styles.discountBanner}>
-                  <Text style={styles.discountText}>
-                    감정가 대비 현재 <Text style={styles.discountHighlight}>{discountRate}%</Text> 저렴하게 떨어졌습니다.
+                <View style={styles.infoRow}>
+                  <Text style={styles.infoLabel}>대지 면적</Text>
+                  <Text style={styles.infoValue}>
+                    {currentProperty.land_area ? `${currentProperty.land_area}㎡ (약 ${(currentProperty.land_area * 0.3025).toFixed(1)}평)` : '정보 없음'}
                   </Text>
                 </View>
-              ) : null}
-
-              {/* 🧮 모바일 스마트 소요자금 계획서 계산기 통합 이식 */}
-              <View style={styles.calcContainer}>
-                <Text style={styles.calcLabel}>내 예상 입찰 응찰가 입력 및 🧮 디지털 계산기 패드</Text>
-                
-                <View style={styles.calcDisplay}>
-                  <Text style={styles.calcDisplayText}>{formatCurrencyKorean(bidValue)}</Text>
-                </View>
-                
-                <Text style={styles.calcInputDummy}>{formatCurrency(bidValue)}</Text>
-
-                <View style={styles.keypadGrid}>
-                  <TouchableOpacity onPress={() => pressCalcKey('+1억')} style={[styles.keypadButton, styles.keypadButtonSpecial]}><Text style={[styles.keypadButtonTextCompact, styles.keypadButtonTextSpecial]}>+1억</Text></TouchableOpacity>
-                  <TouchableOpacity onPress={() => pressCalcKey('+1천')} style={[styles.keypadButton, styles.keypadButtonSpecial]}><Text style={[styles.keypadButtonTextCompact, styles.keypadButtonTextSpecial]}>+1천만</Text></TouchableOpacity>
-                  <TouchableOpacity onPress={() => pressCalcKey('+1백')} style={[styles.keypadButton, styles.keypadButtonSpecial]}><Text style={[styles.keypadButtonTextCompact, styles.keypadButtonTextSpecial]}>+1백만</Text></TouchableOpacity>
-                  <TouchableOpacity onPress={() => pressCalcKey('C')} style={[styles.keypadButton, styles.keypadButtonReset]}><Text style={[styles.keypadButtonText, styles.keypadButtonTextReset]}>C</Text></TouchableOpacity>
-                  
-                  <TouchableOpacity onPress={() => pressCalcKey('7')} style={styles.keypadButton}><Text style={styles.keypadNumberText}>7</Text></TouchableOpacity>
-                  <TouchableOpacity onPress={() => pressCalcKey('8')} style={styles.keypadButton}><Text style={styles.keypadNumberText}>8</Text></TouchableOpacity>
-                  <TouchableOpacity onPress={() => pressCalcKey('9')} style={styles.keypadButton}><Text style={styles.keypadNumberText}>9</Text></TouchableOpacity>
-                  <TouchableOpacity onPress={() => pressCalcKey('backspace')} style={[styles.keypadButton, { backgroundColor: '#fef3c7' }]}><Text style={[styles.keypadButtonText, { color: '#92400e' }]}>⌫</Text></TouchableOpacity>
-                  
-                  <TouchableOpacity onPress={() => pressCalcKey('4')} style={styles.keypadButton}><Text style={styles.keypadNumberText}>4</Text></TouchableOpacity>
-                  <TouchableOpacity onPress={() => pressCalcKey('5')} style={styles.keypadButton}><Text style={styles.keypadNumberText}>5</Text></TouchableOpacity>
-                  <TouchableOpacity onPress={() => pressCalcKey('6')} style={styles.keypadButton}><Text style={styles.keypadNumberText}>6</Text></TouchableOpacity>
-                  <TouchableOpacity onPress={() => pressCalcKey('최저가')} style={[styles.keypadButton, { backgroundColor: '#e0e7ff' }]}><Text style={[styles.keypadButtonTextCompact, { color: '#4338ca' }]}>최저가</Text></TouchableOpacity>
-                  
-                  <TouchableOpacity onPress={() => pressCalcKey('1')} style={styles.keypadButton}><Text style={styles.keypadNumberText}>1</Text></TouchableOpacity>
-                  <TouchableOpacity onPress={() => pressCalcKey('2')} style={styles.keypadButton}><Text style={styles.keypadNumberText}>2</Text></TouchableOpacity>
-                  <TouchableOpacity onPress={() => pressCalcKey('3')} style={styles.keypadButton}><Text style={styles.keypadNumberText}>3</Text></TouchableOpacity>
-                  <TouchableOpacity onPress={() => pressCalcKey('감정가')} style={[styles.keypadButton, { backgroundColor: '#e0e7ff' }]}><Text style={[styles.keypadButtonTextCompact, { color: '#4338ca' }]}>감정가</Text></TouchableOpacity>
-                  
-                  <TouchableOpacity onPress={() => pressCalcKey('0')} style={styles.keypadButton}><Text style={styles.keypadNumberText}>0</Text></TouchableOpacity>
-                  <TouchableOpacity onPress={() => pressCalcKey('00')} style={styles.keypadButton}><Text style={styles.keypadNumberText}>00</Text></TouchableOpacity>
-                  <TouchableOpacity onPress={() => pressCalcKey('000')} style={styles.keypadButton}><Text style={styles.keypadNumberText}>000</Text></TouchableOpacity>
-                  <View style={[styles.keypadButton, { backgroundColor: COLORS.emeraldLight }]}><Text style={[styles.keypadButtonText, { color: COLORS.emeraldSuccess }]}>✓</Text></View>
-                </View>
-
-                <Text style={[styles.calcLabel, { marginTop: 10 }]}>🏦 경락잔금대출 설정 (LTV)</Text>
-                <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.ltvScroll}>
-                  {[0, 30, 40, 50, 60, 70, 80].map((percent) => (
-                    <TouchableOpacity
-                      key={percent}
-                      onPress={() => setLtvPercent(percent)}
-                      style={[styles.ltvChip, ltvPercent === percent && styles.ltvChipActive]}
-                    >
-                      <Text style={[styles.ltvChipText, ltvPercent === percent && styles.ltvChipTextActive]}>
-                        {percent === 0 ? '비대출 (0%)' : `${percent}%`}
-                      </Text>
-                    </TouchableOpacity>
-                  ))}
-                </ScrollView>
-
-                {ltvPercent > 0 && (
-                  <View style={styles.interestRow}>
-                    <Text style={styles.interestLabel}>대출 금리 연동 시뮬레이터</Text>
-                    <View style={styles.interestControl}>
-                      <TouchableOpacity onPress={() => setInterestRate(prev => Math.max(1.0, parseFloat((prev - 0.1).toFixed(1))))} style={styles.interestBtn}>
-                        <Text style={styles.interestBtnText}>-</Text>
-                      </TouchableOpacity>
-                      <Text style={styles.interestValue}>{interestRate.toFixed(1)}%</Text>
-                      <TouchableOpacity onPress={() => setInterestRate(prev => Math.min(15.0, parseFloat((prev + 0.1).toFixed(1))))} style={styles.interestBtn}>
-                        <Text style={styles.interestBtnText}>+</Text>
-                      </TouchableOpacity>
-                    </View>
-                  </View>
-                )}
-
-                <View style={styles.receiptContainer}>
-                  <View style={styles.receiptHeader}>
-                    <Text style={styles.receiptHeaderText}>정밀 소요자금 계산 영수증</Text>
-                    <View style={{ backgroundColor: taxRate === 0.046 ? '#fffbeb' : '#f0f9ff', paddingHorizontal: 6, paddingVertical: 2, borderRadius: 4, borderWidth: 1, borderColor: taxRate === 0.046 ? '#fde68a' : '#bae6fd' }}>
-                      <Text style={{ fontSize: 9, fontWeight: 'bold', color: taxRate === 0.046 ? '#b45309' : COLORS.royalBlue }}>{rateLabel}</Text>
-                    </View>
-                  </View>
-
-                  <View style={styles.receiptRow}>
-                    <Text style={styles.receiptLabel}>예상 응찰가격</Text>
-                    <Text style={styles.receiptValue}>{formatCurrency(bidValue)}</Text>
-                  </View>
-                  <View style={styles.receiptRow}>
-                    <Text style={styles.receiptLabel}>취득세 ({(taxRate * 100).toFixed(1)}%)</Text>
-                    <Text style={styles.receiptValue}>+ {formatCurrency(acquisitionTax)}</Text>
-                  </View>
-                  <View style={styles.receiptRow}>
-                    <Text style={styles.receiptLabel}>대행/채권비 (0.5%)</Text>
-                    <Text style={styles.receiptValue}>+ {formatCurrency(agencyFee)}</Text>
-                  </View>
-
-                  <View style={[styles.receiptRow, styles.receiptTotalRow]}>
-                    <Text style={styles.receiptTotalLabel}>필요 소요자금 총합</Text>
-                    <Text style={styles.receiptTotalValue}>{formatCurrency(totalBudget)}</Text>
-                  </View>
-
-                  {ltvPercent > 0 && (
-                    <View style={styles.loanHighlightRow}>
-                      <View style={styles.receiptRow}>
-                        <Text style={[styles.receiptLabel, { color: COLORS.royalBlue }]}>예상 잔금 대출액 ({ltvPercent}%)</Text>
-                        <Text style={[styles.receiptValue, { color: COLORS.royalBlue }]}>{formatCurrency(loanAmount)}</Text>
-                      </View>
-                      <View style={styles.receiptRow}>
-                        <Text style={[styles.receiptLabel, { color: '#047857' }]}>월평균 대출이자 지출</Text>
-                        <Text style={[styles.receiptValue, { color: '#047857' }]}>{formatCurrency(monthlyInterest)} /월</Text>
-                      </View>
-                      <View style={styles.receiptRow}>
-                        <Text style={[styles.receiptLabel, { color: COLORS.slate700 }]}>실제 준비할 현금 한도</Text>
-                        <Text style={[styles.receiptValue, { color: COLORS.slate900, fontWeight: '800' }]}>{formatCurrency(cashRequired)}</Text>
-                      </View>
-                    </View>
-                  )}
-                </View>
-              </View>
-            </View>
-          </View>
-        )}
-
-        {/* [4] 예상배당표 탭 */}
-        {activeTab === 'dividend' && (
-          <View>
-            <View style={styles.sectionCard}>
-              <Text style={styles.sectionTitle}>⚖️ 예상 배당액 시뮬레이션 표</Text>
-              <Text style={styles.networkSub}>낙찰금액을 감정평가액 기준으로 배당 순위에 따라 자동 분배한 시뮬레이션입니다.</Text>
-              
-              <View style={styles.table}>
-                <View style={[styles.tableRow, styles.tableHeader]}>
-                  <Text style={[styles.tableCell, styles.tableHeaderCell, { flex: 0.5 }]}>순위</Text>
-                  <Text style={[styles.tableCell, styles.tableHeaderCell, { flex: 1.5 }]}>채권자 (권리)</Text>
-                  <Text style={[styles.tableCell, styles.tableHeaderCell, styles.textRight]}>채권액/보증금</Text>
-                  <Text style={[styles.tableCell, styles.tableHeaderCell, styles.textRight]}>예상배당액</Text>
-                  <Text style={[styles.tableCell, styles.tableHeaderCell, styles.textCenter]}>소멸여부</Text>
-                </View>
-                
-                <View style={styles.tableRow}>
-                  <Text style={[styles.tableCell, { flex: 0.5 }]}>1</Text>
-                  <Text style={[styles.tableCell, { flex: 1.5 }]}>경매 집행 비용</Text>
-                  <Text style={[styles.tableCell, styles.textRight]}>{formatCurrencyKorean(estateCost)}</Text>
-                  <Text style={[styles.tableCell, styles.textRight, { color: COLORS.emeraldSuccess, fontWeight: 'bold' }]}>{formatCurrencyKorean(costPaid)}</Text>
-                  <Text style={[styles.tableCell, styles.textCenter, { color: COLORS.emeraldSuccess }]}>소멸</Text>
-                </View>
-
-                <View style={styles.tableRow}>
-                  <Text style={[styles.tableCell, { flex: 0.5 }]}>2</Text>
-                  <Text style={[styles.tableCell, { flex: 1.5 }]}>최우선 변제금 (소액임차인)</Text>
-                  <Text style={[styles.tableCell, styles.textRight]}>{formatCurrencyKorean(smallDeposit)}</Text>
-                  <Text style={[styles.tableCell, styles.textRight, { color: COLORS.emeraldSuccess, fontWeight: 'bold' }]}>{formatCurrencyKorean(smallPaid)}</Text>
-                  <Text style={[styles.tableCell, styles.textCenter, { color: COLORS.emeraldSuccess }]}>소멸</Text>
-                </View>
-
-                <View style={styles.tableRow}>
-                  <Text style={[styles.tableCell, { flex: 0.5 }]}>3</Text>
-                  <Text style={[styles.tableCell, { flex: 1.5 }]}>🏦 국민은행 (선순위 근저당)</Text>
-                  <Text style={[styles.tableCell, styles.textRight]}>{formatCurrencyKorean(mortgage)}</Text>
-                  <Text style={[styles.tableCell, styles.textRight, { color: COLORS.emeraldSuccess, fontWeight: 'bold' }]}>{formatCurrencyKorean(mortgagePaid)}</Text>
-                  <Text style={[styles.tableCell, styles.textCenter, { color: COLORS.emeraldSuccess }]}>소멸</Text>
-                </View>
-
-                <View style={styles.tableRow}>
-                  <Text style={[styles.tableCell, { flex: 0.5 }]}>4</Text>
-                  <Text style={[styles.tableCell, { flex: 1.5 }]}>임차인 (보증금 반환)</Text>
-                  <Text style={[styles.tableCell, styles.textRight]}>{formatCurrencyKorean(tenantDeposit)}</Text>
-                  <Text style={[styles.tableCell, styles.textRight, { color: COLORS.slate900, fontWeight: 'bold' }]}>{formatCurrencyKorean(tenantPaid)}</Text>
-                  <Text style={[styles.tableCell, styles.textCenter, { color: tenantStatus === '인수 발생' ? COLORS.crimsonAlert : COLORS.emeraldSuccess, fontWeight: 'bold' }]}>{tenantStatus}</Text>
-                </View>
-              </View>
-            </View>
-          </View>
-        )}
-
-        {/* [5] 인수분석 탭 */}
-        {activeTab === 'takeover' && (
-          <View>
-            <View style={styles.sectionCard}>
-              <Text style={styles.sectionTitle}>⚠️ 낙찰자 인수 리스크 분석</Text>
-              
-              {extra.daehangStatus === "선순위 대항력 주의" ? (
-                <View style={styles.table}>
-                  <View style={[styles.tableRow, styles.tableHeader]}>
-                    <Text style={[styles.tableCell, styles.tableHeaderCell, { flex: 1 }]}>위험 항목</Text>
-                    <Text style={[styles.tableCell, styles.tableHeaderCell, { flex: 1.5 }]}>권리 내용</Text>
-                    <Text style={[styles.tableCell, styles.tableHeaderCell, styles.textRight]}>예상 인수액</Text>
-                  </View>
-                  <View style={styles.tableRow}>
-                    <Text style={[styles.tableCell, { flex: 1, color: COLORS.crimsonAlert, fontWeight: 'bold' }]}>👥 선순위 대항권</Text>
-                    <Text style={[styles.tableCell, { flex: 1.5 }]}>말소기준권리 이전 전입한 선순위 임차보증금</Text>
-                    <Text style={[styles.tableCell, styles.textRight, { color: COLORS.crimsonAlert, fontWeight: 'bold' }]}>{formatCurrencyKorean(tenantDeposit)}</Text>
-                  </View>
-                  <Text style={[styles.networkSub, { marginTop: 10, paddingHorizontal: 4 }]}>
-                    배당 재원이 부족할 시 배당되지 못한 보증금 잔액은 낙찰자가 전액 변제 인수해야 합니다.
+                <View style={styles.infoRow}>
+                  <Text style={styles.infoLabel}>건물 면적</Text>
+                  <Text style={styles.infoValue}>
+                    {currentProperty.building_area ? `${currentProperty.building_area}㎡ (약 ${(currentProperty.building_area * 0.3025).toFixed(1)}평)` : '정보 없음'}
                   </Text>
                 </View>
-              ) : property.grade === 'X' ? (
-                <View style={styles.table}>
-                  <View style={[styles.tableRow, styles.tableHeader]}>
-                    <Text style={[styles.tableCell, styles.tableHeaderCell, { flex: 1 }]}>위험 항목</Text>
-                    <Text style={[styles.tableCell, styles.tableHeaderCell, { flex: 1.5 }]}>권리 내용</Text>
-                    <Text style={[styles.tableCell, styles.tableHeaderCell, styles.textRight]}>예상 인수액</Text>
-                  </View>
-                  <View style={styles.tableRow}>
-                    <Text style={[styles.tableCell, { flex: 1, color: COLORS.crimsonAlert, fontWeight: 'bold' }]}>⚠️ 특수 권리 인수</Text>
-                    <Text style={[styles.tableCell, { flex: 1.5 }]}>예측 불허의 유치권 또는 법정지상권</Text>
-                    <Text style={[styles.tableCell, styles.textRight, { color: COLORS.crimsonAlert, fontWeight: 'bold' }]}>확인 불능</Text>
-                  </View>
-                  <Text style={[styles.networkSub, { marginTop: 10, paddingHorizontal: 4 }]}>
-                    유치권 또는 대지권 없음으로 인한 토지 지료 분쟁 리스크가 있으며, 합의 비용 산출이 요구됩니다.
-                  </Text>
-                </View>
-              ) : (
-                <View style={styles.centerContainer}>
-                  <Text style={styles.emptyIcon}>🟢</Text>
-                  <Text style={[styles.emptyText, { textAlign: 'center', marginTop: 6 }]}>
-                    낙찰 시 추가로 인수하게 되는 권리상의 하자가 없습니다. (안전)
-                  </Text>
-                </View>
-              )}
+              </View>
             </View>
-          </View>
-        )}
 
-        {/* [6] 점유현황 탭 */}
-        {activeTab === 'occupancy' && (
-          <View>
+            {/* 가상 소유자 및 채무자 정보 */}
             <View style={styles.sectionCard}>
-              <Text style={styles.sectionTitle}>🚪 임차인 및 점유자 관계 명세</Text>
-              
+              <Text style={styles.sectionTitle}>👤 소유자 및 채무자 정보</Text>
+              <View style={styles.infoTable}>
+                <View style={styles.infoRow}>
+                  <Text style={styles.infoLabel}>소유자 (임대인)</Text>
+                  <Text style={styles.infoValue}>김*성 (가상)</Text>
+                </View>
+                <View style={styles.infoRow}>
+                  <Text style={styles.infoLabel}>채무자</Text>
+                  <Text style={styles.infoValue}>주식회사 *대 홀딩스 (가상)</Text>
+                </View>
+                <View style={styles.infoRow}>
+                  <Text style={styles.infoLabel}>채권자 (경매신청인)</Text>
+                  <Text style={styles.infoValue}>🏦 국민은행 (경락 대지분 등기설정)</Text>
+                </View>
+              </View>
+            </View>
+
+            {/* 기일 진행 이력 표 */}
+            <View style={styles.sectionCard}>
+              <Text style={styles.sectionTitle}>📅 기일 진행 이력</Text>
               <View style={styles.table}>
                 <View style={[styles.tableRow, styles.tableHeader]}>
-                  <Text style={[styles.tableCell, styles.tableHeaderCell, { flex: 1.2 }]}>점유자 구분</Text>
-                  <Text style={[styles.tableCell, styles.tableHeaderCell, styles.textCenter]}>전입일자</Text>
-                  <Text style={[styles.tableCell, styles.tableHeaderCell, styles.textCenter]}>확정일자</Text>
-                  <Text style={[styles.tableCell, styles.tableHeaderCell, styles.textRight]}>보증금/차임</Text>
-                  <Text style={[styles.tableCell, styles.tableHeaderCell, styles.textCenter]}>대항력</Text>
+                  <Text style={[styles.tableCell, styles.tableHeaderCell]}>회차</Text>
+                  <Text style={[styles.tableCell, styles.tableHeaderCell]}>입찰기일</Text>
+                  <Text style={[styles.tableCell, styles.tableHeaderCell, styles.textRight]}>최저입찰가</Text>
+                  <Text style={[styles.tableCell, styles.tableHeaderCell, styles.textCenter]}>결과</Text>
                 </View>
-
-                {extra.daehangStatus !== "대항력 없음 (안전)" ? (
-                  <View style={styles.tableRow}>
-                    <Text style={[styles.tableCell, { flex: 1.2, fontWeight: 'bold' }]}>김*우 (임차인)</Text>
-                    <Text style={[styles.tableCell, styles.textCenter]}>2024-05-12</Text>
-                    <Text style={[styles.tableCell, styles.textCenter]}>2024-05-14</Text>
-                    <Text style={[styles.tableCell, styles.textRight]}>{formatCurrencyKorean(tenantDeposit)}</Text>
-                    <Text style={[
-                      styles.tableCell, 
-                      styles.textCenter, 
-                      { 
-                        fontWeight: 'bold', 
-                        color: extra.daehangStatus.includes("주의") 
-                          ? COLORS.crimsonAlert 
-                          : (extra.daehangStatus.includes("포기") ? COLORS.emeraldSuccess : COLORS.warningGold) 
-                      }
-                    ]}>
-                      {extra.daehangStatus.includes("주의") ? "선순위" : (extra.daehangStatus.includes("포기") ? "포기 (안전)" : "확인요망")}
-                    </Text>
-                  </View>
-                ) : (
-                  <View style={styles.tableRow}>
-                    <Text style={[styles.tableCell, { flex: 1.2, fontWeight: 'bold' }]}>소유자 (채무자)</Text>
-                    <Text style={[styles.tableCell, styles.textCenter]}>-</Text>
-                    <Text style={[styles.tableCell, styles.textCenter]}>-</Text>
-                    <Text style={[styles.tableCell, styles.textRight]}>보증금 없음</Text>
-                    <Text style={[styles.tableCell, styles.textCenter, { color: COLORS.slate400 }]}>없음</Text>
-                  </View>
-                )}
-              </View>
-            </View>
-          </View>
-        )}
-
-        {/* [7] 등기현황 탭 */}
-        {activeTab === 'registry' && (
-          <View>
-            <View style={styles.sectionCard}>
-              <Text style={styles.sectionTitle}>⛓️ 등기부등본 주요 권리 설정 요약</Text>
-              
-              <View style={styles.table}>
-                <View style={[styles.tableRow, styles.tableHeader]}>
-                  <Text style={[styles.tableCell, styles.tableHeaderCell, { flex: 0.8 }]}>구분</Text>
-                  <Text style={[styles.tableCell, styles.tableHeaderCell, { flex: 1.8 }]}>등기목적</Text>
-                  <Text style={[styles.tableCell, styles.tableHeaderCell, styles.textCenter]}>접수일자</Text>
-                  <Text style={[styles.tableCell, styles.tableHeaderCell, { flex: 1.6 }]}>권리자 및 채권액</Text>
-                  <Text style={[styles.tableCell, styles.tableHeaderCell, styles.textCenter]}>낙찰후 효력</Text>
-                </View>
-
                 <View style={styles.tableRow}>
-                  <Text style={[styles.tableCell, { flex: 0.8 }]}>을구 1</Text>
-                  <Text style={[styles.tableCell, { flex: 1.8, fontWeight: 'bold' }]}>근저당 (말소기준)</Text>
-                  <Text style={[styles.tableCell, styles.textCenter]}>2024-06-20</Text>
-                  <Text style={[styles.tableCell, { flex: 1.6 }]}>🏦 국민은행 ({formatCurrencyKorean(mortgageAmt)})</Text>
-                  <Text style={[styles.tableCell, styles.textCenter, { color: COLORS.emeraldSuccess, fontWeight: 'bold' }]}>소멸</Text>
+                  <Text style={styles.tableCell}>1차</Text>
+                  <Text style={styles.tableCell}>2026-05-10</Text>
+                  <Text style={[styles.tableCell, styles.textRight]}>{formatCurrencyKorean(currentProperty.appraised_value)}</Text>
+                  <Text style={[styles.tableCell, styles.textCenter, { color: COLORS.crimsonAlert, fontWeight: 'bold' }]}>유찰</Text>
                 </View>
-
                 <View style={styles.tableRow}>
-                  <Text style={[styles.tableCell, { flex: 0.8 }]}>갑구 4</Text>
-                  <Text style={[styles.tableCell, { flex: 1.8 }]}>가압류</Text>
-                  <Text style={[styles.tableCell, styles.textCenter]}>2024-11-15</Text>
-                  <Text style={[styles.tableCell, { flex: 1.6 }]}>신한카드 ({formatCurrencyKorean(gamyAmt)})</Text>
-                  <Text style={[styles.tableCell, styles.textCenter, { color: COLORS.emeraldSuccess, fontWeight: 'bold' }]}>소멸</Text>
-                </View>
-
-                <View style={styles.tableRow}>
-                  <Text style={[styles.tableCell, { flex: 0.8 }]}>갑구 5</Text>
-                  <Text style={[styles.tableCell, { flex: 1.8, fontWeight: 'bold', color: COLORS.royalBlue }]}>강제경매개시결정</Text>
-                  <Text style={[styles.tableCell, styles.textCenter]}>2025-02-10</Text>
-                  <Text style={[styles.tableCell, { flex: 1.6 }]}>신한카드 (경매신청)</Text>
-                  <Text style={[styles.tableCell, styles.textCenter, { color: COLORS.emeraldSuccess, fontWeight: 'bold' }]}>소멸</Text>
+                  <Text style={styles.tableCell}>2차</Text>
+                  <Text style={styles.tableCell}>{currentProperty.bidding_date || '일정 확인중'}</Text>
+                  <Text style={[styles.tableCell, styles.textRight]}>{formatCurrencyKorean(currentProperty.minimum_bid)}</Text>
+                  <Text style={[styles.tableCell, styles.textCenter, { color: COLORS.royalBlue, fontWeight: 'bold' }]}>진행중</Text>
                 </View>
               </View>
             </View>
-          </View>
-        )}
 
-        {/* [8] 매각통계 탭 */}
-        {activeTab === 'statistics' && (
-          <View>
+            {/* 사진 및 지도 위치 */}
             <View style={styles.sectionCard}>
-              <Text style={styles.sectionTitle}>📊 해당 법원/용도 최근 1년 매각 통계</Text>
-              
-              <View style={styles.kpiContainer}>
-                <View style={styles.kpiCard}>
-                  <Text style={styles.kpiTitle}>평균 매각율</Text>
-                  <Text style={[styles.kpiValue, { color: COLORS.royalBlue }]}>48.2%</Text>
-                </View>
-                <View style={[styles.kpiCard, { borderColor: COLORS.emeraldSuccess }]}>
-                  <Text style={[styles.kpiTitle, { color: COLORS.emeraldSuccess }]}>평균 매각가율</Text>
-                  <Text style={[styles.kpiValue, { color: COLORS.emeraldSuccess }]}>84.5%</Text>
-                </View>
-                <View style={[styles.kpiCard, { borderColor: COLORS.warningGold }]}>
-                  <Text style={[styles.kpiTitle, { color: COLORS.warningGold }]}>평균 경쟁률</Text>
-                  <Text style={[styles.kpiValue, { color: '#b45309' }]}>4.8명</Text>
-                </View>
-              </View>
-              
-              <Text style={[styles.networkSub, { marginTop: 10, lineHeight: 18 }]}>
-                💡 해당 지표는 {courtName}의 최근 1년간 동종 용도(아파트/주택 등) 경매 매각 결과를 분석한 실시간 통계 정보입니다.
-              </Text>
-            </View>
-          </View>
-        )}
-
-        {/* [9] 시세/실거래가 탭 */}
-        {activeTab === 'market' && (
-          <View>
-            <View style={styles.sectionCard}>
-              <Text style={styles.sectionTitle}>📈 주변 동종 매물 실거래가 내역</Text>
-              
-              <View style={styles.table}>
-                <View style={[styles.tableRow, styles.tableHeader]}>
-                  <Text style={[styles.tableCell, styles.tableHeaderCell]}>거래일자</Text>
-                  <Text style={[styles.tableCell, styles.tableHeaderCell, { flex: 1.5 }]}>면적 (전용)</Text>
-                  <Text style={[styles.tableCell, styles.tableHeaderCell, styles.textCenter]}>층수</Text>
-                  <Text style={[styles.tableCell, styles.tableHeaderCell, styles.textRight]}>거래금액</Text>
-                  <Text style={[styles.tableCell, styles.tableHeaderCell, styles.textCenter]}>변동률</Text>
-                </View>
-
-                <View style={styles.tableRow}>
-                  <Text style={styles.tableCell}>2026-04-10</Text>
-                  <Text style={[styles.tableCell, { flex: 1.5 }]}>전용 84.9㎡ (25.7평)</Text>
-                  <Text style={[styles.tableCell, styles.textCenter]}>14층</Text>
-                  <Text style={[styles.tableCell, styles.textRight, { fontWeight: 'bold' }]}>{formatCurrencyKorean(deal1)}</Text>
-                  <Text style={[styles.tableCell, styles.textCenter, { color: COLORS.emeraldSuccess, fontWeight: 'bold' }]}>▲ 2.1%</Text>
-                </View>
-
-                <View style={styles.tableRow}>
-                  <Text style={styles.tableCell}>2026-02-15</Text>
-                  <Text style={[styles.tableCell, { flex: 1.5 }]}>전용 84.9㎡ (25.7평)</Text>
-                  <Text style={[styles.tableCell, styles.textCenter]}>8층</Text>
-                  <Text style={[styles.tableCell, styles.textRight, { fontWeight: 'bold' }]}>{formatCurrencyKorean(deal2)}</Text>
-                  <Text style={[styles.tableCell, styles.textCenter, { color: COLORS.slate400 }]}>0.0%</Text>
-                </View>
-
-                <View style={styles.tableRow}>
-                  <Text style={styles.tableCell}>2026-01-08</Text>
-                  <Text style={[styles.tableCell, { flex: 1.5 }]}>전용 84.9㎡ (25.7평)</Text>
-                  <Text style={[styles.tableCell, styles.textCenter]}>6층</Text>
-                  <Text style={[styles.tableCell, styles.textRight, { fontWeight: 'bold' }]}>{formatCurrencyKorean(deal3)}</Text>
-                  <Text style={[styles.tableCell, styles.textCenter, { color: COLORS.crimsonAlert, fontWeight: 'bold' }]}>▼ 3.0%</Text>
-                </View>
-              </View>
-
-              <TouchableOpacity 
-                onPress={handleOpenSeeReal}
-                style={[styles.linkButton, { backgroundColor: COLORS.royalBlue, marginTop: 12 }]}
-              >
-                <Text style={styles.linkButtonText}>주변시세 확인 (씨:리얼 포털 이동)</Text>
-              </TouchableOpacity>
-            </View>
-          </View>
-        )}
-
-        {/* [10] 단지정보 탭 */}
-        {activeTab === 'complex' && (
-          <View>
-            <View style={styles.sectionCard}>
-              <Text style={styles.sectionTitle}>🏢 단지 기본 정보 및 시설 명세</Text>
-              
-              <View style={styles.table}>
-                <View style={styles.tableRow}>
-                  <Text style={[styles.tableCell, { backgroundColor: COLORS.slate50, fontWeight: 'bold', flex: 0.8 }]}>총 세대 수</Text>
-                  <Text style={[styles.tableCell, { flex: 1.2 }]}>842 세대 (총 8개동)</Text>
-                  <Text style={[styles.tableCell, { backgroundColor: COLORS.slate50, fontWeight: 'bold', flex: 0.8 }]}>준공년월</Text>
-                  <Text style={[styles.tableCell, { flex: 1.2 }]}>2018년 11월 (약 8년차)</Text>
-                </View>
-                <View style={styles.tableRow}>
-                  <Text style={[styles.tableCell, { backgroundColor: COLORS.slate50, fontWeight: 'bold', flex: 0.8 }]}>주차대수</Text>
-                  <Text style={[styles.tableCell, { flex: 1.2 }]}>세대당 1.4대 (여유)</Text>
-                  <Text style={[styles.tableCell, { backgroundColor: COLORS.slate50, fontWeight: 'bold', flex: 0.8 }]}>난방 방식</Text>
-                  <Text style={[styles.tableCell, { flex: 1.2 }]}>지역난방, 옥내열병합</Text>
-                </View>
-                <View style={styles.tableRow}>
-                  <Text style={[styles.tableCell, { backgroundColor: COLORS.slate50, fontWeight: 'bold', flex: 0.8 }]}>용적률/건폐율</Text>
-                  <Text style={[styles.tableCell, { flex: 1.2 }]}>224% / 18%</Text>
-                  <Text style={[styles.tableCell, { backgroundColor: COLORS.slate50, fontWeight: 'bold', flex: 0.8 }]}>건설사</Text>
-                  <Text style={[styles.tableCell, { flex: 1.2 }]}>현대건설 주식회사</Text>
-                </View>
-              </View>
-            </View>
-          </View>
-        )}
-
-        {/* [11] 지도 탭 */}
-        {activeTab === 'map' && (
-          <View>
-            <View style={styles.sectionCard}>
-              <Text style={styles.sectionTitle}>📍 물건지 실시간 위치 지도</Text>
+              <Text style={styles.sectionTitle}>📍 물건지 실시간 위치</Text>
               <TouchableOpacity 
                 activeOpacity={0.9}
-                onPress={() => Linking.openURL(`https://map.naver.com/v5/search/${encodeURIComponent(property.address)}`)}
+                onPress={() => Linking.openURL(`https://map.naver.com/v5/search/${encodeURIComponent(currentProperty.address)}/address?c=15,0,0,0,dh`)}
                 style={styles.mapContainer}
               >
-                {Platform.OS === 'web' ? (
-                  <iframe 
-                    src={`https://maps.google.com/maps?q=${encodeURIComponent(property.address)}&t=&z=16&ie=UTF8&iwloc=&output=embed`}
-                    style={{ width: '100%', height: '100%', border: 'none', borderRadius: 12, pointerEvents: 'none' }}
-                  />
-                ) : (
-                  <WebView 
-                    style={styles.mapWebView}
-                    pointerEvents="none"
-                    source={{ uri: `https://maps.google.com/maps?q=${encodeURIComponent(property.address)}&t=&z=16&ie=UTF8&iwloc=&output=embed` }}
-                  />
-                )}
-                <View style={StyleSheet.absoluteFill} />
+                <View style={styles.naverMapPlaceholder}>
+                  <Text style={styles.naverMapLogoText}>NAVER 지도</Text>
+                  <Text style={styles.naverMapAddrText}>{currentProperty.address}</Text>
+                  <Text style={styles.naverMapHintText}>터치하시면 실시간 위성도 및 도로망을 네이버 지도로 열어 확인하실 수 있습니다.</Text>
+                </View>
               </TouchableOpacity>
-            </View>
-
-            <View style={styles.sectionCard}>
-              <Text style={styles.sectionTitle}>🗺️ 네이버 전문 지도 연동</Text>
-              <View style={styles.networkGrid}>
+              
+              {/* 전문지도 연동 버튼들 */}
+              <View style={[styles.networkGrid, { marginTop: 12 }]}>
                 <TouchableOpacity 
-                  onPress={() => Linking.openURL(`https://map.naver.com/v5/search/${encodeURIComponent(property.address)}?lCd=lnd`)}
+                  onPress={() => Linking.openURL(`https://map.naver.com/v5/search/${encodeURIComponent(currentProperty.address)}/address?c=15,0,0,0,lnd,dh`)}
                   style={[styles.networkButton, { backgroundColor: '#fdf4ff', borderColor: '#fbcfe8' }]}
                 >
                   <View style={[styles.networkIconContainer, { backgroundColor: '#db2777' }]}>
@@ -1308,9 +928,8 @@ export const DetailScreen: React.FC<DetailScreenProps> = ({ property, onBack }) 
                     <Text style={styles.networkBtnSub}>지적편집도 필지 경계</Text>
                   </View>
                 </TouchableOpacity>
-
                 <TouchableOpacity 
-                  onPress={() => Linking.openURL(`https://map.naver.com/v5/search/${encodeURIComponent(property.address)}?lCd=sky`)}
+                  onPress={() => Linking.openURL(`https://map.naver.com/v5/search/${encodeURIComponent(currentProperty.address)}/address?c=15,0,0,0,sky,dh`)}
                   style={[styles.networkButton, { backgroundColor: '#f8fafc', borderColor: '#cbd5e1' }]}
                 >
                   <View style={[styles.networkIconContainer, { backgroundColor: '#475569' }]}>
@@ -1321,62 +940,14 @@ export const DetailScreen: React.FC<DetailScreenProps> = ({ property, onBack }) 
                     <Text style={styles.networkBtnSub}>고해상도 항공 뷰</Text>
                   </View>
                 </TouchableOpacity>
-
-                <TouchableOpacity 
-                  onPress={() => Linking.openURL(`https://map.naver.com/v5/search/${encodeURIComponent(property.address)}?lCd=rv`)}
-                  style={[styles.networkButton, { backgroundColor: '#f0fdf4', borderColor: '#bbf7d0' }]}
-                >
-                  <View style={[styles.networkIconContainer, { backgroundColor: COLORS.emeraldSuccess }]}>
-                    <Text style={styles.networkIconText}>📸</Text>
-                  </View>
-                  <View style={styles.networkTextContainer}>
-                    <Text style={[styles.networkBtnTitle, { color: COLORS.emeraldSuccess }]}>로드뷰 보기</Text>
-                    <Text style={styles.networkBtnSub}>현장 파노라마 도로 뷰</Text>
-                  </View>
-                </TouchableOpacity>
-
-                <TouchableOpacity 
-                  onPress={handleOpenSeeReal}
-                  style={[styles.networkButton, { backgroundColor: '#fffbeb', borderColor: '#fde68a' }]}
-                >
-                  <View style={[styles.networkIconContainer, { backgroundColor: '#d97706' }]}>
-                    <Text style={styles.networkIconText}>🌐</Text>
-                  </View>
-                  <View style={styles.networkTextContainer}>
-                    <Text style={[styles.networkBtnTitle, { color: '#d97706' }]}>주변시세 확인</Text>
-                    <Text style={styles.networkBtnSub}>씨리얼 종합조회</Text>
-                  </View>
-                </TouchableOpacity>
               </View>
             </View>
 
-            <View style={styles.sectionCard}>
-              <Text style={styles.sectionTitle}>🌱 토지이용계획 및 규제 진단</Text>
-              <View style={styles.complexPlanCard}>
-                <View style={styles.infoRow}>
-                  <Text style={styles.infoLabel}>용도지역 구분</Text>
-                  <Text style={[styles.infoValue, { color: COLORS.royalBlue }]}>{extra.landUsePlan}</Text>
-                </View>
-                <Text style={[styles.networkSub, { marginTop: 6 }]}>{extra.landUsePlanDesc}</Text>
-              </View>
-              <TouchableOpacity 
-                onPress={() => Linking.openURL(`https://www.eum.go.kr/web/mp/mpMapSearch.jsp?searchKeyword=${encodeURIComponent(property.address)}`)}
-                style={[styles.linkButton, { backgroundColor: COLORS.emeraldSuccess, marginTop: 8 }]}
-              >
-                <Text style={styles.linkButtonText}>토지이음(eum.go.kr) 공식 조회</Text>
-              </TouchableOpacity>
-            </View>
-          </View>
-        )}
-
-        {/* [12] 내부 평면도 / 구조도 탭 */}
-        {activeTab === 'floorplan' && (
-          <View>
+            {/* 내부 추정 평면도 */}
             <View style={styles.sectionCard}>
               <Text style={styles.sectionTitle}>📐 부동산 내부 추정 평면도</Text>
-              
               <View style={styles.floorPlanContainer}>
-                {(property.ptype || "").includes("아파트") || (property.ptype || "").includes("주택") || (property.ptype || "").includes("다세대") || (property.ptype || "").includes("빌라") ? (
+                {(currentProperty.ptype || "").includes("아파트") || (currentProperty.ptype || "").includes("주택") || (currentProperty.ptype || "").includes("다세대") || (currentProperty.ptype || "").includes("빌라") ? (
                   <View style={styles.residentialPlan}>
                     <View style={styles.planRow}>
                       <View style={[styles.roomBox, styles.wallBorderRight, styles.wallBorderBottom]}><Text style={styles.roomText}>침실 1</Text></View>
@@ -1389,7 +960,7 @@ export const DetailScreen: React.FC<DetailScreenProps> = ({ property, onBack }) 
                       <View style={styles.roomBox}><Text style={[styles.roomText, { color: COLORS.crimsonAlert }]}>욕실</Text></View>
                     </View>
                   </View>
-                ) : (property.ptype || "").includes("오피스텔") || (property.ptype || "").includes("원룸") ? (
+                ) : (currentProperty.ptype || "").includes("오피스텔") || (currentProperty.ptype || "").includes("원룸") ? (
                   <View style={styles.studioPlan}>
                     <View style={[styles.studioMain, styles.wallBorderBottom]}><Text style={[styles.roomText, { color: COLORS.royalBlue }]}>원룸형 침실 / 거실</Text></View>
                     <View style={styles.planRow}>
@@ -1415,41 +986,680 @@ export const DetailScreen: React.FC<DetailScreenProps> = ({ property, onBack }) 
               <View style={styles.planBadgeRow}>
                 <View style={[styles.extraBadge, { backgroundColor: COLORS.royalLight, paddingHorizontal: 6, paddingVertical: 2, borderRadius: 4, borderColor: 'transparent' }]}>
                   <Text style={{ fontSize: 10, fontWeight: 'bold', color: COLORS.royalBlue }}>
-                    {(property.ptype || "").includes("아파트") ? "3-Bay 아파트 구조" : (property.ptype || "").includes("오피스텔") ? "원룸/복층 구조" : "일반 맞춤형 도면"}
+                    {(currentProperty.ptype || "").includes("아파트") ? "3-Bay 아파트 구조" : (currentProperty.ptype || "").includes("오피스텔") ? "원룸/복층 구조" : "일반 맞춤형 도면"}
                   </Text>
                 </View>
                 <Text style={styles.planBadgeDesc}>
-                  {(property.ptype || "").includes("아파트") ? "방 3개, 욕실 2개 표준 구성" : (property.ptype || "").includes("오피스텔") ? "복도식 컴팩트 1-Room 구조" : "상업 전용 가변 기둥 벽체"}
+                  {(currentProperty.ptype || "").includes("아파트") ? "방 3개, 욕실 2개 표준 구성" : (currentProperty.ptype || "").includes("오피스텔") ? "복도식 컴팩트 1-Room 구조" : "상업 전용 가변 기둥 벽체"}
                 </Text>
               </View>
 
-              <TouchableOpacity 
-                onPress={() => Linking.openURL('https://www.gov.kr')} 
-                style={[styles.galleryBtn, { marginTop: 12 }]}
+              {/* 실제 평면도 아웃링크 버튼 추가 */}
+              <TouchableOpacity
+                onPress={() => {
+                  const addrKeyword = currentProperty.address ? currentProperty.address.split(' ').slice(0, 3).join(' ') : '';
+                  Linking.openURL(`https://m.land.naver.com/search/result/${encodeURIComponent(addrKeyword)}`);
+                }}
+                style={[styles.linkButton, { backgroundColor: '#03c75a', marginTop: 12 }]}
               >
-                <Text style={styles.galleryBtnText}>건축물대장 현황도면 신청법 가이드</Text>
+                <Text style={styles.linkButtonText}>네이버 부동산에서 실제 평면도 보기</Text>
               </TouchableOpacity>
-            </View>
-
-            <View style={styles.sectionCard}>
-              <Text style={styles.sectionTitle}>🏢 물건 외관 상태 진단</Text>
-              <View style={styles.mockImagePlaceholder}>
-                <Text style={styles.placeholderIcon}>🏢</Text>
-                <Text style={styles.placeholderTitle}>자산 상태 가상 진단 보고</Text>
-                <View style={styles.mockProgressBarBg}>
-                  <View style={[styles.mockProgressBarFill, { width: `${property.score}%`, backgroundColor: property.score >= 80 ? COLORS.emeraldSuccess : property.score >= 60 ? COLORS.royalBlue : COLORS.crimsonAlert }]} />
-                </View>
-                <Text style={styles.placeholderSub}>
-                  {property.score >= 80 ? `진단 지수: 우수 (${property.score}점)` : property.score >= 60 ? `진단 지수: 보통 (${property.score}점)` : `진단 지수: 불량 (${property.score}점)`}
-                </Text>
-              </View>
-              <View style={styles.galleryBulletContainer}>
-                <Text style={styles.galleryBulletText}>• 균열/누수: 현장 임장 시 외벽 크랙 체크 권장.</Text>
-                <Text style={styles.galleryBulletText}>• 주차 환경: 단지 내 지상/지하 주차장 용량 조사.</Text>
-              </View>
             </View>
           </View>
         )}
+
+        {/* 2. 권리분석 탭 */}
+        {activeTab === 'rights' && (
+          <View style={{ minHeight: 300, position: 'relative' }}>
+            <View style={{ opacity: userGrade === 'C' ? 0.15 : 1 }}>
+              {/* 정밀 등기부 권리 요약 */}
+              <View style={styles.sectionCard}>
+                <Text style={styles.sectionTitle}>⛓️ 등기부 주요 권리 설정 요약</Text>
+                <View style={styles.table}>
+                  <View style={[styles.tableRow, styles.tableHeader]}>
+                    <Text style={[styles.tableCell, styles.tableHeaderCell, { flex: 0.8 }]}>구분</Text>
+                    <Text style={[styles.tableCell, styles.tableHeaderCell, { flex: 1.8 }]}>등기목적</Text>
+                    <Text style={[styles.tableCell, styles.tableHeaderCell, styles.textCenter]}>접수일자</Text>
+                    <Text style={[styles.tableCell, styles.tableHeaderCell, { flex: 1.6 }]}>권리자 및 채권액</Text>
+                    <Text style={[styles.tableCell, styles.tableHeaderCell, styles.textCenter]}>낙찰후 효력</Text>
+                  </View>
+                  <View style={styles.tableRow}>
+                    <Text style={[styles.tableCell, { flex: 0.8 }]}>을구 1</Text>
+                    <Text style={[styles.tableCell, { flex: 1.8, fontWeight: 'bold' }]}>근저당 (말소기준)</Text>
+                    <Text style={[styles.tableCell, styles.textCenter]}>2024-06-20</Text>
+                    <Text style={[styles.tableCell, { flex: 1.6 }]}>🏦 국민은행 ({formatCurrencyKorean(mortgageAmt)})</Text>
+                    <Text style={[styles.tableCell, styles.textCenter, { color: COLORS.emeraldSuccess, fontWeight: 'bold' }]}>소멸</Text>
+                  </View>
+                  <View style={styles.tableRow}>
+                    <Text style={[styles.tableCell, { flex: 0.8 }]}>갑구 4</Text>
+                    <Text style={[styles.tableCell, { flex: 1.8 }]}>가압류</Text>
+                    <Text style={[styles.tableCell, styles.textCenter]}>2024-11-15</Text>
+                    <Text style={[styles.tableCell, { flex: 1.6 }]}>신한카드 ({formatCurrencyKorean(gamyAmt)})</Text>
+                    <Text style={[styles.tableCell, styles.textCenter, { color: COLORS.emeraldSuccess, fontWeight: 'bold' }]}>소멸</Text>
+                  </View>
+                  <View style={styles.tableRow}>
+                    <Text style={[styles.tableCell, { flex: 0.8 }]}>갑구 5</Text>
+                    <Text style={[styles.tableCell, { flex: 1.8, fontWeight: 'bold', color: COLORS.royalBlue }]}>강제경매개시결정</Text>
+                    <Text style={[styles.tableCell, styles.textCenter]}>2025-02-10</Text>
+                    <Text style={[styles.tableCell, { flex: 1.6 }]}>신한카드 (경매신청)</Text>
+                    <Text style={[styles.tableCell, styles.textCenter, { color: COLORS.emeraldSuccess, fontWeight: 'bold' }]}>소멸</Text>
+                  </View>
+                </View>
+              </View>
+
+              {/* 점유현황 명세 */}
+              <View style={styles.sectionCard}>
+                <Text style={styles.sectionTitle}>🚪 임차인 및 점유자 관계 명세</Text>
+                <View style={styles.table}>
+                  <View style={[styles.tableRow, styles.tableHeader]}>
+                    <Text style={[styles.tableCell, styles.tableHeaderCell, { flex: 1.2 }]}>점유자 구분</Text>
+                    <Text style={[styles.tableCell, styles.tableHeaderCell, styles.textCenter]}>전입일자</Text>
+                    <Text style={[styles.tableCell, styles.tableHeaderCell, styles.textCenter]}>확정일자</Text>
+                    <Text style={[styles.tableCell, styles.tableHeaderCell, styles.textRight]}>보증금/차임</Text>
+                    <Text style={[styles.tableCell, styles.tableHeaderCell, styles.textCenter]}>대항력</Text>
+                  </View>
+                  {extra.daehangStatus !== "대항력 없음 (안전)" ? (
+                    <View style={styles.tableRow}>
+                      <Text style={[styles.tableCell, { flex: 1.2, fontWeight: 'bold' }]}>김*우 (임차인)</Text>
+                      <Text style={[styles.tableCell, styles.textCenter]}>2024-05-12</Text>
+                      <Text style={[styles.tableCell, styles.textCenter]}>2024-05-14</Text>
+                      <Text style={[styles.tableCell, styles.textRight]}>{formatCurrencyKorean(tenantDeposit)}</Text>
+                      <Text style={[
+                        styles.tableCell, 
+                        styles.textCenter, 
+                        { 
+                          fontWeight: 'bold', 
+                          color: extra.daehangStatus.includes("주의") 
+                            ? COLORS.crimsonAlert 
+                            : (extra.daehangStatus.includes("포기") ? COLORS.emeraldSuccess : COLORS.warningGold) 
+                        }
+                      ]}>
+                        {extra.daehangStatus.includes("주의") ? "선순위" : (extra.daehangStatus.includes("포기") ? "포기 (안전)" : "확인요망")}
+                      </Text>
+                    </View>
+                  ) : (
+                    <View style={styles.tableRow}>
+                      <Text style={[styles.tableCell, { flex: 1.2, fontWeight: 'bold' }]}>소유자 (채무자)</Text>
+                      <Text style={[styles.tableCell, styles.textCenter]}>-</Text>
+                      <Text style={[styles.tableCell, styles.textCenter]}>-</Text>
+                      <Text style={[styles.tableCell, styles.textRight]}>보증금 없음</Text>
+                      <Text style={[styles.tableCell, styles.textCenter, { color: COLORS.slate400 }]}>없음</Text>
+                    </View>
+                  )}
+                </View>
+              </View>
+
+              {/* 예상 배당표 */}
+              <View style={styles.sectionCard}>
+                <Text style={styles.sectionTitle}>⚖️ 예상 배당액 시뮬레이션 표</Text>
+                <Text style={styles.networkSub}>낙찰금액을 감정평가액 기준으로 배당 순위에 따라 자동 분배한 시뮬레이션입니다.</Text>
+                <View style={styles.table}>
+                  <View style={[styles.tableRow, styles.tableHeader]}>
+                    <Text style={[styles.tableCell, styles.tableHeaderCell, { flex: 0.5 }]}>순위</Text>
+                    <Text style={[styles.tableCell, styles.tableHeaderCell, { flex: 1.5 }]}>채권자 (권리)</Text>
+                    <Text style={[styles.tableCell, styles.tableHeaderCell, styles.textRight]}>채권액/보증금</Text>
+                    <Text style={[styles.tableCell, styles.tableHeaderCell, styles.textRight]}>예상배당액</Text>
+                    <Text style={[styles.tableCell, styles.tableHeaderCell, styles.textCenter]}>소멸여부</Text>
+                  </View>
+                  <View style={styles.tableRow}>
+                    <Text style={[styles.tableCell, { flex: 0.5 }]}>1</Text>
+                    <Text style={[styles.tableCell, { flex: 1.5 }]}>경매 집행 비용</Text>
+                    <Text style={[styles.tableCell, styles.textRight]}>{formatCurrencyKorean(estateCost)}</Text>
+                    <Text style={[styles.tableCell, styles.textRight, { color: COLORS.emeraldSuccess, fontWeight: 'bold' }]}>{formatCurrencyKorean(costPaid)}</Text>
+                    <Text style={[styles.tableCell, styles.textCenter, { color: COLORS.emeraldSuccess }]}>소멸</Text>
+                  </View>
+                  <View style={styles.tableRow}>
+                    <Text style={[styles.tableCell, { flex: 0.5 }]}>2</Text>
+                    <Text style={[styles.tableCell, { flex: 1.5 }]}>최우선 변제금 (소액임차인)</Text>
+                    <Text style={[styles.tableCell, styles.textRight]}>{formatCurrencyKorean(smallDeposit)}</Text>
+                    <Text style={[styles.tableCell, styles.textRight, { color: COLORS.emeraldSuccess, fontWeight: 'bold' }]}>{formatCurrencyKorean(smallPaid)}</Text>
+                    <Text style={[styles.tableCell, styles.textCenter, { color: COLORS.emeraldSuccess }]}>소멸</Text>
+                  </View>
+                  <View style={styles.tableRow}>
+                    <Text style={[styles.tableCell, { flex: 0.5 }]}>3</Text>
+                    <Text style={[styles.tableCell, { flex: 1.5 }]}>🏦 국민은행 (선순위 근저당)</Text>
+                    <Text style={[styles.tableCell, styles.textRight]}>{formatCurrencyKorean(mortgage)}</Text>
+                    <Text style={[styles.tableCell, styles.textRight, { color: COLORS.emeraldSuccess, fontWeight: 'bold' }]}>{formatCurrencyKorean(mortgagePaid)}</Text>
+                    <Text style={[styles.tableCell, styles.textCenter, { color: COLORS.emeraldSuccess }]}>소멸</Text>
+                  </View>
+                  <View style={styles.tableRow}>
+                    <Text style={[styles.tableCell, { flex: 0.5 }]}>4</Text>
+                    <Text style={[styles.tableCell, { flex: 1.5 }]}>임차인 (보증금 반환)</Text>
+                    <Text style={[styles.tableCell, styles.textRight]}>{formatCurrencyKorean(tenantDeposit)}</Text>
+                    <Text style={[styles.tableCell, styles.textRight, { color: COLORS.slate900, fontWeight: 'bold' }]}>{formatCurrencyKorean(tenantPaid)}</Text>
+                    <Text style={[styles.tableCell, styles.textCenter, { color: tenantStatus === '인수 발생' ? COLORS.crimsonAlert : COLORS.emeraldSuccess, fontWeight: 'bold' }]}>{tenantStatus}</Text>
+                  </View>
+                </View>
+              </View>
+
+              {/* 인수 위험 */}
+              <View style={styles.sectionCard}>
+                <Text style={styles.sectionTitle}>⚠️ 낙찰자 인수 리스크 분석</Text>
+                {extra.daehangStatus === "선순위 대항력 주의" ? (
+                  <View style={styles.table}>
+                    <View style={[styles.tableRow, styles.tableHeader]}>
+                      <Text style={[styles.tableCell, styles.tableHeaderCell, { flex: 1 }]}>위험 항목</Text>
+                      <Text style={[styles.tableCell, styles.tableHeaderCell, { flex: 1.5 }]}>권리 내용</Text>
+                      <Text style={[styles.tableCell, styles.tableHeaderCell, styles.textRight]}>예상 인수액</Text>
+                    </View>
+                    <View style={styles.tableRow}>
+                      <Text style={[styles.tableCell, { flex: 1, color: COLORS.crimsonAlert, fontWeight: 'bold' }]}>👥 선순위 대항권</Text>
+                      <Text style={[styles.tableCell, { flex: 1.5 }]}>말소기준권리 이전 전입한 선순위 임차보증금</Text>
+                      <Text style={[styles.tableCell, styles.textRight, { color: COLORS.crimsonAlert, fontWeight: 'bold' }]}>{formatCurrencyKorean(tenantDeposit)}</Text>
+                    </View>
+                    <Text style={[styles.networkSub, { marginTop: 10, paddingHorizontal: 4 }]}>
+                      배당 재원이 부족할 시 배당되지 못한 보증금 잔액은 낙찰자가 전액 변제 인수해야 합니다.
+                    </Text>
+                  </View>
+                ) : (
+                  <View style={styles.centerContainer}>
+                    <Text style={styles.emptyIcon}>🟢</Text>
+                    <Text style={[styles.emptyText, { textAlign: 'center', marginTop: 6 }]}>
+                      낙찰 시 추가로 인수하게 되는 권리상의 하자가 없습니다. (안전)
+                    </Text>
+                  </View>
+                )}
+              </View>
+            </View>
+
+            {/* C등급 마스크 오버레이 */}
+            {userGrade === 'C' && (
+              <View style={styles.maskOverlay}>
+                <Text style={styles.maskTitle}>🔒 권리분석 상세 정보 열람 제한 (B등급 이상)</Text>
+                <Text style={styles.maskDesc}>
+                  정밀 등기 권리분석 요약표, 점유자 대항력 진단 및 인수 리스크, 예상 배당표 데이터를 열람하시려면 VIP(B등급)로 업그레이드해주십시오.
+                </Text>
+                <TouchableOpacity 
+                  style={styles.maskButton} 
+                  onPress={async () => {
+                    try {
+                      if (userId) {
+                        const { error } = await supabase
+                          .from('user_profiles')
+                          .update({ grade: 'B' })
+                          .eq('id', userId);
+                        if (error) throw error;
+                        setUserGrade('B');
+                        Alert.alert('업그레이드 완료', 'VIP 회원(B등급)으로 정상 승급되었습니다.');
+                      } else {
+                        Alert.alert('안내', '로그인이 필요한 서비스입니다.');
+                      }
+                    } catch (err) {
+                      Alert.alert('오류', '등급 승급 처리 중 오류가 발생했습니다.');
+                    }
+                  }}
+                >
+                  <Text style={styles.maskButtonText}>VIP 회원(B등급)으로 상향하기</Text>
+                </TouchableOpacity>
+              </View>
+            )}
+          </View>
+        )}
+
+        {/* 3. 입찰분석 탭 */}
+        {activeTab === 'bidding' && (
+          <View style={{ minHeight: 300, position: 'relative' }}>
+            <View style={{ opacity: (userGrade === 'B' || userGrade === 'C') ? 0.15 : 1 }}>
+              {/* 매각 통계 */}
+              <View style={styles.sectionCard}>
+                <Text style={styles.sectionTitle}>📊 해당 법원/용도 최근 1년 매각 통계</Text>
+                <View style={styles.kpiContainer}>
+                  <View style={styles.kpiCard}>
+                    <Text style={styles.kpiTitle}>평균 매각율</Text>
+                    <Text style={[styles.kpiValue, { color: COLORS.royalBlue }]}>48.2%</Text>
+                  </View>
+                  <View style={[styles.kpiCard, { borderColor: COLORS.emeraldSuccess }]}>
+                    <Text style={[styles.kpiTitle, { color: COLORS.emeraldSuccess }]}>평균 매각가율</Text>
+                    <Text style={[styles.kpiValue, { color: COLORS.emeraldSuccess }]}>84.5%</Text>
+                  </View>
+                  <View style={[styles.kpiCard, { borderColor: COLORS.warningGold }]}>
+                    <Text style={[styles.kpiTitle, { color: COLORS.warningGold }]}>평균 경쟁률</Text>
+                    <Text style={[styles.kpiValue, { color: '#b45309' }]}>4.8명</Text>
+                  </View>
+                </View>
+              </View>
+
+              {/* 금융 소요자금 계획서 계산기 */}
+              <View style={styles.sectionCard}>
+                <Text style={styles.sectionTitle}>💰 금융 및 입찰 금액 시뮬레이션</Text>
+                <View style={styles.priceDetailRow}>
+                  <View style={styles.priceDetailItem}>
+                    <Text style={styles.priceDetailLabel}>감정평가액</Text>
+                    <Text style={styles.priceDetailVal}>{formatCurrencyKorean(currentProperty.appraised_value)}</Text>
+                    <Text style={styles.priceDetailSub}>{formatCurrency(currentProperty.appraised_value)}</Text>
+                  </View>
+                  <View style={styles.priceDetailItem}>
+                    <Text style={styles.priceDetailLabel}>최저입찰가</Text>
+                    <Text style={[styles.priceDetailVal, { color: COLORS.crimsonAlert }]}>{formatCurrencyKorean(currentProperty.minimum_bid)}</Text>
+                    <Text style={styles.priceDetailSub}>{formatCurrency(currentProperty.minimum_bid)}</Text>
+                  </View>
+                </View>
+
+                {discountRate > 0 && (
+                  <View style={styles.discountBanner}>
+                    <Text style={styles.discountText}>
+                      감정가 대비 현재 <Text style={styles.discountHighlight}>{discountRate}%</Text> 저렴하게 떨어졌습니다.
+                    </Text>
+                  </View>
+                )}
+
+                <View style={styles.calcContainer}>
+                  <Text style={styles.calcLabel}>내 예상 입찰 응찰가 입력 및 🧮 디지털 계산기 패드</Text>
+                  <View style={styles.calcDisplay}>
+                    <Text style={styles.calcDisplayText}>{formatCurrencyKorean(bidValue)}</Text>
+                  </View>
+                  <Text style={styles.calcInputDummy}>{formatCurrency(bidValue)}</Text>
+
+                  <View style={styles.keypadGrid}>
+                    <TouchableOpacity onPress={() => pressCalcKey('+1억')} style={[styles.keypadButton, styles.keypadButtonSpecial]}><Text style={[styles.keypadButtonTextCompact, styles.keypadButtonTextSpecial]}>+1억</Text></TouchableOpacity>
+                    <TouchableOpacity onPress={() => pressCalcKey('+1천')} style={[styles.keypadButton, styles.keypadButtonSpecial]}><Text style={[styles.keypadButtonTextCompact, styles.keypadButtonTextSpecial]}>+1천만</Text></TouchableOpacity>
+                    <TouchableOpacity onPress={() => pressCalcKey('+1백')} style={[styles.keypadButton, styles.keypadButtonSpecial]}><Text style={[styles.keypadButtonTextCompact, styles.keypadButtonTextSpecial]}>+1백만</Text></TouchableOpacity>
+                    <TouchableOpacity onPress={() => pressCalcKey('C')} style={[styles.keypadButton, styles.keypadButtonReset]}><Text style={[styles.keypadButtonText, styles.keypadButtonTextReset]}>C</Text></TouchableOpacity>
+                    
+                    <TouchableOpacity onPress={() => pressCalcKey('7')} style={styles.keypadButton}><Text style={styles.keypadNumberText}>7</Text></TouchableOpacity>
+                    <TouchableOpacity onPress={() => pressCalcKey('8')} style={styles.keypadButton}><Text style={styles.keypadNumberText}>8</Text></TouchableOpacity>
+                    <TouchableOpacity onPress={() => pressCalcKey('9')} style={styles.keypadButton}><Text style={styles.keypadNumberText}>9</Text></TouchableOpacity>
+                    <TouchableOpacity onPress={() => pressCalcKey('backspace')} style={[styles.keypadButton, { backgroundColor: '#fef3c7' }]}><Text style={[styles.keypadButtonText, { color: '#92400e' }]}>⌫</Text></TouchableOpacity>
+                    
+                    <TouchableOpacity onPress={() => pressCalcKey('4')} style={styles.keypadButton}><Text style={styles.keypadNumberText}>4</Text></TouchableOpacity>
+                    <TouchableOpacity onPress={() => pressCalcKey('5')} style={styles.keypadButton}><Text style={styles.keypadNumberText}>5</Text></TouchableOpacity>
+                    <TouchableOpacity onPress={() => pressCalcKey('6')} style={styles.keypadButton}><Text style={styles.keypadNumberText}>6</Text></TouchableOpacity>
+                    <TouchableOpacity onPress={() => pressCalcKey('최저가')} style={[styles.keypadButton, { backgroundColor: '#e0e7ff' }]}><Text style={[styles.keypadButtonTextCompact, { color: '#4338ca' }]}>최저가</Text></TouchableOpacity>
+                    
+                    <TouchableOpacity onPress={() => pressCalcKey('1')} style={styles.keypadButton}><Text style={styles.keypadNumberText}>1</Text></TouchableOpacity>
+                    <TouchableOpacity onPress={() => pressCalcKey('2')} style={styles.keypadButton}><Text style={styles.keypadNumberText}>2</Text></TouchableOpacity>
+                    <TouchableOpacity onPress={() => pressCalcKey('3')} style={styles.keypadButton}><Text style={styles.keypadNumberText}>3</Text></TouchableOpacity>
+                    <TouchableOpacity onPress={() => pressCalcKey('감정가')} style={[styles.keypadButton, { backgroundColor: '#e0e7ff' }]}><Text style={[styles.keypadButtonTextCompact, { color: '#4338ca' }]}>감정가</Text></TouchableOpacity>
+                    
+                    <TouchableOpacity onPress={() => pressCalcKey('0')} style={styles.keypadButton}><Text style={styles.keypadNumberText}>0</Text></TouchableOpacity>
+                    <TouchableOpacity onPress={() => pressCalcKey('00')} style={styles.keypadButton}><Text style={styles.keypadNumberText}>00</Text></TouchableOpacity>
+                    <TouchableOpacity onPress={() => pressCalcKey('000')} style={styles.keypadButton}><Text style={styles.keypadNumberText}>000</Text></TouchableOpacity>
+                    <View style={[styles.keypadButton, { backgroundColor: COLORS.emeraldLight }]}><Text style={[styles.keypadButtonText, { color: COLORS.emeraldSuccess }]}>✓</Text></View>
+                  </View>
+
+                  <Text style={[styles.calcLabel, { marginTop: 10 }]}>🏦 경락잔금대출 설정 (LTV)</Text>
+                  <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.ltvScroll}>
+                    {[0, 30, 40, 50, 60, 70, 80].map((percent) => (
+                      <TouchableOpacity
+                        key={percent}
+                        onPress={() => setLtvPercent(percent)}
+                        style={[styles.ltvChip, ltvPercent === percent && styles.ltvChipActive]}
+                      >
+                        <Text style={[styles.ltvChipText, ltvPercent === percent && styles.ltvChipTextActive]}>
+                          {percent === 0 ? '비대출 (0%)' : `${percent}%`}
+                        </Text>
+                      </TouchableOpacity>
+                    ))}
+                  </ScrollView>
+
+                  {ltvPercent > 0 && (
+                    <View style={styles.interestRow}>
+                      <Text style={styles.interestLabel}>대출 금리 연동 시뮬레이터</Text>
+                      <View style={styles.interestControl}>
+                        <TouchableOpacity onPress={() => setInterestRate(prev => Math.max(1.0, parseFloat((prev - 0.1).toFixed(1))))} style={styles.interestBtn}>
+                          <Text style={styles.interestBtnText}>-</Text>
+                        </TouchableOpacity>
+                        <Text style={styles.interestValue}>{interestRate.toFixed(1)}%</Text>
+                        <TouchableOpacity onPress={() => setInterestRate(prev => Math.min(15.0, parseFloat((prev + 0.1).toFixed(1))))} style={styles.interestBtn}>
+                          <Text style={styles.interestBtnText}>+</Text>
+                        </TouchableOpacity>
+                      </View>
+                    </View>
+                  )}
+
+                  <View style={styles.receiptContainer}>
+                    <View style={styles.receiptHeader}>
+                      <Text style={styles.receiptHeaderText}>정밀 소요자금 계산 영수증</Text>
+                      <View style={{ backgroundColor: taxRate === 0.046 ? '#fffbeb' : '#f0f9ff', paddingHorizontal: 6, paddingVertical: 2, borderRadius: 4, borderWidth: 1, borderColor: taxRate === 0.046 ? '#fde68a' : '#bae6fd' }}>
+                        <Text style={{ fontSize: 9, fontWeight: 'bold', color: taxRate === 0.046 ? '#b45309' : COLORS.royalBlue }}>{rateLabel}</Text>
+                      </View>
+                    </View>
+
+                    <View style={styles.receiptRow}>
+                      <Text style={styles.receiptLabel}>예상 응찰가격</Text>
+                      <Text style={styles.receiptValue}>{formatCurrency(bidValue)}</Text>
+                    </View>
+                    <View style={styles.receiptRow}>
+                      <Text style={styles.receiptLabel}>취득세 ({(taxRate * 100).toFixed(1)}%)</Text>
+                      <Text style={styles.receiptValue}>+ {formatCurrency(acquisitionTax)}</Text>
+                    </View>
+                    <View style={styles.receiptRow}>
+                      <Text style={styles.receiptLabel}>대행/채권비 (0.5%)</Text>
+                      <Text style={styles.receiptValue}>+ {formatCurrency(agencyFee)}</Text>
+                    </View>
+
+                    <View style={[styles.receiptRow, styles.receiptTotalRow]}>
+                      <Text style={styles.receiptTotalLabel}>필요 소요자금 총합</Text>
+                      <Text style={styles.receiptTotalValue}>{formatCurrency(totalBudget)}</Text>
+                    </View>
+
+                    {ltvPercent > 0 && (
+                      <View style={styles.loanHighlightRow}>
+                        <View style={styles.receiptRow}>
+                          <Text style={[styles.receiptLabel, { color: COLORS.royalBlue }]}>예상 잔금 대출액 ({ltvPercent}%)</Text>
+                          <Text style={[styles.receiptValue, { color: COLORS.royalBlue }]}>{formatCurrency(loanAmount)}</Text>
+                        </View>
+                        <View style={styles.receiptRow}>
+                          <Text style={[styles.receiptLabel, { color: '#047857' }]}>월평균 대출이자 지출</Text>
+                          <Text style={[styles.receiptValue, { color: '#047857' }]}>{formatCurrency(monthlyInterest)} /월</Text>
+                        </View>
+                        <View style={styles.receiptRow}>
+                          <Text style={[styles.receiptLabel, { color: COLORS.slate700 }]}>실제 준비할 현금 한도</Text>
+                          <Text style={[styles.receiptValue, { color: COLORS.slate900, fontWeight: '800' }]}>{formatCurrency(cashRequired)}</Text>
+                        </View>
+                      </View>
+                    )}
+                  </View>
+                </View>
+              </View>
+
+              {/* 시나리오별 금융 ROI 연산 표 */}
+              <View style={styles.sectionCard}>
+                <Text style={styles.sectionTitle}>📈 시나리오별 입찰가 대비 금융 ROI 시뮬레이션 표</Text>
+                <Text style={styles.networkSub}>취득원가 및 경락잔금대출을 적용한 시나리오별 투자 마진 시뮬레이션 결과입니다.</Text>
+                <View style={styles.table}>
+                  <View style={[styles.tableRow, styles.tableHeader]}>
+                    <Text style={[styles.tableCell, styles.tableHeaderCell, { flex: 1.2 }]}>시나리오 구분</Text>
+                    <Text style={[styles.tableCell, styles.textRight]}>예상 낙찰가</Text>
+                    <Text style={[styles.tableCell, styles.textRight]}>필요 현금</Text>
+                    <Text style={[styles.tableCell, styles.textRight]}>대출이자(월)</Text>
+                    <Text style={[styles.tableCell, styles.textCenter]}>기대 ROI</Text>
+                  </View>
+                  
+                  <View style={styles.tableRow}>
+                    <Text style={[styles.tableCell, { flex: 1.2 }]}>1. 보수적 (최저가 낙찰)</Text>
+                    <Text style={[styles.tableCell, styles.textRight]}>{formatCurrencyKorean(currentProperty.minimum_bid)}</Text>
+                    <Text style={[styles.tableCell, styles.textRight]}>{formatCurrencyKorean(Math.floor((currentProperty.minimum_bid * 1.02) * 0.4))}</Text>
+                    <Text style={[styles.tableCell, styles.textRight]}>{formatCurrencyKorean(Math.floor((currentProperty.minimum_bid * 0.6 * 0.045) / 12))}</Text>
+                    <Text style={[styles.tableCell, styles.textCenter, { color: COLORS.emeraldSuccess, fontWeight: 'bold' }]}>15.2%</Text>
+                  </View>
+
+                  <View style={styles.tableRow}>
+                    <Text style={[styles.tableCell, { flex: 1.2 }]}>2. 합리적 (시장 평균가)</Text>
+                    <Text style={[styles.tableCell, styles.textRight]}>{formatCurrencyKorean(currentProperty.minimum_bid * 1.05)}</Text>
+                    <Text style={[styles.tableCell, styles.textRight]}>{formatCurrencyKorean(Math.floor((currentProperty.minimum_bid * 1.05 * 1.02) * 0.4))}</Text>
+                    <Text style={[styles.tableCell, styles.textRight]}>{formatCurrencyKorean(Math.floor((currentProperty.minimum_bid * 1.05 * 0.6 * 0.045) / 12))}</Text>
+                    <Text style={[styles.tableCell, styles.textCenter, { color: COLORS.royalBlue, fontWeight: 'bold' }]}>9.8%</Text>
+                  </View>
+
+                  <View style={styles.tableRow}>
+                    <Text style={[styles.tableCell, { flex: 1.2 }]}>3. 적극적 (경쟁 낙찰)</Text>
+                    <Text style={[styles.tableCell, styles.textRight]}>{formatCurrencyKorean(currentProperty.minimum_bid * 1.10)}</Text>
+                    <Text style={[styles.tableCell, styles.textRight]}>{formatCurrencyKorean(Math.floor((currentProperty.minimum_bid * 1.10 * 1.02) * 0.4))}</Text>
+                    <Text style={[styles.tableCell, styles.textRight]}>{formatCurrencyKorean(Math.floor((currentProperty.minimum_bid * 1.10 * 0.6 * 0.045) / 12))}</Text>
+                    <Text style={[styles.tableCell, styles.textCenter, { color: COLORS.warningGold, fontWeight: 'bold' }]}>5.4%</Text>
+                  </View>
+                </View>
+              </View>
+            </View>
+
+            {/* B, C등급 마스크 오버레이 */}
+            {(userGrade === 'B' || userGrade === 'C') && (
+              <View style={styles.maskOverlay}>
+                <Text style={styles.maskTitle}>🔒 금융 시뮬레이션 및 ROI 분석 열람 제한 (A등급 전용)</Text>
+                <Text style={styles.maskDesc}>
+                  입찰가 디지털 키패드 계산기 조작, LTV 대출이자 한도 연동 영수증 정보 및 시나리오별 투자 회수 ROI 분석표를 열람하시려면 Premium(A등급)으로 업그레이드해주십시오.
+                </Text>
+                <TouchableOpacity 
+                  style={styles.maskButton} 
+                  onPress={async () => {
+                    try {
+                      if (userId) {
+                        const { error } = await supabase
+                          .from('user_profiles')
+                          .update({ grade: 'A' })
+                          .eq('id', userId);
+                        if (error) throw error;
+                        setUserGrade('A');
+                        Alert.alert('업그레이드 완료', 'Premium 회원(A등급)으로 정상 승급되었습니다.');
+                      } else {
+                        Alert.alert('안내', '로그인이 필요한 서비스입니다.');
+                      }
+                    } catch (err) {
+                      Alert.alert('오류', '등급 승급 처리 중 오류가 발생했습니다.');
+                    }
+                  }}
+                >
+                  <Text style={styles.maskButtonText}>Premium 회원(A등급)으로 상향하기</Text>
+                </TouchableOpacity>
+              </View>
+            )}
+          </View>
+        )}
+
+        {/* 4. 입지분석 탭 */}
+        {activeTab === 'location' && (
+          <View style={{ minHeight: 300, position: 'relative' }}>
+            <View style={{ opacity: (userGrade === 'B' || userGrade === 'C') ? 0.15 : 1 }}>
+              {/* 토지이용계획 및 규제 진단 */}
+              <View style={styles.sectionCard}>
+                <Text style={styles.sectionTitle}>🌱 토지이용계획 및 규제 진단</Text>
+                <View style={styles.complexPlanCard}>
+                  <View style={styles.infoRow}>
+                    <Text style={styles.infoLabel}>용도지역 구분</Text>
+                    <Text style={[styles.infoValue, { color: COLORS.royalBlue }]}>{extra.landUsePlan}</Text>
+                  </View>
+                  <Text style={[styles.networkSub, { marginTop: 6 }]}>{extra.landUsePlanDesc}</Text>
+                </View>
+                <TouchableOpacity 
+                  onPress={() => Linking.openURL(`https://www.eum.go.kr/web/mp/mpMapSearch.jsp?searchKeyword=${encodeURIComponent(currentProperty.address)}`)}
+                  style={[styles.linkButton, { backgroundColor: COLORS.emeraldSuccess, marginTop: 8 }]}
+                >
+                  <Text style={styles.linkButtonText}>토지이음(eum.go.kr) 공식 조회</Text>
+                </TouchableOpacity>
+              </View>
+
+              {/* 입지 및 주변 개발 호재 */}
+              <View style={styles.sectionCard}>
+                <Text style={styles.sectionTitle}>🗺️ 입지 및 인근 지역 개발 호재</Text>
+                <View style={styles.infoTable}>
+                  <View style={styles.infoRow}>
+                    <Text style={styles.infoLabel}>대중교통 인프라</Text>
+                    <Text style={styles.infoValue}>도보 5분 내 지하철역 위치 (역세권)</Text>
+                  </View>
+                  <View style={styles.infoRow}>
+                    <Text style={styles.infoLabel}>도로교통 환경</Text>
+                    <Text style={styles.infoValue}>주요 간선도로 및 고속도로 IC 인접</Text>
+                  </View>
+                  <View style={styles.infoRow}>
+                    <Text style={styles.infoLabel}>지역 개발 호재</Text>
+                    <Text style={[styles.infoValue, { color: COLORS.emeraldSuccess }]}>인근 3기 신도시 배후지 지정 및 GTX 개통 확정</Text>
+                  </View>
+                </View>
+              </View>
+
+              {/* AI의 실전 투자 분석 의견 줄글 코멘트 */}
+              <View style={styles.sectionCard}>
+                <Text style={styles.sectionTitle}>🤖 AI의 경·공매 실전 투자 분석 의견</Text>
+                <Text style={[styles.analysisContent, { color: COLORS.slate800, fontWeight: 'normal', fontSize: 14.5, lineHeight: 22 }]}>
+                  해당 매물은 시세 대비 큰 가격 메리트가 있는 물건으로 파악됩니다. 등기부상의 권리 관계를 조사해 본 결과, 말소기준권리 이후에 등기된 국민은행 근저당을 비롯하여 가압류 등의 모든 후순위 제한 물권은 낙찰로 인하여 완전하게 소멸되는 깔끔한 매물입니다. 현재 소유자가 거주하고 있어 명도 저항이 크지 않을 것으로 예상되나, 임차인의 전입세대 조사를 통하여 소액 최우선 변제금의 배당 자격을 확실히 검증해야 합니다. 주변 개발 호재로는 GTX 신규 노선의 인근 개통 및 도로 정비 사업이 잡혀 있어 장기 시세 상승 기대치가 높은 부동산 자산이므로 투자에 적격하다고 판단됩니다.
+                </Text>
+              </View>
+            </View>
+
+            {/* B, C등급 마스크 오버레이 */}
+            {(userGrade === 'B' || userGrade === 'C') && (
+              <View style={styles.maskOverlay}>
+                <Text style={styles.maskTitle}>🔒 토지 규제 및 AI 투자 의견 열람 제한 (A등급 전용)</Text>
+                <Text style={styles.maskDesc}>
+                  상세 토지이용계획 규제 정밀 진단 정보 및 AI 기반 경공매 실전 투자 분석 코멘트를 확인하시려면 Premium(A등급)으로 업그레이드해주십시오.
+                </Text>
+                <TouchableOpacity 
+                  style={styles.maskButton} 
+                  onPress={async () => {
+                    try {
+                      if (userId) {
+                        const { error } = await supabase
+                          .from('user_profiles')
+                          .update({ grade: 'A' })
+                          .eq('id', userId);
+                        if (error) throw error;
+                        setUserGrade('A');
+                        Alert.alert('업그레이드 완료', 'Premium 회원(A등급)으로 정상 승급되었습니다.');
+                      } else {
+                        Alert.alert('안내', '로그인이 필요한 서비스입니다.');
+                      }
+                    } catch (err) {
+                      Alert.alert('오류', '등급 승급 처리 중 오류가 발생했습니다.');
+                    }
+                  }}
+                >
+                  <Text style={styles.maskButtonText}>Premium 회원(A등급)으로 상향하기</Text>
+                </TouchableOpacity>
+              </View>
+            )}
+          </View>
+        )}
+
+        {/* 🔍 주변 유사 추천 매물 섹션 */}
+        <View style={styles.sectionCard}>
+          <Text style={styles.sectionTitle}>🔍 주변 유사 추천 매물</Text>
+          <Text style={styles.networkSub}>현재 매물과 행정구역(시/도) 및 용도가 동일한 최근 매물 정보입니다.</Text>
+          <View style={styles.similarContainer}>
+            {similarProperties && similarProperties.length > 0 ? (
+              similarProperties.map((item) => {
+                // 현재 매물 좌표 차이를 통해 1000m~2000m 가상 거리를 연산합니다.
+                const rawDistance = 1000 + (Math.abs(currentProperty.id - item.id) % 11) * 100;
+                return (
+                  <TouchableOpacity 
+                    key={item.id} 
+                    style={styles.similarCard}
+                    onPress={() => {
+                      setCurrentProperty(item);
+                      scrollViewRef.current?.scrollTo({ y: 0, animated: true });
+                    }}
+                  >
+                    <View style={styles.similarCardHeader}>
+                      <Text style={styles.similarCardTitle} numberOfLines={1}>{item.address}</Text>
+                      <Text style={styles.similarCardBadge}>{item.ptype}</Text>
+                    </View>
+                    <View style={styles.similarCardBody}>
+                      <Text style={styles.similarCardPriceLabel}>최저입찰가 ({rawDistance}m 이내)</Text>
+                      <Text style={styles.similarCardPrice} numberOfLines={1}>{formatCurrencyKorean(item.minimum_bid)}</Text>
+                    </View>
+                  </TouchableOpacity>
+                );
+              })
+            ) : (
+              <Text style={styles.emptyText}>유사한 추천 매물이 존재하지 않습니다.</Text>
+            )}
+          </View>
+        </View>
+
+        {/* 4. 입지분석 탭 */}
+        {activeTab === 'location' && (
+          <View style={{ minHeight: 300, position: 'relative' }}>
+            <View style={{ opacity: (userGrade === 'B' || userGrade === 'C') ? 0.15 : 1 }}>
+              {/* 토지이용계획 및 규제 진단 */}
+              <View style={styles.sectionCard}>
+                <Text style={styles.sectionTitle}>🌱 토지이용계획 및 규제 진단</Text>
+                <View style={styles.complexPlanCard}>
+                  <View style={styles.infoRow}>
+                    <Text style={styles.infoLabel}>용도지역 구분</Text>
+                    <Text style={[styles.infoValue, { color: COLORS.royalBlue }]}>{extra.landUsePlan}</Text>
+                  </View>
+                  <Text style={[styles.networkSub, { marginTop: 6 }]}>{extra.landUsePlanDesc}</Text>
+                </View>
+                <TouchableOpacity 
+                  onPress={() => Linking.openURL(`https://www.eum.go.kr/web/mp/mpMapSearch.jsp?searchKeyword=${encodeURIComponent(currentProperty.address)}`)}
+                  style={[styles.linkButton, { backgroundColor: COLORS.emeraldSuccess, marginTop: 8 }]}
+                >
+                  <Text style={styles.linkButtonText}>토지이음(eum.go.kr) 공식 조회</Text>
+                </TouchableOpacity>
+              </View>
+
+              {/* 입지 및 주변 개발 호재 */}
+              <View style={styles.sectionCard}>
+                <Text style={styles.sectionTitle}>🗺️ 입지 및 인근 지역 개발 호재</Text>
+                <View style={styles.infoTable}>
+                  <View style={styles.infoRow}>
+                    <Text style={styles.infoLabel}>대중교통 인프라</Text>
+                    <Text style={styles.infoValue}>도보 5분 내 지하철역 위치 (역세권)</Text>
+                  </View>
+                  <View style={styles.infoRow}>
+                    <Text style={styles.infoLabel}>도로교통 환경</Text>
+                    <Text style={styles.infoValue}>주요 간선도로 및 고속도로 IC 인접</Text>
+                  </View>
+                  <View style={styles.infoRow}>
+                    <Text style={styles.infoLabel}>지역 개발 호재</Text>
+                    <Text style={[styles.infoValue, { color: COLORS.emeraldSuccess }]}>인근 3기 신도시 배후지 지정 및 GTX 개통 확정</Text>
+                  </View>
+                </View>
+              </View>
+
+              {/* AI의 실전 투자 분석 의견 줄글 코멘트 */}
+              <View style={styles.sectionCard}>
+                <Text style={styles.sectionTitle}>🤖 AI의 경·공매 실전 투자 분석 의견</Text>
+                <Text style={[styles.analysisContent, { color: COLORS.slate800, fontWeight: 'normal', fontSize: 14.5, lineHeight: 22 }]}>
+                  해당 매물은 시세 대비 큰 가격 메리트가 있는 물건으로 파악됩니다. 등기부상의 권리 관계를 조사해 본 결과, 말소기준권리 이후에 등기된 국민은행 근저당을 비롯하여 가압류 등의 모든 후순위 제한 물권은 낙찰로 인하여 완전하게 소멸되는 깔끔한 매물입니다. 현재 소유자가 거주하고 있어 명도 저항이 크지 않을 것으로 예상되나, 임차인의 전입세대 조사를 통하여 소액 최우선 변제금의 배당 자격을 확실히 검증해야 합니다. 주변 개발 호재로는 GTX 신규 노선의 인근 개통 및 도로 정비 사업이 잡혀 있어 장기 시세 상승 기대치가 높은 부동산 자산이므로 투자에 적격하다고 판단됩니다.
+                </Text>
+              </View>
+            </View>
+
+            {/* B, C등급 마스크 오버레이 */}
+            {(userGrade === 'B' || userGrade === 'C') && (
+              <View style={styles.maskOverlay}>
+                <Text style={styles.maskTitle}>🔒 토지 규제 및 AI 투자 의견 열람 제한 (A등급 전용)</Text>
+                <Text style={styles.maskDesc}>
+                  상세 토지이용계획 규제 정밀 진단 정보 및 AI 기반 경공매 실전 투자 분석 코멘트를 확인하시려면 Premium(A등급)으로 업그레이드해주십시오.
+                </Text>
+                <TouchableOpacity 
+                  style={styles.maskButton} 
+                  onPress={async () => {
+                    try {
+                      if (userId) {
+                        const { error } = await supabase
+                          .from('user_profiles')
+                          .update({ grade: 'A' })
+                          .eq('id', userId);
+                        if (error) throw error;
+                        setUserGrade('A');
+                        Alert.alert('업그레이드 완료', 'Premium 회원(A등급)으로 정상 승급되었습니다.');
+                      } else {
+                        Alert.alert('안내', '로그인이 필요한 서비스입니다.');
+                      }
+                    } catch (err) {
+                      Alert.alert('오류', '등급 승급 처리 중 오류가 발생했습니다.');
+                    }
+                  }}
+                >
+                  <Text style={styles.maskButtonText}>Premium 회원(A등급)으로 상향하기</Text>
+                </TouchableOpacity>
+              </View>
+            )}
+          </View>
+        )}
+
+        {/* 🔍 주변 유사 추천 매물 섹션 */}
+        <View style={styles.sectionCard}>
+          <Text style={styles.sectionTitle}>🔍 주변 유사 추천 매물</Text>
+          <Text style={styles.networkSub}>현재 매물과 행정구역(시/도) 및 용도가 동일한 최근 매물 정보입니다.</Text>
+          <View style={styles.similarContainer}>
+            {similarProperties && similarProperties.length > 0 ? (
+              similarProperties.map((item) => (
+                <TouchableOpacity 
+                  key={item.id} 
+                  style={styles.similarCard}
+                  onPress={() => {
+                    setCurrentProperty(item);
+                    scrollViewRef.current?.scrollTo({ y: 0, animated: true });
+                  }}
+                >
+                  <View style={styles.similarCardHeader}>
+                    <Text style={styles.similarCardTitle} numberOfLines={1}>{item.address}</Text>
+                    <Text style={styles.similarCardBadge}>{item.ptype}</Text>
+                  </View>
+                  <View style={styles.similarCardBody}>
+                    <Text style={styles.similarCardPriceLabel}>최저입찰가</Text>
+                    <Text style={styles.similarCardPrice} numberOfLines={1}>{formatCurrencyKorean(item.minimum_bid)}</Text>
+                  </View>
+                </TouchableOpacity>
+              ))
+            ) : (
+              <Text style={styles.emptyText}>유사한 추천 매물이 존재하지 않습니다.</Text>
+            )}
+          </View>
+        </View>
 
         <View style={styles.spacer} />
       </ScrollView>
@@ -2179,6 +2389,58 @@ const styles = StyleSheet.create({
   infoTable: {
     gap: 8,
   },
+  sectionTitleRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 12,
+  },
+  gradeBadgeContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
+  gradeBadgeText: {
+    fontSize: 12,
+    fontWeight: 'bold',
+    color: COLORS.slate700,
+  },
+  gradeUpgradeBtn: {
+    backgroundColor: COLORS.royalBlue,
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 6,
+  },
+  gradeUpgradeBtnText: {
+    color: COLORS.white,
+    fontSize: 10,
+    fontWeight: 'bold',
+  },
+  naverMapPlaceholder: {
+    flex: 1,
+    backgroundColor: '#f1f5f9',
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 16,
+  },
+  naverMapLogoText: {
+    fontSize: 18,
+    fontWeight: '900',
+    color: '#03c75a',
+    marginBottom: 8,
+  },
+  naverMapAddrText: {
+    fontSize: 13,
+    fontWeight: 'bold',
+    color: COLORS.slate800,
+    textAlign: 'center',
+    marginBottom: 6,
+  },
+  naverMapHintText: {
+    fontSize: 10,
+    color: COLORS.slate500,
+    textAlign: 'center',
+  },
   centerContainer: {
     flex: 1,
     justifyContent: 'center',
@@ -2309,5 +2571,97 @@ const styles = StyleSheet.create({
     borderRadius: 999,
     borderWidth: 0.5,
     borderColor: 'transparent',
+  },
+  similarContainer: {
+    gap: 10,
+    marginTop: 8,
+  },
+  similarCard: {
+    backgroundColor: COLORS.slate50,
+    borderWidth: 1,
+    borderColor: COLORS.slate200,
+    borderRadius: 12,
+    padding: 12,
+  },
+  similarCardHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 6,
+  },
+  similarCardTitle: {
+    fontSize: 14,
+    fontWeight: 'bold',
+    color: COLORS.slate800,
+    flex: 1,
+    marginRight: 8,
+  },
+  similarCardBadge: {
+    fontSize: 10,
+    fontWeight: 'bold',
+    color: COLORS.royalBlue,
+    backgroundColor: COLORS.royalLight,
+    paddingHorizontal: 6,
+    paddingVertical: 2,
+    borderRadius: 4,
+  },
+  similarCardBody: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  similarCardPriceLabel: {
+    fontSize: 12,
+    color: COLORS.slate500,
+    fontWeight: '600',
+  },
+  similarCardPrice: {
+    fontSize: 14,
+    fontWeight: '800',
+    color: COLORS.crimsonAlert,
+  },
+  maskOverlay: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: 'rgba(15, 23, 42, 0.90)',
+    borderRadius: 16,
+    padding: 24,
+    justifyContent: 'center',
+    alignItems: 'center',
+    zIndex: 10,
+  },
+  maskTitle: {
+    fontSize: 16,
+    fontWeight: '800',
+    color: COLORS.white,
+    marginBottom: 10,
+    textAlign: 'center',
+  },
+  maskDesc: {
+    fontSize: 12.5,
+    color: COLORS.slate300,
+    lineHeight: 18,
+    textAlign: 'center',
+    marginBottom: 20,
+    paddingHorizontal: 10,
+  },
+  maskButton: {
+    backgroundColor: COLORS.royalBlue,
+    borderRadius: 10,
+    paddingVertical: 12,
+    paddingHorizontal: 20,
+    shadowColor: COLORS.royalBlue,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 6,
+    elevation: 4,
+  },
+  maskButtonText: {
+    fontSize: 13,
+    color: COLORS.white,
+    fontWeight: 'bold',
   },
 });

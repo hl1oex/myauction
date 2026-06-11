@@ -21,9 +21,9 @@ export interface Property {
 
 export interface FilterState {
   search: string;
-  source: 'all' | 'court' | 'onbid' | 'private';
-  ptype: 'all' | 'apart' | 'store' | 'house' | 'land' | 'factory';
-  sido: string;
+  source: ('court' | 'onbid' | 'private')[];
+  ptype: ('apart' | 'officetel' | 'villa' | 'house' | 'store' | 'land' | 'factory')[];
+  sido: string[];
   sigungu: string;
   dateLimit: number; // 남은 기일 필터링 (D-Day 한도)
   budgetLimit: number; // 가용 예산 한도

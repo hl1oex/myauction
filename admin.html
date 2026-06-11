@@ -1,0 +1,602 @@
+<!DOCTYPE html>
+<!-- 새 파일 첫 줄은 해당 파일의 역할을 설명하는 한 줄짜리 한국어 주석으로 시작합니다. -->
+<!-- 백엔드 어드민 페이지로, 회원 등급 관리 및 광고판 애드센스 스위칭 기능을 제공하는 독립형 관리도구입니다. -->
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>부동산경공매 검색시스템 - 백엔드 관리자</title>
+    <!-- 💎 프리미엄 디자인 타이포그래피 Google Fonts 연동 -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Outfit:wght@400;500;600;700;800&family=Noto+Sans+KR:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+    <!-- 💎 시안 2 (Elegant Pearl White) 구현을 위한 Tailwind CSS CDN 연동 -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- 💎 비동기 HTTP 호출 Axios CDN 연동 -->
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <!-- 💎 아이콘 라이브러리 FontAwesome 연동 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- 💎 Supabase Web SDK CDN 연동 -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    
+    <script>
+        const supabaseUrl = "https://ubaxyfxcsxsvrryowswb.supabase.co";
+        const supabaseAnonKey = "sb_publishable_JrM_2rrvppC105lHndMLkg_x2x0sLUE";
+        const supabaseClient = supabase.createClient(supabaseUrl, supabaseAnonKey);
+
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'Noto Sans KR', 'sans-serif'],
+                        outfit: ['Outfit', 'sans-serif'],
+                    },
+                    colors: {
+                        royalBlue: '#1e40af',      /* 메인 테마: 로열 블루 */
+                        royalHover: '#1d4ed8',
+                        emeraldSuccess: '#047857',  /* 서브 포인트: 에메랄드 그린 */
+                        crimsonAlert: '#be123c',    /* 경고 포인트: 크림슨 레드 */
+                        pearlWhiteBg: '#f8fafc',    /* 펄 화이트 배경 */
+                        warningGold: '#d97706',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        html {
+            font-size: 110%;
+        }
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 6px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 9999px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+    </style>
+</head>
+<body class="bg-pearlWhiteBg text-slate-800 font-sans min-h-screen flex flex-col">
+    <!-- 💎 상단 헤더바 -->
+    <header class="bg-white border-b border-slate-200 sticky top-0 z-30 shadow-sm">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+            <div class="flex items-center gap-3">
+                <div class="bg-royalBlue w-9 h-9 rounded-xl flex items-center justify-center text-white text-lg shadow-md">
+                    <i class="fa-solid fa-screwdriver-wrench"></i>
+                </div>
+                <div>
+                    <h1 class="text-sm sm:text-base font-extrabold text-slate-900 leading-tight">부동산경공매 검색시스템 - 백엔드 관리자</h1>
+                    <p class="text-[9.5px] font-bold text-slate-400">ADMIN CONTROL CENTER v1.1</p>
+                </div>
+            </div>
+            <div class="flex items-center gap-3">
+                <a href="./index.html" class="bg-slate-100 hover:bg-slate-200 text-slate-600 text-[10.5px] sm:text-xs font-black px-3.5 py-2 rounded-xl border border-slate-200 flex items-center gap-1.5 transition-all select-none">
+                    <i class="fa-solid fa-home"></i> 홈 피드로 이동
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <main class="flex-1 max-w-7xl w-full mx-auto p-4 sm:p-6 lg:p-8 grid grid-cols-1 lg:grid-cols-4 gap-6">
+        <!-- 💎 좌측 탭바 컨트롤러 -->
+        <aside class="lg:col-span-1 space-y-2">
+            <button onclick="switchTab('ad-tab')" id="btn-ad-tab" class="w-full text-left bg-royalBlue text-white border border-royalBlue px-4 py-3 rounded-xl font-black text-xs flex items-center gap-3 transition-all shadow-sm">
+                <i class="fa-solid fa-rectangle-ad"></i> 광고자산 비주얼 매니저
+            </button>
+            <button onclick="switchTab('user-tab')" id="btn-user-tab" class="w-full text-left bg-white text-slate-600 border border-slate-200 hover:bg-slate-50 px-4 py-3 rounded-xl font-black text-xs flex items-center gap-3 transition-all">
+                <i class="fa-solid fa-users-gear"></i> 고객 등급 권한 매니저
+            </button>
+            <button onclick="switchTab('db-tab')" id="btn-db-tab" class="w-full text-left bg-white text-slate-600 border border-slate-200 hover:bg-slate-50 px-4 py-3 rounded-xl font-black text-xs flex items-center gap-3 transition-all">
+                <i class="fa-solid fa-database"></i> 데이터베이스 구축 SQL
+            </button>
+        </aside>
+
+        <!-- 💎 우측 패널 본체 -->
+        <section class="lg:col-span-3 space-y-6">
+            <!-- 📢 1. 광고자산 비주얼 매니저 탭 -->
+            <div id="panel-ad-tab" class="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm space-y-5">
+                <div class="border-b border-slate-100 pb-3 flex items-center justify-between">
+                    <div>
+                        <h2 class="text-base font-extrabold text-slate-900 flex items-center gap-2">
+                            <i class="fa-solid fa-rectangle-ad text-royalBlue"></i> 목록 삽입용 가로 배너 광고판 설정
+                        </h2>
+                        <p class="text-[10px] text-slate-400 font-bold mt-0.5">매물 피드 목록 중간에 삽입되는 동일 규격 카드형 광고 슬롯을 제어합니다.</p>
+                    </div>
+                    <label class="relative inline-flex items-center cursor-pointer">
+                        <input type="checkbox" id="ad-toggle" class="sr-only peer" onchange="saveAdStatus()">
+                        <div class="w-11 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-royalBlue"></div>
+                        <span class="ml-2.5 text-xs font-black text-slate-700" id="ad-toggle-label">비활성</span>
+                    </label>
+                </div>
+
+                <!-- 비주얼 에뮬레이터 프레임 -->
+                <div class="space-y-3">
+                    <h3 class="text-xs font-black text-slate-700">🖥️ 실시간 광고 노출 에뮬레이터 미리보기</h3>
+                    <div class="border border-slate-200 bg-slate-50/50 p-4 rounded-2xl flex justify-center items-center">
+                        <!-- 실제 매물 카드와 100% 동일 규격의 광고 목업 -->
+                        <div id="ad-preview-card" class="w-[300px] min-h-[360px] bg-white border border-slate-200 rounded-2xl p-3 shadow-sm relative overflow-hidden transition-all hover:shadow-md flex flex-col justify-between">
+                            <!-- 광고 내용 렌더러 -->
+                            <div id="ad-preview-container" class="flex-1 flex flex-col justify-between h-full">
+                                <div class="text-center py-10">
+                                    <p class="text-xs text-slate-400 font-bold">광고 정보가 로드되지 않았습니다.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 설정 폼 -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="space-y-4">
+                        <div>
+                            <label class="block text-xs font-black text-slate-700 mb-1.5">광고 송출 형태 선택</label>
+                            <div class="flex gap-4">
+                                <label class="inline-flex items-center cursor-pointer">
+                                    <input type="radio" name="ad_type" value="direct" checked class="text-royalBlue focus:ring-royalBlue" onchange="toggleFormFields('direct')">
+                                    <span class="ml-2 text-xs font-black text-slate-700">🎨 직접 유치 광고 배너</span>
+                                </label>
+                                <label class="inline-flex items-center cursor-pointer">
+                                    <input type="radio" name="ad_type" value="adsense" class="text-royalBlue focus:ring-royalBlue" onchange="toggleFormFields('adsense')">
+                                    <span class="ml-2 text-xs font-black text-slate-700">⚙️ 구글 애드센스 코드</span>
+                                </label>
+                            </div>
+                        </div>
+
+                        <!-- 직접 유치 광고 필드 -->
+                        <div id="direct-fields" class="space-y-3">
+                            <div>
+                                <label class="block text-[11px] font-black text-slate-500 mb-1">광고 타이틀</label>
+                                <input type="text" id="ad-title" oninput="updatePreview('direct')" class="w-full text-xs font-bold p-2.5 border border-slate-200 rounded-xl bg-slate-50 focus:bg-white focus:border-royalBlue outline-none" placeholder="예: ★ 프리미엄 경공매 투자 VIP 멤버십 모집">
+                            </div>
+                            <div>
+                                <label class="block text-[11px] font-black text-slate-500 mb-1">광고 상세 설명</label>
+                                <textarea id="ad-desc" rows="2" oninput="updatePreview('direct')" class="w-full text-xs font-bold p-2.5 border border-slate-200 rounded-xl bg-slate-50 focus:bg-white focus:border-royalBlue outline-none" placeholder="예: 오직 1%를 위한 NPL 부실채권 및 지분 경매 핵심 노하우 단독 공개."></textarea>
+                            </div>
+                            <div>
+                                <label class="block text-[11px] font-black text-slate-500 mb-1">배너 이미지 파일 주소 (URL)</label>
+                                <input type="text" id="ad-image-url" oninput="updatePreview('direct')" class="w-full text-xs font-bold p-2.5 border border-slate-200 rounded-xl bg-slate-50 focus:bg-white focus:border-royalBlue outline-none" placeholder="예: ./apartment_elegant_facade.png">
+                                <span class="text-[9.5px] text-slate-400 font-bold block mt-1">💡 권장 이미지 크기: 가로 800px * 세로 260px (또는 3:1 비율) / 대형 카드 렌더링에 최적화되어 있습니다.</span>
+                            </div>
+                            <div>
+                                <label class="block text-[11px] font-black text-slate-500 mb-1">클릭 시 랜딩 연결 주소 (URL)</label>
+                                <input type="text" id="ad-link-url" oninput="updatePreview('direct')" class="w-full text-xs font-bold p-2.5 border border-slate-200 rounded-xl bg-slate-50 focus:bg-white focus:border-royalBlue outline-none" placeholder="예: https://www.courtauction.go.kr">
+                            </div>
+                        </div>
+
+                        <!-- 애드센스 광고 필드 -->
+                        <div id="adsense-fields" class="space-y-3 hidden">
+                            <div>
+                                <label class="block text-[11px] font-black text-slate-500 mb-1">애드센스 HTML 스크립트 코드</label>
+                                <textarea id="ad-code" rows="5" oninput="updatePreview('adsense')" class="w-full text-xs font-mono p-2.5 border border-slate-200 rounded-xl bg-slate-50 focus:bg-white focus:border-royalBlue outline-none" placeholder='<!-- AdSense Code --><ins class="adsbygoogle" style="display:block" data-ad-format="fluid"...></ins>'></textarea>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 실시간 도움말 및 가이드 -->
+                    <div class="bg-slate-50 border border-slate-200 p-4 rounded-2xl flex flex-col justify-between text-[11px] font-semibold text-slate-600 leading-relaxed">
+                        <div class="space-y-2">
+                            <strong class="text-slate-800 block text-xs font-black"><i class="fa-solid fa-info-circle text-royalBlue"></i> 광고 관리 가이드</strong>
+                            <p>1. 광고 활성 스위치를 켜면 매물 추천 피드 리스트 중간에 광고판 카드가 즉시 생성됩니다.</p>
+                            <p>2. 직접 유치 광고는 로컬에 보관 중인 이미지 경로(`./apartment_elegant_facade.png`)나 외부 이미지 링크 모두 정상적으로 지원됩니다.</p>
+                            <p>3. 애드센스로 전환 시 애드센스 자바스크립트 스크립트 블록이 삽입되어 광고 서비스가 자동으로 연동됩니다.</p>
+                        </div>
+                        <button onclick="saveAdSettings()" class="w-full bg-royalBlue hover:bg-royalHover text-white text-xs font-black py-2.5 px-4 rounded-xl shadow-md transition-all select-none mt-4">
+                            <i class="fa-solid fa-save"></i> 광고 설정 업데이트 적용
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 👥 2. 고객 등급 권한 매니저 탭 -->
+            <div id="panel-user-tab" class="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm space-y-5 hidden">
+                <div>
+                    <h2 class="text-base font-extrabold text-slate-900 flex items-center gap-2">
+                        <i class="fa-solid fa-users-gear text-royalBlue"></i> 가입 회원 리스트 및 권한 등급 조정
+                    </h2>
+                    <p class="text-[10px] text-slate-400 font-bold mt-0.5">고객의 정보 노출 등급(A/B/C)을 직접 지정하여 열람 가능한 분석 범위를 차등 제한합니다.</p>
+                </div>
+
+                <!-- 수동 회원 등록 도구 (예외 방어용) -->
+                <div class="bg-slate-50 border border-slate-200 p-3.5 rounded-2xl grid grid-cols-1 md:grid-cols-3 gap-3 items-end">
+                    <div class="md:col-span-2">
+                        <label class="block text-[10.5px] font-black text-slate-500 mb-1">관리자 수동 회원 강제 등록 (Supabase 데이터베이스 연동용)</label>
+                        <input type="email" id="new-user-email" class="w-full text-xs font-bold p-2 border border-slate-200 rounded-lg bg-white outline-none" placeholder="회원가입한 고객 이메일을 입력하세요">
+                    </div>
+                    <button onclick="registerUserManually()" class="bg-emeraldSuccess hover:bg-emerald-700 text-white text-xs font-black py-2 px-3 rounded-lg flex items-center justify-center gap-1.5 transition-all shadow-sm">
+                        <i class="fa-solid fa-user-plus"></i> 수동 회원 등록
+                    </button>
+                </div>
+
+                <!-- 회원 리스트 테이블 -->
+                <div class="border border-slate-200 rounded-2xl overflow-hidden bg-white">
+                    <table class="w-full text-left border-collapse">
+                        <thead>
+                            <tr class="bg-slate-50 border-b border-slate-200 text-slate-700 text-[10.5px] font-black">
+                                <th class="p-3">가입 회원 이메일</th>
+                                <th class="p-3 w-1/3 text-center">권한 등급 설정</th>
+                                <th class="p-3 w-1/4 text-center">최종 업데이트</th>
+                            </tr>
+                        </thead>
+                        <tbody id="user-list-tbody" class="text-xs font-bold text-slate-750">
+                            <!-- JS를 통해 실시간 목록 로딩 -->
+                            <tr>
+                                <td colspan="3" class="p-8 text-center text-slate-400">회원 데이터를 불러오는 중입니다.</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- ⚙️ 3. 데이터베이스 구축 SQL 탭 -->
+            <div id="panel-db-tab" class="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm space-y-4 hidden">
+                <div>
+                    <h2 class="text-base font-extrabold text-slate-900 flex items-center gap-2">
+                        <i class="fa-solid fa-database text-royalBlue"></i> Supabase 데이터베이스 테이블 셋업 가이드
+                    </h2>
+                    <p class="text-[10px] text-slate-400 font-bold mt-0.5">광고 및 회원 등급 관리에 필요한 Supabase SQL 셋업 명령어 스크립트입니다.</p>
+                </div>
+
+                <div class="space-y-3">
+                    <p class="text-xs text-slate-600 font-semibold leading-relaxed">
+                        아래의 SQL 구문을 전체 복사하여 **Supabase Dashboard -> SQL Editor -> New Query** 창에 붙여넣고 **Run** 버튼을 눌러 실행해주시기 바랍니다.
+                    </p>
+                    
+                    <div class="relative bg-slate-900 rounded-2xl p-4 overflow-x-auto border border-slate-800">
+                        <button onclick="copySQLCode()" class="absolute top-3 right-3 bg-slate-800 hover:bg-slate-700 text-slate-300 text-[9.5px] font-black px-2.5 py-1.5 rounded-lg border border-slate-700 flex items-center gap-1 transition-all select-none">
+                            <i class="fa-solid fa-copy"></i> 복사하기
+                        </button>
+                        <pre id="sql-code-block" class="text-xs text-emerald-400 font-mono leading-relaxed select-all">
+-- 1. 광고판(ads) 데이터베이스 테이블 구축
+CREATE TABLE IF NOT EXISTS public.ads (
+    id SERIAL PRIMARY KEY,
+    slot_name VARCHAR(255) UNIQUE NOT NULL,
+    active BOOLEAN DEFAULT TRUE,
+    type VARCHAR(50) DEFAULT 'direct',
+    title VARCHAR(255),
+    desc TEXT,
+    ad_code TEXT,
+    image_url TEXT,
+    link_url TEXT,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+);
+
+-- 초기 가로 배너 광고 데이터 인서트
+INSERT INTO public.ads (slot_name, active, type, title, desc, image_url, link_url)
+VALUES ('list_banner', true, 'direct', '★ 프리미엄 경공매 투자 VIP 멤버십 모집', '오직 1%를 위한 NPL 부실채권 및 지분 경매 핵심 노하우 단독 공개. 지금 가입 시 30% 한정 할인 적용!', './apartment_elegant_facade.png', 'https://action-b8c75.web.app')
+ON CONFLICT (slot_name) DO NOTHING;
+
+-- 2. 고객 프로필 회원 등급(user_profiles) 테이블 구축
+CREATE TABLE IF NOT EXISTS public.user_profiles (
+    id UUID PRIMARY KEY REFERENCES auth.users(id) ON DELETE CASCADE,
+    email VARCHAR(255) NOT NULL,
+    grade VARCHAR(10) DEFAULT 'C',
+    upgrade_requested BOOLEAN DEFAULT FALSE,
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+);
+
+-- 기존 테이블이 존재할 경우 upgrade_requested 컬럼 추가 SQL
+ALTER TABLE public.user_profiles ADD COLUMN IF NOT EXISTS upgrade_requested BOOLEAN DEFAULT FALSE;
+
+-- 신규 유저 가입 시 자동으로 등급 테이블 행을 연계 생성하는 DB 트리거 함수 작성
+CREATE OR REPLACE FUNCTION public.handle_new_user()
+RETURNS trigger AS $$
+BEGIN
+  INSERT INTO public.user_profiles (id, email, grade, upgrade_requested)
+  VALUES (new.id, new.email, 'C', false)
+  ON CONFLICT (id) DO NOTHING;
+  RETURN new;
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
+
+-- 트리거 생성
+DROP TRIGGER IF EXISTS on_auth_user_created ON auth.users;
+CREATE TRIGGER on_auth_user_created
+  AFTER INSERT ON auth.users
+  FOR EACH ROW EXECUTE FUNCTION public.handle_new_user();
+                        </pre>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- 💎 탭 스위칭 및 데이터 통신 실시간 바인딩 JS -->
+    <script>
+        let currentTabId = "ad-tab";
+        let adSettings = { slot_name: 'list_banner', is_active: true, type: 'direct', image_url: '', link_url: '', code: '' };
+        let usersList = [];
+
+        window.onload = function() {
+            loadAdSettings();
+            loadUsersList();
+            document.title = "부동산경공매 검색시스템 - 백엔드 관리자";
+        };
+
+        // 탭 토글링 구현
+        function switchTab(tabId) {
+            const tabs = ['ad-tab', 'user-tab', 'db-tab'];
+            tabs.forEach(t => {
+                const panel = document.getElementById(`panel-${t}`);
+                const btn = document.getElementById(`btn-${t}`);
+                if (t === tabId) {
+                    panel.classList.remove('hidden');
+                    btn.className = "w-full text-left bg-royalBlue text-white border border-royalBlue px-4 py-3 rounded-xl font-black text-xs flex items-center gap-3 transition-all shadow-sm";
+                } else {
+                    panel.classList.add('hidden');
+                    btn.className = "w-full text-left bg-white text-slate-600 border border-slate-200 hover:bg-slate-50 px-4 py-3 rounded-xl font-black text-xs flex items-center gap-3 transition-all";
+                }
+            });
+            currentTabId = tabId;
+        }
+
+        // 폼 필드 토글
+        function toggleFormFields(type) {
+            const direct = document.getElementById("direct-fields");
+            const adsense = document.getElementById("adsense-fields");
+            if (type === 'direct') {
+                direct.classList.remove('hidden');
+                adsense.classList.add('hidden');
+            } else {
+                direct.classList.add('hidden');
+                adsense.classList.remove('hidden');
+            }
+            updatePreview(type);
+        }
+
+        // 에뮬레이터 실시간 렌더러
+        function updatePreview(type) {
+            const container = document.getElementById("ad-preview-container");
+            const title = document.getElementById("ad-title").value || "★ 프리미엄 경공매 투자 VIP 멤버십 모집";
+            const desc = document.getElementById("ad-desc").value || "오직 1%를 위한 NPL 부실채권 및 지분 경매 핵심 노하우 단독 공개. 지금 가입 시 30% 한정 할인 적용!";
+            const image = document.getElementById("ad-image-url").value || "./apartment_elegant_facade.png";
+            const link = document.getElementById("ad-link-url").value || "#";
+            const code = document.getElementById("ad-code").value || "";
+
+            if (type === 'direct') {
+                container.innerHTML = `
+                    <a href="${link}" target="_blank" class="flex flex-col justify-between h-full space-y-2 group">
+                        <div class="relative w-full h-[110px] rounded-xl overflow-hidden bg-slate-100 border border-slate-200/60">
+                            <img src="${image}" alt="광고" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300">
+                            <span class="absolute top-1.5 left-1.5 bg-slate-900/60 text-white text-[8px] font-black px-1.5 py-0.5 rounded uppercase">AD</span>
+                        </div>
+                        <div class="space-y-1 flex-1 flex flex-col justify-between">
+                            <div>
+                                <h4 class="text-xs font-black text-slate-800 line-clamp-2 leading-snug group-hover:text-royalBlue transition-colors">
+                                    ${title}
+                                </h4>
+                                <p class="text-[10px] text-slate-400 font-bold line-clamp-2 mt-1 leading-normal">
+                                    ${desc}
+                                </p>
+                            </div>
+                            <div class="text-[10.5px] font-black text-royalBlue pt-1 border-t border-slate-100 flex items-center justify-between">
+                                <span>자세히 보기</span>
+                                <i class="fa-solid fa-arrow-right text-[9px] group-hover:translate-x-1 transition-transform"></i>
+                            </div>
+                        </div>
+                    </a>
+                `;
+            } else {
+                container.innerHTML = `
+                    <div class="w-full h-full bg-slate-50 border border-dashed border-slate-300 rounded-xl flex flex-col items-center justify-center p-3 overflow-hidden text-[9px] text-slate-400 font-bold font-mono min-h-[300px]">
+                        <i class="fa-solid fa-code text-amber-500 text-sm mb-1.5"></i>
+                        <span>[구글 애드센스 HTML 렌더링 영역]</span>
+                        <div class="truncate max-w-[80%] text-slate-350 mt-1">${code.replace(/</g, '&lt;')}</div>
+                    </div>
+                `;
+            }
+        }
+
+        // Supabase 연동 - 광고 설정 로드
+        async function loadAdSettings() {
+            try {
+                const { data, error } = await supabaseClient
+                    .from('ads')
+                    .select('*')
+                    .eq('slot_name', 'list_banner')
+                    .single();
+                
+                if (error && error.code !== 'PGRST116') throw error;
+
+                if (data) {
+                    adSettings = data;
+                    document.getElementById("ad-toggle").checked = data.active;
+                    document.getElementById("ad-toggle-label").innerText = data.active ? "활성" : "비활성";
+                    
+                    document.getElementById("ad-title").value = data.title || "";
+                    document.getElementById("ad-desc").value = data.desc || "";
+                    document.getElementById("ad-image-url").value = data.image_url || "";
+                    document.getElementById("ad-link-url").value = data.link_url || "";
+                    document.getElementById("ad-code").value = data.ad_code || "";
+
+                    const radios = document.getElementsByName("ad_type");
+                    radios.forEach(r => {
+                        if (r.value === data.type) {
+                            r.checked = true;
+                            toggleFormFields(data.type);
+                        }
+                    });
+                } else {
+                    updatePreview('direct');
+                }
+            } catch (err) {
+                console.warn("광고 테이블 설정 로드 실패 (아직 테이블 미설정일 수 있습니다)", err);
+                updatePreview('direct');
+            }
+        }
+
+        // 광고 설정 저장
+        async function saveAdSettings() {
+            const isActive = document.getElementById("ad-toggle").checked;
+            const type = document.querySelector('input[name="ad_type"]:checked').value;
+            const title = document.getElementById("ad-title").value;
+            const desc = document.getElementById("ad-desc").value;
+            const imageUrl = document.getElementById("ad-image-url").value;
+            const linkUrl = document.getElementById("ad-link-url").value;
+            const adCode = document.getElementById("ad-code").value;
+
+            try {
+                const { error } = await supabaseClient
+                    .from('ads')
+                    .upsert({
+                        slot_name: 'list_banner',
+                        active: isActive,
+                        type: type,
+                        title: title,
+                        desc: desc,
+                        image_url: imageUrl,
+                        link_url: linkUrl,
+                        ad_code: adCode
+                    }, { onConflict: 'slot_name' });
+
+                if (error) throw error;
+                alert("광고판 설정이 성공적으로 업데이트되었습니다.");
+                updatePreview(type);
+            } catch (err) {
+                console.error("광고 설정 저장 오류", err);
+                alert("설정 저장에 실패했습니다. DB 테이블 셋업 탭의 SQL 가이드를 수행했는지 확인해주시기 바랍니다.");
+            }
+        }
+
+        // 토글 조작 시 상태 즉시 적용
+        async function saveAdStatus() {
+            const isActive = document.getElementById("ad-toggle").checked;
+            document.getElementById("ad-toggle-label").innerText = isActive ? "활성" : "비활성";
+            
+            try {
+                const { error } = await supabaseClient
+                    .from('ads')
+                    .update({ active: isActive })
+                    .eq('slot_name', 'list_banner');
+
+                if (error) throw error;
+            } catch (err) {
+                console.warn("DB 광고 스위치 조작 실패", err);
+            }
+        }
+
+        // Supabase 연동 - 가입 유저 리스트 로드
+        async function loadUsersList() {
+            const tbody = document.getElementById("user-list-tbody");
+            try {
+                const { data, error } = await supabaseClient
+                    .from('user_profiles')
+                    .select('*')
+                    .order('email', { ascending: true });
+
+                if (error) throw error;
+
+                usersList = data || [];
+                if (usersList.length === 0) {
+                    tbody.innerHTML = `
+                        <tr>
+                            <td colspan="3" class="p-8 text-center text-slate-400">등록된 가입 회원 데이터가 존재하지 않습니다.</td>
+                        </tr>
+                    `;
+                    return;
+                }
+
+                tbody.innerHTML = usersList.map(u => {
+                    const updatedAt = u.updated_at ? new Date(u.updated_at).toLocaleString('ko-KR') : '-';
+                    const upgradeBadge = u.upgrade_requested 
+                        ? `<span class="ml-2 inline-flex items-center gap-1 bg-rose-500 text-white text-[9px] font-black px-1.5 py-0.5 rounded-md animate-pulse shadow-sm"><i class="fa-solid fa-bolt text-yellow-300"></i> 등급 업그레이드 신청함</span>` 
+                        : '';
+                    return `
+                        <tr class="border-b border-slate-100 hover:bg-slate-50/50">
+                            <td class="p-3 text-slate-800 font-extrabold select-all flex items-center flex-wrap gap-1">
+                                <span>${u.email}</span>
+                                ${upgradeBadge}
+                            </td>
+                            <td class="p-3 text-center">
+                                <select onchange="changeUserGrade('${u.id}', this.value)" class="text-xs p-1.5 border border-slate-200 rounded-lg bg-white font-extrabold text-slate-700 focus:border-royalBlue outline-none">
+                                    <option value="A" ${u.grade === 'A' ? 'selected' : ''}>🥇 A등급 (100% 오픈)</option>
+                                    <option value="B" ${u.grade === 'B' ? 'selected' : ''}>🥈 B등급 (50% 오픈)</option>
+                                    <option value="C" ${u.grade === 'C' ? 'selected' : ''}>🥉 C등급 (20% 오픈)</option>
+                                </select>
+                            </td>
+                            <td class="p-3 text-center font-mono text-slate-400 text-[10.5px]">${updatedAt}</td>
+                        </tr>
+                    `;
+                }).join('');
+            } catch (err) {
+                console.error("유저 프로필 조회 실패", err);
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="3" class="p-8 text-center text-rose-500 font-black">
+                            <i class="fa-solid fa-triangle-exclamation"></i> 회원 프로필 정보를 조회할 수 없습니다. 
+                            <br><span class="text-[10px] text-slate-400 font-semibold block mt-1">DB 테이블 셋업 탭의 SQL 구문을 먼저 실행해야 합니다.</span>
+                        </td>
+                    </tr>
+                `;
+            }
+        }
+
+        // 등급 실시간 변경
+        async function changeUserGrade(userId, newGrade) {
+            try {
+                const { error } = await supabaseClient
+                    .from('user_profiles')
+                    .update({ grade: newGrade, upgrade_requested: false, updated_at: new Date().toISOString() })
+                    .eq('id', userId);
+
+                if (error) throw error;
+                alert("회원 등급 권한이 실시간 변경 적용되었습니다.");
+                loadUsersList();
+            } catch (err) {
+                console.error("회원 등급 업데이트 실패", err);
+                alert("권한 변경에 실패하였습니다.");
+            }
+        }
+
+        // 예외 방어용 수동 회원 강제 등록
+        async function registerUserManually() {
+            const email = document.getElementById("new-user-email").value.trim();
+            if (!email) {
+                alert("이메일 주소를 입력해 주십시오.");
+                return;
+            }
+
+            try {
+                // Supabase auth.users에서 이 이메일의 유저 ID를 찾아 가져오거나, 
+                // 없으면 가상의 유니크 UUID로 생성하여 user_profiles에 강제 바인딩합니다.
+                // 보통 이미 Supabase auth에 가입한 유저가 존재하지만 user_profiles에 행이 유실된 경우를 위함입니다.
+                
+                // 임시 가상 UUID 생성
+                const tempUuid = '00000000-0000-0000-0000-' + Math.floor(Math.random() * 1000000000000).toString().padStart(12, '0');
+                
+                const { error } = await supabaseClient
+                    .from('user_profiles')
+                    .insert({
+                        id: tempUuid,
+                        email: email,
+                        grade: 'C',
+                        updated_at: new Date().toISOString()
+                    });
+
+                if (error) throw error;
+                alert("수동 회원이 'C등급'으로 성공적으로 신규 등록되었습니다. 목록에서 권한 등급을 상향시켜 주십시오.");
+                document.getElementById("new-user-email").value = "";
+                loadUsersList();
+            } catch (err) {
+                console.error("수동 등록 실패", err);
+                alert("회원 등록에 실패하였습니다. 이미 존재하는 이메일이거나 데이터베이스 오류입니다.");
+            }
+        }
+
+        // SQL 코드 복사
+        function copySQLCode() {
+            const code = document.getElementById("sql-code-block").innerText;
+            navigator.clipboard.writeText(code).then(() => {
+                alert("SQL 셋업 구문이 클립보드에 전체 복사되었습니다.");
+            }).catch(err => {
+                console.error("복사 실패", err);
+            });
+        }
+    </script>
+</body>
+</html>
