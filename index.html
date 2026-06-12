@@ -4125,15 +4125,15 @@
 
             const estType = item.exclusive_area_estimation_type || "exact";
             if (estType === "estimated") {
-                if (item.is_estimated_exclusive) estExSuffix = " (추정)";
-                if (item.is_estimated_supply) estSpSuffix = " (추정)";
-                if (item.is_estimated_land) estLdSuffix = " (추정)";
-                if (item.is_estimated_building) estBdSuffix = " (추정)";
+                if (item.is_estimated_exclusive) estExSuffix = " (⚠️추정)";
+                if (item.is_estimated_supply) estSpSuffix = " (⚠️추정)";
+                if (item.is_estimated_land) estLdSuffix = " (⚠️추정)";
+                if (item.is_estimated_building) estBdSuffix = " (⚠️추정)";
             } else if (estType === "fake") {
-                if (item.is_estimated_exclusive) estExSuffix = " (허수)";
-                if (item.is_estimated_supply) estSpSuffix = " (허수)";
-                if (item.is_estimated_land) estLdSuffix = " (허수)";
-                if (item.is_estimated_building) estBdSuffix = " (허수)";
+                if (item.is_estimated_exclusive) estExSuffix = " (⚠️허수)";
+                if (item.is_estimated_supply) estSpSuffix = " (⚠️허수)";
+                if (item.is_estimated_land) estLdSuffix = " (⚠️허수)";
+                if (item.is_estimated_building) estBdSuffix = " (⚠️허수)";
             }
 
             document.getElementById("detail-spec-exclusive-py").innerText = `${exclusiveArea.toFixed(1)} ㎡ (${exclusivePy} 평)${estExSuffix}`;
@@ -4473,13 +4473,13 @@
                         }
                     }
 
-                    let badgeText = "⚠️ 추정";
+                    let badgeText = "⚠️추정";
                     let badgeColor = "bg-amber-500";
                     if (item.exclusive_area_estimation_type === "fake") {
-                        badgeText = "⚠️ 허수";
+                        badgeText = "⚠️허수";
                         badgeColor = "bg-rose-500 animate-pulse";
                     } else if (item.exclusive_area_estimation_type === "estimated") {
-                        badgeText = "⚠️ 추정";
+                        badgeText = "⚠️추정";
                         badgeColor = "bg-blue-500";
                     }
 

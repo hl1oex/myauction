@@ -600,7 +600,8 @@ def process_single_item(raw_info, service_key):
         "is_lease": is_lease,
         "lease_method": lease_method,
         "lease_term": lease_term,
-        "images": images
+        "images": images,
+        "exclusive_area_estimation_type": "exact"
     }
     
     meta_json = json.dumps(area_meta, ensure_ascii=False)

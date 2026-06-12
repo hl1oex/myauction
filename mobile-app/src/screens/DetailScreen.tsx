@@ -1190,11 +1190,11 @@ export const DetailScreen: React.FC<DetailScreenProps> = ({ property, onBack }) 
                       <Text style={styles.infoLabel}>전용 면적</Text>
                       <View style={{ flexDirection: 'row', alignItems: 'center' }}>
                         <Text style={[styles.infoValue, { color: COLORS.royalBlue, fontFamily: Platform.OS === 'ios' ? 'Courier' : 'monospace' }]}>
-                          {targetExclusiveArea}㎡ (약 {(targetExclusiveArea * 0.3025).toFixed(1)}평){isEstimatedExclusive ? (estType === 'estimated' ? ' (추정)' : ' (허수)') : ''}
+                          {targetExclusiveArea}㎡ (약 {(targetExclusiveArea * 0.3025).toFixed(1)}평){isEstimatedExclusive ? (estType === 'estimated' ? ' (⚠️추정)' : ' (⚠️허수)') : ''}
                         </Text>
                         <View style={{ marginLeft: 6, paddingHorizontal: 4, paddingVertical: 1, borderRadius: 4, borderWidth: 0.5, backgroundColor: !isEstimatedExclusive ? '#ebfbee' : (estType === 'estimated' ? '#e6f7ff' : '#fff0f6'), borderColor: !isEstimatedExclusive ? '#37b24d' : (estType === 'estimated' ? '#1890ff' : '#ffadd2') }}>
                           <Text style={{ fontSize: 8.5, fontWeight: 'bold', color: !isEstimatedExclusive ? '#2b8a3e' : (estType === 'estimated' ? '#0050b3' : '#c41d7f') }}>
-                            {!isEstimatedExclusive ? '실제' : (estType === 'estimated' ? '추정' : '허수')}
+                            {!isEstimatedExclusive ? '실제' : (estType === 'estimated' ? '⚠️추정' : '⚠️허수')}
                           </Text>
                         </View>
                       </View>
@@ -1203,11 +1203,11 @@ export const DetailScreen: React.FC<DetailScreenProps> = ({ property, onBack }) 
                       <Text style={styles.infoLabel}>공급 면적</Text>
                       <View style={{ flexDirection: 'row', alignItems: 'center' }}>
                         <Text style={[styles.infoValue, { color: COLORS.royalBlue, fontFamily: Platform.OS === 'ios' ? 'Courier' : 'monospace' }]}>
-                          {targetSupplyArea}㎡ (약 {(targetSupplyArea * 0.3025).toFixed(1)}평){isEstimatedSupply ? (estType === 'estimated' ? ' (추정)' : ' (허수)') : ''}
+                          {targetSupplyArea}㎡ (약 {(targetSupplyArea * 0.3025).toFixed(1)}평){isEstimatedSupply ? (estType === 'estimated' ? ' (⚠️추정)' : ' (⚠️허수)') : ''}
                         </Text>
                         <View style={{ marginLeft: 6, paddingHorizontal: 4, paddingVertical: 1, borderRadius: 4, borderWidth: 0.5, backgroundColor: !isEstimatedSupply ? '#ebfbee' : (estType === 'estimated' ? '#e6f7ff' : '#fff0f6'), borderColor: !isEstimatedSupply ? '#37b24d' : (estType === 'estimated' ? '#1890ff' : '#ffadd2') }}>
                           <Text style={{ fontSize: 8.5, fontWeight: 'bold', color: !isEstimatedSupply ? '#2b8a3e' : (estType === 'estimated' ? '#0050b3' : '#c41d7f') }}>
-                            {!isEstimatedSupply ? '실제' : (estType === 'estimated' ? '추정' : '허수')}
+                            {!isEstimatedSupply ? '실제' : (estType === 'estimated' ? '⚠️추정' : '⚠️허수')}
                           </Text>
                         </View>
                       </View>
@@ -1216,11 +1216,11 @@ export const DetailScreen: React.FC<DetailScreenProps> = ({ property, onBack }) 
                       <Text style={styles.infoLabel}>토지 대지권</Text>
                       <View style={{ flexDirection: 'row', alignItems: 'center' }}>
                         <Text style={[styles.infoValue, { color: COLORS.royalBlue, fontFamily: Platform.OS === 'ios' ? 'Courier' : 'monospace' }]}>
-                          {targetLandArea}㎡ (약 {(targetLandArea * 0.3025).toFixed(1)}평){isEstimatedLand ? (estType === 'estimated' ? ' (추정)' : ' (허수)') : ''}
+                          {targetLandArea}㎡ (약 {(targetLandArea * 0.3025).toFixed(1)}평){isEstimatedLand ? (estType === 'estimated' ? ' (⚠️추정)' : ' (⚠️허수)') : ''}
                         </Text>
                         <View style={{ marginLeft: 6, paddingHorizontal: 4, paddingVertical: 1, borderRadius: 4, borderWidth: 0.5, backgroundColor: !isEstimatedLand ? '#ebfbee' : (estType === 'estimated' ? '#e6f7ff' : '#fff0f6'), borderColor: !isEstimatedLand ? '#37b24d' : (estType === 'estimated' ? '#1890ff' : '#ffadd2') }}>
                           <Text style={{ fontSize: 8.5, fontWeight: 'bold', color: !isEstimatedLand ? '#2b8a3e' : (estType === 'estimated' ? '#0050b3' : '#c41d7f') }}>
-                            {!isEstimatedLand ? '실제' : (estType === 'estimated' ? '추정' : '허수')}
+                            {!isEstimatedLand ? '실제' : (estType === 'estimated' ? '⚠️추정' : '⚠️허수')}
                           </Text>
                         </View>
                       </View>
@@ -1229,11 +1229,11 @@ export const DetailScreen: React.FC<DetailScreenProps> = ({ property, onBack }) 
                       <Text style={styles.infoLabel}>건물 전용</Text>
                       <View style={{ flexDirection: 'row', alignItems: 'center' }}>
                         <Text style={[styles.infoValue, { color: COLORS.royalBlue, fontFamily: Platform.OS === 'ios' ? 'Courier' : 'monospace' }]}>
-                          {targetBuildingArea}㎡ (약 {(targetBuildingArea * 0.3025).toFixed(1)}평){isEstimatedBuilding ? (estType === 'estimated' ? ' (추정)' : ' (허수)') : ''}
+                          {targetBuildingArea}㎡ (약 {(targetBuildingArea * 0.3025).toFixed(1)}평){isEstimatedBuilding ? (estType === 'estimated' ? ' (⚠️추정)' : ' (⚠️허수)') : ''}
                         </Text>
                         <View style={{ marginLeft: 6, paddingHorizontal: 4, paddingVertical: 1, borderRadius: 4, borderWidth: 0.5, backgroundColor: !isEstimatedBuilding ? '#ebfbee' : (estType === 'estimated' ? '#e6f7ff' : '#fff0f6'), borderColor: !isEstimatedBuilding ? '#37b24d' : (estType === 'estimated' ? '#1890ff' : '#ffadd2') }}>
                           <Text style={{ fontSize: 8.5, fontWeight: 'bold', color: !isEstimatedBuilding ? '#2b8a3e' : (estType === 'estimated' ? '#0050b3' : '#c41d7f') }}>
-                            {!isEstimatedBuilding ? '실제' : (estType === 'estimated' ? '추정' : '허수')}
+                            {!isEstimatedBuilding ? '실제' : (estType === 'estimated' ? '⚠️추정' : '⚠️허수')}
                           </Text>
                         </View>
                       </View>
@@ -1492,14 +1492,14 @@ export const DetailScreen: React.FC<DetailScreenProps> = ({ property, onBack }) 
                             <Image source={estSource} style={{ width: '100%', height: '100%', opacity: 0.8 }} resizeMode="contain" />
                             {/* 추정/허수 배지 */}
                             {(() => {
-                              let badgeText = "⚠️ 추정";
+                              let badgeText = "⚠️추정";
                               let badgeColor = "#3b82f6"; // estimated: 파란색
                               if (estType === "fake" || isEstimatedExclusive) {
-                                badgeText = "⚠️ 허수";
+                                badgeText = "⚠️허수";
                                 badgeColor = "#f43f5e"; // fake: 로즈색
                               }
                               if (isEstimatedExclusive && estType === "estimated") {
-                                badgeText = "⚠️ 추정";
+                                badgeText = "⚠️추정";
                                 badgeColor = "#f59e0b"; // estimated: 주황색
                               }
                               
