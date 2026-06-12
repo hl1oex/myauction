@@ -47,8 +47,24 @@ export function AuthScreen({ onSuccess, onCancel }: AuthScreenProps) {
 
     setLoading(true);
 
+    // 테스트 기간 허용 이메일 화이트리스트 가드 (Bounce Back 방지)
+    const allowedEmails = [
+      "hl1oex@gmail.com",
+      "burwellpartners@gmail.com",
+      "yourdreamagent@gmail.com",
+      "my1dreamagent@gmail.com",
+      "johnkang7270@gmail.com",
+      "hl1oex761201@gmail.com",
+      "burwellpartners.kr@gmail.com"
+    ];
+
     try {
       if (isSignUp) {
+        if (!allowedEmails.includes(email.trim().toLowerCase())) {
+          Alert.alert('알림', '회원가입은 테스트 기간 동안 지정된 메일 계정으로만 가능합니다.');
+          setLoading(false);
+          return;
+        }
         // 회원가입을 시도합니다.
         const { error } = await supabase.auth.signUp({ email, password });
         if (error) throw error;

@@ -5670,8 +5670,23 @@
                 return;
             }
             
+            // 테스트 기간 허용 이메일 화이트리스트 가드 (Bounce Back 방지)
+            const allowedEmails = [
+                "hl1oex@gmail.com",
+                "burwellpartners@gmail.com",
+                "yourdreamagent@gmail.com",
+                "my1dreamagent@gmail.com",
+                "johnkang7270@gmail.com",
+                "hl1oex761201@gmail.com",
+                "burwellpartners.kr@gmail.com"
+            ];
+
             try {
                 if (isSignUpMode) {
+                    if (!allowedEmails.includes(email.toLowerCase())) {
+                        alert("회원가입은 테스트 기간 동안 지정된 메일 계정으로만 가능합니다.");
+                        return;
+                    }
                     const confirmPassword = document.getElementById("login-confirm-password").value;
                     if (password !== confirmPassword) {
                         alert("비밀번호와 비밀번호 확인이 일치하지 않습니다.");
