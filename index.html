@@ -4384,7 +4384,8 @@
                 cleanedNavAddress = navAddrMatch[1].trim();
             }
 
-            const isComplexProperty = item.ptype && (item.ptype.includes("아파트") || item.ptype.includes("오피스텔"));
+            const isComplexProperty = (item.ptype && (item.ptype.includes("아파트") || item.ptype.includes("오피스텔"))) || 
+                                      (item.address && (item.address.includes("아파트") || item.address.includes("오피스텔") || item.address.includes("맨션")));
             const cleanedQuery = getCleanedLandSearchQuery(rawAddress);
             document.getElementById("btn-naver-map").href = `https://map.naver.com/v5/search/${encodeURIComponent(cleanedNavAddress)}`;
             document.getElementById("btn-official-site").href = item.link_url || "https://www.courtauction.go.kr";
@@ -4394,7 +4395,7 @@
                 if (isComplexProperty) {
                     naverLandPriceBtn.href = `https://new.land.naver.com/complexes?searchQuery=${encodeURIComponent(cleanedQuery)}`;
                 } else {
-                    naverLandPriceBtn.href = `https://land.naver.com/search/search.naver?query=${encodeURIComponent(rawAddress)}`;
+                    naverLandPriceBtn.href = `https://new.land.naver.com/search?searchQuery=${encodeURIComponent(rawAddress)}`;
                 }
             }
             
@@ -4405,7 +4406,7 @@
                 } else if (isComplexProperty) {
                     floorplanLink.href = `https://new.land.naver.com/complexes?searchQuery=${encodeURIComponent(cleanedQuery)}`;
                 } else {
-                    floorplanLink.href = `https://land.naver.com/search/search.naver?query=${encodeURIComponent(rawAddress)}`;
+                    floorplanLink.href = `https://new.land.naver.com/search?searchQuery=${encodeURIComponent(rawAddress)}`;
                 }
             }
 
@@ -4441,9 +4442,9 @@
                                 }
                             });
 
-                            // 🟢 카카오 Geocoder로 획득한 위경도 좌표로 네이버 부동산 지도 링크 정밀 맵핑 (단지형 물건만)
+                            // 🟢 카카오 Geocoder로 획득한 위경도 좌표로 네이버 부동산 지도 링크 정밀 맵핑
+                            const activePriceBtn = document.getElementById("btn-naver-land-price");
                             if (isComplexProperty) {
-                                const activePriceBtn = document.getElementById("btn-naver-land-price");
                                 if (activePriceBtn) {
                                     activePriceBtn.href = `https://new.land.naver.com/complexes?ms=${result[0].y},${result[0].x},16&a=APT:OPST:ABRD:OBYG&e=RETAIL`;
                                 }
@@ -4451,6 +4452,13 @@
                                     if (!(item.auction_no === "2025타경502931" || (item.address && item.address.includes("한빛아파트")))) {
                                         floorplanLink.href = `https://new.land.naver.com/complexes?ms=${result[0].y},${result[0].x},16&a=APT:OPST:ABRD:OBYG&e=RETAIL`;
                                     }
+                                }
+                            } else {
+                                if (activePriceBtn) {
+                                    activePriceBtn.href = `https://new.land.naver.com/articles?ms=${result[0].y},${result[0].x},16&a=VL:OR:JW:SG:HO:CO&e=RETAIL`;
+                                }
+                                if (floorplanLink) {
+                                    floorplanLink.href = `https://new.land.naver.com/search?searchQuery=${encodeURIComponent(rawAddress)}`;
                                 }
                             }
 

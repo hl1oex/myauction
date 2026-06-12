@@ -1444,14 +1444,15 @@ export const DetailScreen: React.FC<DetailScreenProps> = ({ property, onBack }) 
                     {/* 실제 평면도 아웃링크 버튼 추가 */}
                     <TouchableOpacity
                       onPress={() => {
-                        const isComplexProperty = currentProperty.ptype && (currentProperty.ptype.includes("아파트") || currentProperty.ptype.includes("오피스텔"));
+                        const isComplexProperty = (currentProperty.ptype && (currentProperty.ptype.includes("아파트") || currentProperty.ptype.includes("오피스텔"))) ||
+                                                  (currentProperty.address && (currentProperty.address.includes("아파트") || currentProperty.address.includes("오피스텔") || currentProperty.address.includes("맨션")));
                         if (isTargetProperty) {
                           Linking.openURL("https://new.land.naver.com/complexes?ms=36.360155,127.354157,16&a=APT:OPST:ABRD:OBYG&e=RETAIL");
                         } else if (isComplexProperty) {
                           const addrKeyword = cleanAddress(currentProperty.address);
                           Linking.openURL(`https://new.land.naver.com/complexes?searchQuery=${encodeURIComponent(addrKeyword)}`);
                         } else {
-                          Linking.openURL(`https://land.naver.com/search/search.naver?query=${encodeURIComponent(currentProperty.address)}`);
+                          Linking.openURL(`https://new.land.naver.com/search?searchQuery=${encodeURIComponent(currentProperty.address)}`);
                         }
                       }}
                       style={[styles.linkButton, { backgroundColor: '#03c75a', marginTop: 12 }]}
@@ -1521,12 +1522,13 @@ export const DetailScreen: React.FC<DetailScreenProps> = ({ property, onBack }) 
                     {/* 비단지형 평면도 아웃링크 (동일하게 주소 기반 검색 적용) */}
                     <TouchableOpacity
                       onPress={() => {
-                        const isComplexProperty = currentProperty.ptype && (currentProperty.ptype.includes("아파트") || currentProperty.ptype.includes("오피스텔"));
+                        const isComplexProperty = (currentProperty.ptype && (currentProperty.ptype.includes("아파트") || currentProperty.ptype.includes("오피스텔"))) ||
+                                                  (currentProperty.address && (currentProperty.address.includes("아파트") || currentProperty.address.includes("오피스텔") || currentProperty.address.includes("맨션")));
                         if (isComplexProperty) {
                           const addrKeyword = cleanAddress(currentProperty.address);
                           Linking.openURL(`https://new.land.naver.com/complexes?searchQuery=${encodeURIComponent(addrKeyword)}`);
                         } else {
-                          Linking.openURL(`https://land.naver.com/search/search.naver?query=${encodeURIComponent(currentProperty.address)}`);
+                          Linking.openURL(`https://new.land.naver.com/search?searchQuery=${encodeURIComponent(currentProperty.address)}`);
                         }
                       }}
                       style={[styles.linkButton, { backgroundColor: '#03c75a', marginTop: 12 }]}
@@ -2487,11 +2489,12 @@ export const DetailScreen: React.FC<DetailScreenProps> = ({ property, onBack }) 
             </TouchableOpacity>
             <TouchableOpacity 
               onPress={() => {
-                const isComplexProperty = currentProperty.ptype && (currentProperty.ptype.includes("아파트") || currentProperty.ptype.includes("오피스텔"));
+                const isComplexProperty = (currentProperty.ptype && (currentProperty.ptype.includes("아파트") || currentProperty.ptype.includes("오피스텔"))) ||
+                                          (currentProperty.address && (currentProperty.address.includes("아파트") || currentProperty.address.includes("오피스텔") || currentProperty.address.includes("맨션")));
                 if (isComplexProperty) {
                   Linking.openURL(`https://new.land.naver.com/complexes?searchQuery=${encodeURIComponent(cleanAddress(currentProperty.address))}`);
                 } else {
-                  Linking.openURL(`https://land.naver.com/search/search.naver?query=${encodeURIComponent(currentProperty.address)}`);
+                  Linking.openURL(`https://new.land.naver.com/search?searchQuery=${encodeURIComponent(currentProperty.address)}`);
                 }
               }}
               style={styles.networkButton}
