@@ -2247,7 +2247,7 @@
         let originalProperties = [];  // 서버에서 수신한 전체 데이터 원본
         let filteredProperties = [];  // 검색/필터 가공 데이터
         let currentSortKey = 'score'; // 현재 정렬 기준
-        let activeSortChain = [{ key: 'score', direction: 'desc' }]; // 🟢 [복수 정렬 체인 상태 엔진]
+        let currentSortDir = 'desc';  // 현재 정렬 방향 ('asc' | 'desc')
         let selectedProperty = null;  // 현재 선택된 활성화 매물 객체
         let currentTabId = 'dashboard'; // 현재 활성화된 탭 ID
 
@@ -2738,56 +2738,43 @@
             saveFiltersToCache();
         }
 
-        // 5. 정렬 기준 정렬 함수 (헤더 양방향 정렬 및 다차원 정렬 완벽 지원)
+        // 5. 정렬 기준 정렬 함수 (단일 정렬 키 기준 양방향 토글 정렬 완벽 지원)
         function sortData(key) {
-            // 정렬 키가 이미 체인에 존재하면 direction을 토글하거나 제거
-            const existingIndex = activeSortChain.findIndex(item => item.key === key);
-            if (existingIndex > -1) {
-                if (activeSortChain[existingIndex].direction === 'desc') {
-                    activeSortChain[existingIndex].direction = 'asc';
-                } else {
-                    activeSortChain.splice(existingIndex, 1);
-                }
+            if (currentSortKey === key) {
+                // 동일 키 클릭 시 오름차순/내림차순 토글
+                currentSortDir = currentSortDir === 'desc' ? 'asc' : 'desc';
             } else {
-                let defaultDir = (key === 'score' || key === 'discount' || key === 'failed') ? 'desc' : 'asc';
-                activeSortChain.push({ key: key, direction: defaultDir });
-            }
-            
-            if (activeSortChain.length === 0) {
-                activeSortChain = [{ key: 'score', direction: 'desc' }];
+                // 새로운 키 클릭 시 기준별 기본 방향 설정
+                currentSortKey = key;
+                currentSortDir = (key === 'score' || key === 'price' || key === 'discount' || key === 'failed') ? 'desc' : 'asc';
             }
             
             updateSortButtonsUI();
             
             filteredProperties.sort((a, b) => {
-                for (let sortRule of activeSortChain) {
-                    const k = sortRule.key;
-                    const dir = sortRule.direction;
-                    
-                    let valA, valB;
-                    if (k === 'score') {
-                        valA = typeof a.score === 'number' ? a.score : 0;
-                        valB = typeof b.score === 'number' ? b.score : 0;
-                    } else if (k === 'date') {
-                        valA = typeof a.remaining_days === 'number' ? a.remaining_days : 9999;
-                        valB = typeof b.remaining_days === 'number' ? b.remaining_days : 9999;
-                    } else if (k === 'price') {
-                        valA = typeof a.minimum_bid === 'number' ? a.minimum_bid : 0;
-                        valB = typeof b.minimum_bid === 'number' ? b.minimum_bid : 0;
-                    } else if (k === 'discount') {
-                        valA = estimateAuctionRounds(a.appraised_value, a.minimum_bid, a.source).discount;
-                        valB = estimateAuctionRounds(b.appraised_value, b.minimum_bid, b.source).discount;
-                    } else if (k === 'failed') {
-                        valA = estimateAuctionRounds(a.appraised_value, a.minimum_bid, a.source).failedCount;
-                        valB = estimateAuctionRounds(b.appraised_value, b.minimum_bid, b.source).failedCount;
-                    } else {
-                        valA = 0;
-                        valB = 0;
-                    }
-                    
-                    if (valA !== valB) {
-                        return dir === 'asc' ? valA - valB : valB - valA;
-                    }
+                let valA, valB;
+                if (currentSortKey === 'score') {
+                    valA = typeof a.score === 'number' ? a.score : 0;
+                    valB = typeof b.score === 'number' ? b.score : 0;
+                } else if (currentSortKey === 'date') {
+                    valA = typeof a.remaining_days === 'number' ? a.remaining_days : 9999;
+                    valB = typeof b.remaining_days === 'number' ? b.remaining_days : 9999;
+                } else if (currentSortKey === 'price') {
+                    valA = typeof a.minimum_bid === 'number' ? a.minimum_bid : 0;
+                    valB = typeof b.minimum_bid === 'number' ? b.minimum_bid : 0;
+                } else if (currentSortKey === 'discount') {
+                    valA = estimateAuctionRounds(a.appraised_value, a.minimum_bid, a.source).discount;
+                    valB = estimateAuctionRounds(b.appraised_value, b.minimum_bid, b.source).discount;
+                } else if (currentSortKey === 'failed') {
+                    valA = estimateAuctionRounds(a.appraised_value, a.minimum_bid, a.source).failedCount;
+                    valB = estimateAuctionRounds(b.appraised_value, b.minimum_bid, b.source).failedCount;
+                } else {
+                    valA = 0;
+                    valB = 0;
+                }
+                
+                if (valA !== valB) {
+                    return currentSortDir === 'asc' ? valA - valB : valB - valA;
                 }
                 return 0;
             });
@@ -2811,14 +2798,10 @@
             
             for (const [btnKey, item] of Object.entries(sortButtons)) {
                 if (item.btn) {
-                    const chainIndex = activeSortChain.findIndex(c => c.key === btnKey);
-                    if (chainIndex > -1) {
-                        const rule = activeSortChain[chainIndex];
-                        const arrow = rule.direction === 'asc' ? '▲' : '▼';
+                    if (currentSortKey === btnKey) {
+                        const arrow = currentSortDir === 'asc' ? '▲' : '▼';
                         item.btn.className = activeClass;
-                        const circles = ['①', '②', '③', '④', '⑤'];
-                        const orderChar = circles[chainIndex] || (chainIndex + 1);
-                        item.btn.innerHTML = `${item.text} ${orderChar} ${arrow}`;
+                        item.btn.innerHTML = `${item.text} ${arrow}`;
                     } else {
                         item.btn.className = inactiveClass;
                         item.btn.innerHTML = item.text;
