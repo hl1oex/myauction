@@ -1889,7 +1889,7 @@
                     </div>
                     <p id="detail-spec-official-price-desc" class="text-[10px] text-slate-500 leading-relaxed font-bold border-t border-slate-200/60 pt-2 mt-2"></p>
                 </div>
-                <a id="btn-official-eum" href="https://www.eum.go.kr" target="_blank" class="w-full bg-emeraldSuccess text-white py-2 rounded-xl text-xs font-black hover:bg-emerald-700 transition-all flex items-center justify-center gap-1 select-none cursor-pointer text-center">
+                <a id="btn-official-eum" href="#" onclick="event.preventDefault(); copyAddressAndOpenEum();" class="w-full bg-emeraldSuccess text-white py-2 rounded-xl text-xs font-black hover:bg-emerald-700 transition-all flex items-center justify-center gap-1 select-none cursor-pointer text-center">
                     국토부 토지이음(eum.go.kr) 공식 조회하기
                 </a>
             </div>
@@ -3394,6 +3394,41 @@
             }
         }
 
+        // 🟢 [신규] 정제 주소를 복사하고 토지이음으로 즉시 연동하는 헬퍼 함수
+        async function copyAddressAndOpenEum() {
+            if (!selectedProperty) return;
+            const rawAddress = selectedProperty.address || "";
+            let cleanedNavAddress = rawAddress;
+            const navAddrMatch = rawAddress.match(/^([가-힣a-zA-Z0-9\s]+?\d+(?:-\d+)?)/);
+            if (navAddrMatch && navAddrMatch[1]) {
+                cleanedNavAddress = navAddrMatch[1].trim();
+            }
+
+            try {
+                if (navigator.clipboard && navigator.clipboard.writeText) {
+                    await navigator.clipboard.writeText(cleanedNavAddress);
+                    showToastAlert(`📋 주소가 클립보드에 복사되었습니다.\n\n[${cleanedNavAddress}]\n\n토지이음 검색창에 붙여넣어(Ctrl+V) 조회해 보세요!`, "https://www.eum.go.kr/web/ar/lu/luLand.jsp");
+                } else {
+                    const textArea = document.createElement("textarea");
+                    textArea.value = cleanedNavAddress;
+                    textArea.style.position = "fixed";
+                    document.body.appendChild(textArea);
+                    textArea.focus();
+                    textArea.select();
+                    const successful = document.execCommand('copy');
+                    document.body.removeChild(textArea);
+                    if (successful) {
+                        showToastAlert(`📋 주소가 클립보드에 복사되었습니다.\n\n[${cleanedNavAddress}]\n\n토지이음 검색창에 붙여넣어(Ctrl+V) 조회해 보세요!`, "https://www.eum.go.kr/web/ar/lu/luLand.jsp");
+                    } else {
+                        throw new Error('복사 실패');
+                    }
+                }
+            } catch (err) {
+                alert(`[주소 복사] 아래 주소를 직접 복사하여 토지이음에 검색해 보십시오.\n\n${cleanedNavAddress}`);
+                window.open("https://www.eum.go.kr/web/ar/lu/luLand.jsp", "_blank");
+            }
+        }
+
         // 모던 스타일 토스트 알림 메시지 (alert 대신 우아하게 노출한 뒤 지정 페이지 이동)
         function showToastAlert(message, targetUrl = "https://seereal.lh.or.kr/") {
             const existing = document.getElementById("seereal-toast");
@@ -3407,6 +3442,8 @@
             let btnText = "씨:리얼 종합정보 페이지로 이동";
             if (targetUrl.includes("courtauction")) {
                 btnText = "대법원 사건검색 페이지로 이동";
+            } else if (targetUrl.includes("eum.go.kr")) {
+                btnText = "국토부 토지이음 페이지로 이동";
             }
 
             toast.innerHTML = `
@@ -4379,7 +4416,8 @@
             // 아웃링크 동적 맵핑 (상세화)
             let rawAddress = item.address || "";
             let cleanedNavAddress = rawAddress;
-            const navAddrMatch = rawAddress.match(/^([가-힣a-zA-Z0-9\s-]+(?:시|도)\s+[가-힣a-zA-Z0-9\s-]+(?:구|군|시)\s+[가-힣a-zA-Z0-9\s-]+(?:동|읍|면|리)?\s+\d+(?:-\d+)?)/);
+            // 최초로 출현하는 번지수(숫자 혹은 숫자-숫자)까지만 주소를 정제하여 상세 동호수/아파트명을 제거합니다.
+            const navAddrMatch = rawAddress.match(/^([가-힣a-zA-Z0-9\s]+?\d+(?:-\d+)?)/);
             if (navAddrMatch && navAddrMatch[1]) {
                 cleanedNavAddress = navAddrMatch[1].trim();
             }
@@ -4650,7 +4688,11 @@
 
             const officialEumBtn = document.getElementById("btn-official-eum");
             if (officialEumBtn) {
-                officialEumBtn.href = `https://www.eum.go.kr/web/mp/mpMapSearch.jsp?searchKeyword=${encodeURIComponent(item.address)}`;
+                officialEumBtn.href = "#";
+                officialEumBtn.onclick = function(e) {
+                    e.preventDefault();
+                    copyAddressAndOpenEum();
+                };
             }
 
             // 📍 구글 지도 임베드 라이브 뷰 연동

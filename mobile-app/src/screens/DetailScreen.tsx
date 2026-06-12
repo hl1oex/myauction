@@ -57,17 +57,18 @@ const estimateAuctionRounds = (appraisal: number, price: number, source: string)
 
 const cleanAddress = (addr: string) => {
   if (!addr) return '';
-  return addr
+  const base = addr
     .replace(/\[[^\]]*\]/g, '')
     .replace(/\{[^}]*\}/g, '')
-    .replace(/\(([^)]*)\)/g, (match, p1) => {
-      if (/[동|읍|면|리|로|길|아파트|빌라|맨션|타운|하우스|호|동]/g.test(p1)) {
-        return match;
-      }
-      return '';
-    })
     .replace(/\s+/g, ' ')
     .trim();
+  
+  // 최초로 등장하는 번지수(숫자 혹은 숫자-숫자)까지만 추출하여 상세 동호수/아파트명을 제거합니다.
+  const match = base.match(/^([가-힣a-zA-Z0-9\s]+?\d+(?:-\d+)?)/);
+  if (match && match[1]) {
+    return match[1].trim();
+  }
+  return base;
 };
 
 const maskName = (name: string | undefined) => {
@@ -559,6 +560,53 @@ export const DetailScreen: React.FC<DetailScreenProps> = ({ property, onBack }) 
             { 
               text: '씨:리얼로 이동', 
               onPress: () => Linking.openURL('https://seereal.lh.or.kr') 
+            }
+          ]
+        );
+      }
+    }
+  };
+
+  // 🟢 [신규] 국토부 토지이음 주소 복사 및 이동 핸들러
+  const handleOpenEum = async () => {
+    const rawAddr = property.address || '';
+    const addr = cleanAddress(rawAddr);
+    if (Platform.OS === 'web') {
+      try {
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          await navigator.clipboard.writeText(addr);
+          alert(`📋 정제된 지번 주소가 클립보드에 복사되었습니다.\n\n[${addr}]\n\n토지이음 검색창에 붙여넣어(Ctrl+V) 조회해 보십시오!`);
+        } else {
+          alert(`[주소 복사] 아래 주소를 복사하여 토지이음에서 검색해 주십시오.\n\n${addr}`);
+        }
+      } catch (err) {
+        alert(`[주소 복사] 아래 주소를 복사하여 토지이음에서 검색해 주십시오.\n\n${addr}`);
+      }
+      Linking.openURL('https://www.eum.go.kr/web/ar/lu/luLand.jsp');
+    } else {
+      try {
+        const Clipboard = require('expo-clipboard');
+        await Clipboard.setStringAsync(addr);
+        Alert.alert(
+          '주소 복사 완료',
+          `📋 정제된 주소가 복사되었습니다.\n\n[${addr}]\n\n토지이음 종합검색창에 붙여넣어 간편하게 토지이용계획을 조회해 보십시오.`,
+          [
+            { text: '취소', style: 'cancel' },
+            { 
+              text: '토지이음으로 이동', 
+              onPress: () => Linking.openURL('https://www.eum.go.kr/web/ar/lu/luLand.jsp') 
+            }
+          ]
+        );
+      } catch (e) {
+        Alert.alert(
+          '안내',
+          `아래 주소를 복사하여 토지이음에서 검색해 주십시오.\n\n${addr}`,
+          [
+            { text: '취소', style: 'cancel' },
+            { 
+              text: '토지이음으로 이동', 
+              onPress: () => Linking.openURL('https://www.eum.go.kr/web/ar/lu/luLand.jsp') 
             }
           ]
         );
@@ -2199,7 +2247,7 @@ export const DetailScreen: React.FC<DetailScreenProps> = ({ property, onBack }) 
                   <Text style={[styles.networkSub, { marginTop: 6 }]}>{extra.landUsePlanDesc}</Text>
                 </View>
                 <TouchableOpacity 
-                  onPress={() => Linking.openURL(`https://www.eum.go.kr/web/mp/mpMapSearch.jsp?searchKeyword=${encodeURIComponent(currentProperty.address)}`)}
+                  onPress={handleOpenEum}
                   style={[styles.linkButton, { backgroundColor: COLORS.emeraldSuccess, marginTop: 8 }]}
                 >
                   <Text style={styles.linkButtonText}>토지이음(eum.go.kr) 공식 조회</Text>
