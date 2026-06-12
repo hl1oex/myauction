@@ -1336,6 +1336,20 @@
                         <i class="fa-solid fa-arrow-up-right-from-square"></i> 네이버부동산 단지 실제 평면도 바로 확인하기
                     </a>
                 </div>
+                <div class="mt-2.5">
+                    <span class="text-slate-450 font-bold text-[10px] sm:text-[11px] block mb-1.5">🧭 현장 분석용 3대 포털 로드뷰 비교 바로가기</span>
+                    <div class="grid grid-cols-3 gap-2">
+                        <a id="btn-floorplan-naver-road" href="#" target="_blank" class="bg-emerald-50 border border-emerald-200 hover:border-emeraldSuccess hover:shadow-md rounded-xl py-2 px-1 flex flex-col items-center justify-center gap-1 transition-all text-[10px] font-black text-slate-700 select-none">
+                            <i class="fa-solid fa-street-view text-emeraldSuccess text-sm"></i> 네이버 로드뷰
+                        </a>
+                        <a id="btn-floorplan-kakao-road" href="#" target="_blank" class="bg-amber-50 border border-amber-200 hover:border-amber-500 hover:shadow-md rounded-xl py-2 px-1 flex flex-col items-center justify-center gap-1 transition-all text-[10px] font-black text-slate-700 select-none">
+                            <i class="fa-solid fa-road text-amber-500 text-sm"></i> 카카오 로드뷰
+                        </a>
+                        <a id="btn-floorplan-google-road" href="#" target="_blank" class="bg-blue-50 border border-blue-200 hover:border-royalBlue hover:shadow-md rounded-xl py-2 px-1 flex flex-col items-center justify-center gap-1 transition-all text-[10px] font-black text-slate-700 select-none">
+                            <i class="fa-solid fa-map-location-dot text-royalBlue text-sm"></i> 구글 스트리트뷰
+                        </a>
+                    </div>
+                </div>
             </div>
 
             <!-- 평면 정보 가이드 및 도면 발급 안내 -->
@@ -4378,7 +4392,7 @@
             const naverLandPriceBtn = document.getElementById("btn-naver-land-price");
             if (naverLandPriceBtn) {
                 if (isComplexProperty) {
-                    naverLandPriceBtn.href = `https://fin.land.naver.com/map?q=${encodeURIComponent(cleanedQuery)}`;
+                    naverLandPriceBtn.href = `https://new.land.naver.com/complexes?searchQuery=${encodeURIComponent(cleanedQuery)}`;
                 } else {
                     naverLandPriceBtn.href = `https://land.naver.com/search/search.naver?query=${encodeURIComponent(rawAddress)}`;
                 }
@@ -4387,13 +4401,22 @@
             const floorplanLink = document.getElementById("btn-naver-floorplan-link");
             if (floorplanLink) {
                 if (item.auction_no === "2025타경502931" || (item.address && item.address.includes("한빛아파트"))) {
-                    floorplanLink.href = "https://fin.land.naver.com/map?center=3ziWYW-2AzOvs&zoom=12";
+                    floorplanLink.href = "https://new.land.naver.com/complexes?ms=36.360155,127.354157,16&a=APT:OPST:ABRD:OBYG&e=RETAIL";
                 } else if (isComplexProperty) {
-                    floorplanLink.href = `https://fin.land.naver.com/map?q=${encodeURIComponent(cleanedQuery)}`;
+                    floorplanLink.href = `https://new.land.naver.com/complexes?searchQuery=${encodeURIComponent(cleanedQuery)}`;
                 } else {
                     floorplanLink.href = `https://land.naver.com/search/search.naver?query=${encodeURIComponent(rawAddress)}`;
                 }
             }
+
+            // 📐 평면도 3사 로드뷰 링크 초기화
+            const fpNaverRoad = document.getElementById("btn-floorplan-naver-road");
+            const fpKakaoRoad = document.getElementById("btn-floorplan-kakao-road");
+            const fpGoogleRoad = document.getElementById("btn-floorplan-google-road");
+
+            if (fpNaverRoad) fpNaverRoad.href = `https://map.naver.com/v5/search/${encodeURIComponent(cleanedNavAddress)}/address?c=15,0,0,0,adh`;
+            if (fpKakaoRoad) fpKakaoRoad.href = `https://map.kakao.com/?q=${encodeURIComponent(cleanedNavAddress)}`;
+            if (fpGoogleRoad) fpGoogleRoad.href = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(cleanedNavAddress)}`;
 
             // 🗺️ 카카오 3D 로드뷰 연동 로직
             const roadviewContainer = document.getElementById("detail-roadview");
@@ -4418,18 +4441,23 @@
                                 }
                             });
 
-                            // 🟢 [신규] 카카오 Geocoder로 획득한 위경도 좌표로 네이버 부동산 지도 링크 정밀 맵핑 (단지형 물건만)
+                            // 🟢 카카오 Geocoder로 획득한 위경도 좌표로 네이버 부동산 지도 링크 정밀 맵핑 (단지형 물건만)
                             if (isComplexProperty) {
                                 const activePriceBtn = document.getElementById("btn-naver-land-price");
                                 if (activePriceBtn) {
-                                    activePriceBtn.href = `https://fin.land.naver.com/map?center=${result[0].x}-${result[0].y}&zoom=12`;
+                                    activePriceBtn.href = `https://new.land.naver.com/complexes?ms=${result[0].y},${result[0].x},16&a=APT:OPST:ABRD:OBYG&e=RETAIL`;
                                 }
                                 if (floorplanLink) {
                                     if (!(item.auction_no === "2025타경502931" || (item.address && item.address.includes("한빛아파트")))) {
-                                        floorplanLink.href = `https://fin.land.naver.com/map?center=${result[0].x}-${result[0].y}&zoom=12`;
+                                        floorplanLink.href = `https://new.land.naver.com/complexes?ms=${result[0].y},${result[0].x},16&a=APT:OPST:ABRD:OBYG&e=RETAIL`;
                                     }
                                 }
                             }
+
+                            // 🟢 좌표 획득 시 3사 로드뷰 링크도 좌표 기반 정밀 링크로 교체
+                            if (fpNaverRoad) fpNaverRoad.href = `https://map.naver.com/v5/?c=${result[0].x},${result[0].y},15,0,0,0,adh`;
+                            if (fpKakaoRoad) fpKakaoRoad.href = `https://map.kakao.com/link/roadview/${result[0].y},${result[0].x}`;
+                            if (fpGoogleRoad) fpGoogleRoad.href = `https://www.google.com/maps/@?api=1&map_action=pano&viewpoint=${result[0].y},${result[0].x}`;
                         } else {
                             showFallback();
                         }

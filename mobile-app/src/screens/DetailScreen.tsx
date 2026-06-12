@@ -1446,10 +1446,10 @@ export const DetailScreen: React.FC<DetailScreenProps> = ({ property, onBack }) 
                       onPress={() => {
                         const isComplexProperty = currentProperty.ptype && (currentProperty.ptype.includes("아파트") || currentProperty.ptype.includes("오피스텔"));
                         if (isTargetProperty) {
-                          Linking.openURL("https://fin.land.naver.com/map?center=3ziWYW-2AzOvs&zoom=12");
+                          Linking.openURL("https://new.land.naver.com/complexes?ms=36.360155,127.354157,16&a=APT:OPST:ABRD:OBYG&e=RETAIL");
                         } else if (isComplexProperty) {
                           const addrKeyword = cleanAddress(currentProperty.address);
-                          Linking.openURL(`https://fin.land.naver.com/map?q=${encodeURIComponent(addrKeyword)}`);
+                          Linking.openURL(`https://new.land.naver.com/complexes?searchQuery=${encodeURIComponent(addrKeyword)}`);
                         } else {
                           Linking.openURL(`https://land.naver.com/search/search.naver?query=${encodeURIComponent(currentProperty.address)}`);
                         }
@@ -1524,7 +1524,7 @@ export const DetailScreen: React.FC<DetailScreenProps> = ({ property, onBack }) 
                         const isComplexProperty = currentProperty.ptype && (currentProperty.ptype.includes("아파트") || currentProperty.ptype.includes("오피스텔"));
                         if (isComplexProperty) {
                           const addrKeyword = cleanAddress(currentProperty.address);
-                          Linking.openURL(`https://fin.land.naver.com/map?q=${encodeURIComponent(addrKeyword)}`);
+                          Linking.openURL(`https://new.land.naver.com/complexes?searchQuery=${encodeURIComponent(addrKeyword)}`);
                         } else {
                           Linking.openURL(`https://land.naver.com/search/search.naver?query=${encodeURIComponent(currentProperty.address)}`);
                         }
@@ -2489,7 +2489,7 @@ export const DetailScreen: React.FC<DetailScreenProps> = ({ property, onBack }) 
               onPress={() => {
                 const isComplexProperty = currentProperty.ptype && (currentProperty.ptype.includes("아파트") || currentProperty.ptype.includes("오피스텔"));
                 if (isComplexProperty) {
-                  Linking.openURL(`https://fin.land.naver.com/map?q=${encodeURIComponent(cleanAddress(currentProperty.address))}`);
+                  Linking.openURL(`https://new.land.naver.com/complexes?searchQuery=${encodeURIComponent(cleanAddress(currentProperty.address))}`);
                 } else {
                   Linking.openURL(`https://land.naver.com/search/search.naver?query=${encodeURIComponent(currentProperty.address)}`);
                 }
