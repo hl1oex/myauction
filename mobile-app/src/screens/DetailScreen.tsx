@@ -2026,7 +2026,7 @@ export const DetailScreen: React.FC<DetailScreenProps> = ({ property, onBack }) 
                 {/* 전문지도 & 시세 연동 버튼들 */}
                 <View style={[styles.networkGrid, { marginTop: 12 }]}>
                   <TouchableOpacity 
-                    onPress={() => Linking.openURL(`https://map.naver.com/v5/search/${encodeURIComponent(cleanAddress(currentProperty.address))}/address?c=15,0,0,0,lnd,dh`)}
+                    onPress={() => Linking.openURL(`https://map.naver.com/v5/search/${encodeURIComponent(cleanAddress(currentProperty.address))}/address?c=15,0,0,0,dgh`)}
                     style={[styles.networkButton, { backgroundColor: '#fdf4ff', borderColor: '#fbcfe8' }]}
                   >
                     <View style={[styles.networkIconContainer, { backgroundColor: '#db2777' }]}>
@@ -2038,7 +2038,7 @@ export const DetailScreen: React.FC<DetailScreenProps> = ({ property, onBack }) 
                     </View>
                   </TouchableOpacity>
                   <TouchableOpacity 
-                    onPress={() => Linking.openURL(`https://map.naver.com/v5/search/${encodeURIComponent(cleanAddress(currentProperty.address))}/address?c=15,0,0,0,sky,dh`)}
+                    onPress={() => Linking.openURL(`https://map.naver.com/v5/search/${encodeURIComponent(cleanAddress(currentProperty.address))}/address?c=15,0,0,1,dh`)}
                     style={[styles.networkButton, { backgroundColor: '#f8fafc', borderColor: '#cbd5e1' }]}
                   >
                     <View style={[styles.networkIconContainer, { backgroundColor: '#475569' }]}>

@@ -4421,9 +4421,9 @@
             }
 
             // 네이버 지도 레이어 이동 링크 바인딩 (v5 최신 스펙 적용).
-            const mapEditUrl = `https://map.naver.com/v5/search/${encodeURIComponent(cleanedNavAddress)}/address?c=15,0,0,0,lnd,dh`;
-            const mapSatUrl = `https://map.naver.com/v5/search/${encodeURIComponent(cleanedNavAddress)}/address?c=15,0,0,0,sky,dh`;
-            const mapRoadUrl = `https://map.naver.com/v5/search/${encodeURIComponent(cleanedNavAddress)}/address?c=15,0,0,0,rv,dh`;
+            const mapEditUrl = `https://map.naver.com/v5/search/${encodeURIComponent(cleanedNavAddress)}/address?c=15,0,0,0,dgh`;
+            const mapSatUrl = `https://map.naver.com/v5/search/${encodeURIComponent(cleanedNavAddress)}/address?c=15,0,0,1,dh`;
+            const mapRoadUrl = `https://map.naver.com/v5/search/${encodeURIComponent(cleanedNavAddress)}/address?c=15,0,0,0,adh`;
 
             const btnMapEdit = document.getElementById("btn-naver-map-edit");
             if (btnMapEdit) btnMapEdit.href = mapEditUrl;
