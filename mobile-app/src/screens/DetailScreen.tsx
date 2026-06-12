@@ -1395,11 +1395,14 @@ export const DetailScreen: React.FC<DetailScreenProps> = ({ property, onBack }) 
                     {/* 실제 평면도 아웃링크 버튼 추가 */}
                     <TouchableOpacity
                       onPress={() => {
+                        const isComplexProperty = currentProperty.ptype && (currentProperty.ptype.includes("아파트") || currentProperty.ptype.includes("오피스텔"));
                         if (isTargetProperty) {
                           Linking.openURL("https://fin.land.naver.com/map?center=3ziWYW-2AzOvs&zoom=12");
-                        } else {
+                        } else if (isComplexProperty) {
                           const addrKeyword = cleanAddress(currentProperty.address);
                           Linking.openURL(`https://fin.land.naver.com/map?q=${encodeURIComponent(addrKeyword)}`);
+                        } else {
+                          Linking.openURL(`https://land.naver.com/search/search.naver?query=${encodeURIComponent(currentProperty.address)}`);
                         }
                       }}
                       style={[styles.linkButton, { backgroundColor: '#03c75a', marginTop: 12 }]}
@@ -2362,7 +2365,14 @@ export const DetailScreen: React.FC<DetailScreenProps> = ({ property, onBack }) 
               </View>
             </TouchableOpacity>
             <TouchableOpacity 
-              onPress={() => Linking.openURL(`https://fin.land.naver.com/map?q=${encodeURIComponent(cleanAddress(currentProperty.address))}`)}
+              onPress={() => {
+                const isComplexProperty = currentProperty.ptype && (currentProperty.ptype.includes("아파트") || currentProperty.ptype.includes("오피스텔"));
+                if (isComplexProperty) {
+                  Linking.openURL(`https://fin.land.naver.com/map?q=${encodeURIComponent(cleanAddress(currentProperty.address))}`);
+                } else {
+                  Linking.openURL(`https://land.naver.com/search/search.naver?query=${encodeURIComponent(currentProperty.address)}`);
+                }
+              }}
               style={styles.networkButton}
             >
               <View style={styles.networkIconContainer}>
