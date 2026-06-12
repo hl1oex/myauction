@@ -252,7 +252,7 @@ def clean_address(address):
     return address
 
 def extract_court_areas(st_text):
-    """주소 텍스트(st) 내부에 기재된 대지면적(대지권) 및 건물 전용면적을 정밀 추출합니다."""
+    """주소 및 소재지 내역 텍스트(st)로부터 층수, 층별 면적 리스트, 그리고 최종 해당 호수의 면적을 추정 및 정밀 추출합니다."""
     exclusive_area = 0.0
     land_area = 0.0
     is_estimated_exclusive = True
@@ -261,7 +261,7 @@ def extract_court_areas(st_text):
     if not st_text:
         return exclusive_area, land_area, is_estimated_exclusive, is_estimated_land
 
-    # 1. 대지권 면적 추출 시도 (예: 대지권 44.25㎡, 대지 44.25㎡, 토지대지권 44.25㎡)
+    # 1. 대지권 면적 추출 시도 (기존 로직 유지 및 개선)
     land_match = re.search(r'(?:대지권|토지대지권|대지)\s*(\d+(?:\.\d+)?)\s*㎡', st_text)
     if land_match:
         try:
@@ -270,17 +270,103 @@ def extract_court_areas(st_text):
         except ValueError:
             pass
 
-    # 2. 건물 전용면적 추출 시도 (예: 건물 84.93㎡, 건물전용 84.93㎡, 전용면적 84.93㎡, 전용 84.93㎡)
-    excl_match = re.search(r'(?:건물전용|전용면적|전용|건물)\s*(\d+(?:\.\d+)?)\s*㎡', st_text)
-    if excl_match:
+    # 2. 층수 및 호수 파싱 (예: 3층02호, 2층201호, 지층01호, 지하101호, 302호 등)
+    target_floor = None
+    target_room = None
+    
+    # 2-1. 명시적인 '층'과 '호' 패턴
+    floor_room_match = re.search(r'(?:(?:지하|지층)\s*(\d+)|(\d+))\s*층\s*([가-힣\d\-]+)\s*호', st_text)
+    if floor_room_match:
+        is_basement = "지하" in floor_room_match.group(0) or "지층" in floor_room_match.group(0)
+        floor_num = floor_room_match.group(1) or floor_room_match.group(2)
+        target_floor = f"지하{floor_num}층" if is_basement else f"{floor_num}층"
+        target_room = floor_room_match.group(3)
+    else:
+        # 2-2. '지층xx호' 형태
+        basement_room_match = re.search(r'지층\s*([가-힣\d\-]+)\s*호', st_text)
+        if basement_room_match:
+            target_floor = "지층"
+            target_room = basement_room_match.group(1)
+        else:
+            # 2-3. 'xxx호' 숫자만 있는 형태 (예: 302호 -> 3층, 1201호 -> 12층)
+            room_only_match = re.search(r'\b(\d{3,4})\s*호', st_text)
+            if room_only_match:
+                room_str = room_only_match.group(1)
+                target_room = room_str
+                if len(room_str) == 3:
+                    target_floor = f"{room_str[0]}층"
+                elif len(room_str) == 4:
+                    target_floor = f"{room_str[:2]}층"
+
+    # 3. 층별 면적 정보 딕셔너리 구축 (예: "1층 118.39㎡ 2층 118.39㎡" -> {'1층': 118.39, '2층': 118.39})
+    floor_areas = {}
+    floor_area_matches = re.finditer(r'(지층|지하\s*\d*층|\d+층)\s*(\d+(?:\.\d+)?)\s*㎡', st_text)
+    for m in floor_area_matches:
+        f_name = m.group(1).replace(" ", "")
         try:
-            exclusive_area = float(excl_match.group(1))
+            floor_areas[f_name] = float(m.group(2))
+        except ValueError:
+            pass
+
+    # 4. 단독 기재된 전용면적 후보 추출 (층별 면적 리스트에 잡히지 않은 단독 면적 수치들을 찾습니다.)
+    all_area_matches = re.findall(r'(\d+(?:\.\d+)?)\s*㎡', st_text)
+    candidate_exclusive_areas = []
+    for val_str in all_area_matches:
+        try:
+            val = float(val_str)
+            if val not in floor_areas.values() and val != land_area:
+                candidate_exclusive_areas.append(val)
+        except ValueError:
+            pass
+
+    # 5. 전용면적 결정
+    # 5-1. 건물전용, 전용면적, 전용 등의 키워드와 함께 등장하는 단독 면적이 있는지 확인합니다.
+    excl_keyword_match = re.search(r'(?:건물전용|전용면적|전용|건물)\s*(\d+(?:\.\d+)?)\s*㎡', st_text)
+    if excl_keyword_match:
+        try:
+            val = float(excl_keyword_match.group(1))
+            exclusive_area = val
             is_estimated_exclusive = False
         except ValueError:
             pass
 
-    # 3. 단일 면적만 텍스트로 존재할 경우 예외 처리 ("임야 662.0㎡" 또는 "건물 45.2㎡")
-    if not excl_match and not land_match:
+    # 5-2. "전용" 키워드는 없지만, 층별 면적에 포함되지 않는 단독 면적이 맨 뒤나 중간에 존재하는 경우
+    if exclusive_area == 0.0 and candidate_exclusive_areas:
+        # 단독 면적 후보 중 가장 마지막에 나오는 면적을 채택합니다.
+        exclusive_area = candidate_exclusive_areas[-1]
+        is_estimated_exclusive = False
+
+    # 5-3. 단독 면적이 존재하지 않고, 오직 층별 면적 리스트만 있는 경우 (추정이 필요한 경우)
+    if exclusive_area == 0.0 and target_floor and target_floor in floor_areas:
+        total_floor_area = floor_areas[target_floor]
+        
+        # 층당 세대수 결정 (호수 번호 끝자리 기반)
+        divisor = 2  # 기본값: 2세대 분할
+        if target_room:
+            # 방 번호에서 숫자만 추출합니다.
+            room_digits = re.sub(r'\D', '', target_room)
+            if room_digits:
+                try:
+                    room_num = int(room_digits)
+                    last_digit = room_num % 10
+                    
+                    if last_digit in [1, 2]:
+                        divisor = 2
+                    elif last_digit in [3, 4]:
+                        divisor = 4
+                    elif last_digit in [5, 6]:
+                        divisor = 6
+                    elif last_digit > 6:
+                        divisor = last_digit
+                except ValueError:
+                    pass
+                    
+        # 면적 추정 계산 수행
+        exclusive_area = round(total_floor_area / divisor, 2)
+        is_estimated_exclusive = True
+
+    # 6. 폴백 처리 (기존 로직 보존)
+    if exclusive_area == 0.0 and not land_match:
         single_match = re.search(r'(\d+(?:\.\d+)?)\s*㎡', st_text)
         if single_match:
             try:
