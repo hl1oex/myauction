@@ -383,6 +383,9 @@ export const FeedScreen: React.FC<FeedScreenProps> = ({ onSelectProperty, filter
         if (filters.source.includes('onbid' as any) && item.source === 'onbid_etc') {
           return true;
         }
+        if (filters.source.includes('court' as any) && item.source === 'court_etc') {
+          return true;
+        }
         return false;
       });
     } else {
@@ -393,7 +396,12 @@ export const FeedScreen: React.FC<FeedScreenProps> = ({ onSelectProperty, filter
     // 1. 용도 필터링
     if (filters.ptype && filters.ptype.length > 0) {
       result = result.filter((item) => {
-        const type = item.ptype || '';
+        const type = (item.ptype || '').toLowerCase();
+        // 비부동산 개별 분류 여부 판별.
+        const isVehicle = type.includes('차량') || type.includes('운송') || type.includes('자동차') || type.includes('선박') || type.includes('항공기') || type.includes('중기') || type.includes('지게차') || type.includes('suv');
+        const isSecurity = type.includes('유가증권') || type.includes('주식') || type.includes('채권') || type.includes('지분') || type.includes('증권');
+        const isMachinery = type.includes('기계') || (type.includes('장비') && !type.includes('운송장비')) || type.includes('기구') || type.includes('설비') || type.includes('기기');
+
         return filters.ptype.some(pt => {
           if (pt === 'apart') return type.includes('아파트');
           if (pt === 'officetel') return type.includes('오피스텔');
@@ -402,10 +410,10 @@ export const FeedScreen: React.FC<FeedScreenProps> = ({ onSelectProperty, filter
           if (pt === 'store') return type.includes('상가') || type.includes('점포') || type.includes('근린') || type.includes('근생') || type.includes('생활시설') || type.includes('상업') || type.includes('빌딩') || type.includes('사무실');
           if (pt === 'land') return type.includes('토지') || type.includes('임야') || type.includes('대지') || type.includes('잡종지') || type.includes('대') || type.includes('전') || type.includes('답');
           if (pt === 'factory') return type.includes('공장') || type.includes('창고') || type.includes('산업');
-          if (pt === 'vehicle') return type.includes('차량') || type.includes('운송') || type.includes('자동차') || type.includes('선박') || type.includes('항공기') || type.includes('중기');
-          if (pt === 'security') return type.includes('유가증권') || type.includes('주식') || type.includes('채권') || type.includes('지분') || type.includes('증권');
-          if (pt === 'machinery') return type.includes('기계') || (type.includes('장비') && !type.includes('운송장비')) || type.includes('기구') || type.includes('설비');
-          if (pt === 'etc_goods') return type.includes('물품') || type.includes('기타물품') || type.includes('동산') || type.includes('기타동산') || item.source === 'onbid_etc';
+          if (pt === 'vehicle') return isVehicle;
+          if (pt === 'security') return isSecurity;
+          if (pt === 'machinery') return isMachinery;
+          if (pt === 'etc_goods') return (type.includes('물품') || type.includes('기타물품') || type.includes('동산') || type.includes('기타동산') || item.source === 'onbid_etc' || item.source === 'court_etc') && !isVehicle && !isSecurity && !isMachinery;
           return false;
         });
       });

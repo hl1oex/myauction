@@ -269,39 +269,39 @@
         </div>
         
         <!-- [우측 영역] 실시간 자산 현황판 및 연결 센서 (hidden 해제 및 우측 정밀 배치) -->
-        <div class="flex items-center gap-2 ml-auto">
+        <div class="flex items-center gap-1.5 sm:gap-2 ml-auto flex-shrink-0">
             <!-- 🚀 수동 새로고침 버튼 추가 (forceLoad = true 연동) -->
             <button onclick="fetchDataFromServer(true);" 
-                    class="flex items-center justify-center w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-white border border-slate-200 text-slate-500 hover:text-royalBlue hover:border-royalBlue/30 hover:bg-slate-50 active:scale-95 transition-all shadow-sm flex-shrink-0"
+                    class="hidden min-[480px]:flex items-center justify-center w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-white border border-slate-200 text-slate-500 hover:text-royalBlue hover:border-royalBlue/30 hover:bg-slate-50 active:scale-95 transition-all shadow-sm flex-shrink-0"
                     title="최신 데이터 수동 새로고침">
                 <i class="fa-solid fa-arrows-rotate text-[11px] sm:text-xs"></i>
             </button>
             <div id="connection-sensor" onclick="fetchDataFromServer(); fetchSyncStatus();" 
-                 class="flex items-center gap-1 min-[360px]:gap-1.5 px-1.5 min-[360px]:px-2.5 py-0.5 min-[360px]:py-1 rounded-full bg-slate-50 border border-slate-200 text-slate-705 text-[8.5px] min-[360px]:text-[9.5px] font-black shadow-sm transition-all duration-300 cursor-pointer hover:bg-slate-100 active:scale-95 whitespace-nowrap" 
+                 class="hidden min-[480px]:flex items-center gap-1 min-[360px]:gap-1.5 px-1.5 min-[360px]:px-2.5 py-0.5 min-[360px]:py-1 rounded-full bg-slate-50 border border-slate-200 text-slate-705 text-[8.5px] min-[360px]:text-[9.5px] font-black shadow-sm transition-all duration-300 cursor-pointer hover:bg-slate-100 active:scale-95 whitespace-nowrap flex-shrink-0" 
                  title="클릭하시면 즉시 실시간 데이터 연동 및 동기화를 재시도합니다.">
                 <span class="w-1.5 h-1.5 rounded-full bg-slate-400"></span>
                 <span class="hidden sm:inline">연동 대기 중</span>
                 <span class="inline sm:hidden">대기 중</span>
             </div>
             
-            <div class="hidden md:flex items-center gap-1 px-2.5 py-1 bg-blue-50/80 border border-blue-100 text-royalBlue text-[9.5px] font-black rounded-full shadow-sm whitespace-nowrap">
+            <div class="hidden md:flex items-center gap-1 px-2.5 py-1 bg-blue-50/80 border border-blue-100 text-royalBlue text-[9.5px] font-black rounded-full shadow-sm whitespace-nowrap flex-shrink-0">
                 <i class="fa-solid fa-database text-[8px]"></i>
                 <span>실시간 수집: <span id="header-total-count" class="font-outfit font-black">0</span>건 (<span id="header-court-count" class="font-outfit font-bold">0</span>경매 | <span id="header-onbid-count" class="font-outfit font-bold">0</span>공매)</span>
             </div>
             
-            <div class="hidden lg:flex items-center gap-1 text-[9.5px] text-slate-400 font-bold whitespace-nowrap ml-1.5">
+            <div class="hidden lg:flex items-center gap-1 text-[9.5px] text-slate-400 font-bold whitespace-nowrap ml-1.5 flex-shrink-0">
                 <i class="fa-solid fa-clock-rotate-left"></i>
                 <span>백그라운드 스케줄 수집 중</span>
             </div>
             
             <!-- [추가] 백엔드 어드민 바로가기 버튼 -->
-            <a href="/admin.html" class="px-1.5 min-[360px]:px-2.5 py-0.5 min-[360px]:py-1 rounded-full bg-slate-900 hover:bg-slate-800 text-white text-[8.5px] min-[360px]:text-[9.5px] font-black shadow-sm transition-all duration-300 cursor-pointer active:scale-95 whitespace-nowrap flex items-center gap-1">
+            <a href="/admin.html" class="hidden min-[480px]:flex px-1.5 min-[360px]:px-2.5 py-0.5 min-[360px]:py-1 rounded-full bg-slate-900 hover:bg-slate-800 text-white text-[8.5px] min-[360px]:text-[9.5px] font-black shadow-sm transition-all duration-300 cursor-pointer active:scale-95 whitespace-nowrap items-center gap-1 flex-shrink-0">
                 <i class="fa-solid fa-gears text-[10px]"></i>
-                <span>백엔드 관리</span>
+                <span class="hidden min-[420px]:inline">백엔드 관리</span>
             </a>
 
             <!-- [추가] 로그인 / 회원가입 상태 관리 배지 -->
-            <div id="auth-status-container" class="flex items-center gap-1 sm:gap-1.5">
+            <div id="auth-status-container" class="flex items-center gap-1 sm:gap-1.5 flex-shrink-0">
                 <button onclick="openLoginModal()" class="px-1.5 min-[360px]:px-2.5 py-0.5 min-[360px]:py-1 rounded-full border border-royalBlue text-royalBlue bg-white text-[8.5px] min-[360px]:text-[9.5px] font-black shadow-sm transition-all duration-300 cursor-pointer hover:bg-blue-50 active:scale-95 whitespace-nowrap">
                     <i class="fa-solid fa-user-lock mr-0.5"></i> 로그인 / 회원가입
                 </button>
@@ -1979,12 +1979,12 @@
                 selectedCourts: Array.from(document.querySelectorAll('input[name="court-check"]:checked')).map(cb => cb.value),
                 selectedSigungus: Array.from(document.querySelectorAll('input[name="sigungu-check"]:checked')).map(cb => cb.value)
             };
-            localStorage.setItem('auction_filters_v2', JSON.stringify(filters));
+            localStorage.setItem('auction_filters_v3', JSON.stringify(filters));
         }
 
         // 💾 필터 값 로컬스토리지 복원 함수
         function restoreFiltersFromCache() {
-            const cached = localStorage.getItem('auction_filters_v2');
+            const cached = localStorage.getItem('auction_filters_v3');
             if (!cached) return;
             try {
                 const filters = JSON.parse(cached);
@@ -1996,8 +1996,14 @@
                     });
                 }
                 if (filters.selectedPtypes) {
+                    // 방어 코드: 만약 구버전 캐시 복원 등으로 비부동산 키(vehicle, security, machinery, etc_goods)가 유실된 경우 기본 활성화합니다.
+                    const hasAnyEtcPtype = filters.selectedPtypes.some(p => ['vehicle', 'security', 'machinery', 'etc_goods'].includes(p));
                     document.querySelectorAll('input[name="ptype-check"]').forEach(cb => {
-                        cb.checked = filters.selectedPtypes.indexOf(cb.value) > -1;
+                        if (!hasAnyEtcPtype && ['vehicle', 'security', 'machinery', 'etc_goods'].includes(cb.value)) {
+                            cb.checked = true;
+                        } else {
+                            cb.checked = filters.selectedPtypes.indexOf(cb.value) > -1;
+                        }
                     });
                 }
                 if (filters.selectedSidos) {
@@ -2041,7 +2047,7 @@
         }        // 🚀 헤더 통계 카운팅 갱신 헬퍼 함수
         function updateHeaderStats(propertiesList) {
             const total = propertiesList.length;
-            const court = propertiesList.filter(p => p.source === 'court').length;
+            const court = propertiesList.filter(p => p.source === 'court' || p.source === 'court_etc').length;
             const onbid = propertiesList.filter(p => p.source === 'onbid' || p.source === 'onbid_etc').length;
             
             const headerTotal = document.getElementById("header-total-count");
@@ -2129,7 +2135,7 @@
                         updateHeaderStats(originalProperties);
                         
                         sensor.innerHTML = '<span class="w-2 h-2 rounded-full bg-[#10b981] animate-ping"></span><span class="hidden sm:inline">🟢 실시간 데이터 연동 정상 (' + originalProperties.length.toLocaleString() + '건)</span><span class="inline sm:hidden">🟢 ' + originalProperties.length.toLocaleString() + '건</span>';
-                        sensor.className = "flex items-center gap-1.5 sm:gap-2 px-2 sm:px-3 py-1 sm:py-1.5 rounded-full bg-emerald-50 border border-emerald-200 text-emerald-700 text-[9px] sm:text-[10px] font-black shadow-sm cursor-pointer";
+                        sensor.className = "flex items-center gap-1.5 sm:gap-2 px-2 sm:px-3 py-1 sm:py-1.5 rounded-full bg-emerald-50 border border-emerald-200 text-emerald-700 text-[9px] sm:text-[10px] font-black shadow-sm cursor-pointer flex-shrink-0";
                         
                         applyFilters();
                     } else {
@@ -2176,9 +2182,8 @@
                         // 통계 갱신
                         updateHeaderStats(originalProperties);
                         
-                        const sensor = document.getElementById("connection-sensor");
                         sensor.innerHTML = '<span class="w-2 h-2 rounded-full bg-[#10b981]"></span><span class="hidden sm:inline">🟢 캐시 데이터 로드 완료 (' + originalProperties.length.toLocaleString() + '건)</span><span class="inline sm:hidden">🟢 ' + originalProperties.length.toLocaleString() + '건</span>';
-                        sensor.className = "flex items-center gap-1.5 sm:gap-2 px-2 sm:px-3 py-1 sm:py-1.5 rounded-full bg-emerald-50 border border-emerald-200 text-emerald-700 text-[9px] sm:text-[10px] font-black shadow-sm cursor-pointer";
+                        sensor.className = "flex items-center gap-1.5 sm:gap-2 px-2 sm:px-3 py-1 sm:py-1.5 rounded-full bg-emerald-50 border border-emerald-200 text-emerald-700 text-[9px] sm:text-[10px] font-black shadow-sm cursor-pointer flex-shrink-0";
                         
                         applyFilters();
                         isFirstLoad = false;
@@ -2212,7 +2217,7 @@
             }
 
             sensor.innerHTML = '<span class="w-2 h-2 rounded-full bg-amber-500"></span><span class="hidden sm:inline">🟡 로컬 오프라인 모드 가동 (' + originalProperties.length.toLocaleString() + '건)</span><span class="inline sm:hidden">🟡 ' + originalProperties.length.toLocaleString() + '건</span>';
-            sensor.className = "flex items-center gap-1.5 sm:gap-2 px-2 sm:px-3 py-1 sm:py-1.5 rounded-full bg-amber-50 border border-amber-200 text-amber-700 text-[9px] sm:text-[10px] font-black shadow-sm cursor-pointer";
+            sensor.className = "flex items-center gap-1.5 sm:gap-2 px-2 sm:px-3 py-1 sm:py-1.5 rounded-full bg-amber-50 border border-amber-200 text-amber-700 text-[9px] sm:text-[10px] font-black shadow-sm cursor-pointer flex-shrink-0";
             applyFilters();
         }
 
@@ -2581,6 +2586,8 @@
                                 headers.forEach((h, idx) => {
                                     row[h] = cols[idx] || "";
                                 });
+                                const courtCount = originalProperties.filter(p => p.source === 'court' || p.source === 'court_etc').length;
+                                const onbidCount = originalProperties.filter(p => p.source === 'onbid' || p.source === 'onbid_etc').length;
                                 parsedData.push(row);
                             }
                         }
@@ -2709,7 +2716,8 @@
                 
                 const matchesSource = selectedSources.length === 0 || 
                     selectedSources.includes(item.source) ||
-                    (selectedSources.includes("onbid") && item.source === "onbid_etc");
+                    (selectedSources.includes("onbid") && item.source === "onbid_etc") ||
+                    (selectedSources.includes("court") && item.source === "court_etc");
                 
                 const matchesDate = dateLimit === 999 || (item.remaining_days && item.remaining_days <= dateLimit);
                 
@@ -2748,6 +2756,11 @@
                 let matchesPtype = selectedPtypes.length === 0;
                 if (selectedPtypes.length > 0) {
                     const type = (item.ptype || "").toLowerCase();
+                    // 비부동산 개별 분류 여부 판별.
+                    const isVehicle = type.includes("차량") || type.includes("운송") || type.includes("자동차") || type.includes("선박") || type.includes("항공기") || type.includes("중기") || type.includes("지게차") || type.includes("suv");
+                    const isSecurity = type.includes("유가증권") || type.includes("주식") || type.includes("채권") || type.includes("지분") || type.includes("증권");
+                    const isMachinery = type.includes("기계") || (type.includes("장비") && !type.includes("운송장비")) || type.includes("기구") || type.includes("설비") || type.includes("기기");
+
                     for (const val of selectedPtypes) {
                         if (val === "apart") {
                             if (type.includes("아파트")) { matchesPtype = true; break; }
@@ -2764,13 +2777,14 @@
                         } else if (val === "factory") {
                             if (type.includes("공장") || type.includes("창고") || type.includes("산업")) { matchesPtype = true; break; }
                         } else if (val === "vehicle") {
-                            if (type.includes("차량") || type.includes("운송") || type.includes("자동차") || type.includes("선박") || type.includes("항공기") || type.includes("중기")) { matchesPtype = true; break; }
+                            if (isVehicle) { matchesPtype = true; break; }
                         } else if (val === "security") {
-                            if (type.includes("유가증권") || type.includes("주식") || type.includes("채권") || type.includes("지분") || type.includes("증권")) { matchesPtype = true; break; }
+                            if (isSecurity) { matchesPtype = true; break; }
                         } else if (val === "machinery") {
-                            if (type.includes("기계") || (type.includes("장비") && !type.includes("운송장비")) || type.includes("기구") || type.includes("설비")) { matchesPtype = true; break; }
+                            if (isMachinery) { matchesPtype = true; break; }
                         } else if (val === "etc_goods") {
-                            if (type.includes("물품") || type.includes("기타물품") || type.includes("동산") || type.includes("기타동산") || item.source === 'onbid_etc') { matchesPtype = true; break; }
+                            // 다른 비부동산 분류에 해당하지 않는 순수 기타동산/물품만 통과시킵니다.
+                            if ((type.includes("물품") || type.includes("기타물품") || type.includes("동산") || type.includes("기타동산") || item.source === 'onbid_etc' || item.source === 'court_etc') && !isVehicle && !isSecurity && !isMachinery) { matchesPtype = true; break; }
                         }
                     }
                 }
@@ -4052,7 +4066,7 @@
             const tab3Btn = document.getElementById("detail-group-tab-3-btn");
             const tab4Btn = document.getElementById("detail-group-tab-4-btn");
 
-            if (item.source === 'onbid_etc') {
+            if (item.source === 'onbid_etc' || item.source === 'court_etc') {
                 if (rvTitle) rvTitle.innerHTML = `<i class="fa-solid fa-image text-royalBlue"></i> 📦 자산 대표 이미지`;
                 if (rvFallbackText) rvFallbackText.innerText = "비부동산 자산은 로드뷰를 제공하지 않습니다.";
                 if (tab2Btn) tab2Btn.classList.add("hidden");
@@ -4099,11 +4113,11 @@
             // 배지 및 등급 점수 바인딩
             const badge = document.getElementById("detail-badge");
             
-            if (item.source === 'court') {
-                badge.innerText = "⚖️ 대법원 법원경매";
+            if (item.source === 'court' || item.source === 'court_etc') {
+                badge.innerText = item.source === 'court_etc' ? "⚖️ 대법원 법원자산" : "⚖️ 대법원 법원경매";
                 badge.className = "bg-blue-50 text-royalBlue border border-blue-200 text-xs font-black px-2.5 py-1 rounded-md";
             } else if (item.source === 'onbid' || item.source === 'onbid_etc') {
-                badge.innerText = "🏢 캠코 온비드공매";
+                badge.innerText = item.source === 'onbid_etc' ? "🏢 캠코 온비드자산" : "🏢 캠코 온비드공매";
                 badge.className = "bg-emerald-50 text-emeraldSuccess border border-emerald-200 text-xs font-black px-2.5 py-1 rounded-md";
             } else {
                 badge.innerText = "📁 사설 엑셀 믹싱";
@@ -5788,24 +5802,12 @@
             
             if (currentUser) {
                 const emailId = currentUser.email.split('@')[0];
-                const gradeBadge = `<span class="bg-yellow-100 text-yellow-800 text-[8.5px] sm:text-[9.5px] font-black px-1.5 sm:px-2.5 py-0.5 sm:py-1 rounded-full border border-yellow-300 ml-1 flex items-center gap-0.5 shadow-sm"><i class="fa-solid fa-crown text-[8px] text-yellow-500"></i> ${userGrade}등급</span>`;
-                
-                let upgradeBtn = "";
-                if (userGrade !== "A") {
-                    if (isUpgradeRequested) {
-                        upgradeBtn = `<button disabled class="px-1.5 sm:px-2.5 py-0.5 sm:py-1 rounded-full border border-slate-200 text-slate-400 bg-slate-50 text-[8.5px] sm:text-[9.5px] font-bold cursor-not-allowed whitespace-nowrap ml-1">신청 대기 중</button>`;
-                    } else {
-                        upgradeBtn = `<button onclick="requestUpgrade()" class="px-1.5 sm:px-2.5 py-0.5 sm:py-1 rounded-full border border-amber-300 text-amber-800 bg-amber-50 text-[8.5px] sm:text-[9.5px] font-black shadow-sm transition-all duration-300 cursor-pointer hover:bg-amber-100 active:scale-95 whitespace-nowrap ml-1"><i class="fa-solid fa-arrow-up mr-0.5"></i> 등급 업그레이드</button>`;
-                    }
-                }
 
                 container.innerHTML = `
-                    <span class="text-[8.5px] sm:text-[9.5px] font-black text-slate-600 bg-slate-100 px-1.5 sm:px-2.5 py-0.5 sm:py-1 rounded-full border border-slate-200 flex items-center gap-0.5 sm:gap-1 shadow-sm">
-                        <i class="fa-solid fa-user text-[8px] text-royalBlue"></i> <span class="max-w-[50px] sm:max-w-none truncate">${emailId}님</span>
+                    <span class="text-[8.5px] sm:text-[9.5px] font-black text-slate-600 bg-slate-100 px-1.5 sm:px-2.5 py-0.5 sm:py-1 rounded-full border border-slate-200 flex items-center gap-0.5 sm:gap-1 shadow-sm flex-shrink-0">
+                        <i class="fa-solid fa-user text-[8px] text-royalBlue"></i> <span class="max-w-[80px] sm:max-w-none truncate">${emailId}님 (${userGrade}등급)</span>
                     </span>
-                    ${gradeBadge}
-                    ${upgradeBtn}
-                    <button onclick="handleLogout()" class="px-1.5 sm:px-2.5 py-0.5 sm:py-1 rounded-full border border-rose-200 text-rose-600 bg-white text-[8.5px] sm:text-[9.5px] font-black shadow-sm transition-all duration-300 cursor-pointer hover:bg-rose-50 active:scale-95 whitespace-nowrap ml-1">
+                    <button onclick="handleLogout()" class="px-1.5 sm:px-2.5 py-0.5 sm:py-1 rounded-full border border-rose-200 text-rose-600 bg-white text-[8.5px] sm:text-[9.5px] font-black shadow-sm transition-all duration-300 cursor-pointer hover:bg-rose-50 active:scale-95 whitespace-nowrap ml-1 flex-shrink-0">
                         <i class="fa-solid fa-right-from-bracket mr-0.5"></i> 로그아웃
                     </button>
                 `;
