@@ -1,7 +1,7 @@
 // 모바일 애플리케이션의 탭 상태와 상세 화면 네비게이션을 조율하는 메인 진입점 파일입니다.
 
 import React, { useState, useEffect } from 'react';
-import { StyleSheet, Text, View, TouchableOpacity, SafeAreaView, Modal, Platform } from 'react-native';
+import { StyleSheet, Text, View, TouchableOpacity, SafeAreaView, Modal, Platform, Image, Alert } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import { COLORS } from './src/components/Theme';
 import { Property, FilterState } from './src/types';
@@ -21,10 +21,13 @@ export default function App() {
   const [selectedProperty, setSelectedProperty] = useState<Property | null>(null);
   const [user, setUser] = useState<User | null>(null);
   const [showAuthScreen, setShowAuthScreen] = useState<boolean>(false);
+  const [showMyPageModal, setShowMyPageModal] = useState<boolean>(false);
+  const [userGrade, setUserGrade] = useState<'A' | 'B' | 'C'>('C');
+  const [isUpgradeRequested, setIsUpgradeRequested] = useState<boolean>(false);
   const [filters, setFilters] = useState<FilterState>({
     search: '',
     source: ['court', 'onbid', 'private'],
-    ptype: ['apart', 'officetel', 'villa', 'house', 'store', 'land', 'factory'],
+    ptype: ['apart', 'officetel', 'villa', 'house', 'store', 'land', 'factory', 'vehicle', 'security', 'machinery', 'etc_goods'],
     sido: [],
     sigungu: 'all',
     dateLimit: 999,
@@ -35,14 +38,74 @@ export default function App() {
     selectedCourts: [],
   });
 
+  // 🔒 Supabase user_profiles 고객 등급 조회 함수
+  const fetchUserGrade = async (uid: string) => {
+    try {
+      const { data, error } = await supabase
+        .from('user_profiles')
+        .select('grade, upgrade_requested')
+        .eq('id', uid)
+        .maybeSingle();
+      if (error) throw error;
+      if (data) {
+        setUserGrade((data.grade || 'C') as 'A' | 'B' | 'C');
+        setIsUpgradeRequested(!!data.upgrade_requested);
+      } else {
+        await supabase
+          .from('user_profiles')
+          .insert({ id: uid, grade: 'C', email: user?.email || '', upgrade_requested: false });
+        setUserGrade('C');
+        setIsUpgradeRequested(false);
+      }
+    } catch (err) {
+      console.error('모바일 회원 등급 연동 실패:', err);
+      setUserGrade('C');
+      setIsUpgradeRequested(false);
+    }
+  };
+
+  // 🔒 등급 업그레이드 신청 API 연동 함수
+  const requestUpgrade = async () => {
+    if (!user) return;
+    try {
+      const { error } = await supabase
+        .from('user_profiles')
+        .update({ upgrade_requested: true })
+        .eq('id', user.id);
+      if (error) throw error;
+      Alert.alert('신청 완료', '등급 업그레이드 신청이 완료되었습니다.');
+      setIsUpgradeRequested(true);
+      if (user) {
+        fetchUserGrade(user.id);
+      }
+    } catch (err) {
+      console.error('등급 업그레이드 신청 실패:', err);
+      Alert.alert('오류', '업그레이드 신청 중 오류가 발생했습니다.');
+    }
+  };
+
   useEffect(() => {
     // 앱이 처음 시작되거나 갱신될 때 Supabase 인증 세션 상태의 변경 사항을 즉각 감지하기 위해 리스너를 구독하였습니다.
     supabase.auth.getSession().then(({ data: { session } }) => {
-      setUser(session ? session.user : null);
+      const currentUser = session ? session.user : null;
+      setUser(currentUser);
+      if (currentUser) {
+        fetchUserGrade(currentUser.id);
+      } else {
+        setUserGrade('C');
+        setIsUpgradeRequested(false);
+      }
     });
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-      setUser(session ? session.user : null);
+      const currentUser = session ? session.user : null;
+      setUser(currentUser);
+      if (currentUser) {
+        fetchUserGrade(currentUser.id);
+      } else {
+        setUserGrade('C');
+        setIsUpgradeRequested(false);
+      }
     });
 
     return () => subscription.unsubscribe();
@@ -164,7 +227,7 @@ export default function App() {
             setFilters({
               search: '',
               source: ['court', 'onbid', 'private'],
-              ptype: ['apart', 'officetel', 'villa', 'house', 'store', 'land', 'factory'],
+              ptype: ['apart', 'officetel', 'villa', 'house', 'store', 'land', 'factory', 'vehicle', 'security', 'machinery', 'etc_goods'],
               sido: [],
               sigungu: 'all',
               dateLimit: 999,
@@ -180,9 +243,14 @@ export default function App() {
           <Text style={styles.logoSubtitle}>PREMIUM ELEGANT PEARL WHITE</Text>
         </TouchableOpacity>
         {user ? (
-          <View style={styles.userBadgeHeader}>
-            <Text style={styles.userBadgeText}>LIVE</Text>
-          </View>
+          <TouchableOpacity 
+            style={styles.userHeaderBadge}
+            onPress={() => setShowMyPageModal(true)}
+          >
+            <Text style={styles.userHeaderText} numberOfLines={1}>
+              {user.email ? user.email.split('@')[0] : '유저'} ({userGrade}등급)
+            </Text>
+          </TouchableOpacity>
         ) : (
           <TouchableOpacity 
             style={styles.loginHeaderButton}
@@ -263,6 +331,94 @@ export default function App() {
           }}
           onCancel={() => setShowAuthScreen(false)}
         />
+      </Modal>
+
+      {/* 👤 프리미엄 마이페이지(개인화) 모달 영역 */}
+      <Modal
+        visible={showMyPageModal}
+        animationType="fade"
+        transparent={true}
+        onRequestClose={() => setShowMyPageModal(false)}
+      >
+        <View style={styles.myPageModalOverlay}>
+          <View style={styles.myPageModalContent}>
+            <View style={styles.myPageModalHeader}>
+              <Text style={styles.myPageModalTitle}>마이페이지</Text>
+              <Text style={styles.myPageModalSubtitle}>로그인 정보와 계정 연동 상태를 확인합니다.</Text>
+              <TouchableOpacity 
+                style={styles.myPageCloseIconButton} 
+                onPress={() => setShowMyPageModal(false)}
+              >
+                <Text style={styles.myPageCloseIconText}>×</Text>
+              </TouchableOpacity>
+            </View>
+
+            {user && (
+              <View>
+                {/* 프로필 정보 카드 */}
+                <View style={styles.myPageProfileCard}>
+                  <Image 
+                    source={{ uri: user.user_metadata?.avatar_url || 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=150&q=80' }} 
+                    style={styles.myPageAvatar} 
+                  />
+                  <View style={styles.myPageProfileInfo}>
+                    <Text style={styles.myPageEmailText} numberOfLines={1}>{user.email}</Text>
+                    <View style={styles.myPageGradeBadge}>
+                      <Text style={styles.myPageGradeBadgeText}>👑 {userGrade}등급</Text>
+                    </View>
+                  </View>
+                </View>
+
+                {/* 소셜 계정 연동 상태 */}
+                <View style={styles.myPageSection}>
+                  <Text style={styles.myPageSectionTitle}>소셜 로그인 연동 정보</Text>
+                  <View style={styles.myPageSocialRow}>
+                    <Text style={styles.myPageSocialLabel}>Google</Text>
+                    <Text style={[
+                      styles.myPageSocialStatus, 
+                      { color: user.app_metadata?.providers?.includes('google') ? COLORS.emeraldSuccess : COLORS.slate400 }
+                    ]}>
+                      {user.app_metadata?.providers?.includes('google') ? '🟢 연결됨' : '연결 없음'}
+                    </Text>
+                  </View>
+                  <View style={styles.myPageSocialRowLast}>
+                    <Text style={styles.myPageSocialLabel}>Kakao</Text>
+                    <Text style={[
+                      styles.myPageSocialStatus, 
+                      { color: user.app_metadata?.providers?.includes('kakao') ? COLORS.emeraldSuccess : COLORS.slate400 }
+                    ]}>
+                      {user.app_metadata?.providers?.includes('kakao') ? '🟢 연결됨' : '연결 없음'}
+                    </Text>
+                  </View>
+                </View>
+
+                {/* 하단 동작 버튼 */}
+                <View style={styles.myPageButtonContainer}>
+                  {userGrade !== 'A' && (
+                    <TouchableOpacity 
+                      style={[styles.myPageUpgradeButton, isUpgradeRequested && styles.myPageUpgradeButtonDisabled]} 
+                      disabled={isUpgradeRequested}
+                      onPress={requestUpgrade}
+                    >
+                      <Text style={[styles.myPageUpgradeButtonText, isUpgradeRequested && styles.myPageUpgradeButtonDisabledText]}>
+                        {isUpgradeRequested ? '신청 대기 중' : '▲ 등급 업그레이드'}
+                      </Text>
+                    </TouchableOpacity>
+                  )}
+                  <TouchableOpacity 
+                    style={styles.myPageLogoutButton}
+                    onPress={() => {
+                      setShowMyPageModal(false);
+                      handleLogout();
+                    }}
+                  >
+                    <Text style={styles.myPageLogoutButtonText}>로그아웃</Text>
+                  </TouchableOpacity>
+                </View>
+              </View>
+            )}
+          </View>
+        </View>
       </Modal>
     </SafeAreaView>
   );
@@ -399,5 +555,187 @@ const styles = StyleSheet.create({
     color: COLORS.white,
     fontSize: 16,
     fontWeight: 'bold',
+  },
+  // 👤 모바일 마이페이지 모달용 신규 스타일
+  myPageModalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(15, 23, 42, 0.6)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 20,
+  },
+  myPageModalContent: {
+    backgroundColor: COLORS.white,
+    borderRadius: 24,
+    width: '100%',
+    maxWidth: 360,
+    padding: 24,
+    borderWidth: 1,
+    borderColor: COLORS.slate200,
+    shadowColor: COLORS.slate900,
+    shadowOffset: { width: 0, height: 10 },
+    shadowOpacity: 0.1,
+    shadowRadius: 20,
+    elevation: 10,
+  },
+  myPageModalHeader: {
+    alignItems: 'center',
+    marginBottom: 20,
+    position: 'relative',
+    width: '100%',
+  },
+  myPageModalTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: COLORS.slate900,
+  },
+  myPageModalSubtitle: {
+    fontSize: 10.5,
+    fontWeight: 'bold',
+    color: COLORS.slate400,
+    marginTop: 4,
+  },
+  myPageCloseIconButton: {
+    position: 'absolute',
+    top: -4,
+    right: -4,
+    padding: 8,
+  },
+  myPageCloseIconText: {
+    fontSize: 22,
+    color: COLORS.slate400,
+    fontWeight: 'bold',
+    lineHeight: 22,
+  },
+  myPageProfileCard: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: 16,
+    backgroundColor: COLORS.slate50,
+    borderRadius: 16,
+    borderWidth: 1,
+    borderColor: COLORS.slate100,
+    marginBottom: 20,
+  },
+  myPageAvatar: {
+    width: 60,
+    height: 60,
+    borderRadius: 30,
+    borderWidth: 2,
+    borderColor: COLORS.royalBlue,
+  },
+  myPageProfileInfo: {
+    flex: 1,
+    marginLeft: 12,
+  },
+  myPageEmailText: {
+    fontSize: 14,
+    fontWeight: 'bold',
+    color: COLORS.slate800,
+  },
+  myPageGradeBadge: {
+    alignSelf: 'flex-start',
+    backgroundColor: '#fef9c3',
+    paddingHorizontal: 8,
+    paddingVertical: 2,
+    borderRadius: 9999,
+    borderWidth: 1,
+    borderColor: '#fde047',
+    marginTop: 6,
+  },
+  myPageGradeBadgeText: {
+    fontSize: 10.5,
+    fontWeight: 'bold',
+    color: '#854d0e',
+  },
+  myPageSection: {
+    backgroundColor: COLORS.slate50,
+    borderRadius: 16,
+    padding: 16,
+    borderWidth: 1,
+    borderColor: COLORS.slate100,
+    marginBottom: 24,
+  },
+  myPageSectionTitle: {
+    fontSize: 11,
+    fontWeight: 'bold',
+    color: COLORS.slate400,
+    marginBottom: 12,
+    textTransform: 'uppercase',
+    letterSpacing: 0.5,
+  },
+  myPageSocialRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 10,
+  },
+  myPageSocialRowLast: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  myPageSocialLabel: {
+    fontSize: 13,
+    fontWeight: 'bold',
+    color: COLORS.slate600,
+  },
+  myPageSocialStatus: {
+    fontSize: 11,
+    fontWeight: 'bold',
+  },
+  myPageButtonContainer: {
+    flexDirection: 'row',
+    gap: 8,
+  },
+  myPageUpgradeButton: {
+    flex: 1,
+    height: 44,
+    backgroundColor: '#fffbeb',
+    borderWidth: 1,
+    borderColor: '#fcd34d',
+    borderRadius: 12,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  myPageUpgradeButtonText: {
+    fontSize: 12,
+    fontWeight: 'bold',
+    color: '#78350f',
+  },
+  myPageUpgradeButtonDisabled: {
+    backgroundColor: COLORS.slate50,
+    borderColor: COLORS.slate200,
+  },
+  myPageUpgradeButtonDisabledText: {
+    color: COLORS.slate400,
+  },
+  myPageLogoutButton: {
+    paddingHorizontal: 16,
+    height: 44,
+    borderWidth: 1,
+    borderColor: '#fecaca',
+    borderRadius: 12,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  myPageLogoutButtonText: {
+    fontSize: 12,
+    fontWeight: 'bold',
+    color: COLORS.crimsonAlert,
+  },
+  userHeaderBadge: {
+    backgroundColor: COLORS.white,
+    borderWidth: 1,
+    borderColor: COLORS.royalBlue,
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    borderRadius: 9999,
+    maxWidth: 150,
+  },
+  userHeaderText: {
+    fontSize: 11,
+    fontWeight: 'bold',
+    color: COLORS.royalBlue,
   },
 });

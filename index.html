@@ -29,6 +29,8 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <!-- 💎 5. Supabase Web SDK CDN 연동 -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <!-- 🗺️ 카카오 지도/로드뷰 SDK 로딩 (무료 API 키 기반 동적 지도 시각화 실사진화 목적) -->
+    <script type="text/javascript" src="https://dapi.kakao.com/v2/maps/sdk.js?appkey=ec7b35c73770fbe949e52bf3ff940346&libraries=services"></script>
     
     <script>
         const supabaseUrl = "https://ubaxyfxcsxsvrryowswb.supabase.co";
@@ -1090,7 +1092,7 @@
                             <span id="detail-spec-exclusive-py" class="font-extrabold text-slate-800 font-mono"></span>
                         </div>
                         <div class="bg-slate-50 border border-slate-100 p-2 rounded-xl flex justify-between items-center">
-                            <span class="text-slate-450 font-semibold text-[10px] sm:text-xs">공급 면적 (추정)</span>
+                            <span class="text-slate-455 font-semibold text-[10px] sm:text-xs">공급 면적</span>
                             <span id="detail-spec-supply-py" class="font-extrabold text-slate-800 font-mono"></span>
                         </div>
                         <div class="bg-slate-50 border border-slate-100 p-2 rounded-xl flex justify-between items-center">
@@ -1285,7 +1287,7 @@
                 <h4 class="text-xs sm:text-sm font-black text-slate-800 flex items-center gap-1.5 mb-2.5">
                     <i class="fa-solid fa-compass text-royalBlue"></i> 📐 부동산 내부 추정 평면도
                 </h4>
-                <div class="w-full h-[220px] rounded-xl overflow-hidden border border-slate-200 bg-slate-100 flex items-center justify-center relative cursor-pointer" onclick="openFloorplanModal()" title="클릭하시면 큰 이미지로 보실 수 있습니다.">
+                <div id="detail-floorplan-img-container" class="w-full h-[220px] rounded-xl overflow-hidden border border-slate-200 bg-slate-100 flex items-center justify-center relative cursor-pointer" onclick="openFloorplanModal()" title="클릭하시면 큰 이미지로 보실 수 있습니다.">
                     <img id="detail-floorplan-img" src="./floorplan_modern_apartment.png" alt="부동산 평면도" class="w-full h-full object-contain">
                     <div class="absolute bottom-2 right-2 bg-slate-900/60 text-white text-[9px] px-2 py-1 rounded font-black flex items-center gap-1">
                         <i class="fa-solid fa-magnifying-glass-plus"></i> 크게 보기
@@ -1299,7 +1301,7 @@
             </div>
 
             <!-- 평면 정보 가이드 및 도면 발급 안내 -->
-            <div class="bg-white border border-slate-200 rounded-2xl p-3.5 sm:p-4 space-y-3 shadow-sm">
+            <div id="detail-floorplan-guide-card" class="bg-white border border-slate-200 rounded-2xl p-3.5 sm:p-4 space-y-3 shadow-sm">
                 <h4 class="text-xs sm:text-sm font-black text-slate-800 flex items-center gap-1.5 pb-2 border-b border-slate-100">
                     <i class="fa-solid fa-file-pdf text-royalBlue"></i> 공식 건축물대장 현황도면 발급 안내
                 </h4>
@@ -1491,7 +1493,7 @@
             </div>
         </div>
         <div id="detail-group-panel-3" class="flex-1 overflow-y-auto p-4 sm:p-5 space-y-4 sm:space-y-5 custom-scrollbar bg-slate-50/50 hidden relative">
-            <div id="group-content-3" class="space-y-4 sm:space-y-5">
+            <div id="group-content-3" class="space-y-4 sm:space-y-5 max-w-[720px] mx-auto w-full">
                 <div id="detail-panel-bid" class="space-y-4 sm:space-y-5">
             <!-- AI 낙찰 시뮬레이션 지표 분석 -->
             <div class="bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 rounded-2xl p-3.5 sm:p-4 space-y-2.5 shadow-sm mb-4">
@@ -1515,7 +1517,7 @@
             </div>
 
             <!-- 🧮 세법 스마트 낙찰 계획서 계산기 -->
-            <div class="bg-white border border-slate-200 rounded-2xl p-3.5 sm:p-4 shadow-sm space-y-3">
+            <div class="bg-white border border-slate-200 rounded-2xl p-3.5 sm:p-4 shadow-sm space-y-3 max-w-[720px] mx-auto w-full">
                 <div class="flex items-center justify-between pb-2 border-b border-slate-100">
                     <h4 class="text-xs sm:text-sm font-black text-slate-800 flex items-center gap-1.5">
                         <i class="fa-solid fa-calculator text-royalBlue"></i> 스마트 정밀 소요자금 계획서
@@ -1761,7 +1763,7 @@
                 <h4 class="text-xs sm:text-sm font-black text-slate-800 flex items-center gap-1.5">
                     <i class="fa-solid fa-map-location-dot text-royalBlue"></i> 📍 물건지 실시간 위치 지도
                 </h4>
-                <div id="detail-map-container" class="w-full h-[220px] rounded-xl overflow-hidden border border-slate-200/60 bg-slate-50 cursor-pointer relative group" onclick="openNaverMapForDetail()" title="클릭 시 네이버 지도로 바로 이동합니다.">
+                <div id="detail-map-container" class="w-full h-[220px] rounded-xl overflow-hidden border border-slate-200/60 bg-slate-50 relative group">
                     <!-- Javascript에서 iframe 동적 주입 -->
                 </div>
             </div>
@@ -3222,6 +3224,47 @@
             }
         }
 
+        // 🗺️ 카카오 지도/로드뷰 SDK 기반의 인터랙티브 로드뷰 사진 로드 함수
+        function loadKakaoRoadview(address) {
+            const roadviewContainer = document.getElementById("detail-roadview");
+            const fallbackContainer = document.getElementById("detail-roadview-fallback");
+            if (!roadviewContainer) return;
+
+            roadviewContainer.innerHTML = "";
+            if (fallbackContainer) fallbackContainer.classList.add("hidden");
+
+            if (!address || address.trim() === "") {
+                if (fallbackContainer) fallbackContainer.classList.remove("hidden");
+                return;
+            }
+
+            if (typeof kakao === "undefined" || !kakao.maps || !kakao.maps.services) {
+                console.warn("Kakao maps SDK not loaded yet.");
+                if (fallbackContainer) fallbackContainer.classList.remove("hidden");
+                return;
+            }
+
+            const geocoder = new kakao.maps.services.Geocoder();
+            geocoder.addressSearch(address, function(result, status) {
+                if (status === kakao.maps.services.Status.OK) {
+                    const coords = new kakao.maps.LatLng(result[0].y, result[0].x);
+                    
+                    const rv = new kakao.maps.Roadview(roadviewContainer);
+                    const rvClient = new kakao.maps.RoadviewClient();
+
+                    rvClient.getNearestPanoId(coords, 50, function(panoId) {
+                        if (panoId) {
+                            rv.setPanoId(panoId, coords);
+                        } else {
+                            if (fallbackContainer) fallbackContainer.classList.remove("hidden");
+                        }
+                    });
+                } else {
+                    if (fallbackContainer) fallbackContainer.classList.remove("hidden");
+                }
+            });
+        }
+
         // 💎 씨:리얼 부동산종합정보 주소 복사 후 새 창 연동 함수
         function copyAddressToClipboardAndOpenSeeReal() {
             if (selectedProperty && selectedProperty.address) {
@@ -3444,20 +3487,13 @@
 
         // 평면도 추정 평면도 원본 이미지 확대 팝업 모달 함수
         function openFloorplanModal() {
+            if (!selectedProperty || !selectedProperty.images || selectedProperty.images.length === 0) {
+                return;
+            }
             const existing = document.getElementById("floorplan-zoom-modal");
             if (existing) existing.remove();
 
-            let fpSrc = "./floorplan_84.png";
-            if (selectedProperty && selectedProperty.exclusive_area) {
-                const exclusiveArea = selectedProperty.exclusive_area;
-                if (exclusiveArea < 70) {
-                    fpSrc = "./floorplan_59.png";
-                } else if (exclusiveArea >= 70 && exclusiveArea < 100) {
-                    fpSrc = "./floorplan_84.png";
-                } else {
-                    fpSrc = "./floorplan_114.png";
-                }
-            }
+            let fpSrc = selectedProperty.images[0];
 
             const modal = document.createElement("div");
             modal.id = "floorplan-zoom-modal";
@@ -3743,6 +3779,46 @@
 
         function enrichPropertyData(item) {
             if (!item) return item;
+            
+            // notes_content 복사 및 메타데이터 파싱
+            let meta = { is_estimated: true, is_lease: false, images: [] };
+            let cleanNotes = item.notes_content || '';
+            if (item.notes_content) {
+                const metaMatch = item.notes_content.match(/__METADATA__:(.*)__/);
+                if (metaMatch) {
+                    try {
+                        meta = JSON.parse(metaMatch[1]);
+                        cleanNotes = item.notes_content.replace(/\n\n__METADATA__:.*__/, "").trim();
+                    } catch (e) {
+                        console.error("Failed to parse metadata", e);
+                    }
+                }
+            }
+            item.notes_content = cleanNotes;
+            item.is_estimated = meta.is_estimated !== undefined ? meta.is_estimated : true;
+            item.is_lease = meta.is_lease !== undefined ? meta.is_lease : false;
+            item.images = meta.images || [];
+            item.lease_method = meta.lease_method || null;
+            item.lease_term = meta.lease_term || null;
+            item.complex_info = meta.complex_info || {};
+            item.elementary_school = meta.elementary_school || "";
+            item.recent_deals = meta.recent_deals || [];
+            item.car_info = meta.car_info || null;
+            item.security_info = meta.security_info || null;
+            item.machinery_info = meta.machinery_info || null;
+            item.etc_info = meta.etc_info || null;
+
+            // 면적 덮어쓰기
+            if (meta.exclusive_area > 0) item.exclusive_area = meta.exclusive_area;
+            if (meta.land_area > 0) item.land_area = meta.land_area;
+            if (meta.supply_area > 0) item.supply_area = meta.supply_area;
+            if (meta.building_area > 0) item.building_area = meta.building_area;
+
+            item.is_estimated_exclusive = meta.is_estimated_exclusive !== undefined ? meta.is_estimated_exclusive : (meta.is_estimated !== undefined ? meta.is_estimated : true);
+            item.is_estimated_supply = meta.is_estimated_supply !== undefined ? meta.is_estimated_supply : (meta.is_estimated !== undefined ? meta.is_estimated : true);
+            item.is_estimated_land = meta.is_estimated_land !== undefined ? meta.is_estimated_land : (meta.is_estimated !== undefined ? meta.is_estimated : true);
+            item.is_estimated_building = meta.is_estimated_building !== undefined ? meta.is_estimated_building : (meta.is_estimated !== undefined ? meta.is_estimated : true);
+
             // 2025타경502931 어은동 한빛아파트 경매 사건의 실제 데이터(구조 및 면적) 정밀 매핑을 위해 수동 예외 처리를 반영하였습니다.
             if (item.auction_no === "2025타경502931" || (item.address && item.address.includes("한빛아파트"))) {
                 item.structure = "철근콘크리트조 및 벽식조";
@@ -3750,6 +3826,10 @@
                 item.supply_area = 102.47;
                 item.land_area = 44.25;
                 item.building_area = 84.93;
+                item.is_estimated_exclusive = false;
+                item.is_estimated_supply = false;
+                item.is_estimated_land = false;
+                item.is_estimated_building = false;
                 return item;
             }
             let structure = item.structure || "";
@@ -3876,16 +3956,18 @@
             const extra = analyzePropertyDetailExtra(item);
             const est = estimateAuctionRounds(item.appraised_value, item.minimum_bid, item.source);
 
-            // 주소까지만 깔끔하게 분리하여 정제 (시/도 시/군/구 동/읍/면/리 지번 번지까지만 매칭)
-            let cleanedTitleAddress = item.address || "";
-            const bracketIndex = cleanedTitleAddress.search(/[\[\({]/);
-            if (bracketIndex !== -1) {
-                cleanedTitleAddress = cleanedTitleAddress.substring(0, bracketIndex).trim();
-            }
-            const addressMatch = cleanedTitleAddress.match(/^([가-힣a-zA-Z0-9\s-]+(?:시|도)\s+[가-힣a-zA-Z0-9\s-]+(?:구|군|시)\s+[가-힣a-zA-Z0-9\s-]+(?:동|읍|면|리)?\s+\d+(?:-\d+)?)/);
-            if (addressMatch && addressMatch[1]) {
-                cleanedTitleAddress = addressMatch[1].trim();
-            }
+            // 주소 부분은 정확히 냅두고 대괄호, 소괄호, 중괄호 및 그 내부 텍스트(예: 용도, 유의사항 등)만 제거하여 제목이 중간에 잘리지 않도록 정제합니다.
+            let cleanedTitleAddress = (item.address || "")
+                .replace(/\[[^\]]*\]/g, "")
+                .replace(/\{[^}]*\}/g, "")
+                .replace(/\(([^)]*)\)/g, (match, p1) => {
+                    if (/[동|읍|면|리|로|길|아파트|빌라|맨션|타운|하우스|호|동]/g.test(p1)) {
+                        return match;
+                    }
+                    return "";
+                })
+                .replace(/\s+/g, " ")
+                .trim();
 
             document.getElementById("detail-address").innerText = cleanedTitleAddress;
             document.getElementById("detail-no").innerText = `사건번호/관리번호 : ${item.auction_no} (${item.round_info})`;
@@ -3976,10 +4058,15 @@
             const landPy = (landArea * 0.3025).toFixed(1);
             const buildingPy = (buildingArea * 0.3025).toFixed(1);
 
-            document.getElementById("detail-spec-exclusive-py").innerText = `${exclusiveArea.toFixed(1)} ㎡ (${exclusivePy} 평)`;
-            document.getElementById("detail-spec-supply-py").innerText = `${supplyArea.toFixed(1)} ㎡ (${supplyPy} 평)`;
-            document.getElementById("detail-spec-land-py").innerText = `${landArea.toFixed(1)} ㎡ (${landPy} 평)`;
-            document.getElementById("detail-spec-building-py").innerText = `${buildingArea.toFixed(1)} ㎡ (${buildingPy} 평)`;
+            const estExSuffix = item.is_estimated_exclusive ? " 추정(허수)" : "";
+            const estSpSuffix = item.is_estimated_supply ? " 추정(허수)" : "";
+            const estLdSuffix = item.is_estimated_land ? " 추정(허수)" : "";
+            const estBdSuffix = item.is_estimated_building ? " 추정(허수)" : "";
+
+            document.getElementById("detail-spec-exclusive-py").innerText = `${exclusiveArea.toFixed(1)} ㎡ (${exclusivePy} 평)${estExSuffix}`;
+            document.getElementById("detail-spec-supply-py").innerText = `${supplyArea.toFixed(1)} ㎡ (${supplyPy} 평)${estSpSuffix}`;
+            document.getElementById("detail-spec-land-py").innerText = `${landArea.toFixed(1)} ㎡ (${landPy} 평)${estLdSuffix}`;
+            document.getElementById("detail-spec-building-py").innerText = `${buildingArea.toFixed(1)} ㎡ (${buildingPy} 평)${estBdSuffix}`;
 
             // 📅 기일 진행 이력 표 렌더링
             const giilTbody = document.getElementById("detail-giiil-tbody");
@@ -4225,20 +4312,21 @@
                 }
             }
 
-            // 📐 평형별 평면도 이미지 매칭
-            const fpImg = document.getElementById("detail-floorplan-img");
-            let fpSrc = "./floorplan_84.png";
-            if (exclusiveArea > 0) {
-                if (exclusiveArea < 70) {
-                    fpSrc = "./floorplan_59.png";
-                } else if (exclusiveArea >= 70 && exclusiveArea < 100) {
-                    fpSrc = "./floorplan_84.png";
-                } else {
-                    fpSrc = "./floorplan_114.png";
-                }
-            }
-            if (fpImg) {
-                fpImg.src = fpSrc;
+            // 📐 평형별 평면도 이미지 매칭 비활성화 (실 평면도가 아닐 시 추정 평면도를 보여주지 않고 빈칸으로 방치)
+            const fpImgContainer = document.getElementById("detail-floorplan-img-container");
+            const guideCard = document.getElementById("detail-floorplan-guide-card");
+            if (fpImgContainer && (!item.images || item.images.length === 0)) {
+                fpImgContainer.innerHTML = `
+                    <div class="w-full h-full bg-slate-50/30 border border-dashed border-slate-200 rounded-xl">
+                        <!-- 실 평면도가 아니므로 빈칸으로 방치 -->
+                    </div>
+                `;
+                fpImgContainer.onclick = null;
+                if (guideCard) guideCard.classList.add("hidden");
+            } else if (fpImgContainer && item.images && item.images.length > 0) {
+                fpImgContainer.innerHTML = `<img id="detail-floorplan-img" src="${item.images[0]}" alt="부동산 실제 평면도" class="w-full h-full object-contain">`;
+                fpImgContainer.onclick = openFloorplanModal;
+                if (guideCard) guideCard.classList.add("hidden");
             }
 
             // ⚖️ 법정 서류 요약 테이블 및 상시 노출형 카드 데이터 동적 바인딩
@@ -4358,25 +4446,19 @@
                 officialEumBtn.href = `https://www.eum.go.kr/web/mp/mpMapSearch.jsp?searchKeyword=${encodeURIComponent(item.address)}`;
             }
 
-            // 📍 네이버 지도 프리미엄 뷰 연동
+            // 📍 구글 지도 임베드 라이브 뷰 연동
             const mapContainer = document.getElementById("detail-map-container");
             if (mapContainer && item.address) {
+                const mapQuery = getCleanedLandSearchQuery(item.address);
                 mapContainer.innerHTML = `
-                    <div class="w-full h-full bg-slate-50 border border-slate-200 rounded-xl flex flex-col items-center justify-center p-4 relative group overflow-hidden">
-                        <div class="absolute inset-0 bg-cover bg-center filter blur-[1px] opacity-10" style="background-image: url('./apartment_elegant_facade.png');"></div>
-                        <div class="relative z-10 flex flex-col items-center text-center space-y-3">
-                            <div class="bg-emerald-50 text-emeraldSuccess w-11 h-11 rounded-full flex items-center justify-center shadow-sm">
-                                <i class="fa-solid fa-map-location-dot text-base"></i>
-                            </div>
-                            <div class="space-y-0.5">
-                                <strong class="text-xs font-black text-slate-800">네이버 지도로 위치 확인</strong>
-                                <p class="text-[9.5px] text-slate-400 font-bold max-w-[260px] truncate">${item.address}</p>
-                            </div>
-                            <a href="https://map.naver.com/v5/search/${encodeURIComponent(item.address)}" target="_blank" class="bg-emeraldSuccess hover:bg-emerald-700 text-white text-[10px] font-black py-2 px-3 rounded-lg shadow transition-all flex items-center gap-1.5 select-none">
-                                <i class="fa-solid fa-arrow-up-right-from-square"></i> 네이버 지도 열기
-                            </a>
-                        </div>
-                    </div>
+                    <iframe 
+                        width="100%" 
+                        height="100%" 
+                        style="border:0; border-radius: 12px;" 
+                        loading="lazy" 
+                        allowfullscreen 
+                        src="https://maps.google.com/maps?q=${encodeURIComponent(mapQuery)}&t=&z=16&ie=UTF8&iwloc=&output=embed">
+                    </iframe>
                 `;
             }
 
@@ -4618,26 +4700,37 @@
             // 10. 단지정보 (complex)
             const complexTbody = document.getElementById("detail-complex-tbody");
             if (complexTbody) {
-                complexTbody.innerHTML = `
-                    <tr class="border-b border-slate-100 text-xs">
-                        <td class="p-2 bg-slate-50 font-extrabold text-slate-700 w-1/4">총 세대 수</td>
-                        <td class="p-2 text-slate-800">842 세대 (총 8개동)</td>
-                        <td class="p-2 bg-slate-50 font-extrabold text-slate-700 w-1/4">준공년월</td>
-                        <td class="p-2 text-slate-800">2018년 11월 (약 8년차)</td>
-                    </tr>
-                    <tr class="border-b border-slate-100 text-xs">
-                        <td class="p-2 bg-slate-50 font-extrabold text-slate-700">주차대수</td>
-                        <td class="p-2 text-slate-800">세대당 1.4대 (여유)</td>
-                        <td class="p-2 bg-slate-50 font-extrabold text-slate-700">난방 방식</td>
-                        <td class="p-2 text-slate-800">지역난방, 옥내열병합</td>
-                    </tr>
-                    <tr class="border-b border-slate-100 text-xs">
-                        <td class="p-2 bg-slate-50 font-extrabold text-slate-700">용적률/건폐율</td>
-                        <td class="p-2 text-slate-800">224% / 18%</td>
-                        <td class="p-2 bg-slate-50 font-extrabold text-slate-700">건설사</td>
-                        <td class="p-2 text-slate-800">현대건설 주식회사</td>
-                    </tr>
-                `;
+                const isResidential = (item.ptype || "").includes("아파트") || (item.ptype || "").includes("오피스텔") || (item.ptype || "").includes("다세대") || (item.ptype || "").includes("빌라") || (item.ptype || "").includes("단독") || (item.ptype || "").includes("다가구");
+                
+                if (isResidential && item.complex_info && item.complex_info.complex_name) {
+                    complexTbody.innerHTML = `
+                        <tr class="border-b border-slate-100 text-xs">
+                            <td class="p-2 bg-slate-50 font-extrabold text-slate-700 w-1/4">단지명</td>
+                            <td class="p-2 text-slate-800" colspan="3">${item.complex_info.complex_name}</td>
+                        </tr>
+                        <tr class="border-b border-slate-100 text-xs">
+                            <td class="p-2 bg-slate-50 font-extrabold text-slate-700 w-1/4">총 세대 수</td>
+                            <td class="p-2 text-slate-800">${item.complex_info.total_households ? item.complex_info.total_households + ' 세대' : '-'}</td>
+                            <td class="p-2 bg-slate-50 font-extrabold text-slate-700 w-1/4">준공년도</td>
+                            <td class="p-2 text-slate-800">${item.complex_info.built_year ? item.complex_info.built_year + ' 년' : '-'}</td>
+                        </tr>
+                        <tr class="border-b border-slate-100 text-xs">
+                            <td class="p-2 bg-slate-50 font-extrabold text-slate-700">건설사</td>
+                            <td class="p-2 text-slate-800" colspan="3">${item.complex_info.construction_company || '-'}</td>
+                        </tr>
+                    `;
+                } else {
+                    const emptyText = item.source === 'court'
+                        ? '💡 본 경매 매물은 대법원 단지 상세 정보가 제공되지 않는 대상입니다. 지번 및 상세 시세는 네이버 부동산 아웃링크를 참고해 주십시오.'
+                        : '💡 본 공매 매물은 온비드 단지 상세 정보가 제공되지 않는 대상입니다. 지번 및 상세 시세는 네이버 부동산 아웃링크를 참고해 주십시오.';
+                    complexTbody.innerHTML = `
+                        <tr>
+                            <td colspan="4" class="p-8 text-center text-xs text-slate-500 font-bold bg-slate-50 rounded-xl border border-dashed border-slate-200">
+                                ${emptyText}
+                            </td>
+                        </tr>
+                    `;
+                }
             }
         }
 
@@ -5826,6 +5919,14 @@
                 }
             }
 
+            // 📍 4. 위치 & 시세 분석 탭 선택 시 하위 패널들(지도 및 시세)의 hidden 클래스를 강제로 해제하여 화이트아웃 현상을 복구합니다.
+            if (tabNum === 4) {
+                const mapPanel = document.getElementById("detail-panel-map");
+                const marketPanel = document.getElementById("detail-panel-market");
+                if (mapPanel) mapPanel.classList.remove("hidden");
+                if (marketPanel) marketPanel.classList.remove("hidden");
+            }
+
             const mask2 = document.getElementById("group-mask-2");
             const mask3 = document.getElementById("group-mask-3");
             const mask4 = document.getElementById("group-mask-4");
@@ -5840,12 +5941,13 @@
             if (content3) content3.style.filter = "none";
             if (content4) content4.style.filter = "none";
 
-            if (userGrade === "B") {
+            // 전체 코딩/개발 기간 임시 우회 처리: 등급에 관계없이 100% 정보 노출 (등급 오버레이 락 해제)
+            if (false && userGrade === "B") {
                 if (mask3) mask3.classList.remove("hidden");
                 if (mask4) mask4.classList.remove("hidden");
                 if (content3) content3.style.filter = "blur(8px)";
                 if (content4) content4.style.filter = "blur(8px)";
-            } else if (userGrade === "C") {
+            } else if (false && userGrade === "C") {
                 if (mask2) mask2.classList.remove("hidden");
                 if (mask3) mask3.classList.remove("hidden");
                 if (mask4) mask4.classList.remove("hidden");

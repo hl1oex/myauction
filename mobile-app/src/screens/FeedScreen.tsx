@@ -20,6 +20,34 @@ import { subscribeProperties, fetchProperties, fetchSyncStatus } from '../utils/
 import { supabase } from '../utils/supabase';
 
 
+const estimateAuctionRounds = (appraisal: number, price: number, source: string) => {
+  if (!appraisal || !price || appraisal <= 0 || price <= 0) {
+    return { round: 1, failedCount: 0, discount: 0 };
+  }
+  const discount = Math.round(((appraisal - price) / appraisal) * 100);
+  const ratio = price / appraisal;
+  let failedCount = 0;
+  
+  if (source === 'court') {
+    if (ratio >= 0.95) failedCount = 0;
+    else if (ratio >= 0.75) failedCount = 1;
+    else if (ratio >= 0.55) failedCount = 2;
+    else if (ratio >= 0.40) failedCount = 3;
+    else failedCount = 4;
+  } else {
+    if (ratio >= 0.95) failedCount = 0;
+    else if (ratio >= 0.85) failedCount = 1;
+    else if (ratio >= 0.75) failedCount = 2;
+    else if (ratio >= 0.65) failedCount = 3;
+    else failedCount = 4;
+  }
+  return {
+    round: failedCount + 1,
+    failedCount: failedCount,
+    discount: discount < 0 ? 0 : discount
+  };
+};
+
 const FULL_REGIONS: Record<string, string[]> = {
   "서울": ["강남구", "강동구", "강북구", "강서구", "관악구", "광진구", "구로구", "금천구", "노원구", "도봉구", "동대문구", "동작구", "마포구", "서대문구", "서초구", "성동구", "성북구", "송파구", "양천구", "영등포구", "용산구", "은평구", "종로구", "중구", "중랑구"],
   "부산": ["강서구", "금정구", "기장군", "남구", "동구", "동래구", "부산진구", "북구", "사상구", "사하구", "서구", "수영구", "연제구", "영도구", "중구", "해운대구"],
@@ -120,6 +148,8 @@ interface FeedScreenProps {
 export const FeedScreen: React.FC<FeedScreenProps> = ({ onSelectProperty, filters, setFilters }) => {
   const [properties, setProperties] = useState<Property[]>([]);
   const [filteredProperties, setFilteredProperties] = useState<Property[]>([]);
+  const [sortKey, setSortKey] = useState<string>('score');
+  const [sortDir, setSortDir] = useState<'asc' | 'desc'>('desc');
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const [showFilterPanel, setShowFilterPanel] = useState<boolean>(false);
@@ -347,7 +377,13 @@ export const FeedScreen: React.FC<FeedScreenProps> = ({ onSelectProperty, filter
     // 0. 자산 공급 출처 다중 필터링
     if (filters.source && filters.source.length > 0) {
       result = result.filter((item) => {
-        return filters.source.includes(item.source as any);
+        if (filters.source.includes(item.source as any)) {
+          return true;
+        }
+        if (filters.source.includes('onbid' as any) && item.source === 'onbid_etc') {
+          return true;
+        }
+        return false;
       });
     } else {
       // 선택된 출처가 하나도 없으면 아무것도 보여주지 않습니다.
@@ -366,13 +402,16 @@ export const FeedScreen: React.FC<FeedScreenProps> = ({ onSelectProperty, filter
           if (pt === 'store') return type.includes('상가') || type.includes('점포') || type.includes('근린') || type.includes('근생') || type.includes('생활시설') || type.includes('상업') || type.includes('빌딩') || type.includes('사무실');
           if (pt === 'land') return type.includes('토지') || type.includes('임야') || type.includes('대지') || type.includes('잡종지') || type.includes('대') || type.includes('전') || type.includes('답');
           if (pt === 'factory') return type.includes('공장') || type.includes('창고') || type.includes('산업');
+          if (pt === 'vehicle') return type.includes('차량') || type.includes('운송') || type.includes('자동차') || type.includes('선박') || type.includes('항공기') || type.includes('중기');
+          if (pt === 'security') return type.includes('유가증권') || type.includes('주식') || type.includes('채권') || type.includes('지분') || type.includes('증권');
+          if (pt === 'machinery') return type.includes('기계') || (type.includes('장비') && !type.includes('운송장비')) || type.includes('기구') || type.includes('설비');
+          if (pt === 'etc_goods') return type.includes('물품') || type.includes('기타물품') || type.includes('동산') || type.includes('기타동산') || item.source === 'onbid_etc';
           return false;
         });
       });
     } else {
       result = [];
     }
-
     // 2. 시도 및 시군구 지역 필터링
     if (filters.sido && filters.sido.length > 0) {
       result = result.filter((item) => {
@@ -450,15 +489,43 @@ export const FeedScreen: React.FC<FeedScreenProps> = ({ onSelectProperty, filter
       });
     }
 
+    // 9. 정렬 기준 적용 (단일 필드 양방향 정렬)
+    result.sort((a, b) => {
+      let valA: any = 0;
+      let valB: any = 0;
+
+      if (sortKey === 'score') {
+        valA = typeof a.score === 'number' ? a.score : (a.score ? Number(a.score) : 0);
+        valB = typeof b.score === 'number' ? b.score : (b.score ? Number(b.score) : 0);
+      } else if (sortKey === 'date') {
+        valA = typeof a.remaining_days === 'number' ? a.remaining_days : (a.remaining_days !== undefined && a.remaining_days !== null ? Number(a.remaining_days) : 9999);
+        valB = typeof b.remaining_days === 'number' ? b.remaining_days : (b.remaining_days !== undefined && b.remaining_days !== null ? Number(b.remaining_days) : 9999);
+      } else if (sortKey === 'price') {
+        valA = typeof a.minimum_bid === 'number' ? a.minimum_bid : (a.minimum_bid ? Number(a.minimum_bid) : 0);
+        valB = typeof b.minimum_bid === 'number' ? b.minimum_bid : (b.minimum_bid ? Number(b.minimum_bid) : 0);
+      } else if (sortKey === 'discount') {
+        valA = estimateAuctionRounds(a.appraised_value, a.minimum_bid, a.source).discount;
+        valB = estimateAuctionRounds(b.appraised_value, b.minimum_bid, b.source).discount;
+      } else if (sortKey === 'failed') {
+        valA = estimateAuctionRounds(a.appraised_value, a.minimum_bid, a.source).failedCount;
+        valB = estimateAuctionRounds(b.appraised_value, b.minimum_bid, b.source).failedCount;
+      }
+
+      if (valA !== valB) {
+        return sortDir === 'asc' ? valA - valB : valB - valA;
+      }
+      return (b.score || 0) - (a.score || 0);
+    });
+
     setFilteredProperties(result);
-  }, [properties, filters]);
+  }, [properties, filters, sortKey, sortDir]);
 
   // 필터 초기화 함수입니다.
   const handleResetFilters = () => {
     setFilters({
       search: '',
       source: ['court', 'onbid', 'private'],
-      ptype: ['apart', 'officetel', 'villa', 'house', 'store', 'land', 'factory'],
+      ptype: ['apart', 'officetel', 'villa', 'house', 'store', 'land', 'factory', 'vehicle', 'security', 'machinery', 'etc_goods'],
       sido: [],
       sigungu: 'all',
       dateLimit: 999,
@@ -686,7 +753,7 @@ export const FeedScreen: React.FC<FeedScreenProps> = ({ onSelectProperty, filter
                 {activeFilterTab === 'ptype' && (
                   <View style={styles.tabContent}>
                     <View style={styles.selectionActions}>
-                      <TouchableOpacity onPress={() => setFilters(prev => ({ ...prev, ptype: ['apart', 'officetel', 'villa', 'house', 'store', 'land', 'factory'] }))}>
+                      <TouchableOpacity onPress={() => setFilters(prev => ({ ...prev, ptype: ['apart', 'officetel', 'villa', 'house', 'store', 'land', 'factory', 'vehicle', 'security', 'machinery', 'etc_goods'] }))}>
                         <Text style={styles.actionText}>전체 선택</Text>
                       </TouchableOpacity>
                       <Text style={styles.actionDivider}>|</Text>
@@ -704,6 +771,10 @@ export const FeedScreen: React.FC<FeedScreenProps> = ({ onSelectProperty, filter
                         { value: 'store', label: '상가/점포' },
                         { value: 'land', label: '토지/임야' },
                         { value: 'factory', label: '공장/창고' },
+                        { value: 'vehicle', label: '차량/운송장비' },
+                        { value: 'security', label: '유가증권' },
+                        { value: 'machinery', label: '기계장비' },
+                        { value: 'etc_goods', label: '기타물품' },
                       ].map((item) => {
                         const isSelected = filters.ptype.includes(item.value as any);
                         return (
@@ -931,6 +1002,40 @@ export const FeedScreen: React.FC<FeedScreenProps> = ({ onSelectProperty, filter
           </View>
         </View>
 
+        {/* 정렬 칩 바 */}
+        <View style={styles.sortContainer}>
+          <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.sortScrollContent}>
+            {[
+              { key: 'score', label: '✨ 점수순' },
+              { key: 'date', label: '📅 기일순' },
+              { key: 'price', label: '💰 금액순' },
+              { key: 'discount', label: '📉 저감율순' },
+              { key: 'failed', label: '🔄 유찰순' },
+            ].map((item) => {
+              const isActive = sortKey === item.key;
+              const arrow = sortDir === 'asc' ? ' ▲' : ' ▼';
+              return (
+                <TouchableOpacity
+                  key={item.key}
+                  style={[styles.sortChip, isActive && styles.sortChipActive]}
+                  onPress={() => {
+                    if (sortKey === item.key) {
+                      setSortDir((prev) => (prev === 'desc' ? 'asc' : 'desc'));
+                    } else {
+                      setSortKey(item.key);
+                      setSortDir(item.key === 'date' ? 'asc' : 'desc');
+                    }
+                  }}
+                >
+                  <Text style={[styles.sortChipText, isActive && styles.sortChipTextActive]}>
+                    {item.label}{isActive ? arrow : ''}
+                  </Text>
+                </TouchableOpacity>
+              );
+            })}
+          </ScrollView>
+        </View>
+
         {/* 메인 리스트 피드 영역 */}
         {loading ? (
           <View style={styles.centerContainer}>
@@ -1019,6 +1124,42 @@ export const FeedScreen: React.FC<FeedScreenProps> = ({ onSelectProperty, filter
 };
 
 const styles = StyleSheet.create({
+  sortContainer: {
+    marginVertical: 10,
+    backgroundColor: 'transparent',
+  },
+  sortScrollContent: {
+    paddingHorizontal: 2,
+    alignItems: 'center',
+    gap: 8,
+  },
+  sortChip: {
+    backgroundColor: '#ffffff',
+    borderWidth: 1,
+    borderColor: '#e2e8f0',
+    borderRadius: 20,
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    flexDirection: 'row',
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.05,
+    shadowRadius: 2,
+    elevation: 1,
+  },
+  sortChipActive: {
+    backgroundColor: COLORS.royalBlue,
+    borderColor: COLORS.royalBlue,
+  },
+  sortChipText: {
+    color: '#475569',
+    fontSize: 13,
+    fontWeight: 'bold',
+  },
+  sortChipTextActive: {
+    color: '#ffffff',
+  },
   safeArea: {
     flex: 1,
     backgroundColor: COLORS.pearlWhiteBg,

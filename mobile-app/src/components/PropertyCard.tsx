@@ -65,7 +65,7 @@ export const PropertyCard: React.FC<PropertyCardProps> = ({ property, onPress, i
   const isResidence = isResidential;
 
   const gradeStyle = getGradeStyle(property.grade);
-  const sourceLabel = property.source === 'court' ? '⚖️ 법원경매' : property.source === 'onbid' ? '🏢 캠코공매' : '📁 사설';
+  const sourceLabel = property.source === 'court' ? (property.is_lease ? '⚖️ 법원임대' : '⚖️ 법원경매') : property.source === 'onbid' ? (property.is_lease ? '🏢 캠코임대' : '🏢 캠코공매') : property.source === 'onbid_etc' ? '🏢 온비드자산' : '📁 사설';
 
   return (
     <TouchableOpacity style={styles.card} onPress={onPress} activeOpacity={0.85}>
@@ -86,12 +86,24 @@ export const PropertyCard: React.FC<PropertyCardProps> = ({ property, onPress, i
       </View>
 
       {/* 주소 및 물건 종류 정보 */}
-      <Text style={styles.address} numberOfLines={2}>{property.address}</Text>
+      <Text style={styles.address} numberOfLines={2}>
+        {property.is_lease ? (
+          <Text style={{ color: '#d97706', fontWeight: 'bold' }}>[임대] </Text>
+        ) : null}
+        {property.address}
+      </Text>
       
       <View style={styles.tagContainer}>
         {property.ptype ? (
           <View style={styles.ptypeBadge}>
             <Text style={styles.ptypeText}>{property.ptype}</Text>
+          </View>
+        ) : null}
+        {property.exclusive_area ? (
+          <View style={styles.areaBadge}>
+            <Text style={styles.areaText}>
+              {(property.exclusive_area).toFixed(1)}㎡ ({((property.exclusive_area) * 0.3025).toFixed(1)}평)
+            </Text>
           </View>
         ) : null}
         <View style={[styles.scoreBadge, { backgroundColor: property.score >= 80 ? COLORS.emeraldLight : COLORS.slate100 }]}>
@@ -304,5 +316,20 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: 'bold',
     color: '#1d4ed8',
+  },
+  areaBadge: {
+    backgroundColor: '#eff6ff',
+    borderColor: '#dbeafe',
+    borderWidth: 1,
+    paddingHorizontal: 8,
+    paddingVertical: 3,
+    borderRadius: 6,
+    marginRight: 6,
+    marginBottom: 4,
+  },
+  areaText: {
+    fontSize: 14,
+    fontWeight: 'bold',
+    color: COLORS.royalBlue,
   },
 });

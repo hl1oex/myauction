@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+# 한국자산관리공사 온비드 공매 물건 수집 및 클라우드 Supabase DB 연동 모듈입니다.
 import os
 import json
 import requests
@@ -7,9 +9,73 @@ import time
 import sqlite3
 import urllib.parse
 import random
+from bs4 import BeautifulSoup
 
 # SQLite 인메모리 데이터베이스를 활용하여 로컬 I/O 생성을 완전히 차단합니다.
 DB_PATH = ":memory:"
+
+def scrape_onbid_web_details(url, is_lease):
+    """온비드 공식 상세페이지 웹사이트를 직접 크롤링하여 실사진 목록 및 임대방식 등의 상세 정보를 추출합니다."""
+    headers = {
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/110.0.0.0 Safari/537.36",
+        "Referer": "https://www.onbid.co.kr/op/cltrpbancinf/toppagemng/unfsrch/UnfSrchController/mvmnUnfSrchClg.do"
+    }
+    result = {
+        "images": [],
+        "ptype_detail": None,
+        "bid_method": None,
+        "lease_method": None,
+        "lease_term": None,
+        "round": None,
+        "failed_count": None,
+        "success": False
+    }
+    try:
+        # API 및 웹 서버 과부하 방지 딜레이 적용
+        time.sleep(0.3 + random.random() * 0.3)
+        res = requests.get(url, headers=headers, timeout=12)
+        if res.status_code == 200:
+            soup = BeautifulSoup(res.text, "html.parser")
+            
+            # 1. 실제 물건 사진 이미지 URL 목록 파싱
+            images = []
+            for img in soup.find_all("img"):
+                src = img.get("src", "")
+                if "dnldImgFile.do" in src or "FileMngPrcsController" in src:
+                    full_url = src
+                    if not src.startswith("http"):
+                        full_url = "https://www.onbid.co.kr" + src
+                    if full_url not in images:
+                        images.append(full_url)
+            result["images"] = images
+            
+            # 2. 동적 텍스트 매칭 기반 상세 명세 파싱
+            def get_val(label_text):
+                for span in soup.find_all(class_=["tit01", "tit02"]):
+                    if label_text in span.text:
+                        parent = span.find_parent(class_=["tit_box", "tit_box01", "tit_box02"])
+                        if parent:
+                            sibling = parent.find_next_sibling(class_="txt_box01")
+                            if sibling:
+                                return sibling.text.strip().replace("\n", " ").replace("  ", " ")
+                        item = span.find_parent(class_="item")
+                        if item:
+                            val_box = item.find(class_="txt_box01")
+                            if val_box:
+                                return val_box.text.strip().replace("\n", " ").replace("  ", " ")
+                return None
+                
+            result["ptype_detail"] = get_val("재산유형")
+            result["bid_method"] = get_val("입찰방식")
+            result["lease_method"] = get_val("임대방식")
+            result["lease_term"] = get_val("임대기간")
+            result["round"] = get_val("회차")
+            result["failed_count"] = get_val("유찰횟수")
+            result["success"] = True
+    except Exception as e:
+        print(f"[-] Web scraping details failed for {url} with error {e}")
+    return result
+
 
 def init_db(conn):
     """메모리 내에 경매 및 공매 물건 테이블 구조를 동적으로 구축합니다."""
@@ -293,69 +359,292 @@ def log_sync_status(conn, status, count, error_msg=""):
     except Exception as e:
         print(f"Error logging sync status: {e}")
 
-def generate_simulated_onbid_data():
-    """공공데이터 API 실패 시 고품질의 캠코 온비드 공매 시뮬레이션 데이터를 충분히 공급하는 방어 엔진"""
-    properties = []
+# 모의 데이터 생성 함수가 완전히 제거되었습니다.
+
+
+
+def fetch_onbid_api_details(service_key, cltr_mng_no, pbct_cdtn_no, asset_type='rlst'):
+    """온비드 차세대 부동산/차량/동산 물건상세조회 오픈 API를 호출하여 정밀한 실사진 및 임대조건 정보를 가져옵니다."""
+    if asset_type == 'car':
+        url = "http://apis.data.go.kr/B010003/OnbidCarDtlSrvc2/getCarDtlInf2"
+    elif asset_type == 'mvast':
+        url = "http://apis.data.go.kr/B010003/OnbidMvastDtlSrvc2/getMvastDtlInf2"
+    else:
+        url = "http://apis.data.go.kr/B010003/OnbidRlstDtlSrvc2/getRlstDtlInf2"
+        
+    result = {
+        "images": [],
+        "ptype_detail": None,
+        "lease_method": None,
+        "lease_term": None,
+        "round": None,
+        "failed_count": None,
+        "desc_detail": None,
+        "success": False
+    }
     
-    regions = [
-        ("서울특별시 강남구 역삼동 702", "아파트", 1600000000, "A", 95, "강남 초역세권 대단지 아파트입니다. 명도 난이도 최하."),
-        ("경기도 성남시 분당구 삼평동 650", "아파트", 1200000000, "A", 92, "판교역 도보 5분 거리 아파트. 학군 우수, 권리관계 무결."),
-        ("인천광역시 연수구 송도동 10-5", "오피스텔", 450000000, "B", 85, "송도국제도시 중심상업지구 오피스텔. 임차 수요 풍부."),
-        ("부산광역시 해운대구 우동 1402", "아파트", 2100000000, "A", 96, "해운대 오션뷰 고급 주거시설. 자산 가치 최상급."),
-        ("서울특별시 송파구 잠실동 35-2", "아파트", 1800000000, "A", 94, "잠실 대단지 아파트. 재건축 호재 및 인프라 극상."),
-        ("경기도 수원시 영통구 이의동 1320", "상가", 750000000, "B", 82, "광교신도시 중심가 대형 프라자 상가 1층 점포입니다."),
-        ("서울특별시 마포구 도화동 32-1", "오피스텔", 380000000, "A", 90, "공덕역 역세권 직주근접 최고 인기 소형 오피스텔."),
-        ("대전광역시 유성구 봉명동 1010", "상가", 620000000, "C", 78, "충남대 대학가 메인 로드숍 점포. 유동인구 우수."),
-        ("세종특별자치시 나성동 204", "아파트", 800000000, "A", 91, "세종 행정중심복합도시 중심 주거단지. 상태 우수."),
-        ("대구광역시 수성구 범어동 180", "아파트", 1100000000, "A", 93, "범어역 초역세권 대치동급 최고 명문 학군지 단지."),
-        ("경기도 고양시 일산동구 마두동 502", "아파트", 650000000, "B", 88, "일산 호수공원 인접 쾌적한 주거 인프라 대단지."),
-        ("인천광역시 부평구 부평동 24-1", "오피스텔", 280000000, "B", 81, "부평역 더블역세권 빌트인 풀옵션 투룸형 오피스텔."),
-        ("부산광역시 수영구 광안동 90", "아파트", 1350000000, "A", 93, "광안대교 영구 조망권 프리미엄 재건축 유망 단지."),
-        ("울산광역시 남구 신정동 110", "아파트", 550000000, "B", 84, "울산대공원 도보 생활권 친환경 고품격 거주 환경."),
-        ("강원도 원주시 무실동 88", "아파트", 400000000, "B", 86, "원주 시청 인접 최고 신축 단지. 명도 인수금 없음."),
-        ("서울특별시 서초구 서초동 1300", "오피스텔", 520000000, "A", 94, "서초역 역세권 풀옵션 명품 오피스텔. 임차 수요 확실."),
-        ("경기도 용인시 기흥구 구갈동 220", "아파트", 480000000, "B", 85, "기흥역 도보 3분 역세권 단지. 내부 올수리 완료."),
-        ("충청남도 천안시 서북구 불당동 400", "상가", 350000000, "C", 76, "불당 신도시 학원가 상업용지 3층. 임대수익률 우수.")
-    ]
+    try:
+        params = {
+            "serviceKey": service_key,
+            "pageNo": "1",
+            "numOfRows": "10",
+            "resultType": "json",
+            "cltrMngNo": cltr_mng_no
+        }
+        if pbct_cdtn_no:
+            params["pbctCdtnNo"] = pbct_cdtn_no
+            
+        res = None
+        for attempt in range(3):
+            try:
+                time.sleep(0.2 + attempt * 0.3 + random.random() * 0.2)
+                res = requests.get(url, params=params, timeout=10)
+                if res.status_code == 200:
+                    break
+            except Exception as conn_err:
+                if attempt == 2:
+                    raise conn_err
+                print(f"[*] API 상세조회 접속 재시도 중 (시도 {attempt + 1}/3)오류: {conn_err}")
+                
+        if res and res.status_code == 200:
+            data = res.json()
+            if "response" in data:
+                data = data["response"]
+            header = data.get("header", {})
+            if header.get("resultCode") == "00":
+                body = data.get("body", {})
+                items = body.get("items", {})
+                if items:
+                    item_list = items.get("item", [])
+                    if isinstance(item_list, dict):
+                        item_list = [item_list]
+                    if item_list:
+                        dtl = item_list[0]
+                        images = []
+                        img_list = dtl.get("upsCltrImgUrlList") or dtl.get("cltrImgUrlList") or dtl.get("imgUrlList") or []
+                        if isinstance(img_list, dict):
+                            img_list = [img_list]
+                        for img_item in img_list:
+                            url_val = img_item.get("upsCltrImgUrl") or img_item.get("cltrImgUrl") or img_item.get("imgUrl") or img_item.get("fileUrl")
+                            if url_val:
+                                images.append(url_val)
+                        result["images"] = images
+                        result["ptype_detail"] = dtl.get("cltrUsgSclsCtgrNm") or dtl.get("prptDivNm")
+                        result["bid_method"] = dtl.get("bidMtdNm")
+                        result["lease_method"] = dtl.get("leaseMtdNm") or dtl.get("dpslDvsNm")
+                        result["lease_term"] = dtl.get("leaseTerm")
+                        result["round"] = dtl.get("pbctNo")
+                        result["failed_count"] = dtl.get("fldCnt") or dtl.get("failedCount")
+                        result["desc_detail"] = dtl.get("onbidCltrNm") or dtl.get("cltrNm")
+                        result["success"] = True
+    except Exception as e:
+        print(f"[-] Onbid API details failed for {cltr_mng_no} with error {e}")
+    return result
+
+def process_single_item(raw_info, service_key):
+    """단일 온비드 매물 아이템의 상세 정보를 OpenAPI 또는 웹 스크래핑으로 수집하여 가공합니다."""
+    item = raw_info["item"]
+    asset_type = raw_info["asset_type"]
+    dpsl_cd = raw_info["dpsl_cd"]
     
-    # 85건의 풍부한 시뮬레이션 공매 데이터 생성
-    for i in range(85):
-        base = regions[i % len(regions)]
-        address = base[0] + f" {101 + i}호"
-        ptype = base[1]
-        appraised = int(base[2] + (i * 7000000))
-        minimum = int(appraised * 0.8) if i % 2 == 0 else int(appraised * 0.7)
-        grade = base[3]
-        score = int(base[4] - (i % 4))
-        desc = base[5]
+    cltr_area_text = ""
+    land_area_text = ""
+    bdng_area_text = ""
+    
+    if isinstance(item, ET.Element):
+        cltr_no = item.findtext("cltrMngNo") or ""
+        if not cltr_no:
+            return None
+        address = item.findtext("lnmAdr") or item.findtext("roadAdr") or item.findtext("onbidCltrNm") or "--"
+        price = safe_int(item.findtext("lowstBidPrcIndctCont") or item.findtext("cltrMnprPrc") or 0)
+        appraisal = safe_int(item.findtext("apslEvlAmt") or item.findtext("dpslMnprPrc") or 0)
+        ptype = item.findtext("cltrUsgSclsCtgrNm") or item.findtext("prptDivNm") or "--"
+        close_date_raw = item.findtext("cltrBidEndDt") or item.findtext("pbctClsDtm") or ""
+        desc = item.findtext("onbidCltrNm") or ""
+        notes = item.findtext("pbctCdtnNo") or ""
         
-        # 기일 생성 (D-3 ~ D-60)
-        rem_days = 3 + (i * 3) % 55
-        close_date = (datetime.date.today() + datetime.timedelta(days=rem_days)).strftime("%Y-%m-%d")
+        cltr_area_text = item.findtext("cltrArea") or item.findtext("sqmsArea") or ""
+        land_area_text = item.findtext("landSqmsArea") or ""
+        bdng_area_text = item.findtext("bdngSqmsArea") or ""
         
-        properties.append({
-            "source": "onbid",
-            "auction_no": f"2026-{10000 + i:05d}-001",
-            "address": address,
-            "appraised_value": appraised,
-            "minimum_bid": minimum,
-            "ptype": ptype,
-            "bidding_date": close_date,
-            "round_info": f"{1 + (i % 3)}회차 인터넷입찰",
-            "desc_content": desc,
-            "notes_content": "공매 권리관계 무결성 정밀 분석 완료. 낙찰 시 인수금액 및 추가 등기 하자 전혀 없음.",
-            "link_url": "https://www.onbid.co.kr",
-            "grade": grade,
-            "score": score,
-            "remaining_days": rem_days
-        })
+        onbid_cltr_no = item.findtext("onbidCltrno") or ""
+        pbct_no = item.findtext("pbctNo") or ""
+        pbct_cdtn_no = item.findtext("pbctCdtnNo") or ""
+        prpt_div_cd = item.findtext("prptDivCd") or ""
+        onbid_pbanc_no = item.findtext("onbidPbancNo") or ""
+    else:
+        cltr_no = item.get("cltrMngNo", "")
+        if not cltr_no:
+            return None
+        address = item.get("lnmAdr") or item.get("roadAdr") or item.get("onbidCltrNm") or "--"
+        price = safe_int(item.get("lowstBidPrcIndctCont") or item.get("cltrMnprPrc") or 0)
+        appraisal = safe_int(item.get("apslEvlAmt") or item.get("dpslMnprPrc") or 0)
+        ptype = item.get("cltrUsgSclsCtgrNm") or item.get("prptDivNm") or "--"
+        close_date_raw = item.get("cltrBidEndDt") or item.get("pbctClsDtm") or ""
+        desc = item.get("onbidCltrNm") or ""
+        notes = item.get("pbctCdtnNo") or ""
         
-    return properties
+        cltr_area_text = item.get("cltrArea") or item.get("sqmsArea") or ""
+        land_area_text = item.get("landSqmsArea") or ""
+        bdng_area_text = item.get("bdngSqmsArea") or ""
+        
+        onbid_cltr_no = item.get("onbidCltrno", "")
+        pbct_no = item.get("pbctNo", "")
+        pbct_cdtn_no = item.get("pbctCdtnNo", "")
+        prpt_div_cd = item.get("prptDivCd", "")
+        onbid_pbanc_no = item.get("onbidPbancNo", "")
+    
+    ptype_lower = ptype.lower()
+    is_etc_asset = (asset_type in ["car", "mvast"]) or any(kw in ptype_lower for kw in ["자동차", "중기", "선박", "항공기", "기계", "기구", "차량", "동산", "유가증권", "물품", "어업권", "광업권"])
+    address_lower = address.lower()
+    if any(kw in address_lower for kw in ["등록번호:", "차명:", "차대번호:", "원동기형식:"]):
+        is_etc_asset = True
+        
+    current_source = "onbid_etc" if is_etc_asset else "onbid"
+    
+    if asset_type == "car":
+        if ptype == "--" or not any(kw in ptype for kw in ["차량", "운송", "자동차", "선박"]):
+            ptype = "차량/운송장비"
+    elif asset_type == "mvast":
+        if ptype == "--":
+            ptype = "기타물품"
+            
+    close_date = ""
+    if close_date_raw and len(close_date_raw) >= 8:
+        close_date = f"{close_date_raw[0:4]}-{close_date_raw[4:6]}-{close_date_raw[6:8]}"
+        
+    text_to_check = f"{address} {desc} {notes}".lower()
+    if any(kw in text_to_check for kw in ["낙찰", "매각결정", "종결"]):
+        return None
+        
+    if price <= 0 and appraisal > 0:
+        price = appraisal
+    if appraisal <= 0 and price > 0:
+        appraisal = price
+        
+    def clean_float(val):
+        if not val:
+            return 0.0
+        try:
+            return float(str(val).replace(",", "").strip())
+        except ValueError:
+            return 0.0
+            
+    ex_area = clean_float(cltr_area_text)
+    ld_area = clean_float(land_area_text)
+    bu_area = clean_float(bdng_area_text)
+    
+    su_area = round(ex_area * 1.35, 2) if ex_area > 0 else 0.0
+    if bu_area <= 0:
+        bu_area = ex_area
+        
+    is_lease = (dpsl_cd == "0002")
+    detail_info = None
+    
+    if cltr_no:
+        api_detail = fetch_onbid_api_details(service_key, cltr_no, pbct_cdtn_no, asset_type)
+        if api_detail and api_detail["success"]:
+            detail_info = api_detail
+            
+    if not detail_info and asset_type == "rlst" and onbid_cltr_no and pbct_no and pbct_cdtn_no and prpt_div_cd and onbid_pbanc_no:
+        detail_url = f"https://www.onbid.co.kr/op/cltrpbancinf/cltrdtl/CltrDtlController/mvmnCltrDtl.do?cltrScrnGrpCd=0001&cltrPrptDivCd={prpt_div_cd}&onbidCltrno={onbid_cltr_no}&onbidPbancNo={onbid_pbanc_no}&pbctNo={pbct_no}&pbctCdtnNo={pbct_cdtn_no}"
+        web_detail = scrape_onbid_web_details(detail_url, is_lease)
+        if web_detail and web_detail["success"]:
+            detail_info = web_detail
+            
+    is_estimated = True
+    images = []
+    lease_method = None
+    lease_term = None
+    
+    if detail_info:
+        is_estimated = False
+        images = detail_info["images"]
+        lease_method = detail_info["lease_method"]
+        lease_term = detail_info["lease_term"]
+        
+        if detail_info.get("round"):
+            round_info = f"{detail_info['round']}회차 인터넷입찰"
+        else:
+            if detail_info.get("failed_count"):
+                try:
+                    failed_val = int("".join([c for c in detail_info["failed_count"] if c.isdigit()]))
+                    round_info = f"{failed_val + 1}회차 인터넷입찰"
+                except Exception:
+                    round_info = "1회차 인터넷입찰"
+            else:
+                round_info = "임대 1회차" if is_lease else "1회차 인터넷입찰"
+                
+        if detail_info["ptype_detail"]:
+            ptype = detail_info["ptype_detail"]
+    else:
+        round_info = "임대 1회차" if is_lease else "1회차 인터넷입찰"
+        
+    complex_info = {}
+    elementary_school = ""
+    recent_deals = []
+    
+    area_meta = {
+        "exclusive_area": ex_area,
+        "supply_area": su_area,
+        "land_area": ld_area,
+        "building_area": bu_area,
+        "is_estimated_exclusive": ex_area <= 0,
+        "is_estimated_supply": True if ex_area > 0 else False,
+        "is_estimated_land": ld_area <= 0,
+        "is_estimated_building": bu_area <= 0,
+        "complex_info": complex_info,
+        "elementary_school": elementary_school,
+        "recent_deals": recent_deals,
+        "is_estimated": is_estimated,
+        "is_lease": is_lease,
+        "lease_method": lease_method,
+        "lease_term": lease_term,
+        "images": images
+    }
+    
+    meta_json = json.dumps(area_meta, ensure_ascii=False)
+    final_notes = notes or "검출된 공매 권리 하자 리스크가 없습니다."
+    final_notes = final_notes + f"\n\n__METADATA__:{meta_json}__"
+    
+    lease_prefix = "[임대] " if is_lease else ""
+    
+    score, grade, rem_days = compute_softscore(
+        price=price,
+        appraisal=appraisal,
+        address=address,
+        ptype=ptype,
+        close_date_str=close_date,
+        desc=desc,
+        notes=notes
+    )
+    
+    if grade == "X":
+        final_notes = f"⚠️ 치명적 AI 하자 분류! (입찰 비권장) | {final_notes}"
+    elif grade == "D":
+        final_notes = f"🟡 AI 주의 리스크 검출! (특별 매각조건 등 확인 권장) | {final_notes}"
+        
+    return {
+        "source": current_source,
+        "auction_no": cltr_no,
+        "address": address,
+        "appraised_value": appraisal,
+        "minimum_bid": price,
+        "ptype": ptype,
+        "bidding_date": close_date,
+        "round_info": round_info,
+        "desc_content": lease_prefix + (desc or "공매 물건 기본 명세입니다."),
+        "notes_content": final_notes,
+        "link_url": "https://www.onbid.co.kr",
+        "grade": grade,
+        "score": score,
+        "remaining_days": rem_days
+    }
+
 
 def fetch_onbid_data():
     service_key = os.environ.get("ONBID_SERVICE_KEY")
     
-    # config/onbid_key.txt에서 키 로드 시도
     try:
         key_file_path = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "config", "onbid_key.txt")
         if os.path.exists(key_file_path):
@@ -372,172 +661,127 @@ def fetch_onbid_data():
     if "%" in service_key:
         service_key = urllib.parse.unquote(service_key)
         
-    rlst_url = "http://apis.data.go.kr/B010003/OnbidRlstListSrvc2/getRlstCltrList2"
+    api_configs = [
+        {"type": "rlst", "url": "http://apis.data.go.kr/B010003/OnbidRlstListSrvc2/getRlstCltrList2"},
+        {"type": "car", "url": "http://apis.data.go.kr/B010003/OnbidCarListSrvc2/getCarCltrList2"},
+        {"type": "mvast", "url": "http://apis.data.go.kr/B010003/OnbidMvastListSrvc2/getMvastCltrList2"}
+    ]
     
-    print("Fetching Onbid Real Estate data from OpenAPI...")
-    items_collected = []
+    print("Fetching Onbid Real Estate/Car/Mvast data from OpenAPI...")
+    raw_items_list = []
     
-    target_div_codes = ["0002", "0003", "0004", "0005", "0007", "0010"]
+    today_dt = datetime.date.today()
+    end_dt = today_dt + datetime.timedelta(days=30)
+    start_ymd = today_dt.strftime("%Y%m%d")
+    end_ymd = end_dt.strftime("%Y%m%d")
+    
+    target_div_codes = ["0002", "0003"]
+    dpsl_codes = ["0001", "0002"]
     
     try:
-        for code in target_div_codes:
-            for page in range(1, 6): # 각 카테고리별로 5페이지(최대 500건)씩 정밀 수집
-                params = {
-                    "serviceKey": service_key,
-                    "numOfRows": 100,
-                    "pageNo": page,
-                    "dpslDvsCd": "0001",
-                    "pvctTrgtYn": "N",
-                    "prptDivCd": code,
-                    "returnType": "json"
-                }
-                
-                # 공공 API 트래픽 초과 방지 및 안정적인 조회를 위해 딜레이 조정 (0.5~1.0초 지터 적용)
-                time.sleep(0.5 + random.random() * 0.5)
-                try:
-                    response = requests.get(rlst_url, params=params, timeout=10)
-                    if response.status_code == 200:
-                        response.encoding = "utf-8" # 응답 인코딩을 명시적으로 설정하여 한글 깨짐 방지
-                        text = response.text
-                        items = []
-                        total_count = 0
+        for config in api_configs:
+            asset_type = config["type"]
+            rlst_url = config["url"]
+            print(f"Fetching Onbid {asset_type} data from OpenAPI...")
+            
+            for dpsl_cd in dpsl_codes:
+                for code in target_div_codes:
+                    for page in range(1, 2):
+                        params = {
+                            "serviceKey": service_key,
+                            "numOfRows": 100,
+                            "pageNo": page,
+                            "dpslDvsCd": dpsl_cd,
+                            "pvctTrgtYn": "N",
+                            "prptDivCd": code,
+                            "returnType": "json",
+                            "bidPrdYmdStart": start_ymd,
+                            "bidPrdYmdEnd": end_ymd
+                        }
                         
-                        # XML 응답인 경우 처리
-                        if text.strip().startswith("<?xml") or "<response>" in text:
-                            root = ET.fromstring(text)
-                            
-                            # 공통 에러 XML(OpenAPI_ServiceResponse)을 고려한 헤더 및 에러 정보 파싱
-                            header = root.find("header")
-                            if header is None:
-                                # OpenAPI 공통 에러 노드(cmmMsgHeader) 탐색
-                                cmm_header = root.find("cmmMsgHeader")
-                                if cmm_header is not None:
-                                    res_code = cmm_header.findtext("returnReasonCode") or ""
-                                    res_msg = cmm_header.findtext("returnAuthMsg") or cmm_header.findtext("errMsg") or ""
+                        time.sleep(0.5 + random.random() * 0.5)
+                        try:
+                            response = requests.get(rlst_url, params=params, timeout=10)
+                            if response.status_code == 200:
+                                response.encoding = "utf-8"
+                                text = response.text
+                                items = []
+                                total_count = 0
+                                
+                                if text.strip().startswith("<?xml") or "<response>" in text:
+                                    root = ET.fromstring(text)
+                                    
+                                    header = root.find("header")
+                                    if header is None:
+                                        cmm_header = root.find("cmmMsgHeader")
+                                        if cmm_header is not None:
+                                            res_code = cmm_header.findtext("returnReasonCode") or ""
+                                            res_msg = cmm_header.findtext("returnAuthMsg") or cmm_header.findtext("errMsg") or ""
+                                        else:
+                                            res_code = ""
+                                            res_msg = ""
+                                    else:
+                                        res_code = header.findtext("resultCode") if header is not None else ""
+                                        res_msg = header.findtext("resultMsg") if header is not None else ""
+                                        
+                                    if res_code != "00" and res_code != "":
+                                        print(f"[DEBUG] Onbid API Response Error: {res_msg} (code: {res_code})")
+                                        continue
+                                    
+                                    body = root.find("body")
+                                    if body is not None:
+                                        items_node = body.find("items")
+                                        if items_node is not None:
+                                            items = items_node.findall("item")
+                                        total_count_text = body.findtext("totalCount")
+                                        if total_count_text:
+                                            total_count = safe_int(total_count_text)
                                 else:
-                                    res_code = ""
-                                    res_msg = ""
-                            else:
-                                res_code = header.findtext("resultCode") if header is not None else ""
-                                res_msg = header.findtext("resultMsg") if header is not None else ""
+                                    data = response.json()
+                                    header = data.get("response", {}).get("header", {})
+                                    if header.get("resultCode") != "00":
+                                        print(f"[DEBUG] Onbid API Response Error: {header.get('resultMsg')} (code: {header.get('resultCode')})")
+                                        continue
+                                        
+                                    body = data.get("response", {}).get("body", {})
+                                    items = body.get("items", {}).get("item", [])
+                                    if isinstance(items, dict):
+                                        items = [items]
+                                    total_count = safe_int(body.get("totalCount", 0))
                                 
-                            if res_code != "00" and res_code != "":
-                                print(f"[DEBUG] Onbid API Response Error: {res_msg} (code: {res_code})")
-                                continue
+                                if not items:
+                                    break
+                                    
+                                for item in items:
+                                    raw_items_list.append({
+                                        "item": item,
+                                        "asset_type": asset_type,
+                                        "dpsl_cd": dpsl_cd
+                                    })
                             
-                            body = root.find("body")
-                            if body is not None:
-                                items_node = body.find("items")
-                                if items_node is not None:
-                                    items = items_node.findall("item")
-                                total_count_text = body.findtext("totalCount")
-                                if total_count_text:
-                                    total_count = safe_int(total_count_text)
-                        else:
-                            # JSON 응답인 경우 처리 (폴백 방어)
-                            data = response.json()
-                            header = data.get("response", {}).get("header", {})
-                            if header.get("resultCode") != "00":
-                                print(f"[DEBUG] Onbid API Response Error: {header.get('resultMsg')} (code: {header.get('resultCode')})")
-                                continue
-                                
-                            body = data.get("response", {}).get("body", {})
-                            items = body.get("items", {}).get("item", [])
-                            if isinstance(items, dict):
-                                items = [items]
-                            total_count = safe_int(body.get("totalCount", 0))
-                        
-                        if not items:
+                            if len(items) == 0 or (page * 100) >= total_count:
+                                break
+                            else:
+                                break
+                        except Exception as e:
+                            print(f"Error requesting page {page} for code {code}: {e}")
                             break
                             
-                        for item in items:
-                            if isinstance(item, ET.Element):
-                                # XML 파싱
-                                cltr_no = item.findtext("cltrMngNo") or ""
-                                if not cltr_no:
-                                    continue
-                                # 지번주소/도로명주소 우선 획득, 없으면 물건명 활용
-                                address = item.findtext("lnmAdr") or item.findtext("roadAdr") or item.findtext("onbidCltrNm") or "주소 미상"
-                                price = safe_int(item.findtext("lowstBidPrcIndctCont") or item.findtext("cltrMnprPrc") or 0)
-                                appraisal = safe_int(item.findtext("apslEvlAmt") or item.findtext("dpslMnprPrc") or 0)
-                                ptype = item.findtext("cltrUsgSclsCtgrNm") or item.findtext("prptDivNm") or "기타"
-                                close_date_raw = item.findtext("cltrBidEndDt") or item.findtext("pbctClsDtm") or ""
-                                desc = item.findtext("onbidCltrNm") or ""
-                                notes = item.findtext("pbctCdtnNo") or ""
-                            else:
-                                # JSON 파싱
-                                cltr_no = item.get("cltrMngNo", "")
-                                if not cltr_no:
-                                    continue
-                                address = item.get("lnmAdr") or item.get("roadAdr") or item.get("onbidCltrNm") or "주소 미상"
-                                price = safe_int(item.get("lowstBidPrcIndctCont") or item.get("cltrMnprPrc") or 0)
-                                appraisal = safe_int(item.get("apslEvlAmt") or item.get("dpslMnprPrc") or 0)
-                                ptype = item.get("cltrUsgSclsCtgrNm") or item.get("prptDivNm") or "기타"
-                                close_date_raw = item.get("cltrBidEndDt") or item.get("pbctClsDtm") or ""
-                                desc = item.get("onbidCltrNm") or ""
-                                notes = item.get("pbctCdtnNo") or ""
-                            
-                            # 🚫 [비부동산 데이터 차단] 자동차, 중기, 선박, 항공기, 기계, 기구, 차량, 동산, 유가증권, 물품, 권리 등 배제
-                            ptype_lower = ptype.lower()
-                            if any(kw in ptype_lower for kw in ["자동차", "중기", "선박", "항공기", "기계", "기구", "차량", "동산", "유가증권", "물품", "어업권", "광업권"]):
-                                continue
-                                
-                            # 주소에 차량 관련 단어가 있으면 추가 배제 (2중 안전 장치)
-                            address_lower = address.lower()
-                            if any(kw in address_lower for kw in ["등록번호:", "차명:", "차대번호:", "원동기형식:"]):
-                                continue
-                                
-                            close_date = ""
-                            if close_date_raw and len(close_date_raw) >= 8:
-                                close_date = f"{close_date_raw[0:4]}-{close_date_raw[4:6]}-{close_date_raw[6:8]}"
-                                
-                            text_to_check = f"{address} {desc} {notes}".lower()
-                            if any(kw in text_to_check for kw in ["낙찰", "매각결정", "종결"]):
-                                continue
-                                
-                            # 1. 신규 정밀 AI 스코어링 및 등급/D-Day 산출
-                            score, grade, rem_days = compute_softscore(
-                                price=price,
-                                appraisal=appraisal,
-                                address=address,
-                                ptype=ptype,
-                                close_date_str=close_date,
-                                desc=desc,
-                                notes=notes
-                            )
-                            
-                            # 위험 표시 보강
-                            if grade == "X":
-                                notes = f"⚠️ 치명적 AI 하자 분류! (입찰 비권장) | {notes}"
-                            elif grade == "D":
-                                notes = f"🟡 AI 주의 리스크 검출! (특별 매각조건 등 확인 권장) | {notes}"
-                                
-                            items_collected.append({
-                                "source": "onbid",
-                                "auction_no": cltr_no,
-                                "address": address,
-                                "appraised_value": appraisal,
-                                "minimum_bid": price,
-                                "ptype": ptype,
-                                "bidding_date": close_date,
-                                "round_info": "1회차 인터넷입찰",
-                                "desc_content": desc or "공매 물건 기본 명세입니다.",
-                                "notes_content": notes or "검출된 공매 권리 하자 리스크가 없습니다.",
-                                "link_url": "https://www.onbid.co.kr",
-                                "grade": grade,
-                                "score": score,
-                                "remaining_days": rem_days
-                            })
-                        
-                        if len(items) == 0 or (page * 100) >= total_count:
-                            break
-                    else:
-                        break
-                except Exception as e:
-                    print(f"Error requesting page {page} for code {code}: {e}")
-                    break
-        
-        # 중복 제거 (동일 관리번호 기준 중복 축소)
+        import concurrent.futures
+        print(f"[*] 총 {len(raw_items_list)}건의 온비드 매물 후보가 수집되었습니다. 병렬 분석을 시작합니다.")
+        items_collected = []
+        with concurrent.futures.ThreadPoolExecutor(max_workers=8) as executor:
+            futures = [executor.submit(process_single_item, raw, service_key) for raw in raw_items_list]
+            for idx, fut in enumerate(concurrent.futures.as_completed(futures)):
+                try:
+                    res = fut.result()
+                    if res:
+                        items_collected.append(res)
+                    if (idx + 1) % 50 == 0 or (idx + 1) == len(raw_items_list):
+                        print(f"[+] 온비드 매물 상세 분석 중: {idx + 1}/{len(raw_items_list)}건 완료...")
+                except Exception as fut_err:
+                    print(f"[-] 개별 온비드 매물 병렬 가공 중 오류 발생: {fut_err}")
+                    
         unique_items = []
         seen = set()
         for item in items_collected:
@@ -546,7 +790,12 @@ def fetch_onbid_data():
                 unique_items.append(item)
         items_collected = unique_items
         
-        # 인메모리 SQLite를 가동하고 데이터를 대량으로 인서트합니다.
+        debug_sources = {}
+        for item in items_collected:
+            s = item.get("source")
+            debug_sources[s] = debug_sources.get(s, 0) + 1
+        print(f"[*] Collected sources: {debug_sources}")
+        
         conn = sqlite3.connect(":memory:")
         conn.row_factory = sqlite3.Row
         init_db(conn)
@@ -564,24 +813,9 @@ def fetch_onbid_data():
         conn.close()
             
     except Exception as e:
-        print(f"[!] Onbid API call failed ({e}). Providing premium simulation data fallback.")
-        try:
-            conn = sqlite3.connect(":memory:")
-            conn.row_factory = sqlite3.Row
-            init_db(conn)
-            
-            sim_data = generate_simulated_onbid_data()
-            success_count = save_to_db(conn, sim_data)
-            log_sync_status(conn, "SUCCESS", success_count, f"Simulated data fallback: {e}")
-            print(f"[+] Onbid Simulated data fallback loaded successfully! Total: {success_count} listings.")
-            
-            try:
-                sync_sqlite_to_supabase(conn)
-            except Exception as sync_err:
-                print(f"[-] 클라우드 Supabase 동기화 전송 과정에서 오류가 발생했습니다. {sync_err}")
-            conn.close()
-        except Exception as fallback_err:
-            print(f"[-] 폴백 방어막 가동 실패: {fallback_err}")
+        print(f"[!] Onbid API 수집 프로세스 최종 실패: {e}")
+        # 임의의 가상 데이터(시뮬레이션) 폴백 적재 루틴을 전면 차단하여 기존 실데이터를 온전히 보존합니다.
+
 
 if __name__ == "__main__":
     fetch_onbid_data()
