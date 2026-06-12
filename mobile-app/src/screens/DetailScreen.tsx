@@ -1396,10 +1396,10 @@ export const DetailScreen: React.FC<DetailScreenProps> = ({ property, onBack }) 
                     <TouchableOpacity
                       onPress={() => {
                         if (isTargetProperty) {
-                          Linking.openURL("https://m.land.naver.com/complex/info/5084");
+                          Linking.openURL("https://fin.land.naver.com/map?center=3ziWYW-2AzOvs&zoom=12");
                         } else {
                           const addrKeyword = cleanAddress(currentProperty.address);
-                          Linking.openURL(`https://m.land.naver.com/search/result/${encodeURIComponent(addrKeyword)}`);
+                          Linking.openURL(`https://fin.land.naver.com/map?q=${encodeURIComponent(addrKeyword)}`);
                         }
                       }}
                       style={[styles.linkButton, { backgroundColor: '#03c75a', marginTop: 12 }]}
@@ -2362,7 +2362,7 @@ export const DetailScreen: React.FC<DetailScreenProps> = ({ property, onBack }) 
               </View>
             </TouchableOpacity>
             <TouchableOpacity 
-              onPress={() => Linking.openURL(`https://land.naver.com/search/search.naver?query=${encodeURIComponent(cleanAddress(currentProperty.address))}`)}
+              onPress={() => Linking.openURL(`https://fin.land.naver.com/map?q=${encodeURIComponent(cleanAddress(currentProperty.address))}`)}
               style={styles.networkButton}
             >
               <View style={styles.networkIconContainer}>
