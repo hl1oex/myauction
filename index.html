@@ -499,6 +499,22 @@
                             <input type="checkbox" name="ptype-check" value="factory" checked onchange="applyFilters()" class="accent-royalBlue">
                             <span>공장/창고</span>
                         </label>
+                        <label class="flex items-center gap-2 cursor-pointer select-none text-xs font-bold text-slate-600">
+                            <input type="checkbox" name="ptype-check" value="vehicle" checked onchange="applyFilters()" class="accent-royalBlue">
+                            <span>차량/운송장비</span>
+                        </label>
+                        <label class="flex items-center gap-2 cursor-pointer select-none text-xs font-bold text-slate-600">
+                            <input type="checkbox" name="ptype-check" value="security" checked onchange="applyFilters()" class="accent-royalBlue">
+                            <span>유가증권</span>
+                        </label>
+                        <label class="flex items-center gap-2 cursor-pointer select-none text-xs font-bold text-slate-600">
+                            <input type="checkbox" name="ptype-check" value="machinery" checked onchange="applyFilters()" class="accent-royalBlue">
+                            <span>기계장비</span>
+                        </label>
+                        <label class="flex items-center gap-2 cursor-pointer select-none text-xs font-bold text-slate-600">
+                            <input type="checkbox" name="ptype-check" value="etc_goods" checked onchange="applyFilters()" class="accent-royalBlue">
+                            <span>기타물품</span>
+                        </label>
                     </div>
                 </div>
 
@@ -1043,7 +1059,7 @@
                 <div id="detail-panel-summary" class="space-y-4 sm:space-y-5">
             <!-- 대표 이미지 영역 (실제 로드뷰 3D) -->
             <div class="bg-white border border-slate-200 rounded-2xl p-3.5 sm:p-4 shadow-sm">
-                <h4 class="text-xs sm:text-sm font-black text-slate-800 flex items-center gap-1.5 mb-2.5">
+                <h4 id="detail-roadview-title" class="text-xs sm:text-sm font-black text-slate-800 flex items-center gap-1.5 mb-2.5">
                     <i class="fa-solid fa-image text-royalBlue"></i> 🏢 부동산 대표 전경 (실제 로드뷰)
                 </h4>
                 <div class="w-full h-[220px] rounded-xl overflow-hidden border border-slate-200 bg-slate-100 relative">
@@ -1051,7 +1067,7 @@
                     <div id="detail-roadview-fallback" class="absolute inset-0 flex flex-col items-center justify-center bg-slate-100 p-4 text-center hidden">
                         <img src="./apartment_elegant_facade.png" alt="부동산 전경 폴백" class="absolute inset-0 w-full h-full object-cover opacity-30">
                         <div class="relative z-10 space-y-2">
-                            <p class="text-xs font-black text-slate-700">해당 위치의 로드뷰를 불러올 수 없습니다.</p>
+                            <p id="detail-roadview-fallback-text" class="text-xs font-black text-slate-700">해당 위치의 로드뷰를 불러올 수 없습니다.</p>
                             <a id="btn-naver-roadview-fallback" href="#" target="_blank" class="inline-flex items-center gap-1 bg-royalBlue text-white text-[10px] font-black px-2.5 py-1.5 rounded-lg shadow-sm hover:bg-royalHover transition-all">
                                 <i class="fa-solid fa-map-location-dot"></i> 네이버 지도로 확인하기
                             </a>
@@ -2012,7 +2028,7 @@
         function updateHeaderStats(propertiesList) {
             const total = propertiesList.length;
             const court = propertiesList.filter(p => p.source === 'court').length;
-            const onbid = propertiesList.filter(p => p.source === 'onbid').length;
+            const onbid = propertiesList.filter(p => p.source === 'onbid' || p.source === 'onbid_etc').length;
             
             const headerTotal = document.getElementById("header-total-count");
             const headerCourt = document.getElementById("header-court-count");
@@ -2677,7 +2693,9 @@
                 
                 const matchesBudget = budgetLimit >= 2000000000 || item.minimum_bid <= budgetLimit;
                 
-                const matchesSource = selectedSources.length === 0 || selectedSources.includes(item.source);
+                const matchesSource = selectedSources.length === 0 || 
+                    selectedSources.includes(item.source) ||
+                    (selectedSources.includes("onbid") && item.source === "onbid_etc");
                 
                 const matchesDate = dateLimit === 999 || (item.remaining_days && item.remaining_days <= dateLimit);
                 
@@ -2731,6 +2749,14 @@
                             if (type.includes("토지") || type.includes("대지") || type.includes("임야") || type.includes("잡종지") || type.includes("대") || type.includes("전") || type.includes("답")) { matchesPtype = true; break; }
                         } else if (val === "factory") {
                             if (type.includes("공장") || type.includes("창고") || type.includes("산업")) { matchesPtype = true; break; }
+                        } else if (val === "vehicle") {
+                            if (type.includes("차량") || type.includes("운송") || type.includes("자동차") || type.includes("선박") || type.includes("항공기") || type.includes("중기")) { matchesPtype = true; break; }
+                        } else if (val === "security") {
+                            if (type.includes("유가증권") || type.includes("주식") || type.includes("채권") || type.includes("지분") || type.includes("증권")) { matchesPtype = true; break; }
+                        } else if (val === "machinery") {
+                            if (type.includes("기계") || (type.includes("장비") && !type.includes("운송장비")) || type.includes("기구") || type.includes("설비")) { matchesPtype = true; break; }
+                        } else if (val === "etc_goods") {
+                            if (type.includes("물품") || type.includes("기타물품") || type.includes("동산") || type.includes("기타동산") || item.source === 'onbid_etc') { matchesPtype = true; break; }
                         }
                     }
                 }
@@ -2868,7 +2894,7 @@
             
             if (headerTotal && headerCourt && headerOnbid) {
                 const courtCount = originalProperties.filter(p => p.source === 'court').length;
-                const onbidCount = originalProperties.filter(p => p.source === 'onbid').length;
+                const onbidCount = originalProperties.filter(p => p.source === 'onbid' || p.source === 'onbid_etc').length;
                 
                 headerTotal.innerText = totalText;
                 headerCourt.innerText = courtCount.toLocaleString();
@@ -3965,8 +3991,30 @@
         function loadDetailView(item) {
             if (!item) return;
             item = enrichPropertyData(item);
-            const extra = analyzePropertyDetailExtra(item);
             const est = estimateAuctionRounds(item.appraised_value, item.minimum_bid, item.source);
+            const extra = analyzePropertyDetailExtra(item);
+
+            // 비부동산 자산(onbid_etc)에 대한 상세 뷰 특화 처리
+            const rvTitle = document.getElementById("detail-roadview-title");
+            const rvFallbackText = document.getElementById("detail-roadview-fallback-text");
+            const tab2Btn = document.getElementById("detail-group-tab-2-btn");
+            const tab3Btn = document.getElementById("detail-group-tab-3-btn");
+            const tab4Btn = document.getElementById("detail-group-tab-4-btn");
+
+            if (item.source === 'onbid_etc') {
+                if (rvTitle) rvTitle.innerHTML = `<i class="fa-solid fa-image text-royalBlue"></i> 📦 자산 대표 이미지`;
+                if (rvFallbackText) rvFallbackText.innerText = "비부동산 자산은 로드뷰를 제공하지 않습니다.";
+                if (tab2Btn) tab2Btn.classList.add("hidden");
+                if (tab3Btn) tab3Btn.classList.add("hidden");
+                if (tab4Btn) tab4Btn.classList.add("hidden");
+                changeDetailGroupTab(1);
+            } else {
+                if (rvTitle) rvTitle.innerHTML = `<i class="fa-solid fa-image text-royalBlue"></i> 🏢 부동산 대표 전경 (실제 로드뷰)`;
+                if (rvFallbackText) rvFallbackText.innerText = "해당 위치의 로드뷰를 불러올 수 없습니다.";
+                if (tab2Btn) tab2Btn.classList.remove("hidden");
+                if (tab3Btn) tab3Btn.classList.remove("hidden");
+                if (tab4Btn) tab4Btn.classList.remove("hidden");
+            }
 
             // 주소 부분은 정확히 냅두고 대괄호, 소괄호, 중괄호 및 그 내부 텍스트(예: 용도, 유의사항 등)만 제거하여 제목이 중간에 잘리지 않도록 정제합니다.
             let cleanedTitleAddress = (item.address || "")
@@ -4003,7 +4051,7 @@
             if (item.source === 'court') {
                 badge.innerText = "⚖️ 대법원 법원경매";
                 badge.className = "bg-blue-50 text-royalBlue border border-blue-200 text-xs font-black px-2.5 py-1 rounded-md";
-            } else if (item.source === 'onbid') {
+            } else if (item.source === 'onbid' || item.source === 'onbid_etc') {
                 badge.innerText = "🏢 캠코 온비드공매";
                 badge.className = "bg-emerald-50 text-emeraldSuccess border border-emerald-200 text-xs font-black px-2.5 py-1 rounded-md";
             } else {
