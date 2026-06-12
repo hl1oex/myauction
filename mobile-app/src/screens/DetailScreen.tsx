@@ -1010,6 +1010,8 @@ export const DetailScreen: React.FC<DetailScreenProps> = ({ property, onBack }) 
   const isEstimatedLand = isTargetProperty ? false : (currentProperty.is_estimated_land !== false);
   const isEstimatedBuilding = isTargetProperty ? false : (currentProperty.is_estimated_building !== false);
   
+  const estType = currentProperty.exclusive_area_estimation_type || "exact";
+  
   const targetStructure = isTargetProperty ? "철근콘크리트조 및 벽식조" : detectStructure(currentProperty);
   const targetExclusiveArea = isTargetProperty ? 84.93 : (currentProperty.exclusive_area || 84.9);
   const targetSupplyArea = isTargetProperty ? 102.47 : (currentProperty.supply_area || parseFloat((targetExclusiveArea * 1.32).toFixed(2)));
@@ -1188,11 +1190,11 @@ export const DetailScreen: React.FC<DetailScreenProps> = ({ property, onBack }) 
                       <Text style={styles.infoLabel}>전용 면적</Text>
                       <View style={{ flexDirection: 'row', alignItems: 'center' }}>
                         <Text style={[styles.infoValue, { color: COLORS.royalBlue, fontFamily: Platform.OS === 'ios' ? 'Courier' : 'monospace' }]}>
-                          {targetExclusiveArea}㎡ (약 {(targetExclusiveArea * 0.3025).toFixed(1)}평){isEstimatedExclusive ? ' 추정(허수)' : ''}
+                          {targetExclusiveArea}㎡ (약 {(targetExclusiveArea * 0.3025).toFixed(1)}평){isEstimatedExclusive ? (estType === 'estimated' ? ' (추정)' : ' (허수)') : ''}
                         </Text>
-                        <View style={{ marginLeft: 6, paddingHorizontal: 4, paddingVertical: 1, borderRadius: 4, borderWidth: 0.5, backgroundColor: isEstimatedExclusive ? '#ffffff' : '#ebfbee', borderColor: isEstimatedExclusive ? '#e2e8f0' : '#37b24d' }}>
-                          <Text style={{ fontSize: 8.5, fontWeight: 'bold', color: isEstimatedExclusive ? '#64748b' : '#2b8a3e' }}>
-                            {isEstimatedExclusive ? '추정' : '실제'}
+                        <View style={{ marginLeft: 6, paddingHorizontal: 4, paddingVertical: 1, borderRadius: 4, borderWidth: 0.5, backgroundColor: !isEstimatedExclusive ? '#ebfbee' : (estType === 'estimated' ? '#e6f7ff' : '#fff0f6'), borderColor: !isEstimatedExclusive ? '#37b24d' : (estType === 'estimated' ? '#1890ff' : '#ffadd2') }}>
+                          <Text style={{ fontSize: 8.5, fontWeight: 'bold', color: !isEstimatedExclusive ? '#2b8a3e' : (estType === 'estimated' ? '#0050b3' : '#c41d7f') }}>
+                            {!isEstimatedExclusive ? '실제' : (estType === 'estimated' ? '추정' : '허수')}
                           </Text>
                         </View>
                       </View>
@@ -1201,11 +1203,11 @@ export const DetailScreen: React.FC<DetailScreenProps> = ({ property, onBack }) 
                       <Text style={styles.infoLabel}>공급 면적</Text>
                       <View style={{ flexDirection: 'row', alignItems: 'center' }}>
                         <Text style={[styles.infoValue, { color: COLORS.royalBlue, fontFamily: Platform.OS === 'ios' ? 'Courier' : 'monospace' }]}>
-                          {targetSupplyArea}㎡ (약 {(targetSupplyArea * 0.3025).toFixed(1)}평){isEstimatedSupply ? ' 추정(허수)' : ''}
+                          {targetSupplyArea}㎡ (약 {(targetSupplyArea * 0.3025).toFixed(1)}평){isEstimatedSupply ? (estType === 'estimated' ? ' (추정)' : ' (허수)') : ''}
                         </Text>
-                        <View style={{ marginLeft: 6, paddingHorizontal: 4, paddingVertical: 1, borderRadius: 4, borderWidth: 0.5, backgroundColor: isEstimatedSupply ? '#ffffff' : '#ebfbee', borderColor: isEstimatedSupply ? '#e2e8f0' : '#37b24d' }}>
-                          <Text style={{ fontSize: 8.5, fontWeight: 'bold', color: isEstimatedSupply ? '#64748b' : '#2b8a3e' }}>
-                            {isEstimatedSupply ? '추정' : '실제'}
+                        <View style={{ marginLeft: 6, paddingHorizontal: 4, paddingVertical: 1, borderRadius: 4, borderWidth: 0.5, backgroundColor: !isEstimatedSupply ? '#ebfbee' : (estType === 'estimated' ? '#e6f7ff' : '#fff0f6'), borderColor: !isEstimatedSupply ? '#37b24d' : (estType === 'estimated' ? '#1890ff' : '#ffadd2') }}>
+                          <Text style={{ fontSize: 8.5, fontWeight: 'bold', color: !isEstimatedSupply ? '#2b8a3e' : (estType === 'estimated' ? '#0050b3' : '#c41d7f') }}>
+                            {!isEstimatedSupply ? '실제' : (estType === 'estimated' ? '추정' : '허수')}
                           </Text>
                         </View>
                       </View>
@@ -1214,11 +1216,11 @@ export const DetailScreen: React.FC<DetailScreenProps> = ({ property, onBack }) 
                       <Text style={styles.infoLabel}>토지 대지권</Text>
                       <View style={{ flexDirection: 'row', alignItems: 'center' }}>
                         <Text style={[styles.infoValue, { color: COLORS.royalBlue, fontFamily: Platform.OS === 'ios' ? 'Courier' : 'monospace' }]}>
-                          {targetLandArea}㎡ (약 {(targetLandArea * 0.3025).toFixed(1)}평){isEstimatedLand ? ' 추정(허수)' : ''}
+                          {targetLandArea}㎡ (약 {(targetLandArea * 0.3025).toFixed(1)}평){isEstimatedLand ? (estType === 'estimated' ? ' (추정)' : ' (허수)') : ''}
                         </Text>
-                        <View style={{ marginLeft: 6, paddingHorizontal: 4, paddingVertical: 1, borderRadius: 4, borderWidth: 0.5, backgroundColor: isEstimatedLand ? '#ffffff' : '#ebfbee', borderColor: isEstimatedLand ? '#e2e8f0' : '#37b24d' }}>
-                          <Text style={{ fontSize: 8.5, fontWeight: 'bold', color: isEstimatedLand ? '#64748b' : '#2b8a3e' }}>
-                            {isEstimatedLand ? '추정' : '실제'}
+                        <View style={{ marginLeft: 6, paddingHorizontal: 4, paddingVertical: 1, borderRadius: 4, borderWidth: 0.5, backgroundColor: !isEstimatedLand ? '#ebfbee' : (estType === 'estimated' ? '#e6f7ff' : '#fff0f6'), borderColor: !isEstimatedLand ? '#37b24d' : (estType === 'estimated' ? '#1890ff' : '#ffadd2') }}>
+                          <Text style={{ fontSize: 8.5, fontWeight: 'bold', color: !isEstimatedLand ? '#2b8a3e' : (estType === 'estimated' ? '#0050b3' : '#c41d7f') }}>
+                            {!isEstimatedLand ? '실제' : (estType === 'estimated' ? '추정' : '허수')}
                           </Text>
                         </View>
                       </View>
@@ -1227,11 +1229,11 @@ export const DetailScreen: React.FC<DetailScreenProps> = ({ property, onBack }) 
                       <Text style={styles.infoLabel}>건물 전용</Text>
                       <View style={{ flexDirection: 'row', alignItems: 'center' }}>
                         <Text style={[styles.infoValue, { color: COLORS.royalBlue, fontFamily: Platform.OS === 'ios' ? 'Courier' : 'monospace' }]}>
-                          {targetBuildingArea}㎡ (약 {(targetBuildingArea * 0.3025).toFixed(1)}평){isEstimatedBuilding ? ' 추정(허수)' : ''}
+                          {targetBuildingArea}㎡ (약 {(targetBuildingArea * 0.3025).toFixed(1)}평){isEstimatedBuilding ? (estType === 'estimated' ? ' (추정)' : ' (허수)') : ''}
                         </Text>
-                        <View style={{ marginLeft: 6, paddingHorizontal: 4, paddingVertical: 1, borderRadius: 4, borderWidth: 0.5, backgroundColor: isEstimatedBuilding ? '#ffffff' : '#ebfbee', borderColor: isEstimatedBuilding ? '#e2e8f0' : '#37b24d' }}>
-                          <Text style={{ fontSize: 8.5, fontWeight: 'bold', color: isEstimatedBuilding ? '#64748b' : '#2b8a3e' }}>
-                            {isEstimatedBuilding ? '추정' : '실제'}
+                        <View style={{ marginLeft: 6, paddingHorizontal: 4, paddingVertical: 1, borderRadius: 4, borderWidth: 0.5, backgroundColor: !isEstimatedBuilding ? '#ebfbee' : (estType === 'estimated' ? '#e6f7ff' : '#fff0f6'), borderColor: !isEstimatedBuilding ? '#37b24d' : (estType === 'estimated' ? '#1890ff' : '#ffadd2') }}>
+                          <Text style={{ fontSize: 8.5, fontWeight: 'bold', color: !isEstimatedBuilding ? '#2b8a3e' : (estType === 'estimated' ? '#0050b3' : '#c41d7f') }}>
+                            {!isEstimatedBuilding ? '실제' : (estType === 'estimated' ? '추정' : '허수')}
                           </Text>
                         </View>
                       </View>
@@ -1242,6 +1244,53 @@ export const DetailScreen: React.FC<DetailScreenProps> = ({ property, onBack }) 
                   <Text style={styles.infoLabel}>물건 구조/재질</Text>
                   <Text style={styles.infoValue}>{targetStructure}</Text>
                 </View>
+                
+                {/* 🏢 다세대 건물 전체 상세 명세 (모바일 전용) */}
+                {(() => {
+                  const isVilla = ["다세대", "빌라", "연립"].some(type => (currentProperty.ptype || "").includes(type));
+                  const totalFloors = currentProperty.building_total_floors || 0;
+                  
+                  if (isVilla && totalFloors > 0) {
+                    const sortedFloors = Object.keys(currentProperty.floor_areas || {}).sort((a, b) => {
+                      const getVal = (f: string) => {
+                        if (f.includes("지하")) return -parseInt(f.replace(/\D/g, "")) || -1;
+                        if (f.includes("지층")) return 0;
+                        return parseInt(f.replace(/\D/g, "")) || 999;
+                      };
+                      return getVal(a) - getVal(b);
+                    });
+
+                    return (
+                      <View style={{ marginTop: 12, backgroundColor: '#f0f7ff', borderColor: '#d0e8ff', borderWidth: 1, padding: 12, borderRadius: 12 }}>
+                        <Text style={{ fontSize: 12, fontWeight: 'bold', color: COLORS.slate900, marginBottom: 8 }}>
+                          🏢 다세대 건물 전체 상세 명세
+                        </Text>
+                        <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginBottom: 8 }}>
+                          <View style={{ flex: 1, backgroundColor: '#ffffff', padding: 8, borderRadius: 8, marginRight: 6 }}>
+                            <Text style={{ fontSize: 10, color: '#64748b' }}>건물 층수</Text>
+                            <Text style={{ fontSize: 12, fontWeight: 'bold', color: COLORS.slate900, marginTop: 2 }}>{totalFloors}층 건물</Text>
+                          </View>
+                          <View style={{ flex: 1, backgroundColor: '#ffffff', padding: 8, borderRadius: 8 }}>
+                            <Text style={{ fontSize: 10, color: '#64748b' }}>전체 면적 합계</Text>
+                            <Text style={{ fontSize: 12, fontWeight: 'bold', color: COLORS.slate900, marginTop: 2 }}>{(currentProperty.building_total_area || 0).toFixed(2)}㎡</Text>
+                          </View>
+                        </View>
+                        <View style={{ backgroundColor: '#ffffff', padding: 8, borderRadius: 8 }}>
+                          <Text style={{ fontSize: 10, color: '#64748b', marginBottom: 4 }}>층별 면적 명세</Text>
+                          <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 6 }}>
+                            {sortedFloors.map(f => (
+                              <View key={f} style={{ width: '47%', flexDirection: 'row', justifyContent: 'space-between', borderBottomWidth: 0.5, borderBottomColor: '#f1f5f9', paddingVertical: 4 }}>
+                                <Text style={{ fontSize: 11, color: '#475569' }}>{f}</Text>
+                                <Text style={{ fontSize: 11, fontWeight: 'bold', color: COLORS.slate900 }}>{(currentProperty.floor_areas as any)[f].toFixed(2)}㎡</Text>
+                              </View>
+                            ))}
+                          </View>
+                        </View>
+                      </View>
+                    );
+                  }
+                  return null;
+                })()}
               </View>
             </View>
 
@@ -1411,8 +1460,80 @@ export const DetailScreen: React.FC<DetailScreenProps> = ({ property, onBack }) 
                     </TouchableOpacity>
                   </>
                 ) : (
-                  // 실 평면도가 아닐 경우 가상 평면도를 노출하지 않고 완전히 빈칸으로 방치합니다.
-                  <View style={{ height: 120, backgroundColor: '#f8fafc', borderRadius: 12, borderWidth: 1, borderColor: '#cbd5e1', borderStyle: 'dashed' }} />
+                  // 실 평면도가 아닐 경우 AI 추정 평면도를 매핑하여 노출하고 노란색 '추정(허수)' 꼬리표 부착
+                  <>
+                    {(() => {
+                      const exclArea = currentProperty.exclusive_area || 0;
+                      let estSource = require('../../assets/floorplan_modern_apartment.png');
+                      let sizeLabel = 'AI 추정 구조도';
+                      if (exclArea > 0) {
+                        if (exclArea <= 60) {
+                          estSource = require('../../assets/floorplan_59.png');
+                          sizeLabel = '59㎡형 AI 추정 구조도';
+                        } else if (exclArea <= 90) {
+                          estSource = require('../../assets/floorplan_84.png');
+                          sizeLabel = '84㎡형 AI 추정 구조도';
+                        } else {
+                          estSource = require('../../assets/floorplan_114.png');
+                          sizeLabel = '114㎡형 AI 추정 구조도';
+                        }
+                      }
+                      
+                      return (
+                        <View style={{ height: 180, backgroundColor: '#f8fafc', borderRadius: 12, borderWidth: 1, borderColor: '#cbd5e1', overflow: 'hidden' }}>
+                          <TouchableOpacity
+                            activeOpacity={0.9}
+                            onPress={() => {
+                              setZoomImageSrc(null); // 에셋 확대 렌더링용 null 설정
+                              setFloorplanModalVisible(true);
+                            }}
+                            style={{ width: '100%', height: '100%', justifyContent: 'center', alignItems: 'center' }}
+                          >
+                            <Image source={estSource} style={{ width: '100%', height: '100%', opacity: 0.8 }} resizeMode="contain" />
+                            {/* 추정/허수 배지 */}
+                            {(() => {
+                              let badgeText = "⚠️ 추정";
+                              let badgeColor = "#3b82f6"; // estimated: 파란색
+                              if (estType === "fake" || isEstimatedExclusive) {
+                                badgeText = "⚠️ 허수";
+                                badgeColor = "#f43f5e"; // fake: 로즈색
+                              }
+                              if (isEstimatedExclusive && estType === "estimated") {
+                                badgeText = "⚠️ 추정";
+                                badgeColor = "#f59e0b"; // estimated: 주황색
+                              }
+                              
+                              return (
+                                <View style={{ position: 'absolute', top: 10, right: 10, backgroundColor: badgeColor, paddingHorizontal: 8, paddingVertical: 3, borderRadius: 6 }}>
+                                  <Text style={{ color: '#ffffff', fontSize: 9, fontWeight: 'bold' }}>{badgeText}</Text>
+                                </View>
+                              );
+                            })()}
+
+                            <View style={{ position: 'absolute', bottom: 10, left: 10, backgroundColor: 'rgba(30, 41, 59, 0.8)', paddingHorizontal: 8, paddingVertical: 3, borderRadius: 6 }}>
+                              <Text style={{ color: '#ffffff', fontSize: 9, fontWeight: 'bold' }}>{sizeLabel}</Text>
+                            </View>
+                          </TouchableOpacity>
+                        </View>
+                      );
+                    })()}
+
+                    {/* 비단지형 평면도 아웃링크 (동일하게 주소 기반 검색 적용) */}
+                    <TouchableOpacity
+                      onPress={() => {
+                        const isComplexProperty = currentProperty.ptype && (currentProperty.ptype.includes("아파트") || currentProperty.ptype.includes("오피스텔"));
+                        if (isComplexProperty) {
+                          const addrKeyword = cleanAddress(currentProperty.address);
+                          Linking.openURL(`https://fin.land.naver.com/map?q=${encodeURIComponent(addrKeyword)}`);
+                        } else {
+                          Linking.openURL(`https://land.naver.com/search/search.naver?query=${encodeURIComponent(currentProperty.address)}`);
+                        }
+                      }}
+                      style={[styles.linkButton, { backgroundColor: '#03c75a', marginTop: 12 }]}
+                    >
+                      <Text style={styles.linkButtonText}>네이버 부동산에서 실제 평면도 보기</Text>
+                    </TouchableOpacity>
+                  </>
                 )}
 
                 {/* 3대 포털 로드뷰 비교 바로가기 */}

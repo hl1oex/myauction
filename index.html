@@ -1120,6 +1120,28 @@
                             <span id="detail-spec-date" class="font-extrabold text-slate-800"></span>
                         </div>
                     </div>
+                    <!-- 🏢 다세대 건물 전체 상세 내역 (동적 노출) -->
+                    <div id="detail-villa-building-info" class="mt-3 bg-blue-50/50 border border-blue-100 p-3 rounded-xl space-y-2 hidden">
+                        <h5 class="text-[11px] sm:text-xs font-black text-slate-800 flex items-center gap-1">
+                            <i class="fa-solid fa-building text-royalBlue"></i> 🏢 다세대 건물 전체 상세 명세
+                        </h5>
+                        <div class="grid grid-cols-2 gap-2 text-[10px] sm:text-xs">
+                            <div class="bg-white border border-slate-100 p-2 rounded-lg flex justify-between items-center">
+                                <span class="text-slate-450 font-bold">건물 층수</span>
+                                <span id="detail-villa-total-floors" class="font-extrabold text-slate-800"></span>
+                            </div>
+                            <div class="bg-white border border-slate-100 p-2 rounded-lg flex justify-between items-center">
+                                <span class="text-slate-450 font-bold">전체 면적 합계</span>
+                                <span id="detail-villa-total-area" class="font-extrabold text-slate-800"></span>
+                            </div>
+                        </div>
+                        <div class="bg-white border border-slate-100 p-2 rounded-lg space-y-1">
+                            <span class="text-slate-450 font-bold text-[10px] sm:text-xs block mb-1">층별 면적 명세</span>
+                            <div id="detail-villa-floor-list" class="grid grid-cols-2 gap-1 text-[10px] sm:text-[11px] text-slate-700 font-mono">
+                                <!-- 층별 명세가 동적으로 주입됨 -->
+                            </div>
+                        </div>
+                    </div>
                     <!-- 레거시 ID 매칭용 히든 필드 -->
                     <span id="detail-doc-ptype" class="hidden"></span>
                     <span id="detail-doc-no" class="hidden"></span>
@@ -3803,6 +3825,12 @@
             item.is_estimated_land = meta.is_estimated_land !== undefined ? meta.is_estimated_land : (meta.is_estimated !== undefined ? meta.is_estimated : true);
             item.is_estimated_building = meta.is_estimated_building !== undefined ? meta.is_estimated_building : (meta.is_estimated !== undefined ? meta.is_estimated : true);
 
+            // [신규 필드 매핑]
+            item.exclusive_area_estimation_type = meta.exclusive_area_estimation_type || (item.is_estimated_exclusive ? "fake" : "exact");
+            item.building_total_floors = meta.building_total_floors || 0;
+            item.building_total_area = meta.building_total_area || 0;
+            item.floor_areas = meta.floor_areas || {};
+
             // 2025타경502931 어은동 한빛아파트 경매 사건의 실제 데이터(구조 및 면적) 정밀 매핑을 위해 수동 예외 처리를 반영하였습니다.
             if (item.auction_no === "2025타경502931" || (item.address && item.address.includes("한빛아파트"))) {
                 item.structure = "철근콘크리트조 및 벽식조";
@@ -4042,15 +4070,67 @@
             const landPy = (landArea * 0.3025).toFixed(1);
             const buildingPy = (buildingArea * 0.3025).toFixed(1);
 
-            const estExSuffix = item.is_estimated_exclusive ? " 추정(허수)" : "";
-            const estSpSuffix = item.is_estimated_supply ? " 추정(허수)" : "";
-            const estLdSuffix = item.is_estimated_land ? " 추정(허수)" : "";
-            const estBdSuffix = item.is_estimated_building ? " 추정(허수)" : "";
+            let estExSuffix = "";
+            let estSpSuffix = "";
+            let estLdSuffix = "";
+            let estBdSuffix = "";
+
+            const estType = item.exclusive_area_estimation_type || "exact";
+            if (estType === "estimated") {
+                if (item.is_estimated_exclusive) estExSuffix = " (추정)";
+                if (item.is_estimated_supply) estSpSuffix = " (추정)";
+                if (item.is_estimated_land) estLdSuffix = " (추정)";
+                if (item.is_estimated_building) estBdSuffix = " (추정)";
+            } else if (estType === "fake") {
+                if (item.is_estimated_exclusive) estExSuffix = " (허수)";
+                if (item.is_estimated_supply) estSpSuffix = " (허수)";
+                if (item.is_estimated_land) estLdSuffix = " (허수)";
+                if (item.is_estimated_building) estBdSuffix = " (허수)";
+            }
 
             document.getElementById("detail-spec-exclusive-py").innerText = `${exclusiveArea.toFixed(1)} ㎡ (${exclusivePy} 평)${estExSuffix}`;
             document.getElementById("detail-spec-supply-py").innerText = `${supplyArea.toFixed(1)} ㎡ (${supplyPy} 평)${estSpSuffix}`;
             document.getElementById("detail-spec-land-py").innerText = `${landArea.toFixed(1)} ㎡ (${landPy} 평)${estLdSuffix}`;
             document.getElementById("detail-spec-building-py").innerText = `${buildingArea.toFixed(1)} ㎡ (${buildingPy} 평)${estBdSuffix}`;
+
+            // 🏢 다세대 건물 전체 명세 바인딩
+            const villaPanel = document.getElementById("detail-villa-building-info");
+            if (villaPanel) {
+                const isVilla = ["다세대", "빌라", "연립"].some(type => (item.ptype || "").includes(type));
+                const totalFloors = item.building_total_floors || 0;
+                
+                if (isVilla && totalFloors > 0) {
+                    villaPanel.classList.remove("hidden");
+                    document.getElementById("detail-villa-total-floors").innerText = `${totalFloors} 층 건물`;
+                    document.getElementById("detail-villa-total-area").innerText = `${(item.building_total_area || 0).toFixed(2)} ㎡`;
+                    
+                    const floorListContainer = document.getElementById("detail-villa-floor-list");
+                    if (floorListContainer && item.floor_areas) {
+                        let listHtml = "";
+                        const sortedFloors = Object.keys(item.floor_areas).sort((a, b) => {
+                            const getVal = (f) => {
+                                if (f.includes("지하")) return -parseInt(f.replace(/\D/g, "")) || -1;
+                                if (f.includes("지층")) return 0;
+                                return parseInt(f.replace(/\D/g, "")) || 999;
+                            };
+                            return getVal(a) - getVal(b);
+                        });
+                        
+                        sortedFloors.forEach(f => {
+                            const val = item.floor_areas[f];
+                            listHtml += `
+                                <div class="flex justify-between border-b border-slate-50 py-0.5 pr-2">
+                                    <span class="text-slate-500">${f}</span>
+                                    <span class="font-extrabold text-slate-800">${val.toFixed(2)} ㎡</span>
+                                </div>
+                            `;
+                        });
+                        floorListContainer.innerHTML = listHtml;
+                    }
+                } else {
+                    villaPanel.classList.add("hidden");
+                }
+            }
 
             // 📅 기일 진행 이력 표 렌더링
             const giilTbody = document.getElementById("detail-giiil-tbody");
@@ -4323,18 +4403,53 @@
             // 📐 평형별 평면도 이미지 매칭 비활성화 (실 평면도가 아닐 시 추정 평면도를 보여주지 않고 빈칸으로 방치)
             const fpImgContainer = document.getElementById("detail-floorplan-img-container");
             const guideCard = document.getElementById("detail-floorplan-guide-card");
-            if (fpImgContainer && (!item.images || item.images.length === 0)) {
-                fpImgContainer.innerHTML = `
-                    <div class="w-full h-full bg-slate-50/30 border border-dashed border-slate-200 rounded-xl">
-                        <!-- 실 평면도가 아니므로 빈칸으로 방치 -->
-                    </div>
-                `;
-                fpImgContainer.onclick = null;
-                if (guideCard) guideCard.classList.add("hidden");
-            } else if (fpImgContainer && item.images && item.images.length > 0) {
-                fpImgContainer.innerHTML = `<img id="detail-floorplan-img" src="${item.images[0]}" alt="부동산 실제 평면도" class="w-full h-full object-contain">`;
-                fpImgContainer.onclick = openFloorplanModal;
-                if (guideCard) guideCard.classList.add("hidden");
+            if (fpImgContainer) {
+                if (item.images && item.images.length > 0) {
+                    fpImgContainer.innerHTML = `<img id="detail-floorplan-img" src="${item.images[0]}" alt="부동산 실제 평면도" class="w-full h-full object-contain">`;
+                    fpImgContainer.onclick = openFloorplanModal;
+                    if (guideCard) guideCard.classList.add("hidden");
+                } else {
+                    const exclArea = item.exclusive_area || 0;
+                    let estImg = "./floorplan_modern_apartment.png";
+                    let sizeLabel = "";
+                    if (exclArea > 0) {
+                        if (exclArea <= 60) {
+                            estImg = "./floorplan_59.png";
+                            sizeLabel = "59㎡형 ";
+                        } else if (exclArea <= 90) {
+                            estImg = "./floorplan_84.png";
+                            sizeLabel = "84㎡형 ";
+                        } else {
+                            estImg = "./floorplan_114.png";
+                            sizeLabel = "114㎡형 ";
+                        }
+                    }
+
+                    let badgeText = "⚠️ 추정";
+                    let badgeColor = "bg-amber-500";
+                    if (item.exclusive_area_estimation_type === "fake") {
+                        badgeText = "⚠️ 허수";
+                        badgeColor = "bg-rose-500 animate-pulse";
+                    } else if (item.exclusive_area_estimation_type === "estimated") {
+                        badgeText = "⚠️ 추정";
+                        badgeColor = "bg-blue-500";
+                    }
+
+                    fpImgContainer.innerHTML = `
+                        <img id="detail-floorplan-img" src="${estImg}" alt="부동산 추정 평면도" class="w-full h-full object-contain opacity-80">
+                        <div class="absolute top-2.5 right-2.5 ${badgeColor} text-white text-[9px] font-black px-2 py-0.5 rounded-md shadow-sm select-none z-10">
+                            ${badgeText}
+                        </div>
+                        <div class="absolute bottom-2.5 left-2.5 bg-slate-800/80 text-white text-[9px] font-bold px-2 py-0.5 rounded-md select-none z-10">
+                            ${sizeLabel}AI 추정 구조도
+                        </div>
+                    `;
+
+                    fpImgContainer.onclick = openFloorplanModal;
+
+
+                    if (guideCard) guideCard.classList.remove("hidden");
+                }
             }
 
             // ⚖️ 법정 서류 요약 테이블 및 상시 노출형 카드 데이터 동적 바인딩

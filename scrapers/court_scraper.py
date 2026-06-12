@@ -257,9 +257,18 @@ def extract_court_areas(st_text):
     land_area = 0.0
     is_estimated_exclusive = True
     is_estimated_land = True
+    
+    # 신규 분석 정보
+    excl_est_type = "fake"  # 기본값은 "거의 허수"
+    total_floors = 0
+    total_area = 0.0
+    floor_areas = {}
 
     if not st_text:
-        return exclusive_area, land_area, is_estimated_exclusive, is_estimated_land
+        return (
+            exclusive_area, land_area, is_estimated_exclusive, is_estimated_land,
+            excl_est_type, total_floors, total_area, floor_areas
+        )
 
     # 1. 대지권 면적 추출 시도 (기존 로직 유지 및 개선)
     land_match = re.search(r'(?:대지권|토지대지권|대지)\s*(\d+(?:\.\d+)?)\s*㎡', st_text)
@@ -299,7 +308,6 @@ def extract_court_areas(st_text):
                     target_floor = f"{room_str[:2]}층"
 
     # 3. 층별 면적 정보 딕셔너리 구축 (예: "1층 118.39㎡ 2층 118.39㎡" -> {'1층': 118.39, '2층': 118.39})
-    floor_areas = {}
     floor_area_matches = re.finditer(r'(지층|지하\s*\d*층|\d+층)\s*(\d+(?:\.\d+)?)\s*㎡', st_text)
     for m in floor_area_matches:
         f_name = m.group(1).replace(" ", "")
@@ -307,6 +315,19 @@ def extract_court_areas(st_text):
             floor_areas[f_name] = float(m.group(2))
         except ValueError:
             pass
+
+    # 몇 층 건물인지 계산 (지층 포함 고유한 층의 개수)
+    total_floors = len(floor_areas)
+    # 층수 파싱 예외 대응 (텍스트 내 '4층 다세대주택' 혹은 '4층건물' 등 전체 층수 명시 텍스트 검색)
+    total_floors_match = re.search(r'(\d+)\s*층\s*(?:다세대주택|연립주택|빌라|건물|아파트)', st_text)
+    if total_floors_match:
+        try:
+            total_floors = max(total_floors, int(total_floors_match.group(1)))
+        except ValueError:
+            pass
+
+    # 면적 합계 계산
+    total_area = round(sum(floor_areas.values()), 2)
 
     # 4. 단독 기재된 전용면적 후보 추출 (층별 면적 리스트에 잡히지 않은 단독 면적 수치들을 찾습니다.)
     all_area_matches = re.findall(r'(\d+(?:\.\d+)?)\s*㎡', st_text)
@@ -327,6 +348,7 @@ def extract_court_areas(st_text):
             val = float(excl_keyword_match.group(1))
             exclusive_area = val
             is_estimated_exclusive = False
+            excl_est_type = "exact"  # 명시적인 실제 면적
         except ValueError:
             pass
 
@@ -335,6 +357,7 @@ def extract_court_areas(st_text):
         # 단독 면적 후보 중 가장 마지막에 나오는 면적을 채택합니다.
         exclusive_area = candidate_exclusive_areas[-1]
         is_estimated_exclusive = False
+        excl_est_type = "exact"  # 공부상 단독 전용면적 기재 건이므로 실제 면적으로 채택
 
     # 5-3. 단독 면적이 존재하지 않고, 오직 층별 면적 리스트만 있는 경우 (추정이 필요한 경우)
     if exclusive_area == 0.0 and target_floor and target_floor in floor_areas:
@@ -364,6 +387,7 @@ def extract_court_areas(st_text):
         # 면적 추정 계산 수행
         exclusive_area = round(total_floor_area / divisor, 2)
         is_estimated_exclusive = True
+        excl_est_type = "estimated"  # 층별 면적을 근거로 분할했으므로 최대 근사값 추정
 
     # 6. 폴백 처리 (기존 로직 보존)
     if exclusive_area == 0.0 and not land_match:
@@ -376,11 +400,19 @@ def extract_court_areas(st_text):
                     is_estimated_land = False
                 else:
                     exclusive_area = val
-                    is_estimated_exclusive = False
+                    is_estimated_exclusive = True
+                    excl_est_type = "fake"  # 정보가 부족해 단일 수치로 임의 매핑
             except ValueError:
                 pass
 
-    return exclusive_area, land_area, is_estimated_exclusive, is_estimated_land
+    # 최종 폴백으로 전용면적이 여전히 0이면 거의 허수(fake)
+    if exclusive_area == 0.0:
+        excl_est_type = "fake"
+
+    return (
+        exclusive_area, land_area, is_estimated_exclusive, is_estimated_land,
+        excl_est_type, total_floors, total_area, floor_areas
+    )
 
 
 def calculate_remaining_days(close_date_str):
@@ -891,7 +923,10 @@ def scrape_court_data():
                             notes = f"🟡 AI 주의 리스크 검출! (특별 매각조건 등 확인 권장) | {notes}"
                             
                         raw_st = raw_item.get("st", "")
-                        ex_area, ld_area, is_est_ex, is_est_ld = extract_court_areas(raw_st)
+                        (
+                            ex_area, ld_area, is_est_ex, is_est_ld,
+                            excl_est_type, total_floors, total_area, floor_areas
+                        ) = extract_court_areas(raw_st)
                         su_area = round(ex_area * 1.32, 2) if ex_area > 0 else 0.0
                         bu_area = ex_area
                         
@@ -936,7 +971,11 @@ def scrape_court_data():
                             "is_estimated_building": is_est_ex,
                             "complex_info": complex_info,
                             "elementary_school": elementary_school,
-                            "recent_deals": recent_deals
+                            "recent_deals": recent_deals,
+                            "exclusive_area_estimation_type": excl_est_type,
+                            "building_total_floors": total_floors,
+                            "building_total_area": total_area,
+                            "floor_areas": floor_areas
                         }
                         meta_json = json.dumps(area_meta, ensure_ascii=False)
                         final_notes = notes or "검출된 법적 리스크 권리 인수 특이사항이 없습니다."

@@ -168,6 +168,12 @@ function enrichPropertyDataMobile(item: any): Property {
     item.complex_info = metadata.complex_info || null;
     item.elementary_school = metadata.elementary_school || "";
     item.recent_deals = metadata.recent_deals || [];
+    
+    // [신규 필드 매핑]
+    item.exclusive_area_estimation_type = metadata.exclusive_area_estimation_type || (item.is_estimated_exclusive ? "fake" : "exact");
+    item.building_total_floors = metadata.building_total_floors || 0;
+    item.building_total_area = metadata.building_total_area || 0;
+    item.floor_areas = metadata.floor_areas || {};
   } else {
     item.exclusive_area = exclusiveArea;
     item.land_area = landArea;
@@ -177,6 +183,12 @@ function enrichPropertyDataMobile(item: any): Property {
     item.is_estimated_supply = isEstimatedSupply;
     item.is_estimated_land = isEstimatedLand;
     item.is_estimated_building = isEstimatedBuilding;
+
+    // [신규 필드 매핑 폴백]
+    item.exclusive_area_estimation_type = isEstimatedExclusive ? "fake" : "exact";
+    item.building_total_floors = 0;
+    item.building_total_area = 0;
+    item.floor_areas = {};
 
     // 아파트인 경우 시뮬레이션용 데이터 생성 (폴백 방어)
     if (ptype.includes("아파트")) {
