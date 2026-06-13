@@ -55,7 +55,12 @@ export interface Property {
     color: string;
     accident_history: string;
     inspection_status: string;
+    vin?: string;
+    engine_type?: string;
+    vehicle_type?: string;
+    base_location?: string;
   } | null;
+
   security_info?: {
     company_name: string;
     security_type: string;
@@ -79,6 +84,11 @@ export interface Property {
     status: string;
     notes: string;
   } | null;
+  non_building_meta?: any;
+  exclusive_area_estimation_type?: string;
+  building_total_floors?: number;
+  building_total_area?: number;
+  floor_areas?: Record<string, number>;
 }
 
 export interface FilterState {

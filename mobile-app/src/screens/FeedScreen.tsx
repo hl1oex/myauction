@@ -1044,6 +1044,26 @@ export const FeedScreen: React.FC<FeedScreenProps> = ({ onSelectProperty, filter
           </ScrollView>
         </View>
 
+        {/* 📢 모바일 메인 상단 배너 광고 */}
+        {(() => {
+          const topAd = adSettings.find(a => a.slot_name === 'main_top_banner');
+          if (!topAd || !topAd.active) return null;
+          return (
+            <TouchableOpacity 
+              style={styles.mobileTopAdSlot} 
+              activeOpacity={0.8}
+            >
+              <View style={styles.mobileTopAdBadge}>
+                <Text style={styles.mobileTopAdBadgeText}>AD</Text>
+              </View>
+              <View style={styles.mobileTopAdContent}>
+                <Text style={styles.mobileTopAdTitle} numberOfLines={1}>{topAd.title || '프리미엄 광고'}</Text>
+                <Text style={styles.mobileTopAdDesc} numberOfLines={1}>{topAd.desc || '자세한 내용을 확인해 보세요.'}</Text>
+              </View>
+            </TouchableOpacity>
+          );
+        })()}
+
         {/* 메인 리스트 피드 영역 */}
         {loading ? (
           <View style={styles.centerContainer}>
@@ -1071,11 +1091,12 @@ export const FeedScreen: React.FC<FeedScreenProps> = ({ onSelectProperty, filter
             onRefresh={onRefresh}
             renderItem={({ item, index }) => {
               if (item.isAd) {
-                // 실시간 광고 렌더링
+                // 실시간 광고 렌더링 (list_banner 전용 필터링)
                 let ad = null;
-                if (adSettings && adSettings.length > 0) {
-                  const adIndex = Math.floor(index / 4) % adSettings.length;
-                  ad = adSettings[adIndex];
+                const listAds = adSettings.filter(a => a.slot_name === 'list_banner');
+                if (listAds && listAds.length > 0) {
+                  const adIndex = Math.floor(index / 4) % listAds.length;
+                  ad = listAds[adIndex];
                 }
                 const defaultAd = {
                   title: "★ 프리미엄 경공매 투자 VIP 멤버십 모집",
@@ -1638,5 +1659,42 @@ const styles = StyleSheet.create({
     fontSize: 13,
     fontWeight: 'bold',
     color: COLORS.royalBlue,
+  },
+  mobileTopAdSlot: {
+    backgroundColor: '#fffbeb',
+    borderColor: '#fcd34d',
+    borderWidth: 1,
+    borderRadius: 12,
+    padding: 10,
+    marginHorizontal: 16,
+    marginTop: 8,
+    marginBottom: 8,
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  mobileTopAdBadge: {
+    backgroundColor: COLORS.slate900,
+    paddingHorizontal: 6,
+    paddingVertical: 2,
+    borderRadius: 4,
+    marginRight: 8,
+  },
+  mobileTopAdBadgeText: {
+    fontSize: 9,
+    fontWeight: 'bold',
+    color: COLORS.white,
+  },
+  mobileTopAdContent: {
+    flex: 1,
+  },
+  mobileTopAdTitle: {
+    fontSize: 12,
+    fontWeight: 'bold',
+    color: COLORS.slate900,
+  },
+  mobileTopAdDesc: {
+    fontSize: 10,
+    color: COLORS.slate500,
+    marginTop: 1,
   },
 });

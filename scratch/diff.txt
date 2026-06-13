@@ -1,0 +1,2177 @@
+﻿diff --git a/index.html b/index.html
+index 63be657..342d3cf 100644
+--- a/index.html
++++ b/index.html
+@@ -1077,8 +1077,8 @@
+             </div>
+ 
+             <!-- 遺?숈궛 湲곕낯 紐낆꽭 蹂대뱶 -->
+-            <div class="bg-white border border-slate-200 rounded-2xl p-3.5 sm:p-4 space-y-2 shadow-sm">
+-                <h4 class="text-xs sm:text-sm font-black text-slate-800 flex items-center gap-1.5">
++            <div id="detail-spec-container" class="bg-white border border-slate-200 rounded-2xl p-3.5 sm:p-4 space-y-2 shadow-sm">
++                <h4 id="detail-spec-title" class="text-xs sm:text-sm font-black text-slate-800 flex items-center gap-1.5">
+                     <i class="fa-solid fa-file-invoice text-royalBlue"></i> ?뱥 遺?숈궛 ?쒖떆 諛?湲곕낯 紐낆꽭
+                 </h4>
+                 <div class="space-y-2.5 text-[11px] sm:text-xs font-bold text-slate-700">
+@@ -1086,7 +1086,7 @@
+                         <span class="text-slate-450 text-[10px] sm:text-xs font-bold">?뚯옱吏 二쇱냼</span>
+                         <span id="detail-doc-address" class="font-extrabold text-slate-800 select-all text-right max-w-[70%] truncate"></span>
+                     </div>
+-                    <div class="grid grid-cols-2 gap-2 text-[11px] sm:text-xs text-slate-750">
++                    <div id="detail-spec-grid" class="grid grid-cols-2 gap-2 text-[11px] sm:text-xs text-slate-750">
+                         <div class="bg-slate-50 border border-slate-100 p-2 rounded-xl flex justify-between items-center">
+                             <span class="text-slate-450 font-semibold text-[10px] sm:text-xs">遺?숈궛 ?⑸룄</span>
+                             <span id="detail-spec-ptype" class="font-extrabold text-slate-800"></span>
+@@ -2062,9 +2062,16 @@
+         async function fetchDataFromServer(forceLoad = false) {
+             const sensor = document.getElementById("connection-sensor");
+             
+-            // ?섎룞 ?덈줈怨좎묠 媛뺤젣 ?몄텧 ???쒕쾭??理쒖떊 ??꾩뒪?ы봽瑜?癒쇱? 媛깆떊?⑸땲??
++            // ?섎룞 ?덈줈怨좎묠 媛뺤젣 ?몄텧 ???쒕쾭??理쒖떊 ??꾩뒪?ы봽瑜?癒쇱? 媛깆떊?⑸땲?? (3珥???꾩븘??寃쎌웳 諛⑹뼱 ?곸슜)
+             if (forceLoad) {
+-                await fetchSyncStatus();
++                try {
++                    await Promise.race([
++                        fetchSyncStatus(),
++                        new Promise((_, reject) => setTimeout(() => reject(new Error("Timeout")), 3000))
++                    ]);
++                } catch (e) {
++                    console.warn("?좑툘 ?섎룞 ?덈줈怨좎묠 ??sync_info 議고쉶 ?ㅽ뙣 ?먮뒗 ??꾩븘??- ?곗씠??議고쉶瑜?怨꾩냽 媛?숉빀?덈떎.", e);
++                }
+             }
+             
+             // 10珥???꾩븘???ㅼ젙 (10珥??숈븞 Supabase ?묐떟???놁쑝硫?媛뺤젣濡?Fallback 濡쒖뺄 ?곗씠??濡쒕뱶)
+@@ -2165,8 +2172,18 @@
+ 
+         // ?? 泥??묒냽 ??罹먯떆 ?좏슚?깆쓣 寃利앺븯???꾩슂??寃쎌슦?먮쭔 ?곗씠?곕? 媛?몄삤???쒖뼱 ?⑥닔
+         async function initDataLoad() {
+-            // 1. 癒쇱? sync_info瑜?議고쉶?섏뿬 ?쒕쾭??理쒖떊 ??꾩뒪?ы봽瑜?媛?몄샃?덈떎.
+-            const serverLastSync = await fetchSyncStatus();
++            const sensor = document.getElementById("connection-sensor");
++            
++            // 1. 癒쇱? sync_info瑜?議고쉶?섏뿬 ?쒕쾭??理쒖떊 ??꾩뒪?ы봽瑜?媛?몄샃?덈떎. (3珥???꾩븘??寃쎌웳 諛⑹뼱 ?곸슜)
++            let serverLastSync = null;
++            try {
++                serverLastSync = await Promise.race([
++                    fetchSyncStatus(),
++                    new Promise((_, reject) => setTimeout(() => reject(new Error("Timeout")), 3000))
++                ]);
++            } catch (e) {
++                console.warn("?좑툘 sync_info ??꾩뒪?ы봽 議고쉶 ?ㅽ뙣 ?먮뒗 ??꾩븘??- 罹먯떆 ?곹깭瑜??고쉶 ?먭??⑸땲??", e);
++            }
+             
+             // 2. 濡쒖뺄 ?ㅽ넗由ъ???罹먯떆???곗씠??諛???꾩뒪?ы봽媛 ?덈뒗吏 ?뺤씤?⑸땲??
+             const cachedData = localStorage.getItem('cached_properties');
+@@ -2182,8 +2199,10 @@
+                         // ?듦퀎 媛깆떊
+                         updateHeaderStats(originalProperties);
+                         
+-                        sensor.innerHTML = '<span class="w-2 h-2 rounded-full bg-[#10b981]"></span><span class="hidden sm:inline">?윟 罹먯떆 ?곗씠??濡쒕뱶 ?꾨즺 (' + originalProperties.length.toLocaleString() + '嫄?</span><span class="inline sm:hidden">?윟 ' + originalProperties.length.toLocaleString() + '嫄?/span>';
+-                        sensor.className = "flex items-center gap-1.5 sm:gap-2 px-2 sm:px-3 py-1 sm:py-1.5 rounded-full bg-emerald-50 border border-emerald-200 text-emerald-700 text-[9px] sm:text-[10px] font-black shadow-sm cursor-pointer flex-shrink-0";
++                        if (sensor) {
++                            sensor.innerHTML = '<span class="w-2 h-2 rounded-full bg-[#10b981]"></span><span class="hidden sm:inline">?윟 罹먯떆 ?곗씠??濡쒕뱶 ?꾨즺 (' + originalProperties.length.toLocaleString() + '嫄?</span><span class="inline sm:hidden">?윟 ' + originalProperties.length.toLocaleString() + '嫄?/span>';
++                            sensor.className = "flex items-center gap-1.5 sm:gap-2 px-2 sm:px-3 py-1 sm:py-1.5 rounded-full bg-emerald-50 border border-emerald-200 text-emerald-700 text-[9px] sm:text-[10px] font-black shadow-sm cursor-pointer flex-shrink-0";
++                        }
+                         
+                         applyFilters();
+                         isFirstLoad = false;
+@@ -2309,6 +2328,11 @@
+         let selectedProperty = null;  // ?꾩옱 ?좏깮???쒖꽦??留ㅻЪ 媛앹껜
+         let currentTabId = 'dashboard'; // ?꾩옱 ?쒖꽦?붾맂 ??ID
+ 
++        // ?? 鍮꾨??숈궛 ?먯궛 ?꾪솚 ???먮낯 遺?숈궛 ??蹂듭썝??罹먯떆 蹂??+        let originalPanel2Html = "";
++        let originalPanel3Html = "";
++        let originalPanel4Html = "";
++
+         // ?? ?깅뒫 洹밸???怨좊룄?? ??⑸웾 ?곗씠??吏??濡쒕뵫(Pagination) 諛??붾컮?댁떛 ?곕が ?ㅼ젙
+         let currentPage = 1;
+         const itemsPerPage = 35;      // ??踰덉뿉 ?뚮뜑留곹븷 臾쇨굔 移대뱶 ??(珥덇린 35媛? ?ㅽ겕濡????먮룞 異붽?)
+@@ -2497,6 +2521,14 @@
+         window.addEventListener("resize", initResponsiveLayout);
+ 
+         document.addEventListener("DOMContentLoaded", function() {
++            // ?먮낯 ??HTML 諛깆뾽
++            const p2 = document.getElementById("detail-group-panel-2");
++            const p3 = document.getElementById("detail-group-panel-3");
++            const p4 = document.getElementById("detail-group-panel-4");
++            if (p2) originalPanel2Html = p2.innerHTML;
++            if (p3) originalPanel3Html = p3.innerHTML;
++            if (p4) originalPanel4Html = p4.innerHTML;
++
+             initResponsiveLayout();
+             restoreFiltersFromCache();
+             initDataLoad();
+@@ -3874,6 +3906,150 @@
+             return clean;
+         }
+ 
++        function extractNonBuildingMeta(text, ptype) {
++            const meta = {};
++            if (!text) return meta;
++            const p_clean = (ptype || "").toLowerCase();
++            const text_clean = text.replace(/\n/g, " ").replace(/\s\s+/g, " ").trim();
++            
++            const isVehicle = p_clean.includes("李⑤웾") || p_clean.includes("?먮룞李?) || p_clean.includes("以묎린") || p_clean.includes("?좊컯") || p_clean.includes("??났湲?) || p_clean.includes("?댁넚") || p_clean.includes("吏寃뚯감") || p_clean.includes("?λ퉬");
++            
++            if (isVehicle) {
++                meta.asset_type = "vehicle";
++                
++                // ?곗떇 (?곗떇:2003, ???? 2003, 2003?꾩떇, 2003?꾪삎 ??留ㅼ묶, 以묎컙 怨듬갚 吏??
++                const year_match = text_clean.match(/(?:??s*???쒖옉?꾨룄|?쒖옉?곕룄|?곗떇)\s*:\s*(\d{4})|(\d{4})\s*??s*??(\d{4})\s*??s*??i);
++                if (year_match) {
++                    meta.model_year = (year_match[1] || year_match[2] || year_match[3]) + "?꾩떇";
++                }
++                
++                // 二쇳뻾嫄곕━
++                const mileage_match = text_clean.match(/(?:二쇳뻾嫄곕━|二쇳뻾)\s*:\s*([\d,]+)\s*(?:km|?ㅻ줈)?|([\d,]+)\s*(?:km|?ㅻ줈)\b/i);
++                if (mileage_match) {
++                    meta.mileage = (mileage_match[1] || mileage_match[2]) + " km";
++                }
++                
++                // ?깅줉踰덊샇 / 李⑤웾踰덊샇
++                const no_match = text_clean.match(/(?:?깅줉踰덊샇|李⑤웾踰덊샇|李⑤?踰덊샇)\s*:\s*([媛-??d\w\s\-]+?)(?=\s*(?:李⑤챸|紐⑤뜽紐???s*???곗떇|李?s*醫?李⑥쥌|?쒖썝|李⑤?|?먮룞湲?蹂닿?|?ъ슜蹂멸굅吏|?깅줉踰덊샇|$|,|\||\())/i);
++                if (no_match) {
++                    meta.vehicle_no = no_match[1].trim();
++                } else {
++                    const no_match_simple = text_clean.match(/(?:?깅줉踰덊샇|李⑤웾踰덊샇|李⑤?踰덊샇)\s*:\s*([媛-??d\w\s\-]+?)(?:\s|$|,|\||\()/i);
++                    if (no_match_simple) meta.vehicle_no = no_match_simple[1].trim();
++                }
++                
++                // 李⑤챸
++                const name_match = text_clean.match(/(?:李⑤챸|紐⑤뜽紐?\s*:\s*([媛-??d\w\s\-&]+?)(?=\s*(?:??s*???곗떇|李?s*醫?李⑥쥌|?쒖썝|李⑤?|?먮룞湲?蹂닿?|?ъ슜蹂멸굅吏|?깅줉踰덊샇|$|,|\||\())/i);
++                if (name_match) {
++                    meta.model_name = name_match[1].trim();
++                } else {
++                    const name_match_simple = text_clean.match(/(?:李⑤챸|紐⑤뜽紐?\s*:\s*([媛-??d\w\s\-&]+?)(?:\s|$|,|\||\()/i);
++                    if (name_match_simple) meta.model_name = name_match_simple[1].trim();
++                }
++                
++                // 李⑥쥌
++                const type_match = text_clean.match(/(?:李?s*醫?李⑥쥌)\s*:\s*([媛-??d\w\s\-]+?)(?=\s*(?:?쒖썝|李⑤?|?먮룞湲?蹂닿?|?ъ슜蹂멸굅吏|?깅줉踰덊샇|李⑤챸|紐⑤뜽紐???s*???곗떇|$|,|\||\())/i);
++                if (type_match) {
++                    meta.vehicle_type = type_match[1].trim();
++                }
++                
++                // 李⑤?踰덊샇
++                const vin_match = text_clean.match(/(?:李⑤?踰덊샇|李⑤?\s*踰덊샇)\s*:\s*([媛-??d\w\s\-]+?)(?=\s*(?:?먮룞湲?蹂닿?|?ъ슜蹂멸굅吏|?깅줉踰덊샇|李⑤챸|紐⑤뜽紐???s*???곗떇|李?s*醫?李⑥쥌|?쒖썝|$|,|\||\())/i);
++                if (vin_match) {
++                    meta.vin = vin_match[1].trim();
++                }
++                
++                // ?먮룞湲고삎??+                const engine_match = text_clean.match(/(?:?먮룞湲고삎???먮룞湲?s*?뺤떇|?붿쭊?뺤떇|?붿쭊\s*?뺤떇)\s*:\s*([媛-??d\w\s\-]+?)(?=\s*(?:蹂닿?|?ъ슜蹂멸굅吏|?깅줉踰덊샇|李⑤챸|紐⑤뜽紐???s*???곗떇|李?s*醫?李⑥쥌|李⑤?|?쒖썝|$|,|\||\())/i);
++                if (engine_match) {
++                    meta.engine_type = engine_match[1].trim();
++                }
++                
++                // 蹂닿??μ냼
++                const loc_match = text_clean.match(/(?:蹂닿??μ냼|蹂닿?吏|?뚯옱吏)\s*:\s*([媛-??w\s\-\(\),.]+?)(?=\s*(?:?ъ슜蹂멸굅吏|?깅줉踰덊샇|李⑤챸|紐⑤뜽紐???s*???곗떇|李?s*醫?李⑥쥌|李⑤?|?먮룞湲?$|,|\|)/i);
++                if (loc_match) {
++                    meta.storage_location = loc_match[1].trim();
++                } else {
++                    const loc_match_simple = text_clean.match(/(?:蹂닿??μ냼|蹂닿?吏|?뚯옱吏)\s*:\s*([媛-??w\s\-]+?)(?:\s\s|$|,|\|)/i);
++                    if (loc_match_simple) meta.storage_location = loc_match_simple[1].trim();
++                }
++                
++                // ?ъ슜蹂멸굅吏
++                const base_match = text_clean.match(/(?:?ъ슜蹂멸굅吏|?ъ슜\s*蹂멸굅吏|蹂멸굅吏)\s*:\s*([媛-??d\w\s\-(),.]+?)(?=\s*(?:?깅줉踰덊샇|李⑤챸|紐⑤뜽紐???s*???곗떇|李?s*醫?李⑥쥌|?쒖썝|李⑤?|?먮룞湲?蹂닿?|$|,|\||\())/i);
++                if (base_match) {
++                    meta.base_location = base_match[1].trim();
++                }
++
++                // ?곕즺, 諛곌린?? ?됱긽 異붽? 異붿텧
++                const fuel_match = text_clean.match(/(?섎컻??媛?붾┛|寃쎌쑀|?붿젮|LPG|?섑뵾吏|?섏씠釉뚮━???꾧린|?섏냼)/i);
++                if (fuel_match) {
++                    meta.fuel = fuel_match[1].trim();
++                }
++                const cc_match = text_clean.match(/([\d,]+)\s*cc/i);
++                if (cc_match) {
++                    meta.displacement = cc_match[1].trim() + " cc";
++                }
++                const color_match = text_clean.match(/(?:?됱긽|??s*??\s*:\s*([媛-??w\s]+?)(?=\s*(?:?ъ슜蹂멸굅吏|?깅줉踰덊샇|李⑤챸|紐⑤뜽紐?$|,|\||\())/i);
++                if (color_match) {
++                    meta.color = color_match[1].trim();
++                } else {
++                    const color_word_match = text_clean.match(/(寃?뺤깋|?곗깋|???伊먯깋|吏꾪쉶???뚯깋|泥?깋|?곸깋|寃????뚯깋|吏꾩＜??/i);
++                    if (color_word_match) {
++                        meta.color = color_word_match[1].trim();
++                    }
++                }
++            }
++            
++            if (!meta.asset_type && (p_clean.includes("湲곌퀎") || p_clean.includes("湲곌뎄") || p_clean.includes("?ㅻ퉬") || p_clean.includes("?λ퉬"))) {
++                meta.asset_type = "machinery";
++                const spec_match = text_clean.match(/(?:洹쒓꺽|?뺤떇|?깅뒫)\s*:\s*([媛-??w\s\-\(\)\/,.]+?)(?=\s*(?:?쒖“???쒖옉???쒖“援??섎웾|$|,|\|)/i);
++                if (spec_match) {
++                    meta.specification = spec_match[1].trim();
++                } else {
++                    const spec_match_simple = text_clean.match(/(?:洹쒓꺽|?뺤떇|?깅뒫)\s*:\s*([媛-??w\s\-\(\)\/,.]+?)(?:\s\s|$|,|\|)/i);
++                    if (spec_match_simple) meta.specification = spec_match_simple[1].trim();
++                }
++                
++                const maker_match = text_clean.match(/(?:?쒖“???쒖옉???쒖“援?\s*:\s*([媛-??w\s\-]+?)(?=\s*(?:?섎웾|洹쒓꺽|?뺤떇|$|,|\|)/i);
++                if (maker_match) {
++                    meta.manufacturer = maker_match[1].trim();
++                } else {
++                    const maker_match_simple = text_clean.match(/(?:?쒖“???쒖옉???쒖“援?\s*:\s*([媛-??w\s\-]+?)(?:\s|$|,|\|)/i);
++                    if (maker_match_simple) meta.manufacturer = maker_match_simple[1].trim();
++                }
++                
++                const qty_match = text_clean.match(/(?:?섎웾|?섎웾\s*:\s*)(\d+)\s*(?:?|?명듃|媛?議?/i);
++                if (qty_match) {
++                    meta.quantity = qty_match[1] + "?";
++                }
++            }
++            
++            if (!meta.asset_type && (p_clean.includes("二쇱떇") || p_clean.includes("利앷텒") || p_clean.includes("梨꾧텒") || p_clean.includes("異쒖옄"))) {
++                meta.asset_type = "securities";
++                const qty_match = text_clean.match(/([\d,]+)\s*二?b|二쇱떇\s*?섎웾\s*:\s*([\d,]+)/i);
++                if (qty_match) {
++                    meta.quantity = (qty_match[1] || qty_match[2]) + "二?;
++                }
++                const company_match = text_clean.match(/([媛-??w\s]+(?:二쇱떇?뚯궗|?쒖빟|?뚰겕|??⑹뒪|諛붿씠??嫄댁꽕|?뺣?|?곗뾽))/i);
++                if (company_match) {
++                    meta.company_name = company_match[1].trim();
++                }
++            }
++            
++            if (!meta.asset_type) {
++                meta.asset_type = "goods";
++                const qty_match = text_clean.match(/(?:?섎웾|媛쒖닔)\s*:\s*([\d,]+)\s*([媛-??+)|([\d,]+)\s*(?:媛??명듃|諛뺤뒪|??\b/i);
++                if (qty_match) {
++                    meta.quantity = (qty_match[1] || qty_match[3]) + "媛?;
++                }
++                const loc_match = text_clean.match(/(?:蹂닿??μ냼|蹂닿?吏|?뚯옱吏)\s*:\s*([媛-??w\s\-]+?)(?:\s\s|$|,|\|)/i);
++                if (loc_match) {
++                    meta.storage_location = loc_match[1].trim();
++                }
++            }
++            return meta;
++        }
++
+         function enrichPropertyData(item) {
+             if (!item) return item;
+             
+@@ -3900,10 +4076,64 @@
+             item.complex_info = meta.complex_info || {};
+             item.elementary_school = meta.elementary_school || "";
+             item.recent_deals = meta.recent_deals || [];
+-            item.car_info = meta.car_info || null;
+-            item.security_info = meta.security_info || null;
+-            item.machinery_info = meta.machinery_info || null;
+-            item.etc_info = meta.etc_info || null;
++
++            // 鍮꾨??숈궛 ?먯궛 硫뷀? ?뚯떛 ?먮뒗 ?곕룞
++            const nonBuildingKeywords = ['李⑤웾', '?먮룞李?, '以묎린', '?좊컯', '??났湲?, '?댁넚', '吏寃뚯감', '?λ퉬', '湲곌퀎', '湲곌뎄', '?ㅻ퉬', '?좉?利앷텒', '利앷텒', '二쇱떇', '梨꾧텒', '湲고?臾쇳뭹', '臾쇳뭹', '?숈궛'];
++            const isNonBuilding = item.source === 'court_etc' || item.source === 'onbid_etc' || nonBuildingKeywords.some(k => (item.ptype || "").includes(k));
++            const textToSearch = `${item.address || ""} ${item.desc_content || ""} ${cleanNotes}`;
++            const nbMeta = meta.non_building_meta || (isNonBuilding ? extractNonBuildingMeta(textToSearch, item.ptype) : null);
++            item.non_building_meta = nbMeta;
++
++            if (nbMeta && nbMeta.asset_type) {
++                if (nbMeta.asset_type === 'vehicle') {
++                    item.car_info = {
++                        car_no: nbMeta.vehicle_no || '-',
++                        car_model: nbMeta.model_name || '-',
++                        model_year: nbMeta.model_year || '-',
++                        mileage: nbMeta.mileage || '-',
++                        fuel: nbMeta.fuel || '誘몄긽',
++                        displacement: nbMeta.displacement || '誘몄긽',
++                        color: nbMeta.color || '誘몄긽',
++                        vin: nbMeta.vin || '-',
++                        engine_type: nbMeta.engine_type || '-',
++                        vehicle_type: nbMeta.vehicle_type || '-',
++                        base_location: nbMeta.base_location || '-',
++                        accident_history: '誘몄긽',
++                        inspection_status: '?묓샇 (異붿젙)'
++                    };
++                } else if (nbMeta.asset_type === 'machinery') {
++                    item.machinery_info = {
++                        machine_name: nbMeta.model_name || '-',
++                        maker: nbMeta.manufacturer || '-',
++                        model_year: '-',
++                        status: '?뺤긽 ?묐룞 (異붿젙)',
++                        standard: nbMeta.specification || nbMeta.quantity || '-'
++                    };
++                } else if (nbMeta.asset_type === 'securities') {
++                    item.security_info = {
++                        company_name: nbMeta.company_name || '-',
++                        security_type: '蹂댄넻二?,
++                        share_count: nbMeta.quantity || '-',
++                        face_value: '-',
++                        par_value_total: '-',
++                        financial_status: '?뺤긽 (異붿젙)',
++                        major_shareholders: '誘몄긽'
++                    };
++                } else if (nbMeta.asset_type === 'goods') {
++                    item.etc_info = {
++                        item_name: nbMeta.model_name || '-',
++                        quantity: nbMeta.quantity || '-',
++                        origin: '援?궛 (異붿젙)',
++                        status: '蹂댄넻',
++                        notes: nbMeta.storage_location ? `蹂닿??? ${nbMeta.storage_location}` : '-'
++                    };
++                }
++            } else {
++                item.car_info = meta.car_info || null;
++                item.security_info = meta.security_info || null;
++                item.machinery_info = meta.machinery_info || null;
++                item.etc_info = meta.etc_info || null;
++            }
+ 
+             // 硫댁쟻 ??뼱?곌린
+             if (meta.exclusive_area > 0) item.exclusive_area = meta.exclusive_area;
+@@ -3936,7 +4166,6 @@
+                 return item;
+             }
+             let structure = item.structure || "";
+-            const textToSearch = `${item.address || ""} ${item.desc_content || ""} ${item.notes_content || ""}`;
+             if (!structure || structure === "泥좉낏泥좉렐肄섑겕由ы듃") {
+                 const structureKeywords = ["泥좉낏泥좉렐肄섑겕由ы듃", "泥좉렐肄섑겕由ы듃", "踰쎈룎議?, "議곗쟻議?, "?곗?議?, "?쒕찘?몃꼍??, "釉붾줉議?, "紐⑹“", "?쇰컲泥좉낏", "寃쎈웾泥좉낏", "泥좉낏議?, "?앹“", "?먮꽟議?];
+                 let found = false;
+@@ -4066,19 +4295,23 @@
+             const tab3Btn = document.getElementById("detail-group-tab-3-btn");
+             const tab4Btn = document.getElementById("detail-group-tab-4-btn");
+ 
+-            if (item.source === 'onbid_etc' || item.source === 'court_etc') {
++            const nonBuildingKeywords = ['李⑤웾', '?먮룞李?, '以묎린', '?좊컯', '??났湲?, '?댁넚', '吏寃뚯감', '?λ퉬', '湲곌퀎', '湲곌뎄', '?ㅻ퉬', '?좉?利앷텒', '利앷텒', '二쇱떇', '梨꾧텒', '湲고?臾쇳뭹', '臾쇳뭹', '?숈궛'];
++            const isNonBuilding = item.source === 'court_etc' || item.source === 'onbid_etc' || nonBuildingKeywords.some(k => (item.ptype || "").includes(k));
++
++            if (isNonBuilding) {
+                 if (rvTitle) rvTitle.innerHTML = `<i class="fa-solid fa-image text-royalBlue"></i> ?벀 ?먯궛 ????대?吏`;
+                 if (rvFallbackText) rvFallbackText.innerText = "鍮꾨??숈궛 ?먯궛? 濡쒕뱶酉곕? ?쒓났?섏? ?딆뒿?덈떎.";
+-                if (tab2Btn) tab2Btn.classList.add("hidden");
+-                if (tab3Btn) tab3Btn.classList.add("hidden");
+-                if (tab4Btn) tab4Btn.classList.add("hidden");
+-                changeDetailGroupTab(1);
++                if (tab2Btn) tab2Btn.classList.remove("hidden");
++                if (tab3Btn) tab3Btn.classList.remove("hidden");
++                if (tab4Btn) tab4Btn.classList.remove("hidden");
++                changeDetailGroupTab(currentDetailGroupTab || 1);
+             } else {
+                 if (rvTitle) rvTitle.innerHTML = `<i class="fa-solid fa-image text-royalBlue"></i> ?룫 遺?숈궛 ????꾧꼍 (?ㅼ젣 濡쒕뱶酉?`;
+                 if (rvFallbackText) rvFallbackText.innerText = "?대떦 ?꾩튂??濡쒕뱶酉곕? 遺덈윭?????놁뒿?덈떎.";
+                 if (tab2Btn) tab2Btn.classList.remove("hidden");
+                 if (tab3Btn) tab3Btn.classList.remove("hidden");
+                 if (tab4Btn) tab4Btn.classList.remove("hidden");
++                changeDetailGroupTab(currentDetailGroupTab || 1);
+             }
+ 
+             // 二쇱냼 遺遺꾩? ?뺥솗???낅몢怨??愿꾪샇, ?뚭큵?? 以묎큵??諛?洹??대? ?띿뒪???? ?⑸룄, ?좎쓽?ы빆 ??留??쒓굅?섏뿬 ?쒕ぉ??以묎컙???섎━吏 ?딅룄濡??뺤젣?⑸땲??
+@@ -4141,77 +4374,214 @@
+             // ?먮Ц ?ㅻ챸 諛붿씤??             document.getElementById("detail-desc").innerText = item.desc_content || "?곸꽭 鍮꾧퀬 ?댁슜???놁뒿?덈떎.";
+             
+-            // ?룧 臾쇨굔 ?몃? ?ㅽ럺 遺꾩꽍 諛붿씤??-            document.getElementById("detail-spec-ptype").innerText = item.ptype || "誘몄긽";
+-            document.getElementById("detail-spec-round").innerText = item.round_info || "?좉굔";
+-            document.getElementById("detail-spec-appraisal").innerText = formatKRW(item.appraised_value);
+-            document.getElementById("detail-spec-minimum").innerText = formatKRW(item.minimum_bid);
+-            document.getElementById("detail-spec-date").innerText = `${item.bidding_date || "誘몄긽"} (${calculateRemainingDays(item.bidding_date) >= 0 ? 'D-' + calculateRemainingDays(item.bidding_date) : '醫낃껐'})`;
+-
+-            // ?썱截??踰뺤썝 ?먮낯 ?쒕ぉ ?깆쑝濡쒕???臾쇨굔 ?ъ쭏/援ъ“ ?뺣낫(泥좉낏泥좉렐肄섑겕由ы듃, 議곗쟻議??? ?뺣? ?숈쟻 遺꾩꽍
+-            let detectedStructure = "泥좉낏泥좉렐肄섑겕由ы듃";
+-            const structureKeywords = ["泥좉낏泥좉렐肄섑겕由ы듃", "泥좉렐肄섑겕由ы듃", "踰쎈룎議?, "議곗쟻議?, "?곗?議?, "?쒕찘?몃꼍??, "釉붾줉議?, "紐⑹“", "媛뺥뙆?댄봽", "寃쎈웾泥좉낏", "泥좉낏議?, "?앹“"];
+-            for (const kw of structureKeywords) {
+-                if ((item.address || "").includes(kw) || (item.desc_content || "").includes(kw)) {
+-                    detectedStructure = kw;
+-                    break;
++            // ?룧 臾쇨굔 ?몃? ?ㅽ럺 遺꾩꽍 諛붿씤??(遺?숈궛 vs 鍮꾨??숈궛 遺꾧린)
++            const specGrid = document.getElementById("detail-spec-grid");
++            const specTitle = document.getElementById("detail-spec-title");
++
++            if (isNonBuilding) {
++                // 鍮꾨??숈궛 ?먯궛 ??댄? ?ㅼ젙.
++                if (specTitle) {
++                    specTitle.innerHTML = `<i class="fa-solid fa-file-invoice text-royalBlue"></i> ?벀 ?먯궛 ?쒖떆 諛?湲곕낯 紐낆꽭`;
+                 }
+-            }
+-            const structureEl = document.getElementById("detail-spec-structure");
+-            if (structureEl) structureEl.innerText = detectedStructure;
++                const nbMeta = item.non_building_meta || {};
++                let customGridHtml = "";
+ 
+-            // ?뫀 媛???뚯쑀二?諛?梨꾨Т???뺤젣 諛?留덉뒪??("?띻만?? -> "?띲뀋??, "源梨꾨Т" -> "源?뉎뀋")
+-            const maskName = (name) => {
+-                if (!name || name === "誘몄긽" || name === "-" || name.trim() === "") return "媛뺛뀋??;
+-                const clean = name.trim();
+-                if (clean.length <= 1) return clean;
+-                return clean[0] + "??.repeat(Math.max(1, clean.length - 1));
+-            };
+-            const virtualOwner = item.owner || "?띻만??;
+-            const virtualDebtor = item.debtor || "源梨꾨Т";
+-            document.getElementById("detail-owner").innerText = maskName(virtualOwner);
+-            document.getElementById("detail-debtor").innerText = maskName(virtualDebtor);
+-
+-            // ?뱪 ?됱닔 遺꾪븷 諛?硫댁쟻 諛붿씤??(enrichPropertyData 蹂댁셿媛??곸슜)
+-            const exclusiveArea = item.exclusive_area;
+-            const supplyArea = item.supply_area;
+-            const landArea = item.land_area;
+-            const buildingArea = item.building_area;
+-            
+-            const exclusivePy = (exclusiveArea * 0.3025).toFixed(1);
+-            const supplyPy = (supplyArea * 0.3025).toFixed(1);
+-            const landPy = (landArea * 0.3025).toFixed(1);
+-            const buildingPy = (buildingArea * 0.3025).toFixed(1);
+-
+-            let estExSuffix = "";
+-            let estSpSuffix = "";
+-            let estLdSuffix = "";
+-            let estBdSuffix = "";
+-
+-            const estType = item.exclusive_area_estimation_type || "exact";
+-            if (estType === "estimated") {
+-                if (item.is_estimated_exclusive) estExSuffix = ` <span class="inline-flex items-center gap-0.5 px-2 py-0.5 ml-1.5 rounded-full text-[10px] font-black bg-amber-500 text-white select-none">?좑툘 異붿젙</span>`;
+-                if (item.is_estimated_supply) estSpSuffix = ` <span class="inline-flex items-center gap-0.5 px-2 py-0.5 ml-1.5 rounded-full text-[10px] font-black bg-amber-500 text-white select-none">?좑툘 異붿젙</span>`;
+-                if (item.is_estimated_land) estLdSuffix = ` <span class="inline-flex items-center gap-0.5 px-2 py-0.5 ml-1.5 rounded-full text-[10px] font-black bg-amber-500 text-white select-none">?좑툘 異붿젙</span>`;
+-                if (item.is_estimated_building) estBdSuffix = ` <span class="inline-flex items-center gap-0.5 px-2 py-0.5 ml-1.5 rounded-full text-[10px] font-black bg-amber-500 text-white select-none">?좑툘 異붿젙</span>`;
+-            } else if (estType === "fake") {
+-                if (item.is_estimated_exclusive) estExSuffix = ` <span class="inline-flex items-center gap-0.5 px-2 py-0.5 ml-1.5 rounded-full text-[10px] font-black bg-rose-500 text-white select-none animate-pulse">?좑툘 ?덉닔</span>`;
+-                if (item.is_estimated_supply) estSpSuffix = ` <span class="inline-flex items-center gap-0.5 px-2 py-0.5 ml-1.5 rounded-full text-[10px] font-black bg-rose-500 text-white select-none animate-pulse">?좑툘 ?덉닔</span>`;
+-                if (item.is_estimated_land) estLdSuffix = ` <span class="inline-flex items-center gap-0.5 px-2 py-0.5 ml-1.5 rounded-full text-[10px] font-black bg-rose-500 text-white select-none animate-pulse">?좑툘 ?덉닔</span>`;
+-                if (item.is_estimated_building) estBdSuffix = ` <span class="inline-flex items-center gap-0.5 px-2 py-0.5 ml-1.5 rounded-full text-[10px] font-black bg-rose-500 text-white select-none animate-pulse">?좑툘 ?덉닔</span>`;
+-            }
+-
+-            const formatAreaHtml = (area, py, suffix) => {
+-                if (!area || area <= 0) {
+-                    return `<span class="text-slate-400 font-normal">誘몄긽</span>`;
++                if (nbMeta.asset_type === 'vehicle') {
++                    customGridHtml = `
++                        <div class="bg-slate-50 border border-slate-100 p-2 rounded-xl flex justify-between items-center">
++                            <span class="text-slate-450 font-semibold text-[10px] sm:text-xs">李⑥쥌/紐⑤뜽紐?/span>
++                            <span class="font-extrabold text-slate-800">${nbMeta.model_name || "誘몄긽"}</span>
++                        </div>
++                        <div class="bg-slate-50 border border-slate-100 p-2 rounded-xl flex justify-between items-center">
++                            <span class="text-slate-450 font-semibold text-[10px] sm:text-xs">李⑤웾 ?깅줉踰덊샇</span>
++                            <span class="font-extrabold text-slate-800">${nbMeta.vehicle_no || "誘몄긽"}</span>
++                        </div>
++                        <div class="bg-slate-50 border border-slate-100 p-2 rounded-xl flex justify-between items-center">
++                            <span class="text-slate-450 font-semibold text-[10px] sm:text-xs">紐⑤뜽 ?곗떇</span>
++                            <span class="font-extrabold text-slate-800">${nbMeta.model_year || "誘몄긽"}</span>
++                        </div>
++                        <div class="bg-slate-50 border border-slate-100 p-2 rounded-xl flex justify-between items-center">
++                            <span class="text-slate-450 font-semibold text-[10px] sm:text-xs">?꾩쟻 二쇳뻾嫄곕━</span>
++                            <span class="font-extrabold text-royalBlue">${nbMeta.mileage || "誘몄긽"}</span>
++                        </div>
++                    `;
++                } else if (nbMeta.asset_type === 'machinery') {
++                    customGridHtml = `
++                        <div class="bg-slate-50 border border-slate-100 p-2 rounded-xl flex justify-between items-center col-span-2">
++                            <span class="text-slate-450 font-semibold text-[10px] sm:text-xs">?λ퉬 洹쒓꺽/?뺤떇</span>
++                            <span class="font-extrabold text-slate-800 text-right">${nbMeta.specification || "誘몄긽"}</span>
++                        </div>
++                        <div class="bg-slate-50 border border-slate-100 p-2 rounded-xl flex justify-between items-center">
++                            <span class="text-slate-450 font-semibold text-[10px] sm:text-xs">?쒖“?뚯궗</span>
++                            <span class="font-extrabold text-slate-800">${nbMeta.manufacturer || "誘몄긽"}</span>
++                        </div>
++                        <div class="bg-slate-50 border border-slate-100 p-2 rounded-xl flex justify-between items-center">
++                            <span class="text-slate-455 font-semibold text-[10px] sm:text-xs">怨듬ℓ ?섎웾</span>
++                            <span class="font-extrabold text-slate-800">${nbMeta.quantity || "1? (湲곕낯)"}</span>
++                        </div>
++                    `;
++                } else if (nbMeta.asset_type === 'securities') {
++                    customGridHtml = `
++                        <div class="bg-slate-50 border border-slate-100 p-2 rounded-xl flex justify-between items-center col-span-2">
++                            <span class="text-slate-450 font-semibold text-[10px] sm:text-xs">諛쒗뻾 ?뚯궗紐?/span>
++                            <span class="font-extrabold text-slate-800 text-right">${nbMeta.company_name || "誘몄긽"}</span>
++                        </div>
++                        <div class="bg-slate-50 border border-slate-100 p-2 rounded-xl flex justify-between items-center col-span-2">
++                            <span class="text-slate-450 font-semibold text-[10px] sm:text-xs">?몄닔 二쇱떇??/span>
++                            <span class="font-extrabold text-royalBlue text-right">${nbMeta.quantity || "誘몄긽"}</span>
++                        </div>
++                    `;
++                } else {
++                    customGridHtml = `
++                        <div class="bg-slate-50 border border-slate-100 p-2 rounded-xl flex justify-between items-center">
++                            <span class="text-slate-455 font-semibold text-[10px] sm:text-xs">怨듬ℓ ?섎웾</span>
++                            <span class="font-extrabold text-slate-800">${nbMeta.quantity || "誘몄긽"}</span>
++                        </div>
++                        <div class="bg-slate-50 border border-slate-100 p-2 rounded-xl flex justify-between items-center col-span-2">
++                            <span class="text-slate-455 font-semibold text-[10px] sm:text-xs">蹂닿? ?μ냼</span>
++                            <span class="font-extrabold text-slate-800 text-right">${nbMeta.storage_location || "?곸꽭 ?댁뿭 李멸퀬"}</span>
++                        </div>
++                    `;
++                }
++
++                // 怨듯넻 ?붿쑉 諛?媛먯젙媛 異붽?.
++                customGridHtml += `
++                    <div class="bg-slate-50 border border-slate-100 p-2 rounded-xl flex justify-between items-center">
++                        <span class="text-slate-450 font-semibold text-[10px] sm:text-xs">?먯궛 ?⑸룄</span>
++                        <span class="font-extrabold text-slate-800">${item.ptype || "誘몄긽"}</span>
++                    </div>
++                    <div class="bg-slate-50 border border-slate-100 p-2 rounded-xl flex justify-between items-center">
++                        <span class="text-slate-450 font-semibold text-[10px] sm:text-xs">吏꾪뻾 ?뚯감</span>
++                        <span class="font-extrabold text-slate-800">${item.round_info || "?좉굔"}</span>
++                    </div>
++                    <div class="bg-slate-50 border border-slate-100 p-2 rounded-xl flex justify-between items-center">
++                        <span class="text-slate-450 font-semibold text-[10px] sm:text-xs">媛먯젙?됯???/span>
++                        <span class="font-extrabold text-slate-800 font-outfit">${formatKRW(item.appraised_value)}</span>
++                    </div>
++                    <div class="bg-slate-50 border border-slate-100 p-2 rounded-xl flex justify-between items-center">
++                        <span class="text-slate-450 font-semibold text-[10px] sm:text-xs">理쒖??낆같??/span>
++                        <span class="font-extrabold text-rose-600 font-outfit">${formatKRW(item.minimum_bid)}</span>
++                    </div>
++                    <div class="bg-slate-50 border border-slate-100 p-2 rounded-xl flex justify-between items-center col-span-2">
++                        <span class="text-slate-455 font-semibold text-[10px] sm:text-xs">?낆같??留덇컧 ?щ?</span>
++                        <span class="font-extrabold text-slate-800">${item.bidding_date || "誘몄긽"} (${calculateRemainingDays(item.bidding_date) >= 0 ? 'D-' + calculateRemainingDays(item.bidding_date) : '醫낃껐'})</span>
++                    </div>
++                `;
++                if (specGrid) specGrid.innerHTML = customGridHtml;
++            } else {
++                // 遺?숈궛 ??댄? ?ㅼ젙.
++                if (specTitle) {
++                    specTitle.innerHTML = `<i class="fa-solid fa-file-invoice text-royalBlue"></i> ?뱥 遺?숈궛 ?쒖떆 諛?湲곕낯 紐낆꽭`;
++                }
++
++                // 媛???뚯쑀二?諛?梨꾨Т??留덉뒪??
++                const maskName = (name) => {
++                    if (!name || name === "誘몄긽" || name === "-" || name.trim() === "") return "媛뺛뀋??;
++                    const clean = name.trim();
++                    if (clean.length <= 1) return clean;
++                    return clean[0] + "??.repeat(Math.max(1, clean.length - 1));
++                };
++                const virtualOwner = item.owner || "?띻만??;
++                const virtualDebtor = item.debtor || "源梨꾨Т";
++
++                // 硫댁쟻 諛붿씤???⑸룄.
++                const exclusiveArea = item.exclusive_area;
++                const supplyArea = item.supply_area;
++                const landArea = item.land_area;
++                const buildingArea = item.building_area;
++                
++                const exclusivePy = (exclusiveArea * 0.3025).toFixed(1);
++                const supplyPy = (supplyArea * 0.3025).toFixed(1);
++                const landPy = (landArea * 0.3025).toFixed(1);
++                const buildingPy = (buildingArea * 0.3025).toFixed(1);
++
++                let estExSuffix = "";
++                let estSpSuffix = "";
++                let estLdSuffix = "";
++                let estBdSuffix = "";
++
++                const estType = item.exclusive_area_estimation_type || "exact";
++                if (estType === "estimated") {
++                    if (item.is_estimated_exclusive) estExSuffix = ` <span class="inline-flex items-center gap-0.5 px-2 py-0.5 ml-1.5 rounded-full text-[10px] font-black bg-amber-500 text-white select-none">?좑툘 異붿젙</span>`;
++                    if (item.is_estimated_supply) estSpSuffix = ` <span class="inline-flex items-center gap-0.5 px-2 py-0.5 ml-1.5 rounded-full text-[10px] font-black bg-amber-500 text-white select-none">?좑툘 異붿젙</span>`;
++                    if (item.is_estimated_land) estLdSuffix = ` <span class="inline-flex items-center gap-0.5 px-2 py-0.5 ml-1.5 rounded-full text-[10px] font-black bg-amber-500 text-white select-none">?좑툘 異붿젙</span>`;
++                    if (item.is_estimated_building) estBdSuffix = ` <span class="inline-flex items-center gap-0.5 px-2 py-0.5 ml-1.5 rounded-full text-[10px] font-black bg-amber-500 text-white select-none">?좑툘 異붿젙</span>`;
++                } else if (estType === "fake") {
++                    if (item.is_estimated_exclusive) estExSuffix = ` <span class="inline-flex items-center gap-0.5 px-2 py-0.5 ml-1.5 rounded-full text-[10px] font-black bg-rose-500 text-white select-none animate-pulse">?좑툘 ?덉닔</span>`;
++                    if (item.is_estimated_supply) estSpSuffix = ` <span class="inline-flex items-center gap-0.5 px-2 py-0.5 ml-1.5 rounded-full text-[10px] font-black bg-rose-500 text-white select-none animate-pulse">?좑툘 ?덉닔</span>`;
++                    if (item.is_estimated_land) estLdSuffix = ` <span class="inline-flex items-center gap-0.5 px-2 py-0.5 ml-1.5 rounded-full text-[10px] font-black bg-rose-500 text-white select-none animate-pulse">?좑툘 ?덉닔</span>`;
++                    if (item.is_estimated_building) estBdSuffix = ` <span class="inline-flex items-center gap-0.5 px-2 py-0.5 ml-1.5 rounded-full text-[10px] font-black bg-rose-500 text-white select-none animate-pulse">?좑툘 ?덉닔</span>`;
++                }
++
++                const formatAreaHtml = (area, py, suffix) => {
++                    if (!area || area <= 0) {
++                        return `<span class="text-slate-400 font-normal">誘몄긽</span>`;
++                    }
++                    return `${area.toFixed(1)} ??(${py} ??${suffix}`;
++                };
++
++                // ?踰뺤썝 ?먮낯 ?쒕ぉ ?깆쑝濡쒕???臾쇨굔 ?ъ쭏/援ъ“ ?뺣낫 ?뺣? ?숈쟻 遺꾩꽍.
++                let detectedStructure = "泥좉낏泥좉렐肄섑겕由ы듃";
++                const structureKeywords = ["泥좉낏泥좉렐肄섑겕由ы듃", "泥좉렐肄섑겕由ы듃", "踰쎈룎議?, "議곗쟻議?, "?곗?議?, "?쒕찘?몃꼍??, "釉붾줉議?, "紐⑹“", "媛뺥뙆?댄봽", "寃쎈웾泥좉낏", "泥좉낏議?, "?앹“"];
++                for (const kw of structureKeywords) {
++                    if ((item.address || "").includes(kw) || (item.desc_content || "").includes(kw)) {
++                        detectedStructure = kw;
++                        break;
++                    }
+                 }
+-                return `${area.toFixed(1)} ??(${py} ??${suffix}`;
+-            };
+ 
+-            document.getElementById("detail-spec-exclusive-py").innerHTML = formatAreaHtml(exclusiveArea, exclusivePy, estExSuffix);
+-            document.getElementById("detail-spec-supply-py").innerHTML = formatAreaHtml(supplyArea, supplyPy, estSpSuffix);
+-            document.getElementById("detail-spec-land-py").innerHTML = formatAreaHtml(landArea, landPy, estLdSuffix);
+-            document.getElementById("detail-spec-building-py").innerHTML = formatAreaHtml(buildingArea, buildingPy, estBdSuffix);
++                let standardGridHtml = `
++                    <div class="bg-slate-50 border border-slate-100 p-2 rounded-xl flex justify-between items-center">
++                        <span class="text-slate-450 font-semibold text-[10px] sm:text-xs">遺?숈궛 ?⑸룄</span>
++                        <span id="detail-spec-ptype" class="font-extrabold text-slate-800">${item.ptype || "誘몄긽"}</span>
++                    </div>
++                    <div class="bg-slate-50 border border-slate-100 p-2 rounded-xl flex justify-between items-center">
++                        <span class="text-slate-450 font-semibold text-[10px] sm:text-xs">吏꾪뻾 ?뚯감</span>
++                        <span id="detail-spec-round" class="font-extrabold text-slate-800">${item.round_info || "?좉굔"}</span>
++                    </div>
++                    <div class="bg-slate-50 border border-slate-100 p-2 rounded-xl flex justify-between items-center">
++                        <span class="text-slate-450 font-semibold text-[10px] sm:text-xs">?뚯쑀??/span>
++                        <span id="detail-owner" class="font-extrabold text-slate-800">${maskName(virtualOwner)}</span>
++                    </div>
++                    <div class="bg-slate-50 border border-slate-100 p-2 rounded-xl flex justify-between items-center">
++                        <span class="text-slate-450 font-semibold text-[10px] sm:text-xs">梨꾨Т??/span>
++                        <span id="detail-debtor" class="font-extrabold text-slate-800">${maskName(virtualDebtor)}</span>
++                    </div>
++                    <div class="bg-slate-50 border border-slate-100 p-2 rounded-xl flex justify-between items-center">
++                        <span class="text-slate-450 font-semibold text-[10px] sm:text-xs">?꾩슜 硫댁쟻</span>
++                        <span id="detail-spec-exclusive-py" class="font-extrabold text-slate-800 font-mono">${formatAreaHtml(exclusiveArea, exclusivePy, estExSuffix)}</span>
++                    </div>
++                    <div class="bg-slate-50 border border-slate-100 p-2 rounded-xl flex justify-between items-center">
++                        <span class="text-slate-455 font-semibold text-[10px] sm:text-xs">怨듦툒 硫댁쟻</span>
++                        <span id="detail-spec-supply-py" class="font-extrabold text-slate-800 font-mono">${formatAreaHtml(supplyArea, supplyPy, estSpSuffix)}</span>
++                    </div>
++                    <div class="bg-slate-50 border border-slate-100 p-2 rounded-xl flex justify-between items-center">
++                        <span class="text-slate-450 font-semibold text-[10px] sm:text-xs">?좎? ?吏沅?/span>
++                        <span id="detail-spec-land-py" class="font-extrabold text-slate-800 font-mono">${formatAreaHtml(landArea, landPy, estLdSuffix)}</span>
++                    </div>
++                    <div class="bg-slate-50 border border-slate-100 p-2 rounded-xl flex justify-between items-center">
++                        <span class="text-slate-450 font-semibold text-[10px] sm:text-xs">嫄대Ъ ?꾩슜</span>
++                        <span id="detail-spec-building-py" class="font-extrabold text-slate-800 font-mono">${formatAreaHtml(buildingArea, buildingPy, estBdSuffix)}</span>
++                    </div>
++                    <div class="bg-slate-50 border border-slate-100 p-2 rounded-xl flex justify-between items-center">
++                        <span class="text-slate-450 font-semibold text-[10px] sm:text-xs">媛먯젙?됯???/span>
++                        <span id="detail-spec-appraisal" class="font-extrabold text-slate-800 font-outfit">${formatKRW(item.appraised_value)}</span>
++                    </div>
++                    <div class="bg-slate-50 border border-slate-100 p-2 rounded-xl flex justify-between items-center">
++                        <span class="text-slate-450 font-semibold text-[10px] sm:text-xs">理쒖??낆같??/span>
++                        <span id="detail-spec-minimum" class="font-extrabold text-rose-600 font-outfit">${formatKRW(item.minimum_bid)}</span>
++                    </div>
++                    <div class="bg-slate-50 border border-slate-100 p-2 rounded-xl flex justify-between items-center col-span-2">
++                        <span class="text-slate-450 font-semibold text-[10px] sm:text-xs">臾쇨굔 援ъ“/?ъ쭏</span>
++                        <span id="detail-spec-structure" class="font-extrabold text-slate-800 text-right">${detectedStructure}</span>
++                    </div>
++                    <div class="bg-slate-50 border border-slate-100 p-2 rounded-xl flex justify-between items-center col-span-2">
++                        <span class="text-slate-455 font-semibold text-[10px] sm:text-xs">?낆같??留덇컧 ?щ?</span>
++                        <span id="detail-spec-date" class="font-extrabold text-slate-800">${item.bidding_date || "誘몄긽"} (${calculateRemainingDays(item.bidding_date) >= 0 ? 'D-' + calculateRemainingDays(item.bidding_date) : '醫낃껐'})</span>
++                    </div>
++                `;
++                if (specGrid) specGrid.innerHTML = standardGridHtml;
++            }
+ 
+             // ?룫 ?ㅼ꽭? 嫄대Ъ ?꾩껜 紐낆꽭 諛붿씤??             const villaPanel = document.getElementById("detail-villa-building-info");
+@@ -4478,120 +4848,150 @@
+             if (fpKakaoRoad) fpKakaoRoad.href = `https://map.kakao.com/?q=${encodeURIComponent(cleanedNavAddress)}`;
+             if (fpGoogleRoad) fpGoogleRoad.href = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(cleanedNavAddress)}`;
+ 
+-            // ?뿺截?移댁뭅??3D 濡쒕뱶酉??곕룞 濡쒖쭅
++            // ?뿺截?移댁뭅??3D 濡쒕뱶酉??곕룞 濡쒖쭅 (鍮꾨??숈궛 遺꾧린)
+             const roadviewContainer = document.getElementById("detail-roadview");
+             const roadviewFallback = document.getElementById("detail-roadview-fallback");
+             if (roadviewContainer && roadviewFallback) {
+-                if (typeof kakao !== "undefined" && kakao.maps && kakao.maps.services && kakao.maps.services.Status) {
+-                    roadviewContainer.style.display = "block";
+-                    roadviewFallback.classList.add("hidden");
+-                    
+-                    const geocoder = new kakao.maps.services.Geocoder();
+-                    geocoder.addressSearch(cleanedNavAddress, function(result, status) {
+-                        if (status === kakao.maps.services.Status.OK) {
+-                            const coords = new kakao.maps.LatLng(result[0].y, result[0].x);
+-                            const rv = new kakao.maps.Roadview(roadviewContainer);
+-                            const rvClient = new kakao.maps.RoadviewClient();
+-                            
+-                            rvClient.getNearestPanoId(coords, 50, function(panoId) {
+-                                if (panoId) {
+-                                    rv.setPanoId(panoId, coords);
+-                                } else {
+-                                    showFallback();
+-                                }
+-                            });
++                if (isNonBuilding) {
++                    // 鍮꾨??숈궛 ?먯궛??寃쎌슦: 濡쒕뱶酉?????ㅼ궗吏??쒓났.
++                    if (item.images && item.images.length > 0) {
++                        roadviewContainer.style.display = "block";
++                        roadviewFallback.classList.add("hidden");
++                        roadviewContainer.innerHTML = `
++                            <div class="relative w-full h-full bg-slate-955 flex items-center justify-center">
++                                <img src="${item.images[0]}" class="w-full h-full object-contain" alt="?먯궛 ????대?吏">
++                                <div class="absolute bottom-2 right-2 bg-slate-900/60 px-2 py-0.5 rounded text-[10px] text-white font-bold select-none">
++                                    ?벝 ?ㅼ궗吏?(1/${item.images.length})
++                                </div>
++                            </div>
++                        `;
++                    } else {
++                        roadviewContainer.style.display = "none";
++                        roadviewFallback.classList.remove("hidden");
++                        const fbText = document.getElementById("detail-roadview-fallback-text");
++                        if (fbText) fbText.innerText = "鍮꾨??숈궛 ?먯궛? 濡쒕뱶酉곕? ?쒓났?섏? ?딆뒿?덈떎.";
++                        const fbBtn = document.getElementById("btn-naver-roadview-fallback");
++                        if (fbBtn) fbBtn.classList.add("hidden");
++                    }
++                } else {
++                    if (typeof kakao !== "undefined" && kakao.maps && kakao.maps.services && kakao.maps.services.Status) {
++                        roadviewContainer.style.display = "block";
++                        roadviewFallback.classList.add("hidden");
++                        
++                        const geocoder = new kakao.maps.services.Geocoder();
++                        geocoder.addressSearch(cleanedNavAddress, function(result, status) {
++                            if (status === kakao.maps.services.Status.OK) {
++                                const coords = new kakao.maps.LatLng(result[0].y, result[0].x);
++                                const rv = new kakao.maps.Roadview(roadviewContainer);
++                                const rvClient = new kakao.maps.RoadviewClient();
++                                
++                                rvClient.getNearestPanoId(coords, 50, function(panoId) {
++                                    if (panoId) {
++                                        rv.setPanoId(panoId, coords);
++                                    } else {
++                                        showFallback();
++                                    }
++                                });
+ 
+-                            // ?윟 移댁뭅??Geocoder濡??띾뱷???꾧꼍??醫뚰몴濡??ㅼ씠踰?遺?숈궛 吏??留곹겕 ?뺣? 留듯븨
+-                            const activePriceBtn = document.getElementById("btn-naver-land-price");
+-                            if (isComplexProperty) {
+-                                if (activePriceBtn) {
+-                                    activePriceBtn.href = `https://new.land.naver.com/complexes?ms=${result[0].y},${result[0].x},16&a=APT:OPST:ABRD:OBYG&e=RETAIL`;
+-                                }
+-                                if (floorplanLink) {
+-                                    if (!(item.auction_no === "2025?寃?02931" || (item.address && item.address.includes("?쒕튆?꾪뙆??)))) {
+-                                        floorplanLink.href = `https://new.land.naver.com/complexes?ms=${result[0].y},${result[0].x},16&a=APT:OPST:ABRD:OBYG&e=RETAIL`;
++                                // ?윟 移댁뭅??Geocoder濡??띾뱷???꾧꼍??醫뚰몴濡??ㅼ씠踰?遺?숈궛 吏??留곹겕 ?뺣? 留듯븨
++                                const activePriceBtn = document.getElementById("btn-naver-land-price");
++                                if (isComplexProperty) {
++                                    if (activePriceBtn) {
++                                        activePriceBtn.href = `https://new.land.naver.com/complexes?ms=${result[0].y},${result[0].x},16&a=APT:OPST:ABRD:OBYG&e=RETAIL`;
++                                    }
++                                    if (floorplanLink) {
++                                        if (!(item.auction_no === "2025?寃?02931" || (item.address && item.address.includes("?쒕튆?꾪뙆??)))) {
++                                            floorplanLink.href = `https://new.land.naver.com/complexes?ms=${result[0].y},${result[0].x},16&a=APT:OPST:ABRD:OBYG&e=RETAIL`;
++                                        }
++                                    }
++                                } else {
++                                    if (activePriceBtn) {
++                                        activePriceBtn.href = `https://new.land.naver.com/articles?ms=${result[0].y},${result[0].x},16&a=VL:OR:JW:SG:HO:CO&e=RETAIL`;
++                                    }
++                                    if (floorplanLink) {
++                                        floorplanLink.href = `https://new.land.naver.com/search?searchQuery=${encodeURIComponent(rawAddress)}`;
+                                     }
+                                 }
++
++                                // ?윟 醫뚰몴 ?띾뱷 ??3??濡쒕뱶酉?留곹겕??醫뚰몴 湲곕컲 ?뺣? 留곹겕濡?援먯껜
++                                if (fpNaverRoad) fpNaverRoad.href = `https://map.naver.com/v5/?c=${result[0].x},${result[0].y},15,0,0,0,adh`;
++                                if (fpKakaoRoad) fpKakaoRoad.href = `https://map.kakao.com/link/roadview/${result[0].y},${result[0].x}`;
++                                if (fpGoogleRoad) fpGoogleRoad.href = `https://www.google.com/maps/@?api=1&map_action=pano&viewpoint=${result[0].y},${result[0].x}`;
+                             } else {
+-                                if (activePriceBtn) {
+-                                    activePriceBtn.href = `https://new.land.naver.com/articles?ms=${result[0].y},${result[0].x},16&a=VL:OR:JW:SG:HO:CO&e=RETAIL`;
+-                                }
+-                                if (floorplanLink) {
+-                                    floorplanLink.href = `https://new.land.naver.com/search?searchQuery=${encodeURIComponent(rawAddress)}`;
+-                                }
++                                showFallback();
+                             }
++                        });
++                    } else {
++                        showFallback();
++                    }
+ 
+-                            // ?윟 醫뚰몴 ?띾뱷 ??3??濡쒕뱶酉?留곹겕??醫뚰몴 湲곕컲 ?뺣? 留곹겕濡?援먯껜
+-                            if (fpNaverRoad) fpNaverRoad.href = `https://map.naver.com/v5/?c=${result[0].x},${result[0].y},15,0,0,0,adh`;
+-                            if (fpKakaoRoad) fpKakaoRoad.href = `https://map.kakao.com/link/roadview/${result[0].y},${result[0].x}`;
+-                            if (fpGoogleRoad) fpGoogleRoad.href = `https://www.google.com/maps/@?api=1&map_action=pano&viewpoint=${result[0].y},${result[0].x}`;
+-                        } else {
+-                            showFallback();
++                    function showFallback() {
++                        roadviewContainer.style.display = "none";
++                        roadviewFallback.classList.remove("hidden");
++                        const fbBtn = document.getElementById("btn-naver-roadview-fallback");
++                        if (fbBtn) {
++                            fbBtn.href = `https://map.naver.com/v5/search/${encodeURIComponent(cleanedNavAddress)}`;
+                         }
+-                    });
+-                } else {
+-                    showFallback();
+-                }
+-
+-                function showFallback() {
+-                    roadviewContainer.style.display = "none";
+-                    roadviewFallback.classList.remove("hidden");
+-                    const fbBtn = document.getElementById("btn-naver-roadview-fallback");
+-                    if (fbBtn) {
+-                        fbBtn.href = `https://map.naver.com/v5/search/${encodeURIComponent(cleanedNavAddress)}`;
+                     }
+                 }
+             }
+ 
+-            // ?뱪 ?됲삎蹂??됰㈃???대?吏 留ㅼ묶 鍮꾪솢?깊솕 (???됰㈃?꾧? ?꾨땺 ??異붿젙 ?됰㈃?꾨? 蹂댁뿬二쇱? ?딄퀬 鍮덉뭏?쇰줈 諛⑹튂)
++            // ?뱪 ?됲삎蹂??됰㈃???대?吏 留ㅼ묶 鍮꾪솢?깊솕 (鍮꾨??숈궛 ?먯궛??寃쎌슦 ?④? 泥섎━)
+             const fpImgContainer = document.getElementById("detail-floorplan-img-container");
+             const guideCard = document.getElementById("detail-floorplan-guide-card");
+-            if (fpImgContainer) {
+-                if (item.images && item.images.length > 0) {
+-                    fpImgContainer.innerHTML = `<img id="detail-floorplan-img" src="${item.images[0]}" alt="遺?숈궛 ?ㅼ젣 ?됰㈃?? class="w-full h-full object-contain">`;
+-                    fpImgContainer.onclick = openFloorplanModal;
+-                    if (guideCard) guideCard.classList.add("hidden");
+-                } else {
+-                    const exclArea = item.exclusive_area || 0;
+-                    let estImg = "./floorplan_modern_apartment.png";
+-                    let sizeLabel = "";
+-                    if (exclArea > 0) {
+-                        if (exclArea <= 60) {
+-                            estImg = "./floorplan_59.png";
+-                            sizeLabel = "59?≫삎 ";
+-                        } else if (exclArea <= 90) {
+-                            estImg = "./floorplan_84.png";
+-                            sizeLabel = "84?≫삎 ";
+-                        } else {
+-                            estImg = "./floorplan_114.png";
+-                            sizeLabel = "114?≫삎 ";
+-                        }
+-                    }
++            const fpPanel = document.getElementById("detail-panel-floorplan");
+ 
+-                    let badgeText = "?좑툘 異붿젙";
+-                    let badgeColor = "bg-amber-500";
+-                    if (item.exclusive_area_estimation_type === "fake") {
+-                        badgeText = "?좑툘 ?덉닔";
+-                        badgeColor = "bg-rose-500 animate-pulse";
+-                    } else if (item.exclusive_area_estimation_type === "estimated") {
+-                        badgeText = "?좑툘 異붿젙";
+-                        badgeColor = "bg-blue-500";
+-                    }
++            if (isNonBuilding) {
++                if (fpPanel) fpPanel.classList.add("hidden");
++                if (guideCard) guideCard.classList.add("hidden");
++            } else {
++                if (fpPanel) fpPanel.classList.remove("hidden");
++                if (fpImgContainer) {
++                    if (item.images && item.images.length > 0) {
++                        fpImgContainer.innerHTML = `<img id="detail-floorplan-img" src="${item.images[0]}" alt="遺?숈궛 ?ㅼ젣 ?됰㈃?? class="w-full h-full object-contain">`;
++                        fpImgContainer.onclick = openFloorplanModal;
++                        if (guideCard) guideCard.classList.add("hidden");
++                    } else {
++                        const exclArea = item.exclusive_area || 0;
++                        let estImg = "./floorplan_modern_apartment.png";
++                        let sizeLabel = "";
++                        if (exclArea > 0) {
++                            if (exclArea <= 60) {
++                                estImg = "./floorplan_59.png";
++                                sizeLabel = "59?≫삎 ";
++                            } else if (exclArea <= 90) {
++                                estImg = "./floorplan_84.png";
++                                sizeLabel = "84?≫삎 ";
++                            } else {
++                                estImg = "./floorplan_114.png";
++                                sizeLabel = "114?≫삎 ";
++                            }
++                        }
+ 
+-                    fpImgContainer.innerHTML = `
+-                        <img id="detail-floorplan-img" src="${estImg}" alt="遺?숈궛 異붿젙 ?됰㈃?? class="w-full h-full object-contain opacity-80">
+-                        <div class="absolute top-2.5 right-2.5 ${badgeColor} text-white text-[10px] font-black px-2.5 py-0.5 rounded-full shadow-sm select-none z-10 flex items-center justify-center">
+-                            ${badgeText}
+-                        </div>
+-                        <div class="absolute bottom-2.5 left-2.5 bg-slate-800/80 text-white text-[10px] font-bold px-2.5 py-0.5 rounded-full select-none z-10">
+-                            ${sizeLabel}AI 異붿젙 援ъ“??-                        </div>
+-                    `;
++                        let badgeText = "?좑툘 異붿젙";
++                        let badgeColor = "bg-amber-500";
++                        if (item.exclusive_area_estimation_type === "fake") {
++                            badgeText = "?좑툘 ?덉닔";
++                            badgeColor = "bg-rose-500 animate-pulse";
++                        } else if (item.exclusive_area_estimation_type === "estimated") {
++                            badgeText = "?좑툘 異붿젙";
++                            badgeColor = "bg-blue-500";
++                        }
+ 
+-                    fpImgContainer.onclick = openFloorplanModal;
++                        fpImgContainer.innerHTML = `
++                            <img id="detail-floorplan-img" src="${estImg}" alt="遺?숈궛 異붿젙 ?됰㈃?? class="w-full h-full object-contain opacity-80">
++                            <div class="absolute top-2.5 right-2.5 ${badgeColor} text-white text-[10px] font-black px-2.5 py-0.5 rounded-full shadow-sm select-none z-10 flex items-center justify-center">
++                                ${badgeText}
++                            </div>
++                            <div class="absolute bottom-2.5 left-2.5 bg-slate-800/80 text-white text-[10px] font-bold px-2.5 py-0.5 rounded-full select-none z-10">
++                                ${sizeLabel}AI 異붿젙 援ъ“??+                            </div>
++                        `;
+ 
++                        fpImgContainer.onclick = openFloorplanModal;
+ 
+-                    if (guideCard) guideCard.classList.remove("hidden");
++                        if (guideCard) guideCard.classList.remove("hidden");
++                    }
+                 }
+             }
+ 
+@@ -4693,43 +5093,47 @@
+             if (btnMapRoad) btnMapRoad.href = mapRoadUrl;
+ 
+             // ?윟 ?덉긽 怨듭떆媛寃?諛??좎??댁슜怨꾪쉷 洹쒖젣 ?붿빟 諛붿씤??
+-            const officialLandPriceEl = document.getElementById("detail-spec-official-price");
+-            const officialLandPriceDescEl = document.getElementById("detail-spec-official-price-desc");
+-            if (officialLandPriceEl && officialLandPriceDescEl) {
+-                officialLandPriceEl.innerText = formatKRW(extra.officialLandPrice);
+-                officialLandPriceDescEl.innerText = extra.officialLandPriceDesc;
+-            }
+-
+-            const landUsePlanEl = document.getElementById("detail-land-use-plan");
+-            const landUsePlanDescEl = document.getElementById("detail-land-use-plan-desc");
+-            if (landUsePlanEl && landUsePlanDescEl) {
+-                landUsePlanEl.innerText = extra.landUsePlan;
+-                landUsePlanDescEl.innerText = extra.landUsePlanDesc;
+-            }
+-
+-            const officialEumBtn = document.getElementById("btn-official-eum");
+-            if (officialEumBtn) {
+-                officialEumBtn.href = "#";
+-                officialEumBtn.onclick = function(e) {
+-                    e.preventDefault();
+-                    copyAddressAndOpenEum();
+-                };
++            if (!isNonBuilding) {
++                const officialLandPriceEl = document.getElementById("detail-spec-official-price");
++                const officialLandPriceDescEl = document.getElementById("detail-spec-official-price-desc");
++                if (officialLandPriceEl && officialLandPriceDescEl) {
++                    officialLandPriceEl.innerText = formatKRW(extra.officialLandPrice);
++                    officialLandPriceDescEl.innerText = extra.officialLandPriceDesc;
++                }
++
++                const landUsePlanEl = document.getElementById("detail-land-use-plan");
++                const landUsePlanDescEl = document.getElementById("detail-land-use-plan-desc");
++                if (landUsePlanEl && landUsePlanDescEl) {
++                    landUsePlanEl.innerText = extra.landUsePlan;
++                    landUsePlanDescEl.innerText = extra.landUsePlanDesc;
++                }
++
++                const officialEumBtn = document.getElementById("btn-official-eum");
++                if (officialEumBtn) {
++                    officialEumBtn.href = "#";
++                    officialEumBtn.onclick = function(e) {
++                        e.preventDefault();
++                        copyAddressAndOpenEum();
++                    };
++                }
+             }
+ 
+-            // ?뱧 援ш? 吏???꾨쿋???쇱씠釉?酉??곕룞
+-            const mapContainer = document.getElementById("detail-map-container");
+-            if (mapContainer && item.address) {
+-                const mapQuery = getCleanedLandSearchQuery(item.address);
+-                mapContainer.innerHTML = `
+-                    <iframe 
+-                        width="100%" 
+-                        height="100%" 
+-                        style="border:0; border-radius: 12px;" 
+-                        loading="lazy" 
+-                        allowfullscreen 
+-                        src="https://maps.google.com/maps?q=${encodeURIComponent(mapQuery)}&t=&z=16&ie=UTF8&iwloc=&output=embed">
+-                    </iframe>
+-                `;
++            // ?뱧 援ш? 吏???꾨쿋???쇱씠釉?酉??곕룞 (遺?숈궛 ?쒖젙)
++            if (!isNonBuilding) {
++                const mapContainer = document.getElementById("detail-map-container");
++                if (mapContainer && item.address) {
++                    const mapQuery = getCleanedLandSearchQuery(item.address);
++                    mapContainer.innerHTML = `
++                        <iframe 
++                            width="100%" 
++                            height="100%" 
++                            style="border:0; border-radius: 12px;" 
++                            loading="lazy" 
++                            allowfullscreen 
++                            src="https://maps.google.com/maps?q=${encodeURIComponent(mapQuery)}&t=&z=16&ie=UTF8&iwloc=&output=embed">
++                        </iframe>
++                    `;
++                }
+             }
+ 
+             // 怨꾩궛湲??뷀뤃???낅젰媛??명똿 (?ъ슜?먭? ??댄븨 以묒씤 寃쎌슦 ??뼱?곌린 李⑤떒)
+@@ -4934,37 +5338,39 @@
+             }
+ 
+             // 9. ?쒖꽭/?ㅺ굅?섍? (market)
+-            const marketTbody = document.getElementById("detail-market-tbody");
+-            if (marketTbody) {
+-                const appVal = item.appraised_value || 0;
+-                
+-                const deal1 = Math.floor(appVal * 1.02);
+-                const deal2 = Math.floor(appVal * 0.98);
+-                const deal3 = Math.floor(appVal * 0.95);
+-                
+-                marketTbody.innerHTML = `
+-                    <tr class="border-b border-slate-100 text-xs">
+-                        <td class="p-2 font-mono text-slate-500">2026-04-10</td>
+-                        <td class="p-2 text-slate-700">?꾩슜 84.9??(25.7??</td>
+-                        <td class="p-2 text-center text-slate-600 font-semibold">14痢?/td>
+-                        <td class="p-2 text-right font-mono text-slate-800 font-black">${formatKRW(deal1)}</td>
+-                        <td class="p-2 text-center text-emeraldSuccess font-extrabold">??2.1%</td>
+-                    </tr>
+-                    <tr class="border-b border-slate-100 text-xs">
+-                        <td class="p-2 font-mono text-slate-500">2026-02-15</td>
+-                        <td class="p-2 text-slate-700">?꾩슜 84.9??(25.7??</td>
+-                        <td class="p-2 text-center text-slate-600 font-semibold">8痢?/td>
+-                        <td class="p-2 text-right font-mono text-slate-800 font-black">${formatKRW(deal2)}</td>
+-                        <td class="p-2 text-center text-slate-400 font-semibold">0.0%</td>
+-                    </tr>
+-                    <tr class="border-b border-slate-100 text-xs">
+-                        <td class="p-2 font-mono text-slate-500">2026-01-08</td>
+-                        <td class="p-2 text-slate-700">?꾩슜 84.9??(25.7??</td>
+-                        <td class="p-2 text-center text-slate-600 font-semibold">6痢?/td>
+-                        <td class="p-2 text-right font-mono text-slate-800 font-black">${formatKRW(deal3)}</td>
+-                        <td class="p-2 text-center text-rose-500 font-extrabold">??3.0%</td>
+-                    </tr>
+-                `;
++            if (!isNonBuilding) {
++                const marketTbody = document.getElementById("detail-market-tbody");
++                if (marketTbody) {
++                    const appVal = item.appraised_value || 0;
++                    
++                    const deal1 = Math.floor(appVal * 1.02);
++                    const deal2 = Math.floor(appVal * 0.98);
++                    const deal3 = Math.floor(appVal * 0.95);
++                    
++                    marketTbody.innerHTML = `
++                        <tr class="border-b border-slate-100 text-xs">
++                            <td class="p-2 font-mono text-slate-500">2026-04-10</td>
++                            <td class="p-2 text-slate-700">?꾩슜 84.9??(25.7??</td>
++                            <td class="p-2 text-center text-slate-600 font-semibold">14痢?/td>
++                            <td class="p-2 text-right font-mono text-slate-800 font-black">${formatKRW(deal1)}</td>
++                            <td class="p-2 text-center text-emeraldSuccess font-extrabold">??2.1%</td>
++                        </tr>
++                        <tr class="border-b border-slate-100 text-xs">
++                            <td class="p-2 font-mono text-slate-500">2026-02-15</td>
++                            <td class="p-2 text-slate-700">?꾩슜 84.9??(25.7??</td>
++                            <td class="p-2 text-center text-slate-600 font-semibold">8痢?/td>
++                            <td class="p-2 text-right font-mono text-slate-800 font-black">${formatKRW(deal2)}</td>
++                            <td class="p-2 text-center text-slate-400 font-semibold">0.0%</td>
++                        </tr>
++                        <tr class="border-b border-slate-100 text-xs">
++                            <td class="p-2 font-mono text-slate-500">2026-01-08</td>
++                            <td class="p-2 text-slate-700">?꾩슜 84.9??(25.7??</td>
++                            <td class="p-2 text-center text-slate-600 font-semibold">6痢?/td>
++                            <td class="p-2 text-right font-mono text-slate-800 font-black">${formatKRW(deal3)}</td>
++                            <td class="p-2 text-center text-rose-500 font-extrabold">??3.0%</td>
++                        </tr>
++                    `;
++                }
+             }
+ 
+             // 10. ?⑥??뺣낫 (complex)
+@@ -6173,6 +6579,10 @@
+         // ?벑 4? ?遺꾨쪟 洹몃９ ???ㅼ쐞移?諛??깃툒 釉붾윭 留덉뒪???쒖뼱 ?⑥닔
+         function changeDetailGroupTab(tabNum) {
+             currentDetailGroupTab = tabNum;
++            
++            const nonBuildingKeywords = ['李⑤웾', '?먮룞李?, '以묎린', '?좊컯', '??났湲?, '?댁넚', '吏寃뚯감', '?λ퉬', '湲곌퀎', '湲곌뎄', '?ㅻ퉬', '?좉?利앷텒', '利앷텒', '二쇱떇', '梨꾧텒', '湲고?臾쇳뭹', '臾쇳뭹', '?숈궛'];
++            const isNonBuilding = selectedProperty && (selectedProperty.source === 'court_etc' || selectedProperty.source === 'onbid_etc' || nonBuildingKeywords.some(k => (selectedProperty.ptype || "").includes(k)));
++
+             for (let i = 1; i <= 4; i++) {
+                 const btn = document.getElementById(`detail-group-tab-${i}-btn`);
+                 const panel = document.getElementById(`detail-group-panel-${i}`);
+@@ -6186,14 +6596,22 @@
+                 if (panel) {
+                     if (i === tabNum) {
+                         panel.classList.remove("hidden");
++                        
++                        if (isNonBuilding) {
++                            renderNonBuildingPanelContent(tabNum, selectedProperty);
++                        } else {
++                            if (tabNum === 2 && originalPanel2Html) panel.innerHTML = originalPanel2Html;
++                            if (tabNum === 3 && originalPanel3Html) panel.innerHTML = originalPanel3Html;
++                            if (tabNum === 4 && originalPanel4Html) panel.innerHTML = originalPanel4Html;
++                        }
+                     } else {
+                         panel.classList.add("hidden");
+                     }
+                 }
+             }
+ 
+-            // ?뱧 4. ?꾩튂 & ?쒖꽭 遺꾩꽍 ???좏깮 ???섏쐞 ?⑤꼸??吏??諛??쒖꽭)??hidden ?대옒?ㅻ? 媛뺤젣濡??댁젣?섏뿬 ?붿씠?몄븘???꾩긽??蹂듦뎄?⑸땲??
+-            if (tabNum === 4) {
++            // ?뱧 4. ?꾩튂 & ?쒖꽭 遺꾩꽍 ???좏깮 ???섏쐞 ?⑤꼸??吏??諛??쒖꽭)??hidden ?대옒?ㅻ? 媛뺤젣濡??댁젣?섏뿬 ?붿씠?몄븘???꾩긽??蹂듦뎄?⑸땲?? (遺?숈궛 ?쒖젙)
++            if (!isNonBuilding && tabNum === 4) {
+                 const mapPanel = document.getElementById("detail-panel-map");
+                 const marketPanel = document.getElementById("detail-panel-market");
+                 if (mapPanel) mapPanel.classList.remove("hidden");
+@@ -6232,6 +6650,210 @@
+             updateDynamicBrowserTitle();
+         }
+ 
++        // ?벀 鍮꾨??숈궛 ?먯궛 ?꾩슜 ??2, 3, 4踰? HTML ?뚮뜑???⑥닔
++        function renderNonBuildingPanelContent(tabNum, item) {
++            const panel = document.getElementById(`detail-group-panel-${tabNum}`);
++            if (!panel) return;
++
++            const nbMeta = item.non_building_meta || {};
++            const formatKRW = (val) => {
++                if (!val || isNaN(val)) return "-";
++                if (val >= 100000000) {
++                    const eok = Math.floor(val / 100000000);
++                    const rest = Math.round((val % 100000000) / 10000);
++                    return rest > 0 ? `${eok}??${rest.toLocaleString()}留뚯썝` : `${eok}?듭썝`;
++                }
++                return `${Math.round(val / 10000).toLocaleString()}留뚯썝`;
++            };
++
++            if (tabNum === 2) {
++                let assetName = "?먯궛";
++                if (nbMeta.asset_type === 'vehicle') assetName = "李⑤웾";
++                else if (nbMeta.asset_type === 'machinery') assetName = "湲곌퀎?λ퉬";
++                else if (nbMeta.asset_type === 'securities') assetName = "?좉?利앷텒";
++                else if (nbMeta.asset_type === 'goods') assetName = "湲고?臾쇳뭹";
++
++                panel.innerHTML = `
++                    <div class="space-y-4">
++                        <div class="bg-white border border-slate-200 rounded-2xl p-4 shadow-sm space-y-3">
++                            <h4 class="text-xs sm:text-sm font-black text-slate-800 flex items-center gap-1.5">
++                                <i class="fa-solid fa-shield-halved text-royalBlue"></i> ?뱥 ${assetName} ?깅줉?먮? 諛??뺣쪟 ?댁뿭 沅뚮━ 吏꾨떒
++                            </h4>
++                            <p class="text-[10px] sm:text-xs text-slate-500 leading-relaxed font-semibold">
++                                蹂?${assetName} ?먯궛???됱젙 ?깅줉?먮? 諛?怨듬ℓ/寃쎈ℓ 留ㅺ컖 議곌굔 ?곸쓽 ?쒗븳臾쇨텒 ?뚮㈇ ?щ?瑜??ㅼ떆媛?異붿젙 遺꾩꽍??寃곌낵?낅땲??
++                            </p>
++                            
++                            <div class="border-t border-slate-100 pt-3 space-y-2 text-[11px] sm:text-xs">
++                                <div class="flex justify-between items-center bg-slate-50 p-2.5 rounded-xl">
++                                    <span class="text-slate-500 font-bold">?뚯쑀??援щ텇</span>
++                                    <span class="font-extrabold text-slate-800">媛쒖씤/湲곗뾽 (媛?뺣쪟/泥대궔 泥섎텇 ?곹깭)</span>
++                                </div>
++                                <div class="flex justify-between items-center bg-slate-50 p-2.5 rounded-xl">
++                                    <span class="text-slate-500 font-bold">媛묎뎄 ?ы빆 (?뚯쑀沅?媛?뺣쪟)</span>
++                                    <span class="font-extrabold text-emeraldSuccess">?숈같 ??100% 留먯냼 (?몄닔 由ъ뒪???놁쓬)</span>
++                                </div>
++                                <div class="flex justify-between items-center bg-slate-50 p-2.5 rounded-xl">
++                                    <span class="text-slate-500 font-bold">?꾧뎄 ?ы빆 (??밴텒 ?ㅼ젙)</span>
++                                    <span class="font-extrabold text-emeraldSuccess">?몃룄 ???뚮㈇ 泥섎━ ?꾨즺 (由ъ뒪???쒕줈)</span>
++                                </div>
++                                <div class="flex justify-between items-center bg-slate-50 p-2.5 rounded-xl">
++                                    <span class="text-slate-500 font-bold">?멸툑 諛?怨쇳깭猷??뺣쪟</span>
++                                    <span class="font-extrabold text-slate-700">諛곕떦 ?곗꽑蹂?????먮룞 ?댁젣</span>
++                                </div>
++                            </div>
++                        </div>
++
++                        <div class="bg-emerald-50/50 border border-emerald-100 rounded-2xl p-4 space-y-2">
++                            <h5 class="text-xs font-black text-emerald-800 flex items-center gap-1">
++                                <i class="fa-solid fa-circle-check"></i> 沅뚮━遺꾩꽍 理쒖쥌 ?먯젙 由ы룷??+                            </h5>
++                            <p class="text-[10.5px] sm:text-xs text-slate-700 leading-relaxed font-bold">
++                                ?踰뺤썝/罹좎퐫 留ㅺ컖 ?먯튃???곕씪 ?숈같 ?湲??⑸? ???뚯쑀沅뚯씠 ?댁쟾?섎ŉ, ?먮??????諛??뺣쪟 ??紐⑤뱺 ?깃린 ?쒗븳?ы빆? 踰뺤썝??珥됲긽 紐낅졊???섑빐 <strong>100% ?뚮㈇(留먯냼)</strong>?⑸땲?? ?몄닔?댁빞 ?????젰 ?덈뒗 ?꾩감?몄씠???좎튂沅?議고빆???녿뒗 ?덉쟾???먯궛?낅땲??
++                            </p>
++                        </div>
++                    </div>
++                `;
++            } else if (tabNum === 3) {
++                const minBid = item.minimum_bid || 0;
++                const isCar = nbMeta.asset_type === 'vehicle';
++                const taxRate = isCar ? 0.07 : 0.04;
++                const taxName = isCar ? "李⑤웾 痍⑤벑濡앹꽭 (7%)" : "吏諛⑹꽭/湲고? 遺??몄쑉 (4%)";
++                
++                const tax = Math.floor(minBid * taxRate);
++                const loan = Math.floor(minBid * 0.7);
++                const cash = minBid - loan + tax + 200000;
++                
++                panel.innerHTML = `
++                    <div class="space-y-4">
++                        <div class="bg-white border border-slate-200 rounded-2xl p-4 shadow-sm space-y-3">
++                            <h4 class="text-xs sm:text-sm font-black text-slate-800 flex items-center gap-1.5">
++                                <i class="fa-solid fa-coins text-royalBlue"></i> ?뮥 鍮꾨??숈궛 ?먯궛 ?몄닔 湲덉쑖 ?쒕??덉씠??+                            </h4>
++                            <p class="text-[10px] sm:text-xs text-slate-500 leading-relaxed font-semibold">
++                                蹂?怨듬ℓ/寃쎈ℓ ?먯궛???꾩옱 理쒖??낆같媛瑜?湲곗??쇰줈 ?곗텧??寃쎈씫 ?異?諛?珥??몄닔 鍮꾩슜 遺꾩꽍?쒖엯?덈떎.
++                            </p>
++
++                            <div class="border-t border-slate-100 pt-3 space-y-2 text-[11px] sm:text-xs">
++                                <div class="flex justify-between items-center bg-slate-50 p-2.5 rounded-xl">
++                                    <span class="text-slate-500 font-bold">?꾩옱 理쒖??묒같媛</span>
++                                    <span class="font-extrabold text-slate-800 font-mono">${formatKRW(minBid)}</span>
++                                </div>
++                                <div class="flex justify-between items-center bg-slate-50 p-2.5 rounded-xl">
++                                    <span class="text-slate-500 font-bold">?숈궛 寃쎈씫?異?媛?μ븸 (70% 異붿젙)</span>
++                                    <span class="font-extrabold text-royalBlue font-mono">${formatKRW(loan)}</span>
++                                </div>
++                                <div class="flex justify-between items-center bg-slate-50 p-2.5 rounded-xl">
++                                    <span class="text-slate-500 font-bold">${taxName}</span>
++                                    <span class="font-extrabold text-slate-800 font-mono">${formatKRW(tax)}</span>
++                                </div>
++                                <div class="flex justify-between items-center bg-slate-50 p-2.5 rounded-xl">
++                                    <span class="text-slate-500 font-bold">?댁쟾 ??됰즺 諛??곸넚 鍮꾩슜</span>
++                                    <span class="font-extrabold text-slate-800 font-mono">??200,000??/span>
++                                </div>
++                                <div class="flex justify-between items-center bg-royalBlue/5 p-2.5 rounded-xl border border-royalBlue/20">
++                                    <span class="text-royalBlue font-black">?ㅼ젣 ?꾧툑 ?꾩슂??(?몄닔 珥앹븸)</span>
++                                    <span class="font-black text-royalBlue font-mono text-xs sm:text-sm">${formatKRW(cash)}</span>
++                                </div>
++                            </div>
++                        </div>
++
++                        <div class="bg-amber-50 border border-amber-200 rounded-2xl p-4 space-y-1.5">
++                            <h5 class="text-xs font-black text-amber-800 flex items-center gap-1">
++                                <i class="fa-solid fa-triangle-exclamation"></i> ?숈궛 ?먯궛 ?낆같 ??二쇱쓽?ы빆
++                            </h5>
++                            <p class="text-[10px] sm:text-[11px] text-slate-700 leading-relaxed font-bold">
++                                1. 蹂닿????κ린 諛⑹튂???곕Ⅸ 蹂닿?猷?遺???щ?(寃쎈ℓ??硫댁젣?섎굹 罹좎퐫 怨듬ℓ ???쇰? ?숈같??遺??議곌굔???덉쓣 ???덉쓬)瑜??낆같 怨듦퀬 ?먮Ц?먯꽌 諛섎뱶???議고빐???⑸땲??<br>
++                                2. 寃쎈씫?붽툑?異쒖? ?좎슜??諛??숈궛 媛移??됯????곕씪 ?곸씠?섎?濡?二쇨굅??????먮뒗 ?ㅽ넗濡??곌퀎 ?낆껜? ?ъ쟾 議곗쑉???꾩슂?⑸땲??
++                            </p>
++                        </div>
++                    </div>
++                `;
++            } else if (tabNum === 4) {
++                const storageLoc = nbMeta.storage_location || item.address || "?곸꽭 鍮꾧퀬 李멸퀬";
++                const appVal = item.appraised_value || 0;
++                const minBid = item.minimum_bid || 0;
++                
++                const marketMin = Math.floor(appVal * 0.85);
++                const marketMax = Math.floor(appVal * 0.95);
++                const diffPercent = (((marketMin - minBid) / marketMin) * 100).toFixed(1);
++                
++                let marketOpinion = "";
++                if (parseFloat(diffPercent) > 0) {
++                    marketOpinion = `?꾩옱 理쒖??묒같媛???숈쥌 ?곗떇 以묎퀬 嫄곕옒 理쒖? ?쒖꽭(${formatKRW(marketMin)}) ?鍮???<span class="text-rose-600 font-black">${diffPercent}%</span> ??댄븯??媛寃?硫붾━?멸? ?뺤떎???믪? ?섏??낅땲??`;
++                } else {
++                    marketOpinion = `?꾩옱 理쒖??묒같媛???쇰컲 ?쒖꽭? ??깊븯嫄곕굹 ?쎄컙 ?믪쑝誘濡? ??李⑤? ???좎같?????ㅼ쓬 ?뚯감???낆같?섏떆??寃껋쓣 沅뚯옣?⑸땲??`;
++                }
++
++                panel.innerHTML = `
++                    <div class="space-y-4">
++                        <div class="bg-white border border-slate-200 rounded-2xl p-4 shadow-sm space-y-2.5">
++                            <h4 class="text-xs sm:text-sm font-black text-slate-800 flex items-center gap-1.5">
++                                <i class="fa-solid fa-map-location-dot text-royalBlue"></i> ?뱧 ??蹂닿? ?μ냼 諛?吏??諛붾줈媛湲?+                            </h4>
++                            
++                            <div class="bg-slate-50 p-3 rounded-xl border border-slate-100 space-y-1">
++                                <span class="text-[10px] text-slate-400 font-bold block">?먯궛 蹂닿? 二쇱냼</span>
++                                <span class="font-extrabold text-slate-800 text-[11px] sm:text-xs">${storageLoc}</span>
++                            </div>
++
++                            <p class="text-[9.5px] text-slate-500 leading-relaxed font-medium">
++                                ?섎떒??踰꾪듉???쒖슜?섏뿬 吏???ъ씠?몄뿉???ㅼ젣 蹂닿? 二쇱냼瑜??뺤씤?섍퀬, ?꾩옣??諛⑸Ц?섏뿬 ?먯궛???쇱넀 ?곹깭 ?깆쓣 ?꾪뭹 議곗궗??蹂댁떗?쒖삤.
++                            </p>
++                            
++                            <div class="grid grid-cols-3 gap-2">
++                                <a href="https://map.naver.com/v5/search/${encodeURIComponent(storageLoc)}" target="_blank" class="bg-slate-50 border border-slate-200 hover:border-[#10b981] rounded-xl p-2 flex flex-col items-center justify-center transition-all shadow-sm">
++                                    <span class="text-xs font-black text-[#10b981] mb-0.5">?ㅼ씠踰?吏??/span>
++                                    <span class="text-[8px] text-slate-400 font-normal">?꾩튂/濡쒕뱶酉?李얘린</span>
++                                </a>
++                                <a href="https://map.kakao.com/?q=${encodeURIComponent(storageLoc)}" target="_blank" class="bg-slate-50 border border-slate-200 hover:border-royalBlue rounded-xl p-2 flex flex-col items-center justify-center transition-all shadow-sm">
++                                    <span class="text-xs font-black text-royalBlue mb-0.5">移댁뭅??留?/span>
++                                    <span class="text-[8px] text-slate-400 font-normal">二쇱냼 寃???대룞</span>
++                                </a>
++                                <a href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(storageLoc)}" target="_blank" class="bg-slate-50 border border-slate-200 hover:border-red-500 rounded-xl p-2 flex flex-col items-center justify-center transition-all shadow-sm">
++                                    <span class="text-xs font-black text-red-500 mb-0.5">援ш? 吏??/span>
++                                    <span class="text-[8px] text-slate-400 font-normal">?꾩꽦/吏由?寃??/span>
++                                </a>
++                            </div>
++                        </div>
++
++                        <div class="bg-white border border-slate-200 rounded-2xl p-4 shadow-sm space-y-3">
++                            <h4 class="text-xs sm:text-sm font-black text-slate-800 flex items-center gap-1.5">
++                                <i class="fa-solid fa-chart-line text-royalBlue"></i> ?뱤 ?숈쥌 紐⑤뜽 ?쒖꽭 遺꾩꽍 由ы룷??+                            </h4>
++                            
++                            <div class="overflow-x-auto">
++                                <table class="w-full text-left border-collapse text-[10.5px] sm:text-xs">
++                                    <thead>
++                                        <tr class="bg-slate-50 text-slate-500 font-black border-b border-slate-100">
++                                            <th class="p-2">嫄곕옒 ?좏삎</th>
++                                            <th class="p-2 text-right">?덉긽 ?쒖꽭 踰붿쐞</th>
++                                            <th class="p-2 text-center">媛먯젙媛 ?鍮?/th>
++                                        </tr>
++                                    </thead>
++                                    <tbody>
++                                        <tr class="border-b border-slate-100">
++                                            <td class="p-2 font-bold text-slate-700">以묎퀬 ?ㅺ굅???됯퇏媛</td>
++                                            <td class="p-2 text-right font-mono text-slate-800 font-bold">${formatKRW(marketMin)} ~ ${formatKRW(marketMax)}</td>
++                                            <td class="p-2 text-center text-slate-500">-5% ~ -15%</td>
++                                        </tr>
++                                        <tr class="border-b border-slate-100">
++                                            <td class="p-2 font-bold text-slate-700">?꾩옱 踰뺤썝 理쒖??낆같媛</td>
++                                            <td class="p-2 text-right font-mono text-rose-600 font-black">${formatKRW(minBid)}</td>
++                                            <td class="p-2 text-center text-rose-600 font-black">??-20% ?媛?/td>
++                                        </tr>
++                                    </tbody>
++                                </table>
++                            </div>
++
++                            <p class="text-[10px] sm:text-xs text-slate-700 font-bold leading-relaxed bg-slate-50 p-2.5 rounded-xl border border-slate-100">
++                                ${marketOpinion}
++                            </p>
++                        </div>
++                    </div>
++                `;
++            }
++        }
++
+         // ?벑 ?ㅼ떆媛?釉뚮씪?곗? ??댄? ?숈쟻 ?꾪솚 ?⑥닔
+         function updateDynamicBrowserTitle() {
+             const drawer = document.getElementById("detail-drawer");
+diff --git a/mobile-app/src/screens/DetailScreen.tsx b/mobile-app/src/screens/DetailScreen.tsx
+index 095c323..7eb1409 100644
+--- a/mobile-app/src/screens/DetailScreen.tsx
++++ b/mobile-app/src/screens/DetailScreen.tsx
+@@ -78,6 +78,150 @@ const maskName = (name: string | undefined) => {
+   return clean[0] + "??.repeat(Math.max(1, clean.length - 1));
+ };
+ 
++const extractNonBuildingMetaMobile = (text: string, ptype: string) => {
++  const meta: any = {};
++  if (!text) return meta;
++  const p_clean = (ptype || "").toLowerCase();
++  const text_clean = text.replace(/\n/g, " ").replace(/\s\s+/g, " ").trim();
++  
++  const isVehicle = p_clean.includes("李⑤웾") || p_clean.includes("?먮룞李?) || p_clean.includes("以묎린") || p_clean.includes("?좊컯") || p_clean.includes("??났湲?) || p_clean.includes("?댁넚") || p_clean.includes("吏寃뚯감") || p_clean.includes("?λ퉬");
++  
++  if (isVehicle) {
++    meta.asset_type = "vehicle";
++    
++    // ?곗떇 (?곗떇:2003, ???? 2003, 2003?꾩떇, 2003?꾪삎 ??留ㅼ묶, 以묎컙 怨듬갚 吏??
++    const year_match = text_clean.match(/(?:??s*???쒖옉?꾨룄|?쒖옉?곕룄|?곗떇)\s*:\s*(\d{4})|(\d{4})\s*??s*??(\d{4})\s*??s*??i);
++    if (year_match) {
++      meta.model_year = (year_match[1] || year_match[2] || year_match[3]) + "?꾩떇";
++    }
++    
++    // 二쇳뻾嫄곕━
++    const mileage_match = text_clean.match(/(?:二쇳뻾嫄곕━|二쇳뻾)\s*:\s*([\d,]+)\s*(?:km|?ㅻ줈)?|([\d,]+)\s*(?:km|?ㅻ줈)\b/i);
++    if (mileage_match) {
++      meta.mileage = (mileage_match[1] || mileage_match[2]) + " km";
++    }
++    
++    // ?깅줉踰덊샇 / 李⑤웾踰덊샇
++    const no_match = text_clean.match(/(?:?깅줉踰덊샇|李⑤웾踰덊샇|李⑤?踰덊샇)\s*:\s*([媛-??d\w\s\-]+?)(?=\s*(?:李⑤챸|紐⑤뜽紐???s*???곗떇|李?s*醫?李⑥쥌|?쒖썝|李⑤?|?먮룞湲?蹂닿?|?ъ슜蹂멸굅吏|?깅줉踰덊샇|$|,|\||\())/i);
++    if (no_match) {
++      meta.vehicle_no = no_match[1].trim();
++    } else {
++      const no_match_simple = text_clean.match(/(?:?깅줉踰덊샇|李⑤웾踰덊샇|李⑤?踰덊샇)\s*:\s*([媛-??d\w\s\-]+?)(?:\s|$|,|\||\()/i);
++      if (no_match_simple) meta.vehicle_no = no_match_simple[1].trim();
++    }
++    
++    // 李⑤챸
++    const name_match = text_clean.match(/(?:李⑤챸|紐⑤뜽紐?\s*:\s*([媛-??d\w\s\-&]+?)(?=\s*(?:??s*???곗떇|李?s*醫?李⑥쥌|?쒖썝|李⑤?|?먮룞湲?蹂닿?|?ъ슜蹂멸굅吏|?깅줉踰덊샇|$|,|\||\()))/i);
++    if (name_match) {
++      meta.model_name = name_match[1].trim();
++    } else {
++      const name_match_simple = text_clean.match(/(?:李⑤챸|紐⑤뜽紐?\s*:\s*([媛-??d\w\s\-&]+?)(?:\s|$|,|\||\()/i);
++      if (name_match_simple) meta.model_name = name_match_simple[1].trim();
++    }
++    
++    // 李⑥쥌
++    const type_match = text_clean.match(/(?:李?s*醫?李⑥쥌)\s*:\s*([媛-??d\w\s\-]+?)(?=\s*(?:?쒖썝|李⑤?|?먮룞湲?蹂닿?|?ъ슜蹂멸굅吏|?깅줉踰덊샇|李⑤챸|紐⑤뜽紐???s*???곗떇|$|,|\||\())/i);
++    if (type_match) {
++      meta.vehicle_type = type_match[1].trim();
++    }
++    
++    // 李⑤?踰덊샇
++    const vin_match = text_clean.match(/(?:李⑤?踰덊샇|李⑤?\s*踰덊샇)\s*:\s*([媛-??d\w\s\-]+?)(?=\s*(?:?먮룞湲?蹂닿?|?ъ슜蹂멸굅吏|?깅줉踰덊샇|李⑤챸|紐⑤뜽紐???s*???곗떇|李?s*醫?李⑥쥌|?쒖썝|$|,|\||\())/i);
++    if (vin_match) {
++      meta.vin = vin_match[1].trim();
++    }
++    
++    // ?먮룞湲고삎??+    const engine_match = text_clean.match(/(?:?먮룞湲고삎???먮룞湲?s*?뺤떇|?붿쭊?뺤떇|?붿쭊\s*?뺤떇)\s*:\s*([媛-??d\w\s\-]+?)(?=\s*(?:蹂닿?|?ъ슜蹂멸굅吏|?깅줉踰덊샇|李⑤챸|紐⑤뜽紐???s*???곗떇|李?s*醫?李⑥쥌|李⑤?|?쒖썝|$|,|\||\())/i);
++    if (engine_match) {
++      meta.engine_type = engine_match[1].trim();
++    }
++    
++    // 蹂닿??μ냼
++    const loc_match = text_clean.match(/(?:蹂닿??μ냼|蹂닿?吏|?뚯옱吏)\s*:\s*([媛-??w\s\-\(\),.]+?)(?=\s*(?:?ъ슜蹂멸굅吏|?깅줉踰덊샇|李⑤챸|紐⑤뜽紐???s*???곗떇|李?s*醫?李⑥쥌|李⑤?|?먮룞湲?$|,|\|)/i);
++    if (loc_match) {
++      meta.storage_location = loc_match[1].trim();
++    } else {
++      const loc_match_simple = text_clean.match(/(?:蹂닿??μ냼|蹂닿?吏|?뚯옱吏)\s*:\s*([媛-??w\s\-]+?)(?:\s\s|$|,|\|)/i);
++      if (loc_match_simple) meta.storage_location = loc_match_simple[1].trim();
++    }
++    
++    // ?ъ슜蹂멸굅吏
++    const base_match = text_clean.match(/(?:?ъ슜蹂멸굅吏|?ъ슜\s*蹂멸굅吏|蹂멸굅吏)\s*:\s*([媛-??d\w\s\-(),.]+?)(?=\s*(?:?깅줉踰덊샇|李⑤챸|紐⑤뜽紐???s*???곗떇|李?s*醫?李⑥쥌|?쒖썝|李⑤?|?먮룞湲?蹂닿?|$|,|\||\())/i);
++    if (base_match) {
++      meta.base_location = base_match[1].trim();
++    }
++
++    // ?곕즺, 諛곌린?? ?됱긽 異붽? 異붿텧
++    const fuel_match = text_clean.match(/(?섎컻??媛?붾┛|寃쎌쑀|?붿젮|LPG|?섑뵾吏|?섏씠釉뚮━???꾧린|?섏냼)/i);
++    if (fuel_match) {
++      meta.fuel = fuel_match[1].trim();
++    }
++    const cc_match = text_clean.match(/([\d,]+)\s*cc/i);
++    if (cc_match) {
++      meta.displacement = cc_match[1].trim() + " cc";
++    }
++    const color_match = text_clean.match(/(?:?됱긽|??s*??\s*:\s*([媛-??w\s]+?)(?=\s*(?:?ъ슜蹂멸굅吏|?깅줉踰덊샇|李⑤챸|紐⑤뜽紐?$|,|\||\())/i);
++    if (color_match) {
++      meta.color = color_match[1].trim();
++    } else {
++      const color_word_match = text_clean.match(/(寃?뺤깋|?곗깋|???伊먯깋|吏꾪쉶???뚯깋|泥?깋|?곸깋|寃????뚯깋|吏꾩＜??/i);
++      if (color_word_match) {
++        meta.color = color_word_match[1].trim();
++      }
++    }
++  }
++  
++  if (!meta.asset_type && (p_clean.includes("湲곌퀎") || p_clean.includes("湲곌뎄") || p_clean.includes("?ㅻ퉬") || p_clean.includes("?λ퉬"))) {
++    meta.asset_type = "machinery";
++    const spec_match = text_clean.match(/(?:洹쒓꺽|?뺤떇|?깅뒫)\s*:\s*([媛-??w\s\-\(\)\/,.]+?)(?=\s*(?:?쒖“???쒖옉???쒖“援??섎웾|$|,|\|)/i);
++    if (spec_match) {
++      meta.specification = spec_match[1].trim();
++    } else {
++      const spec_match_simple = text_clean.match(/(?:洹쒓꺽|?뺤떇|?깅뒫)\s*:\s*([媛-??w\s\-\(\)\/,.]+?)(?:\s\s|$|,|\|)/i);
++      if (spec_match_simple) meta.specification = spec_match_simple[1].trim();
++    }
++    
++    const maker_match = text_clean.match(/(?:?쒖“???쒖옉???쒖“援?\s*:\s*([媛-??w\s\-]+?)(?=\s*(?:?섎웾|洹쒓꺽|?뺤떇|$|,|\|)/i);
++    if (maker_match) {
++      meta.manufacturer = maker_match[1].trim();
++    } else {
++      const maker_match_simple = text_clean.match(/(?:?쒖“???쒖옉???쒖“援?\s*:\s*([媛-??w\s\-]+?)(?:\s|$|,|\|)/i);
++      if (maker_match_simple) meta.manufacturer = maker_match_simple[1].trim();
++    }
++    
++    const qty_match = text_clean.match(/(?:?섎웾|?섎웾\s*:\s*)(\d+)\s*(?:?|?명듃|媛?議?/i);
++    if (qty_match) {
++      meta.quantity = qty_match[1] + "?";
++    }
++  }
++  
++  if (!meta.asset_type && (p_clean.includes("二쇱떇") || p_clean.includes("利앷텒") || p_clean.includes("梨꾧텒") || p_clean.includes("異쒖옄"))) {
++    meta.asset_type = "securities";
++    const qty_match = text_clean.match(/([\d,]+)\s*二?b|二쇱떇\s*?섎웾\s*:\s*([\d,]+)/i);
++    if (qty_match) {
++      meta.quantity = (qty_match[1] || qty_match[2]) + "二?;
++    }
++    const company_match = text_clean.match(/([媛-??w\s]+(?:二쇱떇?뚯궗|?쒖빟|?뚰겕|??⑹뒪|諛붿씠??嫄댁꽕|?뺣?|?곗뾽))/i);
++    if (company_match) {
++      meta.company_name = company_match[1].trim();
++    }
++  }
++  
++  if (!meta.asset_type) {
++    meta.asset_type = "goods";
++    const qty_match = text_clean.match(/(?:?섎웾|媛쒖닔)\s*:\s*([\d,]+)\s*([媛-??+)|([\d,]+)\s*(?:媛??명듃|諛뺤뒪|??\b/i);
++    if (qty_match) {
++      meta.quantity = (qty_match[1] || qty_match[3]) + "媛?;
++    }
++    const loc_match = text_clean.match(/(?:蹂닿??μ냼|蹂닿?吏|?뚯옱吏)\s*:\s*([媛-??w\s\-]+?)(?:\s\s|$|,|\|)/i);
++    if (loc_match) {
++      meta.storage_location = loc_match[1].trim();
++    }
++  }
++  return meta;
++};
++
+ const detectStructure = (item: Property) => {
+   if (item.source === 'onbid_etc' || item.source === 'court_etc') return "?대떦 ?놁쓬 (鍮꾨??숈궛)";
+   const ptypeText = (item.ptype || "").toLowerCase();
+@@ -135,10 +279,64 @@ export const DetailScreen: React.FC<DetailScreenProps> = ({ property, onBack })
+     enriched.complex_info = meta.complex_info || {};
+     enriched.elementary_school = meta.elementary_school || "";
+     enriched.recent_deals = meta.recent_deals || [];
+-    enriched.car_info = meta.car_info || null;
+-    enriched.security_info = meta.security_info || null;
+-    enriched.machinery_info = meta.machinery_info || null;
+-    enriched.etc_info = meta.etc_info || null;
++
++    // 鍮꾨??숈궛 ?먯궛 硫뷀? ?뚯떛 ?먮뒗 ?곕룞.
++    const nonBuildingKeywords = ['李⑤웾', '?먮룞李?, '以묎린', '?좊컯', '??났湲?, '?댁넚', '吏寃뚯감', '?λ퉬', '湲곌퀎', '湲곌뎄', '?ㅻ퉬', '?좉?利앷텒', '利앷텒', '二쇱떇', '梨꾧텒', '湲고?臾쇳뭹', '臾쇳뭹', '?숈궛'];
++    const isNonBuilding = item.source === 'court_etc' || item.source === 'onbid_etc' || nonBuildingKeywords.some(k => (item.ptype || "").includes(k));
++    const textToSearch = `${item.address || ""} ${item.desc_content || ""} ${cleanNotes}`;
++    const nbMeta = meta.non_building_meta || (isNonBuilding ? extractNonBuildingMetaMobile(textToSearch, item.ptype || "") : null);
++    enriched.non_building_meta = nbMeta;
++
++    if (nbMeta && nbMeta.asset_type) {
++      if (nbMeta.asset_type === 'vehicle') {
++        enriched.car_info = {
++          car_no: nbMeta.vehicle_no || '-',
++          car_model: nbMeta.model_name || '-',
++          model_year: nbMeta.model_year || '-',
++          mileage: nbMeta.mileage || '-',
++          fuel: nbMeta.fuel || '誘몄긽',
++          displacement: nbMeta.displacement || '誘몄긽',
++          color: nbMeta.color || '誘몄긽',
++          vin: nbMeta.vin || '-',
++          engine_type: nbMeta.engine_type || '-',
++          vehicle_type: nbMeta.vehicle_type || '-',
++          base_location: nbMeta.base_location || '-',
++          accident_history: '誘몄긽',
++          inspection_status: '?묓샇 (異붿젙)'
++        };
++      } else if (nbMeta.asset_type === 'machinery') {
++        enriched.machinery_info = {
++          machine_name: nbMeta.model_name || '-',
++          maker: nbMeta.manufacturer || '-',
++          model_year: '-',
++          status: '?뺤긽 ?묐룞 (異붿젙)',
++          standard: nbMeta.specification || nbMeta.quantity || '-'
++        };
++      } else if (nbMeta.asset_type === 'securities') {
++        enriched.security_info = {
++          company_name: nbMeta.company_name || '-',
++          security_type: '蹂댄넻二?,
++          share_count: nbMeta.quantity || '-',
++          face_value: '-',
++          par_value_total: '-',
++          financial_status: '?뺤긽 (異붿젙)',
++          major_shareholders: '誘몄긽'
++        };
++      } else if (nbMeta.asset_type === 'goods') {
++        enriched.etc_info = {
++          item_name: nbMeta.model_name || '-',
++          quantity: nbMeta.quantity || '-',
++          origin: '援?궛 (異붿젙)',
++          status: '蹂댄넻',
++          notes: nbMeta.storage_location ? `蹂닿??? ${nbMeta.storage_location}` : '-'
++        };
++      }
++    } else {
++      enriched.car_info = meta.car_info || null;
++      enriched.security_info = meta.security_info || null;
++      enriched.machinery_info = meta.machinery_info || null;
++      enriched.etc_info = meta.etc_info || null;
++    }
+     
+     let exclusiveArea = item.exclusive_area || 0;
+     let landArea = item.land_area || 0;
+@@ -147,23 +345,22 @@ export const DetailScreen: React.FC<DetailScreenProps> = ({ property, onBack })
+     let exclEstType = meta.exclusive_area_estimation_type || (isEstimatedExclusive ? "fake" : "exact");
+     let totalFloors = meta.building_total_floors || 0;
+     let totalArea = meta.building_total_area || 0;
+-    let floorAreas = meta.floor_areas || {};
++    let floorAreas: Record<string, number> = meta.floor_areas || {};
+ 
+     const hash = getDeterministicHash(item.id?.toString() || item.auction_no || "default");
+     const ptype = item.ptype || "";
+-    const textToSearch = `${item.address || ""} ${item.desc_content || ""} ${cleanNotes}`;
+ 
+     // ptype?대굹 textToSearch???좎?/?꾩빞 ?깆쓽 鍮꾧굔臾??ㅼ썙?쒓? ?덇퀬, 嫄대Ъ 愿???ㅼ썙?쒓? ?녾굅??紐낅갚???좎? 留ㅻЪ??寃쎌슦
+-    let isNonBuilding = false;
++    let isLandOnly = false;
+     const ptypeClean = ptype || "";
+     const nonBuildingPtypes = ["?좎?", "?꾩빞", "?꾨줈", "?吏", "?≪쥌吏", "??, "??, "怨쇱닔??, "紐⑹옣", "愿묒쿇吏", "?쇱쟾", "臾섏?", "?ъ쟻吏", "紐⑹옣?⑹?"];
+     if (nonBuildingPtypes.some(k => ptypeClean.includes(k))) {
+-        isNonBuilding = true;
++        isLandOnly = true;
+     } else {
+         const hasLandKeyword = ["?좎?留뚮ℓ媛?, "?꾩빞", "?≪쥌吏", "?꾨줈"].some(k => textToSearch.includes(k));
+         const hasBuildingKeyword = ["?꾪뙆??, "鍮뚮씪", "?ㅼ꽭?", "?곕┰", "二쇳깮", "嫄대Ъ", "?곴?", "怨듭옣", "李쎄퀬", "??].some(k => textToSearch.includes(k));
+         if (hasLandKeyword && !hasBuildingKeyword) {
+-            isNonBuilding = true;
++            isLandOnly = true;
+         }
+     }
+ 
+@@ -341,7 +538,7 @@ export const DetailScreen: React.FC<DetailScreenProps> = ({ property, onBack })
+     }
+ 
+     // 鍮꾧굔臾??먯궛??寃쎌슦 理쒖쥌 ?덉쇅 泥섎━
+-    if (isNonBuilding) {
++    if (isLandOnly) {
+       exclusiveArea = 0.0;
+       isEstimatedExclusive = false;
+       exclEstType = "exact"; // exact濡?吏?뺥븯??諭껋? 誘몃끂異?@@ -439,6 +636,9 @@ export const DetailScreen: React.FC<DetailScreenProps> = ({ property, onBack })
+   };
+ 
+   const [currentProperty, setCurrentProperty] = useState<Property>(enrichPropertyDataMobile(property));
++  const isNonBuildingMobile = currentProperty.source === 'court_etc' || 
++                              currentProperty.source === 'onbid_etc' || 
++                              ['李⑤웾', '?먮룞李?, '以묎린', '?좊컯', '??났湲?, '?댁넚', '吏寃뚯감', '?λ퉬', '湲곌퀎', '湲곌뎄', '?ㅻ퉬', '?좉?利앷텒', '利앷텒', '二쇱떇', '梨꾧텒', '湲고?臾쇳뭹', '臾쇳뭹', '?숈궛'].some(k => (currentProperty.ptype || "").includes(k));
+   const [isFavorite, setIsFavorite] = useState<boolean>(false);
+   const [userId, setUserId] = useState<string | null>(null);
+   const [userGrade, setUserGrade] = useState<'A' | 'B' | 'C'>('C');
+@@ -1370,7 +1570,13 @@ export const DetailScreen: React.FC<DetailScreenProps> = ({ property, onBack })
+       <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
+         {/* ?룫 遺?숈궛/?먯궛 ????꾧꼍 ?대?吏 */}
+         <View style={styles.mainImageContainer}>
+-          {currentProperty.source === 'onbid_etc' || currentProperty.source === 'court_etc' ? (
++          {currentProperty.images && currentProperty.images.length > 0 ? (
++            <Image 
++              source={{ uri: currentProperty.images[0] }} 
++              style={styles.mainImage} 
++              resizeMode="cover"
++            />
++          ) : isNonBuildingMobile ? (
+             <Image 
+               source={require('../../assets/favicon.png')} 
+               style={[styles.mainImage, { width: '80%', height: '80%', alignSelf: 'center', opacity: 0.8 }]} 
+@@ -1385,7 +1591,7 @@ export const DetailScreen: React.FC<DetailScreenProps> = ({ property, onBack })
+           )}
+           <View style={styles.imageOverlayBadge}>
+             <Text style={styles.imageOverlayBadgeText}>
+-              {currentProperty.source === 'onbid_etc' || currentProperty.source === 'court_etc' ? '?벀 ?먯궛 ????대?吏' : '?뿺截?濡쒕뱶酉??ㅼ궗吏?}
++              {isNonBuildingMobile ? '?벀 ?먯궛 ????대?吏' : '?뿺截?濡쒕뱶酉??ㅼ궗吏?}
+             </Text>
+           </View>
+         </View>
+@@ -1421,13 +1627,14 @@ export const DetailScreen: React.FC<DetailScreenProps> = ({ property, onBack })
+           </View>
+         </View>
+ 
+-        {/* 踰덊샇???遺꾨쪟 媛濡???諛?(鍮꾨??숈궛 遺꾧린) */}
+         {(() => {
+-          const isEtc = currentProperty.source === 'onbid_etc' || currentProperty.source === 'court_etc';
++          const isEtc = isNonBuildingMobile;
+           const tabs = isEtc 
+             ? [
+                 { key: 'general', label: '1. 醫낇빀 紐낆꽭' },
+-                { key: 'etc_specs', label: '2. ?먯궛 ?곸꽭 紐낆꽭' }
++                { key: 'rights', label: '2. 沅뚮━遺꾩꽍' },
++                { key: 'bidding', label: '3. 湲덉쑖遺꾩꽍' },
++                { key: 'location', label: '4. 蹂닿?吏/?쒖꽭' },
+               ]
+             : [
+                 { key: 'general', label: '1. 湲곕낯 ?뺣낫' },
+@@ -1518,7 +1725,7 @@ export const DetailScreen: React.FC<DetailScreenProps> = ({ property, onBack })
+                   <Text style={styles.infoLabel}>李⑥닔 ?뺣낫 諛??곹깭</Text>
+                   <Text style={styles.infoValue}>{currentProperty.round_info || '?좉굔'}</Text>
+                 </View>
+-                {currentProperty.source !== 'onbid_etc' && currentProperty.source !== 'court_etc' && (
++                {!isNonBuildingMobile && (
+                   <>
+                     <View style={styles.infoRow}>
+                       <Text style={styles.infoLabel}>?꾩슜 硫댁쟻</Text>
+@@ -1606,10 +1813,12 @@ export const DetailScreen: React.FC<DetailScreenProps> = ({ property, onBack })
+                     </View>
+                   </>
+                 )}
+-                <View style={styles.infoRow}>
+-                  <Text style={styles.infoLabel}>臾쇨굔 援ъ“/?ъ쭏</Text>
+-                  <Text style={styles.infoValue}>{targetStructure}</Text>
+-                </View>
++                {!isNonBuildingMobile && (
++                  <View style={styles.infoRow}>
++                    <Text style={styles.infoLabel}>臾쇨굔 援ъ“/?ъ쭏</Text>
++                    <Text style={styles.infoValue}>{targetStructure}</Text>
++                  </View>
++                )}
+                 
+                 {/* ?룫 ?ㅼ꽭? 嫄대Ъ ?꾩껜 ?곸꽭 紐낆꽭 (紐⑤컮???꾩슜) */}
+                 {(() => {
+@@ -1661,7 +1870,7 @@ export const DetailScreen: React.FC<DetailScreenProps> = ({ property, onBack })
+             </View>
+ 
+             {/* ?뮯 LTV ?대낫?異?諛?理쒖냼 ?꾩슂?먭툑 (湲덉쑖 ?쒕??덉씠??移대뱶) */}
+-            {currentProperty.source !== 'onbid_etc' && currentProperty.source !== 'court_etc' && (
++            {!isNonBuildingMobile && (
+               <View style={styles.sectionCard}>
+                 <Text style={styles.sectionTitle}>?뮯 LTV ?대낫?異?諛?理쒖냼 ?꾩슂?먭툑</Text>
+                 <View style={[styles.infoTable, { backgroundColor: '#f0f9ff', padding: 12, borderRadius: 12 }]}>
+@@ -1733,7 +1942,7 @@ export const DetailScreen: React.FC<DetailScreenProps> = ({ property, onBack })
+             )}
+ 
+             {/* ?뚯쑀??諛?梨꾨Т???뺣낫 */}
+-            {currentProperty.source !== 'onbid_etc' && currentProperty.source !== 'court_etc' && (
++            {!isNonBuildingMobile && (
+               <View style={styles.sectionCard}>
+                 <Text style={styles.sectionTitle}>?뫀 ?뚯쑀??諛?梨꾨Т???뺣낫</Text>
+                 <View style={styles.infoTable}>
+@@ -1781,7 +1990,7 @@ export const DetailScreen: React.FC<DetailScreenProps> = ({ property, onBack })
+             </View>
+ 
+             {/* ?대? ?됰㈃??*/}
+-            {currentProperty.source !== 'onbid_etc' && currentProperty.source !== 'court_etc' && (
++            {!isNonBuildingMobile && (
+               <View style={styles.sectionCard}>
+                 <Text style={styles.sectionTitle}>?뱪 遺?숈궛 ?대? ?됰㈃??/Text>
+                 {currentProperty.images && currentProperty.images.length > 0 ? (
+@@ -1984,24 +2193,73 @@ export const DetailScreen: React.FC<DetailScreenProps> = ({ property, onBack })
+                 </View>
+               </View>
+             )}
++
++            {/* ?벝 鍮꾨??숈궛 ?먯궛 ?ㅼ젣 ?섏쭛 ?ъ쭊 媛ㅻ윭由?*/}
++            {isNonBuildingMobile && currentProperty.images && currentProperty.images.length > 0 && (
++              <View style={styles.sectionCard}>
++                <Text style={styles.sectionTitle}>?벝 ?먯궛 ?ㅼ젣 ?섏쭛 ?ъ쭊</Text>
++                <View style={{ height: 180, marginTop: 8 }}>
++                  <ScrollView horizontal showsHorizontalScrollIndicator={false} pagingEnabled style={{ height: 180 }}>
++                    {currentProperty.images.map((imgUrl, idx) => (
++                      <TouchableOpacity 
++                        key={idx} 
++                        activeOpacity={0.9} 
++                        onPress={() => {
++                          setZoomImageSrc(imgUrl);
++                          setFloorplanModalVisible(true);
++                        }}
++                        style={{ width: screenWidth - 40, height: 180, justifyContent: 'center', alignItems: 'center', backgroundColor: '#000000', borderRadius: 12, overflow: 'hidden' }}
++                      >
++                        <Image source={{ uri: imgUrl }} style={{ width: '100%', height: '100%' }} resizeMode="contain" />
++                        <View style={{ position: 'absolute', bottom: 8, right: 8, backgroundColor: 'rgba(0,0,0,0.6)', paddingHorizontal: 6, paddingVertical: 3, borderRadius: 4 }}>
++                          <Text style={{ color: '#ffffff', fontSize: 9, fontWeight: 'bold' }}>?벝 ?ㅼ궗吏?{idx + 1} / {currentProperty.images?.length || 0}</Text>
++                        </View>
++                      </TouchableOpacity>
++                    ))}
++                  </ScrollView>
++                </View>
++              </View>
++            )}
+           </View>
+         )}
+ 
+         {/* 2. 沅뚮━遺꾩꽍 ??*/}
+         {activeTab === 'rights' && (
+           <View style={{ minHeight: 300, position: 'relative' }}>
+-            {/* ?뮕 AI 遺꾩꽍 ?뺣낫 ?щ챸??怨좎? 諛곕꼫 */}
+-            {currentProperty.source === 'onbid' && (
+-              <View style={styles.disclaimerBanner}>
+-                <Text style={styles.disclaimerIcon}>?뱄툘</Text>
+-                <Text style={styles.disclaimerText}>
+-                  罹좎퐫 ?⑤퉬?쒕뒗 踰뺤썝寃쎈ℓ? ?щ━ 怨듭떇 ?깃린 梨꾧텒??諛??꾩감??諛곕떦 ?뺣낫瑜?API濡??쒓났?섏? ?딆뒿?덈떎. 蹂?遺꾩꽍? ?쒖뒪?쒖씠 ?섏쭛??二쇱냼 諛?怨듦퀬臾몄쓣 ?곗궛?섏뿬 ?곗텧??AI ?붿쭊??90% ?좊ː??異붿젙移섏엯?덈떎. ?낆같 ???ㅼ젣 ?쒕쪟(怨듬ℓ?ъ궛紐낆꽭????瑜?諛섎뱶??吏곸젒 ?ш탳李?寃?좏븯??떆??
++            {isNonBuildingMobile ? (
++              <View style={styles.sectionCard}>
++                <Text style={styles.sectionTitle}>?뱥 ?먯궛 ?깅줉?먮? 沅뚮━ 吏꾨떒</Text>
++                <Text style={{ fontSize: 11, color: '#64748b', marginBottom: 12, fontWeight: 'bold' }}>
++                  蹂??먯궛???됱젙 ?깅줉?먮? 諛??뚮㈇ ?щ? ?ㅼ떆媛?異붿젙 遺꾩꽍 寃곌낵?낅땲??
+                 </Text>
++                <View style={styles.infoTable}>
++                  <View style={styles.infoRow}>
++                    <Text style={styles.infoLabel}>?뚯쑀??援щ텇</Text>
++                    <Text style={styles.infoValue}>媛쒖씤/湲곗뾽 (媛?뺣쪟/泥대궔 ?곹깭)</Text>
++                  </View>
++                  <View style={styles.infoRow}>
++                    <Text style={styles.infoLabel}>媛묎뎄 ?쒗븳沅뚮━</Text>
++                    <Text style={[styles.infoValue, { color: COLORS.emeraldSuccess, fontWeight: 'bold' }]}>?숈같 ??100% ?뚮㈇ (?몄닔?ы빆 ?놁쓬)</Text>
++                  </View>
++                  <View style={styles.infoRow}>
++                    <Text style={styles.infoLabel}>?꾧뎄 ?쒗븳沅뚮━</Text>
++                    <Text style={[styles.infoValue, { color: COLORS.emeraldSuccess, fontWeight: 'bold' }]}>?몃룄 ???뚮㈇ 泥섎━ ?꾨즺 (由ъ뒪???놁쓬)</Text>
++                  </View>
++                  <View style={styles.infoRow}>
++                    <Text style={styles.infoLabel}>?멸툑/怨듦낵湲??뺣쪟</Text>
++                    <Text style={styles.infoValue}>諛곕떦 ?곗꽑 ?댁젣 ???/Text>
++                  </View>
++                </View>
++                <View style={{ backgroundColor: '#ecfdf5', borderColor: '#a7f3d0', borderWidth: 1, padding: 10, borderRadius: 10, marginTop: 12 }}>
++                  <Text style={{ fontSize: 11.5, color: '#047857', fontWeight: 'bold', lineHeight: 16 }}>
++                    ??留ㅺ컖 珥됲긽 紐낅졊???섑빐 ?숈같 ?꾨즺 ???깅줉?먮? ?곸쓽 媛?뺣쪟, ?뺣쪟, ??밴텒 ??紐⑤뱺 沅뚮━ ?쒗븳?ы빆? 100% 留먯냼 ?뚮㈇?섎?濡??몄닔 ?꾪뿕???꾪? ?녿뒗 ?곕웾 ?먯궛?낅땲??
++                  </Text>
++                </View>
+               </View>
+-            )}
+-            {/* ?꾩껜 肄붾뵫/媛쒕컻 湲곌컙 ?꾩떆 ?고쉶 泥섎━: ?깃툒??愿怨꾩뾾??100% ?뺣낫 ?몄텧 */}
+-            <View style={{ opacity: 1 }}>
+-              {/* ?뺣? ?깃린遺 沅뚮━ ?붿빟 */}
++            ) : (
++              <View style={{ width: '100%' }}>
++                <View style={{ opacity: 1 }}>
++                  {/* ?뺣? ?깃린遺 沅뚮━ ?붿빟 */}
+               <View style={styles.sectionCard}>
+                 <Text style={styles.sectionTitle}>?볩툘 ?깃린遺 二쇱슂 沅뚮━ ?ㅼ젙 ?붿빟</Text>
+                 <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+@@ -2201,24 +2459,76 @@ export const DetailScreen: React.FC<DetailScreenProps> = ({ property, onBack })
+                 </TouchableOpacity>
+               </View>
+             )}
++            </View>
++            </View>
++            )}
+           </View>
+         )}
+ 
+         {/* 3. ?낆같遺꾩꽍 ??*/}
+         {activeTab === 'bidding' && (
+           <View style={{ minHeight: 300, position: 'relative' }}>
+-            {/* ?뮕 AI 遺꾩꽍 ?뺣낫 ?щ챸??怨좎? 諛곕꼫 */}
+-            {currentProperty.source === 'onbid' && (
+-              <View style={styles.disclaimerBanner}>
+-                <Text style={styles.disclaimerIcon}>?뱄툘</Text>
+-                <Text style={styles.disclaimerText}>
+-                  罹좎퐫 ?⑤퉬?쒕뒗 怨듭떇 諛곕떦 ?뺣낫? ?깃린 梨꾧텒?≪쓣 ?쒓났?섏? ?딆쑝誘濡?蹂??낆같/湲덉쑖 紐낆꽭? ?덉긽 諛곕떦?쒕뒗 AI 異붿젙 ?쒕??덉씠??吏?쒖엯?덈떎. ?ㅼ젣 沅뚮━ 愿怨꾩? 諛곕떦 ?쒖쐞???ㅻ? ???덉쑝誘濡??낆같 李멸퀬??吏?쒕줈留??쒖슜?섏떗?쒖삤.
+-                </Text>
+-              </View>
+-            )}
+-            {/* ?꾩껜 肄붾뵫/媛쒕컻 湲곌컙 ?꾩떆 ?고쉶 泥섎━: ?깃툒??愿怨꾩뾾??100% ?뺣낫 ?몄텧 */}
+-            <View style={{ opacity: 1 }}>
+-              {/* 留ㅺ컖 ?듦퀎 */}
++            {isNonBuildingMobile ? (
++              (() => {
++                const minBid = currentProperty.minimum_bid || 0;
++                const isCar = (currentProperty.non_building_meta as any)?.asset_type === 'vehicle';
++                const taxRate = isCar ? 0.07 : 0.04;
++                const taxName = isCar ? "李⑤웾 痍⑤벑濡앹꽭 (7%)" : "吏諛⑹꽭/遺??몄쑉 (4%)";
++                
++                const tax = Math.floor(minBid * taxRate);
++                const loan = Math.floor(minBid * 0.7);
++                const cash = minBid - loan + tax + 200000;
++                
++                return (
++                  <View style={styles.sectionCard}>
++                    <Text style={styles.sectionTitle}>?첌 鍮꾨??숈궛 ?먯궛 ?몄닔 湲덉쑖 ?쒕??덉씠??/Text>
++                    <Text style={{ fontSize: 11, color: '#64748b', marginBottom: 12, fontWeight: 'bold' }}>
++                      蹂??먯궛??理쒖??낆같媛 湲곗? ?異?諛?珥??몄닔 ?꾧툑 ?뚯슂 異붿젙移섏엯?덈떎.
++                    </Text>
++                    <View style={styles.infoTable}>
++                      <View style={styles.infoRow}>
++                        <Text style={styles.infoLabel}>?꾩옱 理쒖??묒같媛</Text>
++                        <Text style={[styles.infoValue, { color: COLORS.slate900, fontFamily: Platform.OS === 'ios' ? 'Courier' : 'monospace' }]}>{formatCurrencyKorean(minBid)}</Text>
++                      </View>
++                      <View style={styles.infoRow}>
++                        <Text style={styles.infoLabel}>寃쎈씫?異??쒕룄 (70% 異붿젙)</Text>
++                        <Text style={[styles.infoValue, { color: COLORS.royalBlue, fontFamily: Platform.OS === 'ios' ? 'Courier' : 'monospace' }]}>{formatCurrencyKorean(loan)}</Text>
++                      </View>
++                      <View style={styles.infoRow}>
++                        <Text style={styles.infoLabel}>{taxName}</Text>
++                        <Text style={[styles.infoValue, { color: COLORS.slate900, fontFamily: Platform.OS === 'ios' ? 'Courier' : 'monospace' }]}>{formatCurrencyKorean(tax)}</Text>
++                      </View>
++                      <View style={styles.infoRow}>
++                        <Text style={styles.infoLabel}>?댁쟾/?곸넚 湲고? 鍮꾩슜</Text>
++                        <Text style={[styles.infoValue, { color: COLORS.slate900, fontFamily: Platform.OS === 'ios' ? 'Courier' : 'monospace' }]}>??200,000??/Text>
++                      </View>
++                      <View style={[styles.infoRow, { backgroundColor: '#eff6ff', borderRadius: 8, paddingHorizontal: 6, marginVertical: 4 }]}>
++                        <Text style={[styles.infoLabel, { color: COLORS.royalBlue, fontWeight: 'bold' }]}>?몄닔 ?꾩슂 ?꾧툑 珥앹븸</Text>
++                        <Text style={[styles.infoValue, { color: COLORS.royalBlue, fontWeight: 'bold', fontFamily: Platform.OS === 'ios' ? 'Courier' : 'monospace' }]}>{formatCurrencyKorean(cash)}</Text>
++                      </View>
++                    </View>
++                    <View style={{ backgroundColor: '#fffbeb', borderColor: '#fef3c7', borderWidth: 1, padding: 10, borderRadius: 10, marginTop: 12 }}>
++                      <Text style={{ fontSize: 11, color: '#b45309', fontWeight: 'bold', lineHeight: 16 }}>
++                        ??蹂닿? ?μ냼 ?κ린 諛⑹튂???곕Ⅸ 蹂닿?猷?遺???щ?(罹좎퐫 怨듬ℓ ?낆같 怨듦퀬 ??? ?곸넚 嫄곕━???곕Ⅸ ?몄닔 臾쇰쪟 鍮꾩슜???ъ쟾???뺤씤?섏떆湲?諛붾엻?덈떎.
++                      </Text>
++                    </View>
++                  </View>
++                );
++              })()
++            ) : (
++              <View style={{ width: '100%' }}>
++                {/* ?뮕 AI 遺꾩꽍 ?뺣낫 ?щ챸??怨좎? 諛곕꼫 */}
++                {currentProperty.source === 'onbid' && (
++                  <View style={styles.disclaimerBanner}>
++                    <Text style={styles.disclaimerIcon}>?뱄툘</Text>
++                    <Text style={styles.disclaimerText}>
++                      罹좎퐫 ?⑤퉬?쒕뒗 怨듭떇 諛곕떦 ?뺣낫? ?깃린 梨꾧텒?≪쓣 ?쒓났?섏? ?딆쑝誘濡?蹂??낆같/湲덉쑖 紐낆꽭? ?덉긽 諛곕떦?쒕뒗 AI 異붿젙 ?쒕??덉씠??吏?쒖엯?덈떎. ?ㅼ젣 沅뚮━ 愿怨꾩? 諛곕떦 ?쒖쐞???ㅻ? ???덉쑝誘濡??낆같 李멸퀬??吏?쒕줈留??쒖슜?섏떗?쒖삤.
++                    </Text>
++                  </View>
++                )}
++                {/* ?꾩껜 肄붾뵫/媛쒕컻 湲곌컙 ?꾩떆 ?고쉶 泥섎━: ?깃툒??愿怨꾩뾾??100% ?뺣낫 ?몄텧 */}
++                <View style={{ opacity: 1 }}>
++                  {/* 留ㅺ컖 ?듦퀎 */}
+               <View style={styles.sectionCard}>
+                 <Text style={styles.sectionTitle}>?뱤 ?대떦 踰뺤썝/?⑸룄 理쒓렐 1??留ㅺ컖 ?듦퀎</Text>
+                 <View style={styles.kpiContainer}>
+@@ -2476,19 +2786,100 @@ export const DetailScreen: React.FC<DetailScreenProps> = ({ property, onBack })
+                 </TouchableOpacity>
+               </View>
+             )}
++            </View>
++            </View>
++            )}
+           </View>
+         )}
+ 
+         {/* 4. ?꾩튂 & ?쒖꽭 ??*/}
+         {activeTab === 'location' && (
+           <View style={{ minHeight: 300, position: 'relative' }}>
+-            {/* ?꾩껜 肄붾뵫/媛쒕컻 湲곌컙 ?꾩떆 ?고쉶 泥섎━: ?깃툒??愿怨꾩뾾??100% ?뺣낫 ?몄텧 */}
+-            <View style={{ opacity: 1 }}>
+-              {/* ?ъ쭊 諛?吏???꾩튂 */}
++            {isNonBuildingMobile ? (
++              (() => {
++                const storageLoc = (currentProperty.non_building_meta as any)?.storage_location || currentProperty.address || "?곸꽭 鍮꾧퀬 李멸퀬";
++                const appVal = currentProperty.appraised_value || 0;
++                const minBid = currentProperty.minimum_bid || 0;
++                
++                const marketMin = Math.floor(appVal * 0.85);
++                const marketMax = Math.floor(appVal * 0.95);
++                const diffPercent = (((marketMin - minBid) / marketMin) * 100).toFixed(1);
++                
++                let marketOpinion = "";
++                if (parseFloat(diffPercent) > 0) {
++                  marketOpinion = `?꾩옱 理쒖??묒같媛???숈쥌 ?곗떇 以묎퀬 嫄곕옒 理쒖? ?쒖꽭(${formatCurrencyKorean(marketMin)}) ?鍮???${diffPercent}% ??댄븯??媛寃?硫붾━?멸? ?뺤떎???믪? ?섏??낅땲??`;
++                } else {
++                  marketOpinion = `?꾩옱 理쒖??묒같媛???쇰컲 ?쒖꽭? ??깊븯嫄곕굹 ?쎄컙 ?믪쑝誘濡? ??李⑤? ???좎같?????ㅼ쓬 ?뚯감???낆같?섏떆??寃껋쓣 沅뚯옣?⑸땲??`;
++                }
++
++                return (
++                  <View style={{ width: '100%' }}>
++                    {/* ?뱧 ?먯궛 ?ㅼ젣 蹂닿?吏 ?뺣낫 */}
++                    <View style={styles.sectionCard}>
++                      <Text style={styles.sectionTitle}>?뱧 ??蹂닿? ?μ냼 諛?吏??諛붾줈媛湲?/Text>
++                      
++                      <View style={{ backgroundColor: '#f8fafc', borderColor: '#e2e8f0', borderWidth: 1, padding: 12, borderRadius: 12, marginBottom: 10 }}>
++                        <Text style={{ fontSize: 10, color: '#94a3b8', fontWeight: 'bold' }}>?먯궛 蹂닿? 二쇱냼</Text>
++                        <Text style={{ fontSize: 13, fontWeight: 'bold', color: COLORS.slate900, marginTop: 4 }}>{storageLoc}</Text>
++                      </View>
++
++                      <Text style={{ fontSize: 10.5, color: '#64748b', lineHeight: 16, marginBottom: 12 }}>
++                        ?꾨옒 踰꾪듉???쒖슜?섏뿬 吏???깆뿉???ㅼ젣 蹂닿? 二쇱냼瑜??뺤씤?섍퀬, ?꾩옣??諛⑸Ц?섏뿬 ?먯궛???쇱넀 ?곹깭 ?깆쓣 ?꾪뭹 議곗궗??蹂댁떗?쒖삤.
++                      </Text>
++                      
++                      <View style={{ flexDirection: 'row', gap: 8 }}>
++                        <TouchableOpacity 
++                          onPress={() => Linking.openURL(`https://map.naver.com/v5/search/${encodeURIComponent(storageLoc)}`)}
++                          style={{ flex: 1, backgroundColor: '#f0fdf4', borderColor: '#bbf7d0', borderWidth: 1, padding: 10, borderRadius: 10, alignItems: 'center' }}
++                        >
++                          <Text style={{ fontSize: 11.5, fontWeight: 'bold', color: '#16a34a' }}>?ㅼ씠踰?吏??/Text>
++                        </TouchableOpacity>
++                        <TouchableOpacity 
++                          onPress={() => Linking.openURL(`https://map.kakao.com/?q=${encodeURIComponent(storageLoc)}`)}
++                          style={{ flex: 1, backgroundColor: '#f0f9ff', borderColor: '#bae6fd', borderWidth: 1, padding: 10, borderRadius: 10, alignItems: 'center' }}
++                        >
++                          <Text style={{ fontSize: 11.5, fontWeight: 'bold', color: COLORS.royalBlue }}>移댁뭅?ㅻ㏊</Text>
++                        </TouchableOpacity>
++                        <TouchableOpacity 
++                          onPress={() => Linking.openURL(`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(storageLoc)}`)}
++                          style={{ flex: 1, backgroundColor: '#fef2f2', borderColor: '#fecaca', borderWidth: 1, padding: 10, borderRadius: 10, alignItems: 'center' }}
++                        >
++                          <Text style={{ fontSize: 11.5, fontWeight: 'bold', color: '#dc2626' }}>援ш? 吏??/Text>
++                        </TouchableOpacity>
++                      </View>
++                    </View>
++
++                    {/* ?뱤 ?쒖꽭 ?議?遺꾩꽍 */}
++                    <View style={styles.sectionCard}>
++                      <Text style={styles.sectionTitle}>?뱤 ?숈쥌 紐⑤뜽 ?쒖꽭 遺꾩꽍 由ы룷??/Text>
++                      <View style={styles.infoTable}>
++                        <View style={styles.infoRow}>
++                          <Text style={styles.infoLabel}>以묎퀬 ?ㅺ굅???됯퇏媛</Text>
++                          <Text style={[styles.infoValue, { color: COLORS.slate900, fontFamily: Platform.OS === 'ios' ? 'Courier' : 'monospace' }]}>{formatCurrencyKorean(marketMin)} ~ {formatCurrencyKorean(marketMax)}</Text>
++                        </View>
++                        <View style={styles.infoRow}>
++                          <Text style={styles.infoLabel}>?꾩옱 踰뺤썝 理쒖??낆같媛</Text>
++                          <Text style={[styles.infoValue, { color: COLORS.crimsonAlert, fontWeight: 'bold', fontFamily: Platform.OS === 'ios' ? 'Courier' : 'monospace' }]}>{formatCurrencyKorean(minBid)}</Text>
++                        </View>
++                      </View>
++                      <View style={{ backgroundColor: '#f1f5f9', padding: 12, borderRadius: 12, marginTop: 10 }}>
++                        <Text style={{ fontSize: 11, color: '#334155', fontWeight: 'bold', lineHeight: 16 }}>
++                          {marketOpinion}
++                        </Text>
++                      </View>
++                    </View>
++                  </View>
++                );
++              })()
++            ) : (
++              <View style={{ width: '100%' }}>
++                {/* ?꾩껜 肄붾뵫/媛쒕컻 湲곌컙 ?꾩떆 ?고쉶 泥섎━: ?깃툒??愿怨꾩뾾??100% ?뺣낫 ?몄텧 */}
++                <View style={{ opacity: 1 }}>
++                  {/* ?ъ쭊 諛?吏???꾩튂 */}
+               <View style={styles.sectionCard}>
+                 <Text style={styles.sectionTitle}>?뱧 臾쇨굔吏 ?ㅼ떆媛??꾩튂 諛??쒖꽭</Text>
+                 <View style={styles.mapContainer}>
+-                  {(!currentProperty.address || currentProperty.source === 'onbid_etc' || currentProperty.source === 'court_etc') ? (
++                  {(!currentProperty.address || isNonBuildingMobile) ? (
+                     <View style={styles.naverMapPlaceholder}>
+                       <Text style={styles.naverMapLogoText}>?뱧 ?꾩튂 ?뺣낫 ?쒓났 遺덇?</Text>
+                       <Text style={styles.naverMapAddrText}>鍮꾨??숈궛 ?먯궛? 吏?곷룄 諛??꾩튂 吏?꾨? ?쒓났?섏? ?딆뒿?덈떎.</Text>
+@@ -2502,7 +2893,7 @@ export const DetailScreen: React.FC<DetailScreenProps> = ({ property, onBack })
+                       javaScriptEnabled={true}
+                     />
+                   )}
+-                  {currentProperty.address && currentProperty.source !== 'onbid_etc' && currentProperty.source !== 'court_etc' && (
++                  {currentProperty.address && !isNonBuildingMobile && (
+                     <TouchableOpacity 
+                       style={styles.mapLinkOverlay}
+                       onPress={() => Linking.openURL(`https://map.naver.com/v5/search/${encodeURIComponent(cleanAddress(currentProperty.address))}/address?c=15,0,0,0,dh`)}
+@@ -2629,6 +3020,9 @@ export const DetailScreen: React.FC<DetailScreenProps> = ({ property, onBack })
+                 </TouchableOpacity>
+               </View>
+             )}
++            </View>
++            </View>
++            )}
+           </View>
+         )}
+ 
+@@ -2676,6 +3070,22 @@ export const DetailScreen: React.FC<DetailScreenProps> = ({ property, onBack })
+                       <Text style={styles.infoLabel}>?깅뒫 ?먭? ?곹깭</Text>
+                       <Text style={[styles.infoValue, { color: COLORS.emeraldSuccess }]}>{currentProperty.car_info.inspection_status || '-'}</Text>
+                     </View>
++                    <View style={styles.infoRow}>
++                      <Text style={styles.infoLabel}>李⑥쥌</Text>
++                      <Text style={styles.infoValue}>{currentProperty.car_info.vehicle_type || '-'}</Text>
++                    </View>
++                    <View style={styles.infoRow}>
++                      <Text style={styles.infoLabel}>李⑤?踰덊샇</Text>
++                      <Text style={styles.infoValue}>{currentProperty.car_info.vin || '-'}</Text>
++                    </View>
++                    <View style={styles.infoRow}>
++                      <Text style={styles.infoLabel}>?먮룞湲고삎??/Text>
++                      <Text style={styles.infoValue}>{currentProperty.car_info.engine_type || '-'}</Text>
++                    </View>
++                    <View style={styles.infoRow}>
++                      <Text style={styles.infoLabel}>?ъ슜蹂멸굅吏</Text>
++                      <Text style={styles.infoValue}>{currentProperty.car_info.base_location || '-'}</Text>
++                    </View>
+                   </View>
+                 </ScrollView>
+               </View>
+diff --git a/mobile-app/src/types/index.ts b/mobile-app/src/types/index.ts
+index b64a484..7ca9099 100644
+--- a/mobile-app/src/types/index.ts
++++ b/mobile-app/src/types/index.ts
+@@ -79,6 +79,11 @@ export interface Property {
+     status: string;
+     notes: string;
+   } | null;
++  non_building_meta?: any;
++  exclusive_area_estimation_type?: string;
++  building_total_floors?: number;
++  building_total_area?: number;
++  floor_areas?: Record<string, number>;
+ }
+ 
+ export interface FilterState {
+diff --git a/scrapers/court_scraper.py b/scrapers/court_scraper.py
+index e55b2cd..49d6215 100644
+--- a/scrapers/court_scraper.py
++++ b/scrapers/court_scraper.py
+@@ -251,6 +251,73 @@ def clean_address(address):
+     address = re.sub(r'\[?곸꽭?댁뿭\]|\[?곸꽭\]', '', address).strip()
+     return address
+ 
++def extract_non_building_meta(text, ptype=""):
++    """?쒕ぉ 諛??ㅻ챸 ?댁슜 ?띿뒪?몃줈遺??李⑤웾/湲곌퀎?λ퉬/?좉?利앷텒/湲고?臾쇳뭹???ㅼ냽???뺣낫瑜??뺢탳?섍쾶 ?뚯떛?⑸땲??"""
++    meta = {}
++    if not text:
++        return meta
++        
++    p_clean = (ptype or "").lower()
++    text_clean = text.replace("\n", " ").replace("  ", " ").strip()
++    
++    # 1. 李⑤웾/?댁넚?λ퉬 遺꾩꽍 (?먮룞李? 以묎린, 李⑤웾, ?좊컯, ??났湲???
++    if any(k in p_clean for k in ["李⑤웾", "?먮룞李?, "以묎린", "?좊컯", "??났湲?, "?댁넚"]):
++        meta["asset_type"] = "vehicle"
++        year_match = re.search(r'(?:?곗떇|?쒖옉?꾨룄|?쒖옉?곕룄)\s*:\s*(\d{4})|(\d{4})\s*?꾩떇|(\d{4})\s*??s*??, text_clean)
++        if year_match:
++            meta["model_year"] = f"{year_match.group(1) or year_match.group(2) or year_match.group(3)}?꾩떇"
++            
++        mileage_match = re.search(r'(?:二쇳뻾嫄곕━|二쇳뻾)\s*:\s*([\d,]+)\s*(?:km|?ㅻ줈)?|([\d,]+)\s*(?:km|?ㅻ줈)\b', text_clean)
++        if mileage_match:
++            meta["mileage"] = f"{mileage_match.group(1) or mileage_match.group(2)} km"
++            
++        no_match = re.search(r'(?:?깅줉踰덊샇|李⑤웾踰덊샇|李⑤?踰덊샇)\s*:\s*([媛-??d\w\s\-]+?)(?:\s|$|,|\||\()', text_clean)
++        if no_match:
++            meta["vehicle_no"] = no_match.group(1).strip()
++            
++        name_match = re.search(r'(?:李⑤챸|紐⑤뜽紐?\s*:\s*([媛-??d\w\s\-]+?)(?:\s|$|,|\||\()', text_clean)
++        if name_match:
++            meta["model_name"] = name_match.group(1).strip()
++
++    # 2. 湲곌퀎?λ퉬 遺꾩꽍 (湲곌퀎, 湲곌뎄, ?ㅻ퉬 ??
++    elif any(k in p_clean for k in ["湲곌퀎", "湲곌뎄", "?ㅻ퉬", "?λ퉬"]):
++        meta["asset_type"] = "machinery"
++        spec_match = re.search(r'(?:洹쒓꺽|?뺤떇|?깅뒫)\s*:\s*([媛-??w\s\-\(\)\/,.]+?)(?:\s\s|$|,|\|)', text_clean)
++        if spec_match:
++            meta["specification"] = spec_match.group(1).strip()
++            
++        maker_match = re.search(r'(?:?쒖“???쒖옉???쒖“援?\s*:\s*([媛-??w\s\-]+?)(?:\s|$|,|\|)', text_clean)
++        if maker_match:
++            meta["manufacturer"] = maker_match.group(1).strip()
++            
++        qty_match = re.search(r'(?:?섎웾|?섎웾\s*:\s*)(\d+)\s*(?:?|?명듃|媛?議?', text_clean)
++        if qty_match:
++            meta["quantity"] = f"{qty_match.group(1)}?"
++
++    # 3. ?좉?利앷텒 遺꾩꽍 (二쇱떇, 利앷텒 ??
++    elif any(k in p_clean for k in ["二쇱떇", "利앷텒", "梨꾧텒", "異쒖옄"]):
++        meta["asset_type"] = "securities"
++        qty_match = re.search(r'([\d,]+)\s*二?b|二쇱떇\s*?섎웾\s*:\s*([\d,]+)', text_clean)
++        if qty_match:
++            meta["quantity"] = f"{qty_match.group(1) or qty_match.group(2)}二?
++            
++        company_match = re.search(r'([媛-??w\s]+(?:二쇱떇?뚯궗|?쒖빟|?뚰겕|??⑹뒪|諛붿씠??嫄댁꽕|?뺣?|?곗뾽))', text_clean)
++        if company_match:
++            meta["company_name"] = company_match.group(1).strip()
++
++    # 4. 湲고?臾쇳뭹 遺꾩꽍 (臾쇳뭹, ?숈궛 ??
++    else:
++        meta["asset_type"] = "goods"
++        qty_match = re.search(r'(?:?섎웾|媛쒖닔)\s*:\s*([\d,]+)\s*([媛-??+)|([\d,]+)\s*(?:媛??명듃|諛뺤뒪|??\b', text_clean)
++        if qty_match:
++            meta["quantity"] = f"{qty_match.group(1) or qty_match.group(3)}媛?
++            
++        loc_match = re.search(r'(?:蹂닿??μ냼|蹂닿?吏|?뚯옱吏)\s*:\s*([媛-??w\s\-]+?)(?:\s\s|$|,|\|)', text_clean)
++        if loc_match:
++            meta["storage_location"] = loc_match.group(1).strip()
++            
++    return meta
++
+ # ?쒕룄/援??⑥쐞 ??듭쟻???좎? ?〓떦 ?됯퇏 ?④? (媛먯젙媛 ?鍮???궛??
+ LAND_UNIT_PRICES = {
+     "?쒖슱": 4500000,      # ?됰떦 ??1500留뚯썝
+@@ -1092,6 +1159,11 @@ def scrape_court_data():
+                                 {"deal_date": "2025-11", "deal_price": int(base_deal * 0.95), "floor": 18 - (addr_hash % 8)}
+                             ]
+ 
++                        non_building_meta = {}
++                        if is_etc_asset:
++                            parse_target_text = f"{cs_no} {address} {desc} {notes}"
++                            non_building_meta = extract_non_building_meta(parse_target_text, ptype)
++
+                         area_meta = {
+                             "exclusive_area": ex_area,
+                             "supply_area": su_area,
+@@ -1107,7 +1179,8 @@ def scrape_court_data():
+                             "exclusive_area_estimation_type": excl_est_type,
+                             "building_total_floors": total_floors,
+                             "building_total_area": total_area,
+-                            "floor_areas": floor_areas
++                            "floor_areas": floor_areas,
++                            "non_building_meta": non_building_meta
+                         }
+                         meta_json = json.dumps(area_meta, ensure_ascii=False)
+                         final_notes = notes or "寃異쒕맂 踰뺤쟻 由ъ뒪??沅뚮━ ?몄닔 ?뱀씠?ы빆???놁뒿?덈떎."
+diff --git a/scrapers/onbid_fetcher.py b/scrapers/onbid_fetcher.py
+index d1636de..45a81ad 100644
+--- a/scrapers/onbid_fetcher.py
++++ b/scrapers/onbid_fetcher.py
+@@ -227,6 +227,73 @@ HARDFILTER_RULES = {
+     "?뺣낫遺議?: ["?쒕쪟?놁쓬", "?뺤씤遺덇?", "?대엺遺덇?", "?먮즺?놁쓬"]
+ }
+ 
++def extract_non_building_meta(text, ptype=""):
++    """?쒕ぉ 諛??ㅻ챸 ?댁슜 ?띿뒪?몃줈遺??李⑤웾/湲곌퀎?λ퉬/?좉?利앷텒/湲고?臾쇳뭹???ㅼ냽???뺣낫瑜??뺢탳?섍쾶 ?뚯떛?⑸땲??"""
++    meta = {}
++    if not text:
++        return meta
++        
++    p_clean = (ptype or "").lower()
++    text_clean = text.replace("\n", " ").replace("  ", " ").strip()
++    
++    # 1. 李⑤웾/?댁넚?λ퉬 遺꾩꽍 (?먮룞李? 以묎린, 李⑤웾, ?좊컯, ??났湲???
++    if any(k in p_clean for k in ["李⑤웾", "?먮룞李?, "以묎린", "?좊컯", "??났湲?, "?댁넚"]):
++        meta["asset_type"] = "vehicle"
++        year_match = re.search(r'(?:?곗떇|?쒖옉?꾨룄|?쒖옉?곕룄)\s*:\s*(\d{4})|(\d{4})\s*?꾩떇|(\d{4})\s*??s*??, text_clean)
++        if year_match:
++            meta["model_year"] = f"{year_match.group(1) or year_match.group(2) or year_match.group(3)}?꾩떇"
++            
++        mileage_match = re.search(r'(?:二쇳뻾嫄곕━|二쇳뻾)\s*:\s*([\d,]+)\s*(?:km|?ㅻ줈)?|([\d,]+)\s*(?:km|?ㅻ줈)\b', text_clean)
++        if mileage_match:
++            meta["mileage"] = f"{mileage_match.group(1) or mileage_match.group(2)} km"
++            
++        no_match = re.search(r'(?:?깅줉踰덊샇|李⑤웾踰덊샇|李⑤?踰덊샇)\s*:\s*([媛-??d\w\s\-]+?)(?:\s|$|,|\||\()', text_clean)
++        if no_match:
++            meta["vehicle_no"] = no_match.group(1).strip()
++            
++        name_match = re.search(r'(?:李⑤챸|紐⑤뜽紐?\s*:\s*([媛-??d\w\s\-]+?)(?:\s|$|,|\||\()', text_clean)
++        if name_match:
++            meta["model_name"] = name_match.group(1).strip()
++
++    # 2. 湲곌퀎?λ퉬 遺꾩꽍 (湲곌퀎, 湲곌뎄, ?ㅻ퉬 ??
++    elif any(k in p_clean for k in ["湲곌퀎", "湲곌뎄", "?ㅻ퉬", "?λ퉬"]):
++        meta["asset_type"] = "machinery"
++        spec_match = re.search(r'(?:洹쒓꺽|?뺤떇|?깅뒫)\s*:\s*([媛-??w\s\-\(\)\/,.]+?)(?:\s\s|$|,|\|)', text_clean)
++        if spec_match:
++            meta["specification"] = spec_match.group(1).strip()
++            
++        maker_match = re.search(r'(?:?쒖“???쒖옉???쒖“援?\s*:\s*([媛-??w\s\-]+?)(?:\s|$|,|\|)', text_clean)
++        if maker_match:
++            meta["manufacturer"] = maker_match.group(1).strip()
++            
++        qty_match = re.search(r'(?:?섎웾|?섎웾\s*:\s*)(\d+)\s*(?:?|?명듃|媛?議?', text_clean)
++        if qty_match:
++            meta["quantity"] = f"{qty_match.group(1)}?"
++
++    # 3. ?좉?利앷텒 遺꾩꽍 (二쇱떇, 利앷텒 ??
++    elif any(k in p_clean for k in ["二쇱떇", "利앷텒", "梨꾧텒", "異쒖옄"]):
++        meta["asset_type"] = "securities"
++        qty_match = re.search(r'([\d,]+)\s*二?b|二쇱떇\s*?섎웾\s*:\s*([\d,]+)', text_clean)
++        if qty_match:
++            meta["quantity"] = f"{qty_match.group(1) or qty_match.group(2)}二?
++            
++        company_match = re.search(r'([媛-??w\s]+(?:二쇱떇?뚯궗|?쒖빟|?뚰겕|??⑹뒪|諛붿씠??嫄댁꽕|?뺣?|?곗뾽))', text_clean)
++        if company_match:
++            meta["company_name"] = company_match.group(1).strip()
++
++    # 4. 湲고?臾쇳뭹 遺꾩꽍 (臾쇳뭹, ?숈궛 ??
++    else:
++        meta["asset_type"] = "goods"
++        qty_match = re.search(r'(?:?섎웾|媛쒖닔)\s*:\s*([\d,]+)\s*([媛-??+)|([\d,]+)\s*(?:媛??명듃|諛뺤뒪|??\b', text_clean)
++        if qty_match:
++            meta["quantity"] = f"{qty_match.group(1) or qty_match.group(3)}媛?
++            
++        loc_match = re.search(r'(?:蹂닿??μ냼|蹂닿?吏|?뚯옱吏)\s*:\s*([媛-??w\s\-]+?)(?:\s\s|$|,|\|)', text_clean)
++        if loc_match:
++            meta["storage_location"] = loc_match.group(1).strip()
++            
++    return meta
++
+ # ?쒕룄/援??⑥쐞 ??듭쟻???좎? ?〓떦 ?됯퇏 ?④? (媛먯젙媛 ?鍮???궛??
+ LAND_UNIT_PRICES = {
+     "?쒖슱": 4500000,      # ?됰떦 ??1500留뚯썝
+@@ -898,6 +965,11 @@ def process_single_item(raw_info, service_key):
+     elementary_school = ""
+     recent_deals = []
+     
++    non_building_meta = {}
++    if is_etc_asset:
++        parse_target_text = f"{cltr_no} {address} {desc} {notes}"
++        non_building_meta = extract_non_building_meta(parse_target_text, ptype)
++
+     area_meta = {
+         "exclusive_area": ex_area,
+         "supply_area": su_area,
+@@ -918,7 +990,8 @@ def process_single_item(raw_info, service_key):
+         "exclusive_area_estimation_type": excl_est_type,
+         "building_total_floors": total_floors,
+         "building_total_area": total_area,
+-        "floor_areas": floor_areas
++        "floor_areas": floor_areas,
++        "non_building_meta": non_building_meta
+     }
+     
+     meta_json = json.dumps(area_meta, ensure_ascii=False)

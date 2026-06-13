@@ -1,7 +1,7 @@
 // 모바일 애플리케이션의 탭 상태와 상세 화면 네비게이션을 조율하는 메인 진입점 파일입니다.
 
 import React, { useState, useEffect } from 'react';
-import { StyleSheet, Text, View, TouchableOpacity, SafeAreaView, Modal, Platform, Image, Alert } from 'react-native';
+import { StyleSheet, Text, View, TouchableOpacity, SafeAreaView, Modal, Platform, Image, Alert, TextInput, ScrollView } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import { COLORS } from './src/components/Theme';
 import { Property, FilterState } from './src/types';
@@ -24,6 +24,62 @@ export default function App() {
   const [showMyPageModal, setShowMyPageModal] = useState<boolean>(false);
   const [userGrade, setUserGrade] = useState<'A' | 'B' | 'C'>('C');
   const [isUpgradeRequested, setIsUpgradeRequested] = useState<boolean>(false);
+  
+  // 🔒 시스템 관리자 동적 자격증명 상태
+  const [adminEmail, setAdminEmail] = useState<string>('hl1oex@gmail.com');
+  const [adminPassword, setAdminPassword] = useState<string>('123456');
+  const [inputAdminEmail, setInputAdminEmail] = useState<string>('');
+  const [inputAdminPassword, setInputAdminPassword] = useState<string>('');
+
+  const fetchAdminCredentials = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('admin_config')
+        .select('*');
+      if (error) throw error;
+      if (data && data.length > 0) {
+        const emailConfig = data.find(c => c.key === 'admin_email');
+        const pwConfig = data.find(c => c.key === 'admin_password');
+        if (emailConfig) {
+          setAdminEmail(emailConfig.value);
+          setInputAdminEmail(emailConfig.value);
+        }
+        if (pwConfig) {
+          setAdminPassword(pwConfig.value);
+          setInputAdminPassword(pwConfig.value);
+        }
+      }
+    } catch (err) {
+      console.warn('관리자 자격증명 DB 동기화 실패 (기본값 적용):', err);
+    }
+  };
+
+  const saveAdminCredentials = async () => {
+    if (!inputAdminEmail || !inputAdminPassword) {
+      Alert.alert('오류', '관리자 이메일과 비밀번호를 모두 입력해 주십시오.');
+      return;
+    }
+    try {
+      const { error: err1 } = await supabase
+        .from('admin_config')
+        .upsert({ key: 'admin_email', value: inputAdminEmail });
+      
+      const { error: err2 } = await supabase
+        .from('admin_config')
+        .upsert({ key: 'admin_password', value: inputAdminPassword });
+      
+      if (err1 || err2) throw (err1 || err2);
+      
+      setAdminEmail(inputAdminEmail);
+      setAdminPassword(inputAdminPassword);
+      Alert.alert('성공', '관리자 보안 계정이 동기화 업데이트되었습니다.');
+      setShowMyPageModal(false);
+    } catch (err) {
+      console.error('관리자 계정 변경 실패:', err);
+      Alert.alert('오류', '관리자 계정 업데이트 중 오류가 발생했습니다.');
+    }
+  };
+
   const [filters, setFilters] = useState<FilterState>({
     search: '',
     source: ['court', 'onbid', 'private'],
@@ -107,6 +163,8 @@ export default function App() {
         setIsUpgradeRequested(false);
       }
     });
+
+    fetchAdminCredentials();
 
     return () => subscription.unsubscribe();
   }, []);
@@ -354,7 +412,7 @@ export default function App() {
             </View>
 
             {user && (
-              <View>
+              <ScrollView style={{ maxHeight: 380 }} showsVerticalScrollIndicator={false}>
                 {/* 프로필 정보 카드 */}
                 <View style={styles.myPageProfileCard}>
                   <Image 
@@ -392,8 +450,40 @@ export default function App() {
                   </View>
                 </View>
 
+                {/* 🔒 관리자 계정 변경 세션 */}
+                {user.email === adminEmail && (
+                  <View style={[styles.myPageSection, { borderLeftWidth: 3, borderLeftColor: '#f59e0b' }]}>
+                    <Text style={[styles.myPageSectionTitle, { color: '#d97706' }]}>🔒 관리자 계정 보안 설정</Text>
+                    <View style={{ gap: 8 }}>
+                      <View>
+                        <Text style={{ fontSize: 10, fontWeight: 'bold', color: COLORS.slate500, marginBottom: 4 }}>관리자 ID (이메일)</Text>
+                        <TextInput
+                          style={styles.myPageInput}
+                          value={inputAdminEmail}
+                          onChangeText={setInputAdminEmail}
+                          keyboardType="email-address"
+                          autoCapitalize="none"
+                        />
+                      </View>
+                      <View style={{ marginTop: 4 }}>
+                        <Text style={{ fontSize: 10, fontWeight: 'bold', color: COLORS.slate500, marginBottom: 4 }}>관리자 비밀번호</Text>
+                        <TextInput
+                          style={styles.myPageInput}
+                          value={inputAdminPassword}
+                          onChangeText={setInputAdminPassword}
+                          secureTextEntry
+                          autoCapitalize="none"
+                        />
+                      </View>
+                      <TouchableOpacity style={styles.myPageSaveBtn} onPress={saveAdminCredentials}>
+                        <Text style={styles.myPageSaveBtnText}>관리자 정보 업데이트</Text>
+                      </TouchableOpacity>
+                    </View>
+                  </View>
+                )}
+
                 {/* 하단 동작 버튼 */}
-                <View style={styles.myPageButtonContainer}>
+                <View style={[styles.myPageButtonContainer, { marginTop: 8 }]}>
                   {userGrade !== 'A' && (
                     <TouchableOpacity 
                       style={[styles.myPageUpgradeButton, isUpgradeRequested && styles.myPageUpgradeButtonDisabled]} 
@@ -415,7 +505,7 @@ export default function App() {
                     <Text style={styles.myPageLogoutButtonText}>로그아웃</Text>
                   </TouchableOpacity>
                 </View>
-              </View>
+              </ScrollView>
             )}
           </View>
         </View>
@@ -737,5 +827,29 @@ const styles = StyleSheet.create({
     fontSize: 11,
     fontWeight: 'bold',
     color: COLORS.royalBlue,
+  },
+  myPageInput: {
+    backgroundColor: COLORS.slate50,
+    borderWidth: 1,
+    borderColor: COLORS.slate200,
+    borderRadius: 8,
+    paddingHorizontal: 10,
+    paddingVertical: 6,
+    fontSize: 12,
+    fontWeight: 'bold',
+    color: COLORS.slate800,
+  },
+  myPageSaveBtn: {
+    backgroundColor: '#f59e0b',
+    borderRadius: 8,
+    height: 36,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginTop: 6,
+  },
+  myPageSaveBtnText: {
+    fontSize: 11,
+    fontWeight: 'bold',
+    color: COLORS.white,
   },
 });

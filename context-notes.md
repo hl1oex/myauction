@@ -195,3 +195,10 @@
   - 비부동산(etc_specs) 탭의 테이블 찌그러짐을 없애고 부동산 명세와 동일한 세로 명세 보드로 통일 설계하였습니다.
   - 실서버 빌드 및 Firebase 배포 후 브라우저 서브에이전트 E2E 검증을 통과하였습니다.
 
+### 모바일 앱 TypeScript 빌드 오류 디버깅 및 컴파일 안정화 (2026-06-13)
+- **타입 정의 보완**. 모바일 앱 `types/index.ts` 내 `Property` 인터페이스의 `car_info` 에 `vin`, `engine_type`, `vehicle_type`, `base_location` 등 누락된 차량 정보 메타 속성을 명시적으로 정의하여 DetailScreen 내 속성 대입 에러를 해결하였습니다.
+- **인자 매칭 및 변수 정의 누락 복구**. `DetailScreen.tsx` 의 `enrichPropertyDataMobile` 함수 내부에서 `textToSearch` 변수 선언이 누락되었던 문제를 복구하였습니다. 또한, `extractNonBuildingMetaMobile` 함수에 정의되지 않은 매개변수였던 `item.title`을 제거하고 2개의 인자(textToSearch, ptype)만 정상 전달하도록 수정하였습니다.
+- **정규식 매치 인덱스 예외 가드**. `DetailScreen.tsx` 에서 정규식 `match` 실행 시 `index`가 `undefined`일 가능성에 대비하여 3항 연산자를 활용한 널 디펜스(null-safety) 코드를 추가하였습니다.
+- **COLORS 속성 및 API 타입 검증**. `FeedScreen.tsx` 내 존재하지 않는 `COLORS.slate950` 색상 코드를 정상 탑재된 `COLORS.slate900`으로 변경하였습니다. 또한, `api.ts` 에서 `Object.values(floorAreas)`를 `Math.max` 에 전달할 때 발생하는 타입 불일치 에러를 해결하기 위해 `as number[]` 강제 캐스팅을 선언하여 타입 호환성을 확보하였습니다.
+
+

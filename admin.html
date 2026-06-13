@@ -105,18 +105,28 @@
         <section class="lg:col-span-3 space-y-6">
             <!-- 📢 1. 광고자산 비주얼 매니저 탭 -->
             <div id="panel-ad-tab" class="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm space-y-5">
-                <div class="border-b border-slate-100 pb-3 flex items-center justify-between">
+                <div class="border-b border-slate-100 pb-3 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                     <div>
                         <h2 class="text-base font-extrabold text-slate-900 flex items-center gap-2">
-                            <i class="fa-solid fa-rectangle-ad text-royalBlue"></i> 목록 삽입용 가로 배너 광고판 설정
+                            <i class="fa-solid fa-rectangle-ad text-royalBlue"></i> 정밀 타겟 광고 구좌 관리자
                         </h2>
-                        <p class="text-[10px] text-slate-400 font-bold mt-0.5">매물 피드 목록 중간에 삽입되는 동일 규격 카드형 광고 슬롯을 제어합니다.</p>
+                        <p class="text-[10px] text-slate-400 font-bold mt-0.5">상단 메인, 검색필터 하단, 매물 목록 피드 등 각 전용 광고 구좌를 통합 제어합니다.</p>
                     </div>
-                    <label class="relative inline-flex items-center cursor-pointer">
-                        <input type="checkbox" id="ad-toggle" class="sr-only peer" onchange="saveAdStatus()">
-                        <div class="w-11 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-royalBlue"></div>
-                        <span class="ml-2.5 text-xs font-black text-slate-700" id="ad-toggle-label">비활성</span>
-                    </label>
+                    
+                    <div class="flex items-center gap-3">
+                        <div>
+                            <select id="ad-slot-select" onchange="onAdSlotChange()" class="text-xs font-black p-2 border border-slate-200 rounded-xl bg-slate-50 focus:bg-white outline-none">
+                                <option value="list_banner">📰 매물 목록 피드 중간 광고 (list_banner)</option>
+                                <option value="main_top_banner">🏢 페이지 상단 메인 광고 (main_top_banner)</option>
+                                <option value="sidebar_filter_banner">📂 왼쪽 검색필터 아래 광고 (sidebar_filter_banner)</option>
+                            </select>
+                        </div>
+                        <label class="relative inline-flex items-center cursor-pointer">
+                            <input type="checkbox" id="ad-toggle" class="sr-only peer" onchange="saveAdStatus()">
+                            <div class="w-11 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-royalBlue"></div>
+                            <span class="ml-2.5 text-xs font-black text-slate-700" id="ad-toggle-label">비활성</span>
+                        </label>
+                    </div>
                 </div>
 
                 <!-- 비주얼 에뮬레이터 프레임 -->
@@ -278,7 +288,19 @@ INSERT INTO public.ads (slot_name, active, type, title, desc, image_url, link_ur
 VALUES ('list_banner', true, 'direct', '★ 프리미엄 경공매 투자 VIP 멤버십 모집', '오직 1%를 위한 NPL 부실채권 및 지분 경매 핵심 노하우 단독 공개. 지금 가입 시 30% 한정 할인 적용!', './apartment_elegant_facade.png', 'https://action-b8c75.web.app')
 ON CONFLICT (slot_name) DO NOTHING;
 
--- 2. 고객 프로필 회원 등급(user_profiles) 테이블 구축
+-- 2. 시스템 관리자 계정(admin_config) 테이블 구축
+CREATE TABLE IF NOT EXISTS public.admin_config (
+    key VARCHAR(50) PRIMARY KEY,
+    value TEXT NOT NULL
+);
+
+INSERT INTO public.admin_config (key, value)
+VALUES 
+('admin_email', 'hl1oex@gmail.com'),
+('admin_password', '123456')
+ON CONFLICT (key) DO NOTHING;
+
+-- 3. 고객 프로필 회원 등급(user_profiles) 테이블 구축
 CREATE TABLE IF NOT EXISTS public.user_profiles (
     id UUID PRIMARY KEY REFERENCES auth.users(id) ON DELETE CASCADE,
     email VARCHAR(255) NOT NULL,
@@ -320,6 +342,12 @@ CREATE TRIGGER on_auth_user_created
         let usersList = [];
 
         window.onload = function() {
+            if (!localStorage.getItem("admin_email")) {
+                localStorage.setItem("admin_email", "hl1oex@gmail.com");
+            }
+            if (!localStorage.getItem("admin_password")) {
+                localStorage.setItem("admin_password", "123456");
+            }
             checkAdminAuth();
             document.title = "부동산경공매 검색시스템 - 백엔드 관리자";
         };
@@ -357,6 +385,8 @@ CREATE TRIGGER on_auth_user_created
 
         // 에뮬레이터 실시간 렌더러
         function updatePreview(type) {
+            const slotName = document.getElementById("ad-slot-select")?.value || "list_banner";
+            const cardFrame = document.getElementById("ad-preview-card");
             const container = document.getElementById("ad-preview-container");
             const title = document.getElementById("ad-title").value || "★ 프리미엄 경공매 투자 VIP 멤버십 모집";
             const desc = document.getElementById("ad-desc").value || "오직 1%를 위한 NPL 부실채권 및 지분 경매 핵심 노하우 단독 공개. 지금 가입 시 30% 한정 할인 적용!";
@@ -364,32 +394,78 @@ CREATE TRIGGER on_auth_user_created
             const link = document.getElementById("ad-link-url").value || "#";
             const code = document.getElementById("ad-code").value || "";
 
+            // 구좌에 맞춰 프레임 규격 동적 변경
+            if (slotName === "main_top_banner") {
+                cardFrame.className = "w-full max-w-[800px] min-h-[90px] bg-white border border-slate-200 rounded-2xl p-3 shadow-sm relative overflow-hidden transition-all hover:shadow-md flex flex-col justify-center";
+            } else if (slotName === "sidebar_filter_banner") {
+                cardFrame.className = "w-[240px] min-h-[220px] bg-white border border-slate-200 rounded-2xl p-3 shadow-sm relative overflow-hidden transition-all hover:shadow-md flex flex-col justify-between";
+            } else {
+                cardFrame.className = "w-[300px] min-h-[360px] bg-white border border-slate-200 rounded-2xl p-3 shadow-sm relative overflow-hidden transition-all hover:shadow-md flex flex-col justify-between";
+            }
+
             if (type === 'direct') {
-                container.innerHTML = `
-                    <a href="${link}" target="_blank" class="flex flex-col justify-between h-full space-y-2 group">
-                        <div class="relative w-full h-[110px] rounded-xl overflow-hidden bg-slate-100 border border-slate-200/60">
-                            <img src="${image}" alt="광고" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300">
-                            <span class="absolute top-1.5 left-1.5 bg-slate-900/60 text-white text-[8px] font-black px-1.5 py-0.5 rounded uppercase">AD</span>
-                        </div>
-                        <div class="space-y-1 flex-1 flex flex-col justify-between">
-                            <div>
-                                <h4 class="text-xs font-black text-slate-800 line-clamp-2 leading-snug group-hover:text-royalBlue transition-colors">
+                if (slotName === "main_top_banner") {
+                    container.innerHTML = `
+                        <a href="${link}" target="_blank" class="relative w-full h-[70px] bg-slate-100 flex items-center justify-between px-6 py-4 rounded-xl overflow-hidden group">
+                            <div class="space-y-0.5 z-10 max-w-[70%]">
+                                <div class="flex items-center gap-1.5">
+                                    <span class="bg-slate-900 text-white text-[8px] font-black px-1.5 py-0.5 rounded uppercase">AD</span>
+                                    <h4 class="text-xs font-black text-slate-800 line-clamp-1 group-hover:text-royalBlue transition-colors">${title}</h4>
+                                </div>
+                                <p class="text-[10px] text-slate-400 font-bold line-clamp-1">${desc}</p>
+                            </div>
+                            <img src="${image}" alt="광고" class="absolute right-0 top-0 h-full w-[25%] object-cover group-hover:scale-105 transition-transform duration-300">
+                        </a>
+                    `;
+                } else if (slotName === "sidebar_filter_banner") {
+                    container.innerHTML = `
+                        <a href="${link}" target="_blank" class="flex flex-col justify-between h-full space-y-2 group">
+                            <div class="relative w-full h-[90px] rounded-xl overflow-hidden bg-slate-100 border border-slate-200/60">
+                                <img src="${image}" alt="광고" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300">
+                                <span class="absolute top-1 left-1 bg-slate-900/60 text-white text-[7px] font-black px-1 py-0.2 rounded uppercase">AD</span>
+                            </div>
+                            <div class="space-y-0.5">
+                                <h4 class="text-[10px] font-black text-slate-800 line-clamp-1 group-hover:text-royalBlue transition-colors">
                                     ${title}
                                 </h4>
-                                <p class="text-[10px] text-slate-400 font-bold line-clamp-2 mt-1 leading-normal">
+                                <p class="text-[9px] text-slate-400 font-bold line-clamp-2 leading-tight">
                                     ${desc}
                                 </p>
                             </div>
-                            <div class="text-[10.5px] font-black text-royalBlue pt-1 border-t border-slate-100 flex items-center justify-between">
-                                <span>자세히 보기</span>
-                                <i class="fa-solid fa-arrow-right text-[9px] group-hover:translate-x-1 transition-transform"></i>
+                            <div class="text-[9.5px] font-black text-royalBlue pt-1 border-t border-slate-100 flex items-center justify-between">
+                                <span>바로가기</span>
+                                <i class="fa-solid fa-arrow-right text-[8px] group-hover:translate-x-0.5 transition-transform"></i>
                             </div>
-                        </div>
-                    </a>
-                `;
+                        </a>
+                    `;
+                } else {
+                    container.innerHTML = `
+                        <a href="${link}" target="_blank" class="flex flex-col justify-between h-full space-y-2 group">
+                            <div class="relative w-full h-[110px] rounded-xl overflow-hidden bg-slate-100 border border-slate-200/60">
+                                <img src="${image}" alt="광고" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300">
+                                <span class="absolute top-1.5 left-1.5 bg-slate-900/60 text-white text-[8px] font-black px-1.5 py-0.5 rounded uppercase">AD</span>
+                            </div>
+                            <div class="space-y-1 flex-1 flex flex-col justify-between">
+                                <div>
+                                    <h4 class="text-xs font-black text-slate-800 line-clamp-2 leading-snug group-hover:text-royalBlue transition-colors">
+                                        ${title}
+                                    </h4>
+                                    <p class="text-[10px] text-slate-400 font-bold line-clamp-2 mt-1 leading-normal">
+                                        ${desc}
+                                    </p>
+                                </div>
+                                <div class="text-[10.5px] font-black text-royalBlue pt-1 border-t border-slate-100 flex items-center justify-between">
+                                    <span>자세히 보기</span>
+                                    <i class="fa-solid fa-arrow-right text-[9px] group-hover:translate-x-1 transition-transform"></i>
+                                </div>
+                            </div>
+                        </a>
+                    `;
+                }
             } else {
+                const minH = slotName === "main_top_banner" ? "70px" : (slotName === "sidebar_filter_banner" ? "180px" : "300px");
                 container.innerHTML = `
-                    <div class="w-full h-full bg-slate-50 border border-dashed border-slate-300 rounded-xl flex flex-col items-center justify-center p-3 overflow-hidden text-[9px] text-slate-400 font-bold font-mono min-h-[300px]">
+                    <div class="w-full h-full bg-slate-50 border border-dashed border-slate-300 rounded-xl flex flex-col items-center justify-center p-3 overflow-hidden text-[9px] text-slate-400 font-bold font-mono min-h-[${minH}]">
                         <i class="fa-solid fa-code text-amber-500 text-sm mb-1.5"></i>
                         <span>[구글 애드센스 HTML 렌더링 영역]</span>
                         <div class="truncate max-w-[80%] text-slate-350 mt-1">${code.replace(/</g, '&lt;')}</div>
@@ -400,11 +476,12 @@ CREATE TRIGGER on_auth_user_created
 
         // Supabase 연동 - 광고 설정 로드
         async function loadAdSettings() {
+            const slotName = document.getElementById("ad-slot-select")?.value || "list_banner";
             try {
                 const { data, error } = await supabaseClient
                     .from('ads')
                     .select('*')
-                    .eq('slot_name', 'list_banner')
+                    .eq('slot_name', slotName)
                     .single();
                 
                 if (error && error.code !== 'PGRST116') throw error;
@@ -428,7 +505,20 @@ CREATE TRIGGER on_auth_user_created
                         }
                     });
                 } else {
-                    updatePreview('direct');
+                    adSettings = { slot_name: slotName, active: false, type: 'direct', title: '', desc: '', image_url: '', link_url: '', ad_code: '' };
+                    document.getElementById("ad-toggle").checked = false;
+                    document.getElementById("ad-toggle-label").innerText = "비활성";
+                    document.getElementById("ad-title").value = "";
+                    document.getElementById("ad-desc").value = "";
+                    document.getElementById("ad-image-url").value = "";
+                    document.getElementById("ad-link-url").value = "";
+                    document.getElementById("ad-code").value = "";
+                    
+                    const radios = document.getElementsByName("ad_type");
+                    radios.forEach(r => {
+                        if (r.value === 'direct') r.checked = true;
+                    });
+                    toggleFormFields('direct');
                 }
             } catch (err) {
                 console.warn("광고 테이블 설정 로드 실패 (아직 테이블 미설정일 수 있습니다)", err);
@@ -436,8 +526,13 @@ CREATE TRIGGER on_auth_user_created
             }
         }
 
+        async function onAdSlotChange() {
+            await loadAdSettings();
+        }
+
         // 광고 설정 저장
         async function saveAdSettings() {
+            const slotName = document.getElementById("ad-slot-select")?.value || "list_banner";
             const isActive = document.getElementById("ad-toggle").checked;
             const type = document.querySelector('input[name="ad_type"]:checked').value;
             const title = document.getElementById("ad-title").value;
@@ -450,7 +545,7 @@ CREATE TRIGGER on_auth_user_created
                 const { error } = await supabaseClient
                     .from('ads')
                     .upsert({
-                        slot_name: 'list_banner',
+                        slot_name: slotName,
                         active: isActive,
                         type: type,
                         title: title,
@@ -471,6 +566,7 @@ CREATE TRIGGER on_auth_user_created
 
         // 토글 조작 시 상태 즉시 적용
         async function saveAdStatus() {
+            const slotName = document.getElementById("ad-slot-select")?.value || "list_banner";
             const isActive = document.getElementById("ad-toggle").checked;
             document.getElementById("ad-toggle-label").innerText = isActive ? "활성" : "비활성";
             
@@ -478,7 +574,7 @@ CREATE TRIGGER on_auth_user_created
                 const { error } = await supabaseClient
                     .from('ads')
                     .update({ active: isActive })
-                    .eq('slot_name', 'list_banner');
+                    .eq('slot_name', slotName);
 
                 if (error) throw error;
             } catch (err) {
@@ -629,15 +725,45 @@ CREATE TRIGGER on_auth_user_created
             }
         }
 
-        function adminLogin() {
+        async function adminLogin() {
             const email = document.getElementById("login-email").value.trim();
             const pw = document.getElementById("login-password").value;
             
-            if (email === "hl1oex@gmail.com" && pw === "1234") {
-                localStorage.setItem("admin_logged", "true");
-                checkAdminAuth();
-            } else {
-                alert("관리자 계정명 또는 비밀번호가 올바르지 않습니다.");
+            try {
+                const { data, error } = await supabaseClient
+                    .from("admin_config")
+                    .select("*");
+                
+                if (error) throw error;
+                
+                let adminEmail = "hl1oex@gmail.com";
+                let adminPw = "123456";
+                
+                if (data && data.length > 0) {
+                    const emailConfig = data.find(c => c.key === "admin_email");
+                    const pwConfig = data.find(c => c.key === "admin_password");
+                    if (emailConfig) adminEmail = emailConfig.value;
+                    if (pwConfig) adminPw = pwConfig.value;
+                }
+                
+                if (email === adminEmail && pw === adminPw) {
+                    localStorage.setItem("admin_email", adminEmail);
+                    localStorage.setItem("admin_password", adminPw);
+                    localStorage.setItem("admin_logged", "true");
+                    checkAdminAuth();
+                } else {
+                    alert("관리자 계정명 또는 비밀번호가 올바르지 않습니다.");
+                }
+            } catch (err) {
+                console.error("관리자 DB 인증 실패, 로컬 스토리지로 폴백하여 로그인 검증을 진행합니다.", err);
+                const backupEmail = localStorage.getItem("admin_email") || "hl1oex@gmail.com";
+                const backupPw = localStorage.getItem("admin_password") || "123456";
+                if (email === backupEmail && pw === backupPw) {
+                    localStorage.setItem("admin_logged", "true");
+                    checkAdminAuth();
+                } else {
+                    alert("관리자 계정명 또는 비밀번호가 올바르지 않습니다.");
+                }
             }
         }
 

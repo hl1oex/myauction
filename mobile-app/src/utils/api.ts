@@ -51,7 +51,7 @@ function enrichPropertyDataMobile(item: any): Property {
   let exclEstType = item.exclusive_area_estimation_type || "fake";
   let totalFloors = item.building_total_floors || 0;
   let totalArea = item.building_total_area || 0;
-  let floorAreas: any = item.floor_areas || {};
+  let floorAreas: Record<string, number> = item.floor_areas || {};
 
   const hash = getDeterministicHash(item.id?.toString() || item.auction_no || "default");
   const ptype = item.ptype || "";
@@ -159,7 +159,7 @@ function enrichPropertyDataMobile(item: any): Property {
       if (targetFloor && floorAreas[targetFloor]) {
         totalFloorArea = floorAreas[targetFloor];
       } else {
-        totalFloorArea = Math.max(...Object.values(floorAreas));
+        totalFloorArea = Math.max(...(Object.values(floorAreas) as number[]));
       }
       
       const isVilla = ["다세대", "빌라", "연립"].some(k => rawSt.includes(k));

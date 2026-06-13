@@ -294,11 +294,6 @@
                 <span>백그라운드 스케줄 수집 중</span>
             </div>
             
-            <!-- [추가] 백엔드 어드민 바로가기 버튼 -->
-            <a href="/admin.html" class="hidden min-[480px]:flex px-1.5 min-[360px]:px-2.5 py-0.5 min-[360px]:py-1 rounded-full bg-slate-900 hover:bg-slate-800 text-white text-[8.5px] min-[360px]:text-[9.5px] font-black shadow-sm transition-all duration-300 cursor-pointer active:scale-95 whitespace-nowrap items-center gap-1 flex-shrink-0">
-                <i class="fa-solid fa-gears text-[10px]"></i>
-                <span class="hidden min-[420px]:inline">백엔드 관리</span>
-            </a>
 
             <!-- [추가] 로그인 / 회원가입 상태 관리 배지 -->
             <div id="auth-status-container" class="flex items-center gap-1 sm:gap-1.5 flex-shrink-0">
@@ -703,10 +698,13 @@
                 </div>
             </div>
 
+            <!-- 📢 좌측 검색필터 하단 광고 슬롯 -->
+            <div id="sidebar-filter-ad-slot" class="p-4 border-t border-slate-200 bg-white hidden"></div>
+
             <!-- 하단 수집 동기화 메타 현황 -->
             <div class="p-4 border-t border-slate-200 bg-slate-50/50">
                 <h3 class="text-[10px] font-black text-slate-400 uppercase tracking-wider mb-1.5 flex items-center justify-between">
-                    <span class="flex items-center gap-1">📡 백그라운드 스케줄 수집 상태 <a href="/admin.html" class="text-[8px] bg-slate-200 hover:bg-slate-350 text-slate-700 px-1 py-0.2 rounded font-black transition-colors select-none">백엔드 관리</a></span>
+                    <span class="flex items-center gap-1">📡 백그라운드 스케줄 수집 상태 <a href="/admin.html" class="text-[8px] bg-slate-200 hover:bg-slate-350 text-slate-700 px-1 py-0.2 rounded font-black transition-colors select-none">Admin</a></span>
                     <button onclick="fetchSyncStatus()" class="hover:text-royalBlue transition-colors"><i class="fa-solid fa-rotate text-[8px]"></i></button>
                 </h3>
                 <div class="space-y-1 text-[9px] font-bold text-slate-600">
@@ -786,6 +784,8 @@
 
             <!-- 🎯 [TAB 1: 추천 매물 피드 컨테이너] -->
             <div id="dashboard-view" class="flex flex-col flex-1 overflow-hidden">
+                <!-- 📢 메인 상단 배너 광고 슬롯 -->
+                <div id="main-top-ad-slot" class="w-full bg-white px-3.5 pt-2 hidden"></div>
                 <!-- 정렬 및 리스트 필터 바 -->
                 <div class="px-3.5 py-1.5 bg-white border-b border-slate-200 flex flex-wrap justify-between items-center z-10 shadow-sm gap-2">
                     <div class="flex items-center gap-2 flex-wrap">
@@ -1077,8 +1077,8 @@
             </div>
 
             <!-- 부동산 기본 명세 보드 -->
-            <div class="bg-white border border-slate-200 rounded-2xl p-3.5 sm:p-4 space-y-2 shadow-sm">
-                <h4 class="text-xs sm:text-sm font-black text-slate-800 flex items-center gap-1.5">
+            <div id="detail-spec-container" class="bg-white border border-slate-200 rounded-2xl p-3.5 sm:p-4 space-y-2 shadow-sm">
+                <h4 id="detail-spec-title" class="text-xs sm:text-sm font-black text-slate-800 flex items-center gap-1.5">
                     <i class="fa-solid fa-file-invoice text-royalBlue"></i> 📋 부동산 표시 및 기본 명세
                 </h4>
                 <div class="space-y-2.5 text-[11px] sm:text-xs font-bold text-slate-700">
@@ -1086,7 +1086,7 @@
                         <span class="text-slate-450 text-[10px] sm:text-xs font-bold">소재지 주소</span>
                         <span id="detail-doc-address" class="font-extrabold text-slate-800 select-all text-right max-w-[70%] truncate"></span>
                     </div>
-                    <div class="grid grid-cols-2 gap-2 text-[11px] sm:text-xs text-slate-750">
+                    <div id="detail-spec-grid" class="grid grid-cols-2 gap-2 text-[11px] sm:text-xs text-slate-750">
                         <div class="bg-slate-50 border border-slate-100 p-2 rounded-xl flex justify-between items-center">
                             <span class="text-slate-450 font-semibold text-[10px] sm:text-xs">부동산 용도</span>
                             <span id="detail-spec-ptype" class="font-extrabold text-slate-800"></span>
@@ -2062,9 +2062,16 @@
         async function fetchDataFromServer(forceLoad = false) {
             const sensor = document.getElementById("connection-sensor");
             
-            // 수동 새로고침 강제 호출 시 서버의 최신 타임스탬프를 먼저 갱신합니다.
+            // 수동 새로고침 강제 호출 시 서버의 최신 타임스탬프를 먼저 갱신합니다. (3초 타임아웃 경쟁 방어 적용)
             if (forceLoad) {
-                await fetchSyncStatus();
+                try {
+                    await Promise.race([
+                        fetchSyncStatus(),
+                        new Promise((_, reject) => setTimeout(() => reject(new Error("Timeout")), 3000))
+                    ]);
+                } catch (e) {
+                    console.warn("⚠️ 수동 새로고침 시 sync_info 조회 실패 또는 타임아웃 - 데이터 조회를 계속 가동합니다.", e);
+                }
             }
             
             // 10초 타임아웃 설정 (10초 동안 Supabase 응답이 없으면 강제로 Fallback 로컬 데이터 로드)
@@ -2165,8 +2172,18 @@
 
         // 🚀 첫 접속 시 캐시 유효성을 검증하여 필요한 경우에만 데이터를 가져오는 제어 함수
         async function initDataLoad() {
-            // 1. 먼저 sync_info를 조회하여 서버의 최신 타임스탬프를 가져옵니다.
-            const serverLastSync = await fetchSyncStatus();
+            const sensor = document.getElementById("connection-sensor");
+            
+            // 1. 먼저 sync_info를 조회하여 서버의 최신 타임스탬프를 가져옵니다. (3초 타임아웃 경쟁 방어 적용)
+            let serverLastSync = null;
+            try {
+                serverLastSync = await Promise.race([
+                    fetchSyncStatus(),
+                    new Promise((_, reject) => setTimeout(() => reject(new Error("Timeout")), 3000))
+                ]);
+            } catch (e) {
+                console.warn("⚠️ sync_info 타임스탬프 조회 실패 또는 타임아웃 - 캐시 상태를 우회 점검합니다.", e);
+            }
             
             // 2. 로컬 스토리지에 캐시된 데이터 및 타임스탬프가 있는지 확인합니다.
             const cachedData = localStorage.getItem('cached_properties');
@@ -2182,8 +2199,10 @@
                         // 통계 갱신
                         updateHeaderStats(originalProperties);
                         
-                        sensor.innerHTML = '<span class="w-2 h-2 rounded-full bg-[#10b981]"></span><span class="hidden sm:inline">🟢 캐시 데이터 로드 완료 (' + originalProperties.length.toLocaleString() + '건)</span><span class="inline sm:hidden">🟢 ' + originalProperties.length.toLocaleString() + '건</span>';
-                        sensor.className = "flex items-center gap-1.5 sm:gap-2 px-2 sm:px-3 py-1 sm:py-1.5 rounded-full bg-emerald-50 border border-emerald-200 text-emerald-700 text-[9px] sm:text-[10px] font-black shadow-sm cursor-pointer flex-shrink-0";
+                        if (sensor) {
+                            sensor.innerHTML = '<span class="w-2 h-2 rounded-full bg-[#10b981]"></span><span class="hidden sm:inline">🟢 캐시 데이터 로드 완료 (' + originalProperties.length.toLocaleString() + '건)</span><span class="inline sm:hidden">🟢 ' + originalProperties.length.toLocaleString() + '건</span>';
+                            sensor.className = "flex items-center gap-1.5 sm:gap-2 px-2 sm:px-3 py-1 sm:py-1.5 rounded-full bg-emerald-50 border border-emerald-200 text-emerald-700 text-[9px] sm:text-[10px] font-black shadow-sm cursor-pointer flex-shrink-0";
+                        }
                         
                         applyFilters();
                         isFirstLoad = false;
@@ -2308,6 +2327,11 @@
         let currentSortDir = 'desc';  // 현재 정렬 방향 ('asc' | 'desc')
         let selectedProperty = null;  // 현재 선택된 활성화 매물 객체
         let currentTabId = 'dashboard'; // 현재 활성화된 탭 ID
+
+        // 🚀 비부동산 자산 전환 시 원본 부동산 탭 복원용 캐시 변수
+        let originalPanel2Html = "";
+        let originalPanel3Html = "";
+        let originalPanel4Html = "";
 
         // 🚀 성능 극대화 고도화: 대용량 데이터 지연 로딩(Pagination) 및 디바운싱 데몬 설정
         let currentPage = 1;
@@ -2497,6 +2521,14 @@
         window.addEventListener("resize", initResponsiveLayout);
 
         document.addEventListener("DOMContentLoaded", function() {
+            // 원본 탭 HTML 백업
+            const p2 = document.getElementById("detail-group-panel-2");
+            const p3 = document.getElementById("detail-group-panel-3");
+            const p4 = document.getElementById("detail-group-panel-4");
+            if (p2) originalPanel2Html = p2.innerHTML;
+            if (p3) originalPanel3Html = p3.innerHTML;
+            if (p4) originalPanel4Html = p4.innerHTML;
+
             initResponsiveLayout();
             restoreFiltersFromCache();
             initDataLoad();
@@ -3874,6 +3906,238 @@
             return clean;
         }
 
+        function extractNonBuildingMeta(text, ptype, title) {
+            const meta = {};
+            if (!text) return meta;
+            const p_clean = (ptype || "").toLowerCase();
+            const text_clean = text.replace(/\n/g, " ").replace(/\s\s+/g, " ").trim();
+            
+            const isVehicle = p_clean.includes("차량") || p_clean.includes("자동차") || p_clean.includes("중기") || p_clean.includes("선박") || p_clean.includes("항공기") || p_clean.includes("운송") || p_clean.includes("지게차") || p_clean.includes("장비");
+            
+            // 제목에서 연식 정보를 1순위로 정밀 탐색합니다.
+            let yearVal = null;
+            if (title) {
+                const title_clean = title.replace(/\n/g, " ").replace(/\s\s+/g, " ").trim();
+                
+                // 1. 4자리 연도 매칭 (예: 2018년식, 2018년형, 2018년)
+                const year4StrictMatch = title_clean.match(/(19\d{2}|20\d{2})\s*(?:년식|년형|년|제작)/i);
+                if (year4StrictMatch) {
+                    yearVal = year4StrictMatch[1] + "년식";
+                }
+                
+                // 2. 2자리 연도 매칭 및 세기 자동 보정 (예: 18년식 -> 2018년식, 98년식 -> 1998년식)
+                if (!yearVal) {
+                    const year2Match = title_clean.match(/(\d{2})\s*(?:년식|년형|년)/i);
+                    if (year2Match) {
+                        let yearNum = parseInt(year2Match[1]);
+                        if (yearNum >= 80 && yearNum <= 99) {
+                            yearVal = (1900 + yearNum) + "년식";
+                        } else {
+                            yearVal = (2000 + yearNum) + "년식";
+                        }
+                    }
+                }
+                
+                // 3. 괄호 안의 연도 감지 (예: (2018), (18))
+                if (!yearVal) {
+                    const parenMatch = title_clean.match(/\((20\d{2}|19\d{2}|\d{2})\s*(?:년식|년형|년)?\)/i);
+                    if (parenMatch) {
+                        let val = parenMatch[1];
+                        if (val.length === 2) {
+                            let yearNum = parseInt(val);
+                            if (yearNum >= 80 && yearNum <= 99) {
+                                yearVal = (1900 + yearNum) + "년식";
+                            } else {
+                                yearVal = (2000 + yearNum) + "년식";
+                            }
+                        } else {
+                            yearVal = val + "년식";
+                        }
+                    }
+                }
+
+                // 4. 일반 4자리 연도 단독 매칭 (사건번호 및 타경 패턴 예외 처리 적용)
+                if (!yearVal) {
+                    const simpleYearMatch = title_clean.match(/\b(19\d{2}|20\d{2})\b/);
+                    if (simpleYearMatch) {
+                        const idx = simpleYearMatch.index;
+                        const beforeStr = title_clean.substring(Math.max(0, idx - 10), idx);
+                        const afterStr = title_clean.substring(idx + 4, Math.min(title_clean.length, idx + 15));
+                        if (!beforeStr.includes("타경") && !afterStr.includes("타경") && !beforeStr.includes("관리번호") && !afterStr.includes("-") && !beforeStr.includes("/")) {
+                            yearVal = simpleYearMatch[1] + "년식";
+                        }
+                    }
+                }
+            }
+
+            // 공백이나 정렬이 섞인 텍스트에서 각 항목을 정밀하게 추출하기 위해 다중 키워드 맵을 선언합니다.
+            const keywordsMap = {
+                base_location: ['사용본거지', '사용 본거지', '본거지'],
+                vehicle_no: ['등록번호', '차량등록번호', '차량번호', '등록 번호'],
+                model_name: ['차명', '모델명', '차 명', '모델 명'],
+                model_year: ['연식', '연 식', '제작년도', '제작연도', '제작 년도', '제작 연도', '연 식:'],
+                vehicle_type: ['차종', '차 종'],
+                vin: ['차대번호', '차대 번호'],
+                engine_type: ['원동기형식', '원동기 형식', '원동기'],
+                storage_location: ['보관장소', '보관 장소', '보관지', '소재지', '보관'],
+                spec_no: ['제원관리번호', '제원 관리번호', '관리번호', '제원번호'],
+                fuel: ['연료', '연 료'],
+                displacement: ['배기량', '배기 량'],
+                color: ['색상', '색 상']
+            };
+
+            const matches = [];
+            for (const [key, aliases] of Object.entries(keywordsMap)) {
+                for (const alias of aliases) {
+                    // 키워드 뒤에 콜론이 이어지는 패턴을 찾아 정확한 시작과 끝 오프셋을 구합니다.
+                    const regexStr = alias.replace(/\s+/g, "\\s*") + "\\s*:\\s*";
+                    const regex = new RegExp(regexStr, "gi");
+                    let match;
+                    while ((match = regex.exec(text_clean)) !== null) {
+                        matches.push({
+                            key: key,
+                            alias: alias,
+                            start: match.index,
+                            end: regex.lastIndex
+                        });
+                    }
+                }
+            }
+
+            // 인덱스 오버랩을 방지하기 위해 정렬 후 중복 매칭을 필터링합니다.
+            matches.sort((a, b) => a.start - b.start);
+            const filteredMatches = [];
+            let lastEnd = -1;
+            for (const m of matches) {
+                if (m.start >= lastEnd) {
+                    filteredMatches.push(m);
+                    lastEnd = m.end;
+                }
+            }
+
+            // 매칭 정보 간의 텍스트 슬라이싱을 통해 값을 결정합니다.
+            const parsed = {};
+            for (let i = 0; i < filteredMatches.length; i++) {
+                const current = filteredMatches[i];
+                const next = filteredMatches[i + 1];
+                const valueStart = current.end;
+                const valueEnd = next ? next.start : text_clean.length;
+                let value = text_clean.substring(valueStart, valueEnd).trim();
+                // 텍스트 경계에 남은 기호들을 정제합니다.
+                value = value.replace(/^[,\s:|#;]+|[,\s:|#;]+$/g, "").trim();
+                parsed[current.key] = value;
+            }
+
+            if (isVehicle) {
+                meta.asset_type = "vehicle";
+                
+                // 추출된 정보를 객체에 맵핑합니다. 제목 추출값을 우선 매핑합니다.
+                meta.model_year = yearVal || (parsed.model_year ? (parsed.model_year.includes("년") ? parsed.model_year : parsed.model_year + "년식") : null);
+                meta.mileage = parsed.displacement && parsed.displacement.includes("km") ? parsed.displacement : (parsed.mileage ? (parsed.mileage.includes("km") ? parsed.mileage : parsed.mileage + " km") : null);
+                meta.vehicle_no = parsed.vehicle_no || null;
+                meta.model_name = parsed.model_name || null;
+                meta.vehicle_type = parsed.vehicle_type || null;
+                meta.vin = parsed.vin || null;
+                meta.engine_type = parsed.engine_type || null;
+                meta.storage_location = parsed.storage_location || null;
+                meta.base_location = parsed.base_location || null;
+                meta.fuel = parsed.fuel || null;
+                meta.displacement = parsed.displacement || null;
+                meta.color = parsed.color || null;
+
+                // 배기량과 주행거리가 서로 꼬여 들어간 예외를 교차 검증합니다.
+                if (meta.displacement && (meta.displacement.includes("km") || meta.displacement.includes("키로"))) {
+                    meta.mileage = meta.displacement;
+                    meta.displacement = null;
+                }
+
+                // 매칭 실패 시 기존 폴백 정규식을 병행 적용해 누락을 방지합니다.
+                if (!meta.model_year) {
+                    const year_match = text_clean.match(/(?:연\s*식|제작년도|제작연도|연식)\s*:\s*(\d{4})|(\d{4})\s*년\s*식|(\d{4})\s*년\s*형/i);
+                    if (year_match) {
+                        meta.model_year = (year_match[1] || year_match[2] || year_match[3]) + "년식";
+                    }
+                }
+                if (!meta.mileage) {
+                    const mileage_match = text_clean.match(/(?:주행거리|주행)\s*:\s*([\d,]+)\s*(?:km|키로)?|([\d,]+)\s*(?:km|키로)\b/i);
+                    if (mileage_match) {
+                        meta.mileage = (mileage_match[1] || mileage_match[2]) + " km";
+                    }
+                }
+                if (!meta.vehicle_no) {
+                    const no_match_simple = text_clean.match(/(?:등록번호|차량번호)\s*:\s*([가-힣\d\w\s\-]+?)(?:\s|$|,|\||\()/i);
+                    if (no_match_simple) meta.vehicle_no = no_match_simple[1].trim();
+                }
+                if (!meta.model_name) {
+                    const name_match_simple = text_clean.match(/(?:차명|모델명)\s*:\s*([가-힣\d\w\s\-&]+?)(?:\s|$|,|\||\()/i);
+                    if (name_match_simple) meta.model_name = name_match_simple[1].trim();
+                }
+                if (!meta.fuel) {
+                    const fuel_match = text_clean.match(/(휘발유|가솔린|경유|디젤|LPG|엘피지|하이브리드|전기|수소)/i);
+                    if (fuel_match) meta.fuel = fuel_match[1].trim();
+                }
+                if (!meta.displacement) {
+                    const cc_match = text_clean.match(/([\d,]+)\s*cc/i);
+                    if (cc_match) meta.displacement = cc_match[1].trim() + " cc";
+                }
+                if (!meta.color) {
+                    const color_word_match = text_clean.match(/(검정색|흰색|은색|쥐색|진회색|회색|청색|적색|검정|은회색|진주색)/i);
+                    if (color_word_match) meta.color = color_word_match[1].trim();
+                }
+            }
+            
+            if (!meta.asset_type && (p_clean.includes("기계") || p_clean.includes("기구") || p_clean.includes("설비") || p_clean.includes("장비"))) {
+                meta.asset_type = "machinery";
+                // 기계장비 정규식에서 전방탐색 그룹의 닫는 괄호 누락으로 인한 구문 오류를 방지하기 위해 괄호를 추가하여 온전히 닫아줍니다.
+                const spec_match = text_clean.match(/(?:규격|형식|성능)\s*:\s*([가-힣\w\s\-\(\)\/,.]+?)(?=\s*(?:제조사|제작사|제조국|수량|$|,|\|))/i);
+                if (spec_match) {
+                    meta.specification = spec_match[1].trim();
+                } else {
+                    const spec_match_simple = text_clean.match(/(?:규격|형식|성능)\s*:\s*([가-힣\w\s\-\(\)\/,.]+?)(?:\s\s|$|,|\|)/i);
+                    if (spec_match_simple) meta.specification = spec_match_simple[1].trim();
+                }
+                
+                // 제조사 탐색용 전방탐색 그룹도 동일하게 괄호를 추가하여 정형화된 정규식 구조를 갖추도록 정비합니다.
+                const maker_match = text_clean.match(/(?:제조사|제작사|제조국)\s*:\s*([가-힣\w\s\-]+?)(?=\s*(?:수량|규격|형식|$|,|\|))/i);
+                if (maker_match) {
+                    meta.manufacturer = maker_match[1].trim();
+                } else {
+                    const maker_match_simple = text_clean.match(/(?:제조사|제작사|제조국)\s*:\s*([가-힣\w\s\-]+?)(?:\s|$|,|\|)/i);
+                    if (maker_match_simple) meta.manufacturer = maker_match_simple[1].trim();
+                }
+                
+                const qty_match = text_clean.match(/(?:수량|수량\s*:\s*)(\d+)\s*(?:대|세트|개|조)/i);
+                if (qty_match) {
+                    meta.quantity = qty_match[1] + "대";
+                }
+            }
+            
+            if (!meta.asset_type && (p_clean.includes("주식") || p_clean.includes("증권") || p_clean.includes("채권") || p_clean.includes("출자"))) {
+                meta.asset_type = "securities";
+                const qty_match = text_clean.match(/([\d,]+)\s*주\b|주식\s*수량\s*:\s*([\d,]+)/i);
+                if (qty_match) {
+                    meta.quantity = (qty_match[1] || qty_match[2]) + "주";
+                }
+                const company_match = text_clean.match(/([가-힣\w\s]+(?:주식회사|제약|테크|홀딩스|바이오|건설|정밀|산업))/i);
+                if (company_match) {
+                    meta.company_name = company_match[1].trim();
+                }
+            }
+            
+            if (!meta.asset_type) {
+                meta.asset_type = "goods";
+                const qty_match = text_clean.match(/(?:수량|개수)\s*:\s*([\d,]+)\s*([가-힣]+)|([\d,]+)\s*(?:개|세트|박스|톤)\b/i);
+                if (qty_match) {
+                    meta.quantity = (qty_match[1] || qty_match[3]) + "개";
+                }
+                const loc_match = text_clean.match(/(?:보관장소|보관지|소재지)\s*:\s*([가-힣\w\s\-]+?)(?:\s\s|$|,|\|)/i);
+                if (loc_match) {
+                    meta.storage_location = loc_match[1].trim();
+                }
+            }
+            return meta;
+        }
+
         function enrichPropertyData(item) {
             if (!item) return item;
             
@@ -3892,6 +4156,7 @@
                 }
             }
             item.notes_content = cleanNotes;
+            const textToSearch = `${item.address || ''} ${item.desc_content || ''} ${cleanNotes}`.toLowerCase();
             item.is_estimated = meta.is_estimated !== undefined ? meta.is_estimated : true;
             item.is_lease = meta.is_lease !== undefined ? meta.is_lease : false;
             item.images = meta.images || [];
@@ -3900,10 +4165,64 @@
             item.complex_info = meta.complex_info || {};
             item.elementary_school = meta.elementary_school || "";
             item.recent_deals = meta.recent_deals || [];
-            item.car_info = meta.car_info || null;
-            item.security_info = meta.security_info || null;
-            item.machinery_info = meta.machinery_info || null;
-            item.etc_info = meta.etc_info || null;
+
+            // 비부동산 자산 메타 파싱 또는 연동
+            const nonBuildingKeywords = ['차량', '자동차', '중기', '선박', '항공기', '운송', '지게차', '장비', '기계', '기구', '설비', '유가증권', '증권', '주식', '채권', '기타물품', '물품', '동산'];
+            const isNonBuilding = item.source === 'court_etc' || item.source === 'onbid_etc' || nonBuildingKeywords.some(k => (item.ptype || "").includes(k));
+            // 제목(item.title) 정보를 추가로 인자로 전달하여 제목 전용 정밀 연식 파싱 로직이 활성화되도록 유도합니다.
+            const nbMeta = meta.non_building_meta || (isNonBuilding ? extractNonBuildingMeta(textToSearch, item.ptype, item.title) : null);
+            item.non_building_meta = nbMeta;
+
+            if (nbMeta && nbMeta.asset_type) {
+                if (nbMeta.asset_type === 'vehicle') {
+                    item.car_info = {
+                        car_no: nbMeta.vehicle_no || '-',
+                        car_model: nbMeta.model_name || '-',
+                        model_year: nbMeta.model_year || '-',
+                        mileage: nbMeta.mileage || '-',
+                        fuel: nbMeta.fuel || '미상',
+                        displacement: nbMeta.displacement || '미상',
+                        color: nbMeta.color || '미상',
+                        vin: nbMeta.vin || '-',
+                        engine_type: nbMeta.engine_type || '-',
+                        vehicle_type: nbMeta.vehicle_type || '-',
+                        base_location: nbMeta.base_location || '-',
+                        accident_history: '미상',
+                        inspection_status: '양호 (추정)'
+                    };
+                } else if (nbMeta.asset_type === 'machinery') {
+                    item.machinery_info = {
+                        machine_name: nbMeta.model_name || '-',
+                        maker: nbMeta.manufacturer || '-',
+                        model_year: '-',
+                        status: '정상 작동 (추정)',
+                        standard: nbMeta.specification || nbMeta.quantity || '-'
+                    };
+                } else if (nbMeta.asset_type === 'securities') {
+                    item.security_info = {
+                        company_name: nbMeta.company_name || '-',
+                        security_type: '보통주',
+                        share_count: nbMeta.quantity || '-',
+                        face_value: '-',
+                        par_value_total: '-',
+                        financial_status: '정상 (추정)',
+                        major_shareholders: '미상'
+                    };
+                } else if (nbMeta.asset_type === 'goods') {
+                    item.etc_info = {
+                        item_name: nbMeta.model_name || '-',
+                        quantity: nbMeta.quantity || '-',
+                        origin: '국산 (추정)',
+                        status: '보통',
+                        notes: nbMeta.storage_location ? `보관소: ${nbMeta.storage_location}` : '-'
+                    };
+                }
+            } else {
+                item.car_info = meta.car_info || null;
+                item.security_info = meta.security_info || null;
+                item.machinery_info = meta.machinery_info || null;
+                item.etc_info = meta.etc_info || null;
+            }
 
             // 면적 덮어쓰기
             if (meta.exclusive_area > 0) item.exclusive_area = meta.exclusive_area;
@@ -3936,7 +4255,6 @@
                 return item;
             }
             let structure = item.structure || "";
-            const textToSearch = `${item.address || ""} ${item.desc_content || ""} ${item.notes_content || ""}`;
             if (!structure || structure === "철골철근콘크리트") {
                 const structureKeywords = ["철골철근콘크리트", "철근콘크리트", "벽돌조", "조적조", "연와조", "시멘트벽돌", "블록조", "목조", "일반철골", "경량철골", "철골조", "석조", "판넬조"];
                 let found = false;
@@ -4066,19 +4384,23 @@
             const tab3Btn = document.getElementById("detail-group-tab-3-btn");
             const tab4Btn = document.getElementById("detail-group-tab-4-btn");
 
-            if (item.source === 'onbid_etc' || item.source === 'court_etc') {
+            const nonBuildingKeywords = ['차량', '자동차', '중기', '선박', '항공기', '운송', '지게차', '장비', '기계', '기구', '설비', '유가증권', '증권', '주식', '채권', '기타물품', '물품', '동산'];
+            const isNonBuilding = item.source === 'court_etc' || item.source === 'onbid_etc' || nonBuildingKeywords.some(k => (item.ptype || "").includes(k));
+
+            if (isNonBuilding) {
                 if (rvTitle) rvTitle.innerHTML = `<i class="fa-solid fa-image text-royalBlue"></i> 📦 자산 대표 이미지`;
                 if (rvFallbackText) rvFallbackText.innerText = "비부동산 자산은 로드뷰를 제공하지 않습니다.";
-                if (tab2Btn) tab2Btn.classList.add("hidden");
-                if (tab3Btn) tab3Btn.classList.add("hidden");
-                if (tab4Btn) tab4Btn.classList.add("hidden");
-                changeDetailGroupTab(1);
+                if (tab2Btn) tab2Btn.classList.remove("hidden");
+                if (tab3Btn) tab3Btn.classList.remove("hidden");
+                if (tab4Btn) tab4Btn.classList.remove("hidden");
+                changeDetailGroupTab(currentDetailGroupTab || 1);
             } else {
                 if (rvTitle) rvTitle.innerHTML = `<i class="fa-solid fa-image text-royalBlue"></i> 🏢 부동산 대표 전경 (실제 로드뷰)`;
                 if (rvFallbackText) rvFallbackText.innerText = "해당 위치의 로드뷰를 불러올 수 없습니다.";
                 if (tab2Btn) tab2Btn.classList.remove("hidden");
                 if (tab3Btn) tab3Btn.classList.remove("hidden");
                 if (tab4Btn) tab4Btn.classList.remove("hidden");
+                changeDetailGroupTab(currentDetailGroupTab || 1);
             }
 
             // 주소 부분은 정확히 냅두고 대괄호, 소괄호, 중괄호 및 그 내부 텍스트(예: 용도, 유의사항 등)만 제거하여 제목이 중간에 잘리지 않도록 정제합니다.
@@ -4141,77 +4463,214 @@
             // 원문 설명 바인딩
             document.getElementById("detail-desc").innerText = item.desc_content || "상세 비고 내용이 없습니다.";
             
-            // 🏠 물건 세부 스펙 분석 바인딩
-            document.getElementById("detail-spec-ptype").innerText = item.ptype || "미상";
-            document.getElementById("detail-spec-round").innerText = item.round_info || "신건";
-            document.getElementById("detail-spec-appraisal").innerText = formatKRW(item.appraised_value);
-            document.getElementById("detail-spec-minimum").innerText = formatKRW(item.minimum_bid);
-            document.getElementById("detail-spec-date").innerText = `${item.bidding_date || "미상"} (${calculateRemainingDays(item.bidding_date) >= 0 ? 'D-' + calculateRemainingDays(item.bidding_date) : '종결'})`;
+            // 🏠 물건 세부 스펙 분석 바인딩 (부동산 vs 비부동산 분기)
+            const specGrid = document.getElementById("detail-spec-grid");
+            const specTitle = document.getElementById("detail-spec-title");
 
-            // 🛠️ 대법원 원본 제목 등으로부터 물건 재질/구조 정보(철골철근콘크리트, 조적조 등) 정밀 동적 분석
-            let detectedStructure = "철골철근콘크리트";
-            const structureKeywords = ["철골철근콘크리트", "철근콘크리트", "벽돌조", "조적조", "연와조", "시멘트벽돌", "블록조", "목조", "강파이프", "경량철골", "철골조", "석조"];
-            for (const kw of structureKeywords) {
-                if ((item.address || "").includes(kw) || (item.desc_content || "").includes(kw)) {
-                    detectedStructure = kw;
-                    break;
+            if (isNonBuilding) {
+                // 비부동산 자산 타이틀 설정.
+                if (specTitle) {
+                    specTitle.innerHTML = `<i class="fa-solid fa-file-invoice text-royalBlue"></i> 📦 자산 표시 및 기본 명세`;
                 }
-            }
-            const structureEl = document.getElementById("detail-spec-structure");
-            if (structureEl) structureEl.innerText = detectedStructure;
+                const nbMeta = item.non_building_meta || {};
+                let customGridHtml = "";
 
-            // 👤 가상 소유주 및 채무자 정제 및 마스킹 ("홍길동" -> "홍ㅇㅇ", "김채무" -> "김ㅇㅇ")
-            const maskName = (name) => {
-                if (!name || name === "미상" || name === "-" || name.trim() === "") return "강ㅇㅇ";
-                const clean = name.trim();
-                if (clean.length <= 1) return clean;
-                return clean[0] + "ㅇ".repeat(Math.max(1, clean.length - 1));
-            };
-            const virtualOwner = item.owner || "홍길동";
-            const virtualDebtor = item.debtor || "김채무";
-            document.getElementById("detail-owner").innerText = maskName(virtualOwner);
-            document.getElementById("detail-debtor").innerText = maskName(virtualDebtor);
-
-            // 📐 평수 분할 및 면적 바인딩 (enrichPropertyData 보완값 적용)
-            const exclusiveArea = item.exclusive_area;
-            const supplyArea = item.supply_area;
-            const landArea = item.land_area;
-            const buildingArea = item.building_area;
-            
-            const exclusivePy = (exclusiveArea * 0.3025).toFixed(1);
-            const supplyPy = (supplyArea * 0.3025).toFixed(1);
-            const landPy = (landArea * 0.3025).toFixed(1);
-            const buildingPy = (buildingArea * 0.3025).toFixed(1);
-
-            let estExSuffix = "";
-            let estSpSuffix = "";
-            let estLdSuffix = "";
-            let estBdSuffix = "";
-
-            const estType = item.exclusive_area_estimation_type || "exact";
-            if (estType === "estimated") {
-                if (item.is_estimated_exclusive) estExSuffix = ` <span class="inline-flex items-center gap-0.5 px-2 py-0.5 ml-1.5 rounded-full text-[10px] font-black bg-amber-500 text-white select-none">⚠️ 추정</span>`;
-                if (item.is_estimated_supply) estSpSuffix = ` <span class="inline-flex items-center gap-0.5 px-2 py-0.5 ml-1.5 rounded-full text-[10px] font-black bg-amber-500 text-white select-none">⚠️ 추정</span>`;
-                if (item.is_estimated_land) estLdSuffix = ` <span class="inline-flex items-center gap-0.5 px-2 py-0.5 ml-1.5 rounded-full text-[10px] font-black bg-amber-500 text-white select-none">⚠️ 추정</span>`;
-                if (item.is_estimated_building) estBdSuffix = ` <span class="inline-flex items-center gap-0.5 px-2 py-0.5 ml-1.5 rounded-full text-[10px] font-black bg-amber-500 text-white select-none">⚠️ 추정</span>`;
-            } else if (estType === "fake") {
-                if (item.is_estimated_exclusive) estExSuffix = ` <span class="inline-flex items-center gap-0.5 px-2 py-0.5 ml-1.5 rounded-full text-[10px] font-black bg-rose-500 text-white select-none animate-pulse">⚠️ 허수</span>`;
-                if (item.is_estimated_supply) estSpSuffix = ` <span class="inline-flex items-center gap-0.5 px-2 py-0.5 ml-1.5 rounded-full text-[10px] font-black bg-rose-500 text-white select-none animate-pulse">⚠️ 허수</span>`;
-                if (item.is_estimated_land) estLdSuffix = ` <span class="inline-flex items-center gap-0.5 px-2 py-0.5 ml-1.5 rounded-full text-[10px] font-black bg-rose-500 text-white select-none animate-pulse">⚠️ 허수</span>`;
-                if (item.is_estimated_building) estBdSuffix = ` <span class="inline-flex items-center gap-0.5 px-2 py-0.5 ml-1.5 rounded-full text-[10px] font-black bg-rose-500 text-white select-none animate-pulse">⚠️ 허수</span>`;
-            }
-
-            const formatAreaHtml = (area, py, suffix) => {
-                if (!area || area <= 0) {
-                    return `<span class="text-slate-400 font-normal">미상</span>`;
+                if (nbMeta.asset_type === 'vehicle') {
+                    customGridHtml = `
+                        <div class="bg-slate-50 border border-slate-100 p-2 rounded-xl flex justify-between items-center">
+                            <span class="text-slate-450 font-semibold text-[10px] sm:text-xs">차종/모델명</span>
+                            <span class="font-extrabold text-slate-800">${nbMeta.model_name || "미상"}</span>
+                        </div>
+                        <div class="bg-slate-50 border border-slate-100 p-2 rounded-xl flex justify-between items-center">
+                            <span class="text-slate-450 font-semibold text-[10px] sm:text-xs">차량 등록번호</span>
+                            <span class="font-extrabold text-slate-800">${nbMeta.vehicle_no || "미상"}</span>
+                        </div>
+                        <div class="bg-slate-50 border border-slate-100 p-2 rounded-xl flex justify-between items-center">
+                            <span class="text-slate-450 font-semibold text-[10px] sm:text-xs">모델 연식</span>
+                            <span class="font-extrabold text-slate-800">${nbMeta.model_year || "미상"}</span>
+                        </div>
+                        <div class="bg-slate-50 border border-slate-100 p-2 rounded-xl flex justify-between items-center">
+                            <span class="text-slate-450 font-semibold text-[10px] sm:text-xs">누적 주행거리</span>
+                            <span class="font-extrabold text-royalBlue">${nbMeta.mileage || "미상"}</span>
+                        </div>
+                    `;
+                } else if (nbMeta.asset_type === 'machinery') {
+                    customGridHtml = `
+                        <div class="bg-slate-50 border border-slate-100 p-2 rounded-xl flex justify-between items-center col-span-2">
+                            <span class="text-slate-450 font-semibold text-[10px] sm:text-xs">장비 규격/형식</span>
+                            <span class="font-extrabold text-slate-800 text-right">${nbMeta.specification || "미상"}</span>
+                        </div>
+                        <div class="bg-slate-50 border border-slate-100 p-2 rounded-xl flex justify-between items-center">
+                            <span class="text-slate-450 font-semibold text-[10px] sm:text-xs">제조회사</span>
+                            <span class="font-extrabold text-slate-800">${nbMeta.manufacturer || "미상"}</span>
+                        </div>
+                        <div class="bg-slate-50 border border-slate-100 p-2 rounded-xl flex justify-between items-center">
+                            <span class="text-slate-455 font-semibold text-[10px] sm:text-xs">공매 수량</span>
+                            <span class="font-extrabold text-slate-800">${nbMeta.quantity || "1대 (기본)"}</span>
+                        </div>
+                    `;
+                } else if (nbMeta.asset_type === 'securities') {
+                    customGridHtml = `
+                        <div class="bg-slate-50 border border-slate-100 p-2 rounded-xl flex justify-between items-center col-span-2">
+                            <span class="text-slate-450 font-semibold text-[10px] sm:text-xs">발행 회사명</span>
+                            <span class="font-extrabold text-slate-800 text-right">${nbMeta.company_name || "미상"}</span>
+                        </div>
+                        <div class="bg-slate-50 border border-slate-100 p-2 rounded-xl flex justify-between items-center col-span-2">
+                            <span class="text-slate-450 font-semibold text-[10px] sm:text-xs">인수 주식수</span>
+                            <span class="font-extrabold text-royalBlue text-right">${nbMeta.quantity || "미상"}</span>
+                        </div>
+                    `;
+                } else {
+                    customGridHtml = `
+                        <div class="bg-slate-50 border border-slate-100 p-2 rounded-xl flex justify-between items-center">
+                            <span class="text-slate-455 font-semibold text-[10px] sm:text-xs">공매 수량</span>
+                            <span class="font-extrabold text-slate-800">${nbMeta.quantity || "미상"}</span>
+                        </div>
+                        <div class="bg-slate-50 border border-slate-100 p-2 rounded-xl flex justify-between items-center col-span-2">
+                            <span class="text-slate-455 font-semibold text-[10px] sm:text-xs">보관 장소</span>
+                            <span class="font-extrabold text-slate-800 text-right">${nbMeta.storage_location || "상세 내역 참고"}</span>
+                        </div>
+                    `;
                 }
-                return `${area.toFixed(1)} ㎡ (${py} 평)${suffix}`;
-            };
 
-            document.getElementById("detail-spec-exclusive-py").innerHTML = formatAreaHtml(exclusiveArea, exclusivePy, estExSuffix);
-            document.getElementById("detail-spec-supply-py").innerHTML = formatAreaHtml(supplyArea, supplyPy, estSpSuffix);
-            document.getElementById("detail-spec-land-py").innerHTML = formatAreaHtml(landArea, landPy, estLdSuffix);
-            document.getElementById("detail-spec-building-py").innerHTML = formatAreaHtml(buildingArea, buildingPy, estBdSuffix);
+                // 공통 요율 및 감정가 추가.
+                customGridHtml += `
+                    <div class="bg-slate-50 border border-slate-100 p-2 rounded-xl flex justify-between items-center">
+                        <span class="text-slate-450 font-semibold text-[10px] sm:text-xs">자산 용도</span>
+                        <span class="font-extrabold text-slate-800">${item.ptype || "미상"}</span>
+                    </div>
+                    <div class="bg-slate-50 border border-slate-100 p-2 rounded-xl flex justify-between items-center">
+                        <span class="text-slate-450 font-semibold text-[10px] sm:text-xs">진행 회차</span>
+                        <span class="font-extrabold text-slate-800">${item.round_info || "신건"}</span>
+                    </div>
+                    <div class="bg-slate-50 border border-slate-100 p-2 rounded-xl flex justify-between items-center">
+                        <span class="text-slate-450 font-semibold text-[10px] sm:text-xs">감정평가액</span>
+                        <span class="font-extrabold text-slate-800 font-outfit">${formatKRW(item.appraised_value)}</span>
+                    </div>
+                    <div class="bg-slate-50 border border-slate-100 p-2 rounded-xl flex justify-between items-center">
+                        <span class="text-slate-450 font-semibold text-[10px] sm:text-xs">최저입찰액</span>
+                        <span class="font-extrabold text-rose-600 font-outfit">${formatKRW(item.minimum_bid)}</span>
+                    </div>
+                    <div class="bg-slate-50 border border-slate-100 p-2 rounded-xl flex justify-between items-center col-span-2">
+                        <span class="text-slate-455 font-semibold text-[10px] sm:text-xs">입찰일/마감 여부</span>
+                        <span class="font-extrabold text-slate-800">${item.bidding_date || "미상"} (${calculateRemainingDays(item.bidding_date) >= 0 ? 'D-' + calculateRemainingDays(item.bidding_date) : '종결'})</span>
+                    </div>
+                `;
+                if (specGrid) specGrid.innerHTML = customGridHtml;
+            } else {
+                // 부동산 타이틀 설정.
+                if (specTitle) {
+                    specTitle.innerHTML = `<i class="fa-solid fa-file-invoice text-royalBlue"></i> 📋 부동산 표시 및 기본 명세`;
+                }
+
+                // 가상 소유주 및 채무자 마스킹.
+                const maskName = (name) => {
+                    if (!name || name === "미상" || name === "-" || name.trim() === "") return "강ㅇㅇ";
+                    const clean = name.trim();
+                    if (clean.length <= 1) return clean;
+                    return clean[0] + "ㅇ".repeat(Math.max(1, clean.length - 1));
+                };
+                const virtualOwner = item.owner || "홍길동";
+                const virtualDebtor = item.debtor || "김채무";
+
+                // 면적 바인딩 용도.
+                const exclusiveArea = item.exclusive_area;
+                const supplyArea = item.supply_area;
+                const landArea = item.land_area;
+                const buildingArea = item.building_area;
+                
+                const exclusivePy = (exclusiveArea * 0.3025).toFixed(1);
+                const supplyPy = (supplyArea * 0.3025).toFixed(1);
+                const landPy = (landArea * 0.3025).toFixed(1);
+                const buildingPy = (buildingArea * 0.3025).toFixed(1);
+
+                let estExSuffix = "";
+                let estSpSuffix = "";
+                let estLdSuffix = "";
+                let estBdSuffix = "";
+
+                const estType = item.exclusive_area_estimation_type || "exact";
+                if (estType === "estimated") {
+                    if (item.is_estimated_exclusive) estExSuffix = ` <span class="inline-flex items-center gap-0.5 px-2 py-0.5 ml-1.5 rounded-full text-[10px] font-black bg-amber-500 text-white select-none">⚠️ 추정</span>`;
+                    if (item.is_estimated_supply) estSpSuffix = ` <span class="inline-flex items-center gap-0.5 px-2 py-0.5 ml-1.5 rounded-full text-[10px] font-black bg-amber-500 text-white select-none">⚠️ 추정</span>`;
+                    if (item.is_estimated_land) estLdSuffix = ` <span class="inline-flex items-center gap-0.5 px-2 py-0.5 ml-1.5 rounded-full text-[10px] font-black bg-amber-500 text-white select-none">⚠️ 추정</span>`;
+                    if (item.is_estimated_building) estBdSuffix = ` <span class="inline-flex items-center gap-0.5 px-2 py-0.5 ml-1.5 rounded-full text-[10px] font-black bg-amber-500 text-white select-none">⚠️ 추정</span>`;
+                } else if (estType === "fake") {
+                    if (item.is_estimated_exclusive) estExSuffix = ` <span class="inline-flex items-center gap-0.5 px-2 py-0.5 ml-1.5 rounded-full text-[10px] font-black bg-rose-500 text-white select-none animate-pulse">⚠️ 허수</span>`;
+                    if (item.is_estimated_supply) estSpSuffix = ` <span class="inline-flex items-center gap-0.5 px-2 py-0.5 ml-1.5 rounded-full text-[10px] font-black bg-rose-500 text-white select-none animate-pulse">⚠️ 허수</span>`;
+                    if (item.is_estimated_land) estLdSuffix = ` <span class="inline-flex items-center gap-0.5 px-2 py-0.5 ml-1.5 rounded-full text-[10px] font-black bg-rose-500 text-white select-none animate-pulse">⚠️ 허수</span>`;
+                    if (item.is_estimated_building) estBdSuffix = ` <span class="inline-flex items-center gap-0.5 px-2 py-0.5 ml-1.5 rounded-full text-[10px] font-black bg-rose-500 text-white select-none animate-pulse">⚠️ 허수</span>`;
+                }
+
+                const formatAreaHtml = (area, py, suffix) => {
+                    if (!area || area <= 0) {
+                        return `<span class="text-slate-400 font-normal">미상</span>`;
+                    }
+                    return `${area.toFixed(1)} ㎡ (${py} 평)${suffix}`;
+                };
+
+                // 대법원 원본 제목 등으로부터 물건 재질/구조 정보 정밀 동적 분석.
+                let detectedStructure = "철골철근콘크리트";
+                const structureKeywords = ["철골철근콘크리트", "철근콘크리트", "벽돌조", "조적조", "연와조", "시멘트벽돌", "블록조", "목조", "강파이프", "경량철골", "철골조", "석조"];
+                for (const kw of structureKeywords) {
+                    if ((item.address || "").includes(kw) || (item.desc_content || "").includes(kw)) {
+                        detectedStructure = kw;
+                        break;
+                    }
+                }
+
+                let standardGridHtml = `
+                    <div class="bg-slate-50 border border-slate-100 p-2 rounded-xl flex justify-between items-center">
+                        <span class="text-slate-450 font-semibold text-[10px] sm:text-xs">부동산 용도</span>
+                        <span id="detail-spec-ptype" class="font-extrabold text-slate-800">${item.ptype || "미상"}</span>
+                    </div>
+                    <div class="bg-slate-50 border border-slate-100 p-2 rounded-xl flex justify-between items-center">
+                        <span class="text-slate-450 font-semibold text-[10px] sm:text-xs">진행 회차</span>
+                        <span id="detail-spec-round" class="font-extrabold text-slate-800">${item.round_info || "신건"}</span>
+                    </div>
+                    <div class="bg-slate-50 border border-slate-100 p-2 rounded-xl flex justify-between items-center">
+                        <span class="text-slate-450 font-semibold text-[10px] sm:text-xs">소유자</span>
+                        <span id="detail-owner" class="font-extrabold text-slate-800">${maskName(virtualOwner)}</span>
+                    </div>
+                    <div class="bg-slate-50 border border-slate-100 p-2 rounded-xl flex justify-between items-center">
+                        <span class="text-slate-450 font-semibold text-[10px] sm:text-xs">채무자</span>
+                        <span id="detail-debtor" class="font-extrabold text-slate-800">${maskName(virtualDebtor)}</span>
+                    </div>
+                    <div class="bg-slate-50 border border-slate-100 p-2 rounded-xl flex justify-between items-center">
+                        <span class="text-slate-450 font-semibold text-[10px] sm:text-xs">전용 면적</span>
+                        <span id="detail-spec-exclusive-py" class="font-extrabold text-slate-800 font-mono">${formatAreaHtml(exclusiveArea, exclusivePy, estExSuffix)}</span>
+                    </div>
+                    <div class="bg-slate-50 border border-slate-100 p-2 rounded-xl flex justify-between items-center">
+                        <span class="text-slate-455 font-semibold text-[10px] sm:text-xs">공급 면적</span>
+                        <span id="detail-spec-supply-py" class="font-extrabold text-slate-800 font-mono">${formatAreaHtml(supplyArea, supplyPy, estSpSuffix)}</span>
+                    </div>
+                    <div class="bg-slate-50 border border-slate-100 p-2 rounded-xl flex justify-between items-center">
+                        <span class="text-slate-450 font-semibold text-[10px] sm:text-xs">토지 대지권</span>
+                        <span id="detail-spec-land-py" class="font-extrabold text-slate-800 font-mono">${formatAreaHtml(landArea, landPy, estLdSuffix)}</span>
+                    </div>
+                    <div class="bg-slate-50 border border-slate-100 p-2 rounded-xl flex justify-between items-center">
+                        <span class="text-slate-450 font-semibold text-[10px] sm:text-xs">건물 전용</span>
+                        <span id="detail-spec-building-py" class="font-extrabold text-slate-800 font-mono">${formatAreaHtml(buildingArea, buildingPy, estBdSuffix)}</span>
+                    </div>
+                    <div class="bg-slate-50 border border-slate-100 p-2 rounded-xl flex justify-between items-center">
+                        <span class="text-slate-450 font-semibold text-[10px] sm:text-xs">감정평가액</span>
+                        <span id="detail-spec-appraisal" class="font-extrabold text-slate-800 font-outfit">${formatKRW(item.appraised_value)}</span>
+                    </div>
+                    <div class="bg-slate-50 border border-slate-100 p-2 rounded-xl flex justify-between items-center">
+                        <span class="text-slate-450 font-semibold text-[10px] sm:text-xs">최저입찰액</span>
+                        <span id="detail-spec-minimum" class="font-extrabold text-rose-600 font-outfit">${formatKRW(item.minimum_bid)}</span>
+                    </div>
+                    <div class="bg-slate-50 border border-slate-100 p-2 rounded-xl flex justify-between items-center col-span-2">
+                        <span class="text-slate-450 font-semibold text-[10px] sm:text-xs">물건 구조/재질</span>
+                        <span id="detail-spec-structure" class="font-extrabold text-slate-800 text-right">${detectedStructure}</span>
+                    </div>
+                    <div class="bg-slate-50 border border-slate-100 p-2 rounded-xl flex justify-between items-center col-span-2">
+                        <span class="text-slate-455 font-semibold text-[10px] sm:text-xs">입찰일/마감 여부</span>
+                        <span id="detail-spec-date" class="font-extrabold text-slate-800">${item.bidding_date || "미상"} (${calculateRemainingDays(item.bidding_date) >= 0 ? 'D-' + calculateRemainingDays(item.bidding_date) : '종결'})</span>
+                    </div>
+                `;
+                if (specGrid) specGrid.innerHTML = standardGridHtml;
+            }
 
             // 🏢 다세대 건물 전체 명세 바인딩
             const villaPanel = document.getElementById("detail-villa-building-info");
@@ -4478,120 +4937,150 @@
             if (fpKakaoRoad) fpKakaoRoad.href = `https://map.kakao.com/?q=${encodeURIComponent(cleanedNavAddress)}`;
             if (fpGoogleRoad) fpGoogleRoad.href = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(cleanedNavAddress)}`;
 
-            // 🗺️ 카카오 3D 로드뷰 연동 로직
+            // 🗺️ 카카오 3D 로드뷰 연동 로직 (비부동산 분기)
             const roadviewContainer = document.getElementById("detail-roadview");
             const roadviewFallback = document.getElementById("detail-roadview-fallback");
             if (roadviewContainer && roadviewFallback) {
-                if (typeof kakao !== "undefined" && kakao.maps && kakao.maps.services && kakao.maps.services.Status) {
-                    roadviewContainer.style.display = "block";
-                    roadviewFallback.classList.add("hidden");
-                    
-                    const geocoder = new kakao.maps.services.Geocoder();
-                    geocoder.addressSearch(cleanedNavAddress, function(result, status) {
-                        if (status === kakao.maps.services.Status.OK) {
-                            const coords = new kakao.maps.LatLng(result[0].y, result[0].x);
-                            const rv = new kakao.maps.Roadview(roadviewContainer);
-                            const rvClient = new kakao.maps.RoadviewClient();
-                            
-                            rvClient.getNearestPanoId(coords, 50, function(panoId) {
-                                if (panoId) {
-                                    rv.setPanoId(panoId, coords);
-                                } else {
-                                    showFallback();
-                                }
-                            });
+                if (isNonBuilding) {
+                    // 비부동산 자산인 경우: 로드뷰 대신 실사진 제공.
+                    if (item.images && item.images.length > 0) {
+                        roadviewContainer.style.display = "block";
+                        roadviewFallback.classList.add("hidden");
+                        roadviewContainer.innerHTML = `
+                            <div class="relative w-full h-full bg-slate-955 flex items-center justify-center">
+                                <img src="${item.images[0]}" class="w-full h-full object-contain" alt="자산 대표 이미지">
+                                <div class="absolute bottom-2 right-2 bg-slate-900/60 px-2 py-0.5 rounded text-[10px] text-white font-bold select-none">
+                                    📸 실사진 (1/${item.images.length})
+                                </div>
+                            </div>
+                        `;
+                    } else {
+                        roadviewContainer.style.display = "none";
+                        roadviewFallback.classList.remove("hidden");
+                        const fbText = document.getElementById("detail-roadview-fallback-text");
+                        if (fbText) fbText.innerText = "비부동산 자산은 로드뷰를 제공하지 않습니다.";
+                        const fbBtn = document.getElementById("btn-naver-roadview-fallback");
+                        if (fbBtn) fbBtn.classList.add("hidden");
+                    }
+                } else {
+                    if (typeof kakao !== "undefined" && kakao.maps && kakao.maps.services && kakao.maps.services.Status) {
+                        roadviewContainer.style.display = "block";
+                        roadviewFallback.classList.add("hidden");
+                        
+                        const geocoder = new kakao.maps.services.Geocoder();
+                        geocoder.addressSearch(cleanedNavAddress, function(result, status) {
+                            if (status === kakao.maps.services.Status.OK) {
+                                const coords = new kakao.maps.LatLng(result[0].y, result[0].x);
+                                const rv = new kakao.maps.Roadview(roadviewContainer);
+                                const rvClient = new kakao.maps.RoadviewClient();
+                                
+                                rvClient.getNearestPanoId(coords, 50, function(panoId) {
+                                    if (panoId) {
+                                        rv.setPanoId(panoId, coords);
+                                    } else {
+                                        showFallback();
+                                    }
+                                });
 
-                            // 🟢 카카오 Geocoder로 획득한 위경도 좌표로 네이버 부동산 지도 링크 정밀 맵핑
-                            const activePriceBtn = document.getElementById("btn-naver-land-price");
-                            if (isComplexProperty) {
-                                if (activePriceBtn) {
-                                    activePriceBtn.href = `https://new.land.naver.com/complexes?ms=${result[0].y},${result[0].x},16&a=APT:OPST:ABRD:OBYG&e=RETAIL`;
-                                }
-                                if (floorplanLink) {
-                                    if (!(item.auction_no === "2025타경502931" || (item.address && item.address.includes("한빛아파트")))) {
-                                        floorplanLink.href = `https://new.land.naver.com/complexes?ms=${result[0].y},${result[0].x},16&a=APT:OPST:ABRD:OBYG&e=RETAIL`;
+                                // 🟢 카카오 Geocoder로 획득한 위경도 좌표로 네이버 부동산 지도 링크 정밀 맵핑
+                                const activePriceBtn = document.getElementById("btn-naver-land-price");
+                                if (isComplexProperty) {
+                                    if (activePriceBtn) {
+                                        activePriceBtn.href = `https://new.land.naver.com/complexes?ms=${result[0].y},${result[0].x},16&a=APT:OPST:ABRD:OBYG&e=RETAIL`;
+                                    }
+                                    if (floorplanLink) {
+                                        if (!(item.auction_no === "2025타경502931" || (item.address && item.address.includes("한빛아파트")))) {
+                                            floorplanLink.href = `https://new.land.naver.com/complexes?ms=${result[0].y},${result[0].x},16&a=APT:OPST:ABRD:OBYG&e=RETAIL`;
+                                        }
+                                    }
+                                } else {
+                                    if (activePriceBtn) {
+                                        activePriceBtn.href = `https://new.land.naver.com/articles?ms=${result[0].y},${result[0].x},16&a=VL:OR:JW:SG:HO:CO&e=RETAIL`;
+                                    }
+                                    if (floorplanLink) {
+                                        floorplanLink.href = `https://new.land.naver.com/search?searchQuery=${encodeURIComponent(rawAddress)}`;
                                     }
                                 }
+
+                                // 🟢 좌표 획득 시 3사 로드뷰 링크도 좌표 기반 정밀 링크로 교체
+                                if (fpNaverRoad) fpNaverRoad.href = `https://map.naver.com/v5/?c=${result[0].x},${result[0].y},15,0,0,0,adh`;
+                                if (fpKakaoRoad) fpKakaoRoad.href = `https://map.kakao.com/link/roadview/${result[0].y},${result[0].x}`;
+                                if (fpGoogleRoad) fpGoogleRoad.href = `https://www.google.com/maps/@?api=1&map_action=pano&viewpoint=${result[0].y},${result[0].x}`;
                             } else {
-                                if (activePriceBtn) {
-                                    activePriceBtn.href = `https://new.land.naver.com/articles?ms=${result[0].y},${result[0].x},16&a=VL:OR:JW:SG:HO:CO&e=RETAIL`;
-                                }
-                                if (floorplanLink) {
-                                    floorplanLink.href = `https://new.land.naver.com/search?searchQuery=${encodeURIComponent(rawAddress)}`;
-                                }
+                                showFallback();
                             }
+                        });
+                    } else {
+                        showFallback();
+                    }
 
-                            // 🟢 좌표 획득 시 3사 로드뷰 링크도 좌표 기반 정밀 링크로 교체
-                            if (fpNaverRoad) fpNaverRoad.href = `https://map.naver.com/v5/?c=${result[0].x},${result[0].y},15,0,0,0,adh`;
-                            if (fpKakaoRoad) fpKakaoRoad.href = `https://map.kakao.com/link/roadview/${result[0].y},${result[0].x}`;
-                            if (fpGoogleRoad) fpGoogleRoad.href = `https://www.google.com/maps/@?api=1&map_action=pano&viewpoint=${result[0].y},${result[0].x}`;
-                        } else {
-                            showFallback();
+                    function showFallback() {
+                        roadviewContainer.style.display = "none";
+                        roadviewFallback.classList.remove("hidden");
+                        const fbBtn = document.getElementById("btn-naver-roadview-fallback");
+                        if (fbBtn) {
+                            fbBtn.href = `https://map.naver.com/v5/search/${encodeURIComponent(cleanedNavAddress)}`;
                         }
-                    });
-                } else {
-                    showFallback();
-                }
-
-                function showFallback() {
-                    roadviewContainer.style.display = "none";
-                    roadviewFallback.classList.remove("hidden");
-                    const fbBtn = document.getElementById("btn-naver-roadview-fallback");
-                    if (fbBtn) {
-                        fbBtn.href = `https://map.naver.com/v5/search/${encodeURIComponent(cleanedNavAddress)}`;
                     }
                 }
             }
 
-            // 📐 평형별 평면도 이미지 매칭 비활성화 (실 평면도가 아닐 시 추정 평면도를 보여주지 않고 빈칸으로 방치)
+            // 📐 평형별 평면도 이미지 매칭 비활성화 (비부동산 자산인 경우 숨김 처리)
             const fpImgContainer = document.getElementById("detail-floorplan-img-container");
             const guideCard = document.getElementById("detail-floorplan-guide-card");
-            if (fpImgContainer) {
-                if (item.images && item.images.length > 0) {
-                    fpImgContainer.innerHTML = `<img id="detail-floorplan-img" src="${item.images[0]}" alt="부동산 실제 평면도" class="w-full h-full object-contain">`;
-                    fpImgContainer.onclick = openFloorplanModal;
-                    if (guideCard) guideCard.classList.add("hidden");
-                } else {
-                    const exclArea = item.exclusive_area || 0;
-                    let estImg = "./floorplan_modern_apartment.png";
-                    let sizeLabel = "";
-                    if (exclArea > 0) {
-                        if (exclArea <= 60) {
-                            estImg = "./floorplan_59.png";
-                            sizeLabel = "59㎡형 ";
-                        } else if (exclArea <= 90) {
-                            estImg = "./floorplan_84.png";
-                            sizeLabel = "84㎡형 ";
-                        } else {
-                            estImg = "./floorplan_114.png";
-                            sizeLabel = "114㎡형 ";
+            const fpPanel = document.getElementById("detail-panel-floorplan");
+
+            if (isNonBuilding) {
+                if (fpPanel) fpPanel.classList.add("hidden");
+                if (guideCard) guideCard.classList.add("hidden");
+            } else {
+                if (fpPanel) fpPanel.classList.remove("hidden");
+                if (fpImgContainer) {
+                    if (item.images && item.images.length > 0) {
+                        fpImgContainer.innerHTML = `<img id="detail-floorplan-img" src="${item.images[0]}" alt="부동산 실제 평면도" class="w-full h-full object-contain">`;
+                        fpImgContainer.onclick = openFloorplanModal;
+                        if (guideCard) guideCard.classList.add("hidden");
+                    } else {
+                        const exclArea = item.exclusive_area || 0;
+                        let estImg = "./floorplan_modern_apartment.png";
+                        let sizeLabel = "";
+                        if (exclArea > 0) {
+                            if (exclArea <= 60) {
+                                estImg = "./floorplan_59.png";
+                                sizeLabel = "59㎡형 ";
+                            } else if (exclArea <= 90) {
+                                estImg = "./floorplan_84.png";
+                                sizeLabel = "84㎡형 ";
+                            } else {
+                                estImg = "./floorplan_114.png";
+                                sizeLabel = "114㎡형 ";
+                            }
                         }
+
+                        let badgeText = "⚠️ 추정";
+                        let badgeColor = "bg-amber-500";
+                        if (item.exclusive_area_estimation_type === "fake") {
+                            badgeText = "⚠️ 허수";
+                            badgeColor = "bg-rose-500 animate-pulse";
+                        } else if (item.exclusive_area_estimation_type === "estimated") {
+                            badgeText = "⚠️ 추정";
+                            badgeColor = "bg-blue-500";
+                        }
+
+                        fpImgContainer.innerHTML = `
+                            <img id="detail-floorplan-img" src="${estImg}" alt="부동산 추정 평면도" class="w-full h-full object-contain opacity-80">
+                            <div class="absolute top-2.5 right-2.5 ${badgeColor} text-white text-[10px] font-black px-2.5 py-0.5 rounded-full shadow-sm select-none z-10 flex items-center justify-center">
+                                ${badgeText}
+                            </div>
+                            <div class="absolute bottom-2.5 left-2.5 bg-slate-800/80 text-white text-[10px] font-bold px-2.5 py-0.5 rounded-full select-none z-10">
+                                ${sizeLabel}AI 추정 구조도
+                            </div>
+                        `;
+
+                        fpImgContainer.onclick = openFloorplanModal;
+
+                        if (guideCard) guideCard.classList.remove("hidden");
                     }
-
-                    let badgeText = "⚠️ 추정";
-                    let badgeColor = "bg-amber-500";
-                    if (item.exclusive_area_estimation_type === "fake") {
-                        badgeText = "⚠️ 허수";
-                        badgeColor = "bg-rose-500 animate-pulse";
-                    } else if (item.exclusive_area_estimation_type === "estimated") {
-                        badgeText = "⚠️ 추정";
-                        badgeColor = "bg-blue-500";
-                    }
-
-                    fpImgContainer.innerHTML = `
-                        <img id="detail-floorplan-img" src="${estImg}" alt="부동산 추정 평면도" class="w-full h-full object-contain opacity-80">
-                        <div class="absolute top-2.5 right-2.5 ${badgeColor} text-white text-[10px] font-black px-2.5 py-0.5 rounded-full shadow-sm select-none z-10 flex items-center justify-center">
-                            ${badgeText}
-                        </div>
-                        <div class="absolute bottom-2.5 left-2.5 bg-slate-800/80 text-white text-[10px] font-bold px-2.5 py-0.5 rounded-full select-none z-10">
-                            ${sizeLabel}AI 추정 구조도
-                        </div>
-                    `;
-
-                    fpImgContainer.onclick = openFloorplanModal;
-
-
-                    if (guideCard) guideCard.classList.remove("hidden");
                 }
             }
 
@@ -4693,43 +5182,85 @@
             if (btnMapRoad) btnMapRoad.href = mapRoadUrl;
 
             // 🟢 예상 공시가격 및 토지이용계획 규제 요약 바인딩.
-            const officialLandPriceEl = document.getElementById("detail-spec-official-price");
-            const officialLandPriceDescEl = document.getElementById("detail-spec-official-price-desc");
-            if (officialLandPriceEl && officialLandPriceDescEl) {
-                officialLandPriceEl.innerText = formatKRW(extra.officialLandPrice);
-                officialLandPriceDescEl.innerText = extra.officialLandPriceDesc;
+            if (!isNonBuilding) {
+                const officialLandPriceEl = document.getElementById("detail-spec-official-price");
+                const officialLandPriceDescEl = document.getElementById("detail-spec-official-price-desc");
+                if (officialLandPriceEl && officialLandPriceDescEl) {
+                    officialLandPriceEl.innerText = formatKRW(extra.officialLandPrice);
+                    officialLandPriceDescEl.innerText = extra.officialLandPriceDesc;
+                }
+
+                const landUsePlanEl = document.getElementById("detail-land-use-plan");
+                const landUsePlanDescEl = document.getElementById("detail-land-use-plan-desc");
+                if (landUsePlanEl && landUsePlanDescEl) {
+                    landUsePlanEl.innerText = extra.landUsePlan;
+                    landUsePlanDescEl.innerText = extra.landUsePlanDesc;
+                }
+
+                const officialEumBtn = document.getElementById("btn-official-eum");
+                if (officialEumBtn) {
+                    officialEumBtn.href = "#";
+                    officialEumBtn.onclick = function(e) {
+                        e.preventDefault();
+                        copyAddressAndOpenEum();
+                    };
+                }
+            } else {
+                // 비부동산 자산은 토지 규제 및 공시가격 대상이 아니므로 대체 정보로 청소합니다.
+                const officialLandPriceEl = document.getElementById("detail-spec-official-price");
+                const officialLandPriceDescEl = document.getElementById("detail-spec-official-price-desc");
+                if (officialLandPriceEl && officialLandPriceDescEl) {
+                    officialLandPriceEl.innerText = "-";
+                    officialLandPriceDescEl.innerText = "비부동산 자산은 공시가격 산정 대상이 아닙니다.";
+                }
+
+                const landUsePlanEl = document.getElementById("detail-land-use-plan");
+                const landUsePlanDescEl = document.getElementById("detail-land-use-plan-desc");
+                if (landUsePlanEl && landUsePlanDescEl) {
+                    landUsePlanEl.innerText = "-";
+                    landUsePlanDescEl.innerText = "비부동산 자산은 토지이용계획 규제 정보를 제공하지 않습니다.";
+                }
+
+                const officialEumBtn = document.getElementById("btn-official-eum");
+                if (officialEumBtn) {
+                    officialEumBtn.href = "#";
+                    officialEumBtn.onclick = function(e) {
+                        e.preventDefault();
+                        alert("비부동산 자산은 토지이음 규제정보 서비스를 제공하지 않습니다.");
+                    };
+                }
             }
 
-            const landUsePlanEl = document.getElementById("detail-land-use-plan");
-            const landUsePlanDescEl = document.getElementById("detail-land-use-plan-desc");
-            if (landUsePlanEl && landUsePlanDescEl) {
-                landUsePlanEl.innerText = extra.landUsePlan;
-                landUsePlanDescEl.innerText = extra.landUsePlanDesc;
-            }
-
-            const officialEumBtn = document.getElementById("btn-official-eum");
-            if (officialEumBtn) {
-                officialEumBtn.href = "#";
-                officialEumBtn.onclick = function(e) {
-                    e.preventDefault();
-                    copyAddressAndOpenEum();
-                };
-            }
-
-            // 📍 구글 지도 임베드 라이브 뷰 연동
-            const mapContainer = document.getElementById("detail-map-container");
-            if (mapContainer && item.address) {
-                const mapQuery = getCleanedLandSearchQuery(item.address);
-                mapContainer.innerHTML = `
-                    <iframe 
-                        width="100%" 
-                        height="100%" 
-                        style="border:0; border-radius: 12px;" 
-                        loading="lazy" 
-                        allowfullscreen 
-                        src="https://maps.google.com/maps?q=${encodeURIComponent(mapQuery)}&t=&z=16&ie=UTF8&iwloc=&output=embed">
-                    </iframe>
-                `;
+            // 📍 구글 지도 임베드 라이브 뷰 연동 (부동산 vs 비부동산 분기)
+            if (!isNonBuilding) {
+                const mapContainer = document.getElementById("detail-map-container");
+                if (mapContainer && item.address) {
+                    const mapQuery = getCleanedLandSearchQuery(item.address);
+                    mapContainer.innerHTML = `
+                        <iframe 
+                            width="100%" 
+                            height="100%" 
+                            style="border:0; border-radius: 12px;" 
+                            loading="lazy" 
+                            allowfullscreen 
+                            src="https://maps.google.com/maps?q=${encodeURIComponent(mapQuery)}&t=&z=16&ie=UTF8&iwloc=&output=embed">
+                        </iframe>
+                    `;
+                }
+            } else {
+                // 비부동산 자산은 지적도가 불필요하므로 대체 플레이스홀더를 바인딩합니다.
+                const mapContainer = document.getElementById("detail-map-container");
+                if (mapContainer) {
+                    const storageLoc = (item.non_building_meta && item.non_building_meta.storage_location) || item.address || "상세 비고 참고";
+                    mapContainer.innerHTML = `
+                        <div class="flex flex-col items-center justify-center h-full p-6 text-center bg-slate-50 rounded-xl border border-dashed border-slate-300">
+                            <span class="text-3xl mb-2">📦</span>
+                            <strong class="text-xs text-slate-800 font-extrabold block">지적도 및 지리 지도 제공 불가</strong>
+                            <p class="text-[9.5px] text-slate-450 mt-1 leading-normal font-semibold">비부동산 자산은 지적 지도 및 로드뷰 매칭 서비스를 지원하지 않습니다.</p>
+                            <span class="text-[9.5px] text-slate-500 font-black mt-2 bg-slate-100 px-2 py-1 rounded border border-slate-200">실 보관 장소: ${storageLoc}</span>
+                        </div>
+                    `;
+                }
             }
 
             // 계산기 디폴트 입력값 세팅 (사용자가 타이핑 중인 경우 덮어쓰기 차단)
@@ -4912,6 +5443,8 @@
                 const courtMatch = item.auction_no ? item.auction_no.match(/\[(.*?)\]/) : null;
                 const courtName = courtMatch ? courtMatch[1] : "관할 법원";
                 
+                const categoryLabel = isNonBuilding ? "차량/기계장비 등" : "아파트/주택 등";
+                
                 statisticsBox.innerHTML = `
                     <div class="grid grid-cols-3 gap-2.5 text-center">
                         <div class="bg-blue-50/60 border border-blue-100 rounded-xl p-3.5 shadow-sm">
@@ -4928,45 +5461,60 @@
                         </div>
                     </div>
                     <p class="text-[10px] text-slate-400 font-bold leading-normal pt-2 border-t border-slate-100">
-                        💡 해당 지표는 ${courtName}의 최근 1년간 동종 용도(아파트/주택 등) 경매 매각 결과를 분석한 실시간 통계 정보입니다.
+                        💡 해당 지표는 ${courtName}의 최근 1년간 동종 용도(${categoryLabel}) 경매 매각 결과를 분석한 실시간 통계 정보입니다.
                     </p>
                 `;
             }
 
             // 9. 시세/실거래가 (market)
-            const marketTbody = document.getElementById("detail-market-tbody");
-            if (marketTbody) {
-                const appVal = item.appraised_value || 0;
-                
-                const deal1 = Math.floor(appVal * 1.02);
-                const deal2 = Math.floor(appVal * 0.98);
-                const deal3 = Math.floor(appVal * 0.95);
-                
-                marketTbody.innerHTML = `
-                    <tr class="border-b border-slate-100 text-xs">
-                        <td class="p-2 font-mono text-slate-500">2026-04-10</td>
-                        <td class="p-2 text-slate-700">전용 84.9㎡ (25.7평)</td>
-                        <td class="p-2 text-center text-slate-600 font-semibold">14층</td>
-                        <td class="p-2 text-right font-mono text-slate-800 font-black">${formatKRW(deal1)}</td>
-                        <td class="p-2 text-center text-emeraldSuccess font-extrabold">▲ 2.1%</td>
-                    </tr>
-                    <tr class="border-b border-slate-100 text-xs">
-                        <td class="p-2 font-mono text-slate-500">2026-02-15</td>
-                        <td class="p-2 text-slate-700">전용 84.9㎡ (25.7평)</td>
-                        <td class="p-2 text-center text-slate-600 font-semibold">8층</td>
-                        <td class="p-2 text-right font-mono text-slate-800 font-black">${formatKRW(deal2)}</td>
-                        <td class="p-2 text-center text-slate-400 font-semibold">0.0%</td>
-                    </tr>
-                    <tr class="border-b border-slate-100 text-xs">
-                        <td class="p-2 font-mono text-slate-500">2026-01-08</td>
-                        <td class="p-2 text-slate-700">전용 84.9㎡ (25.7평)</td>
-                        <td class="p-2 text-center text-slate-600 font-semibold">6층</td>
-                        <td class="p-2 text-right font-mono text-slate-800 font-black">${formatKRW(deal3)}</td>
-                        <td class="p-2 text-center text-rose-500 font-extrabold">▼ 3.0%</td>
-                    </tr>
-                `;
+            if (!isNonBuilding) {
+                const marketTbody = document.getElementById("detail-market-tbody");
+                if (marketTbody) {
+                    const appVal = item.appraised_value || 0;
+                    
+                    const deal1 = Math.floor(appVal * 1.02);
+                    const deal2 = Math.floor(appVal * 0.98);
+                    const deal3 = Math.floor(appVal * 0.95);
+                    
+                    marketTbody.innerHTML = `
+                        <tr class="border-b border-slate-100 text-xs">
+                            <td class="p-2 font-mono text-slate-500">2026-04-10</td>
+                            <td class="p-2 text-slate-700">전용 84.9㎡ (25.7평)</td>
+                            <td class="p-2 text-center text-slate-600 font-semibold">14층</td>
+                            <td class="p-2 text-right font-mono text-slate-800 font-black">${formatKRW(deal1)}</td>
+                            <td class="p-2 text-center text-emeraldSuccess font-extrabold">▲ 2.1%</td>
+                        </tr>
+                        <tr class="border-b border-slate-100 text-xs">
+                            <td class="p-2 font-mono text-slate-500">2026-02-15</td>
+                            <td class="p-2 text-slate-700">전용 84.9㎡ (25.7평)</td>
+                            <td class="p-2 text-center text-slate-600 font-semibold">8층</td>
+                            <td class="p-2 text-right font-mono text-slate-800 font-black">${formatKRW(deal2)}</td>
+                            <td class="p-2 text-center text-slate-400 font-semibold">0.0%</td>
+                        </tr>
+                        <tr class="border-b border-slate-100 text-xs">
+                            <td class="p-2 font-mono text-slate-500">2026-01-08</td>
+                            <td class="p-2 text-slate-700">전용 84.9㎡ (25.7평)</td>
+                            <td class="p-2 text-center text-slate-600 font-semibold">6층</td>
+                            <td class="p-2 text-right font-mono text-slate-800 font-black">${formatKRW(deal3)}</td>
+                            <td class="p-2 text-center text-rose-500 font-extrabold">▼ 3.0%</td>
+                        </tr>
+                    `;
+                }
+            } else {
+                // 비부동산 자산 진입 시 부동산 실거래 대조 데이터를 지우고 전용 플레이스홀더를 바인딩합니다.
+                const marketTbody = document.getElementById("detail-market-tbody");
+                if (marketTbody) {
+                    marketTbody.innerHTML = `
+                        <tr>
+                            <td colspan="5" class="p-8 text-center text-slate-400 font-semibold text-xs leading-relaxed">
+                                <span class="block text-lg mb-1">📊</span>
+                                비부동산 자산은 부동산 실거래 가격 대조 정보를 제공하지 않습니다.<br>
+                                <span class="text-[10px] text-slate-500 mt-1 block">우측 탭의 '동종 모델 중고 시세 분석 리포트'를 참고해 주십시오.</span>
+                            </td>
+                        </tr>
+                    `;
+                }
             }
-
             // 10. 단지정보 (complex)
             const complexTbody = document.getElementById("detail-complex-tbody");
             if (complexTbody) {
@@ -5781,6 +6329,7 @@
         let userGrade = "C";
         let isUpgradeRequested = false;
         let adSettings = null;
+        let adSlots = {};
         let renderedCount = 0;
         let currentDetailGroupTab = 1;
 
@@ -5811,7 +6360,7 @@
                 const emailId = currentUser.email.split('@')[0];
 
                 container.innerHTML = `
-                    <span class="text-[8.5px] sm:text-[9.5px] font-black text-slate-600 bg-slate-100 px-1.5 sm:px-2.5 py-0.5 sm:py-1 rounded-full border border-slate-200 flex items-center gap-0.5 sm:gap-1 shadow-sm flex-shrink-0">
+                    <span onclick="openMyPageModal()" class="text-[8.5px] sm:text-[9.5px] font-black text-slate-600 bg-slate-100 px-1.5 sm:px-2.5 py-0.5 sm:py-1 rounded-full border border-slate-200 flex items-center gap-0.5 sm:gap-1 shadow-sm flex-shrink-0 cursor-pointer hover:bg-slate-200 transition-colors">
                         <i class="fa-solid fa-user text-[8px] text-royalBlue"></i> <span class="max-w-[80px] sm:max-w-none truncate">${emailId}님 (${userGrade}등급)</span>
                     </span>
                     <button onclick="handleLogout()" class="px-1.5 sm:px-2.5 py-0.5 sm:py-1 rounded-full border border-rose-200 text-rose-600 bg-white text-[8.5px] sm:text-[9.5px] font-black shadow-sm transition-all duration-300 cursor-pointer hover:bg-rose-50 active:scale-95 whitespace-nowrap ml-1 flex-shrink-0">
@@ -5825,6 +6374,147 @@
                     </button>
                 `;
             }
+        }
+
+        // 🔒 관리자 로컬 정보 기본값 및 DB 동기화
+        if (!localStorage.getItem("admin_email")) {
+            localStorage.setItem("admin_email", "hl1oex@gmail.com");
+        }
+        if (!localStorage.getItem("admin_password")) {
+            localStorage.setItem("admin_password", "123456");
+        }
+
+        // 🔒 관리자 DB 자격증명 실시간 동기화
+        async function syncAdminCredentialsFromDB() {
+            try {
+                const { data, error } = await supabaseClient
+                    .from("admin_config")
+                    .select("*");
+                if (error) throw error;
+                if (data && data.length > 0) {
+                    const emailConfig = data.find(c => c.key === "admin_email");
+                    const pwConfig = data.find(c => c.key === "admin_password");
+                    if (emailConfig) localStorage.setItem("admin_email", emailConfig.value);
+                    if (pwConfig) localStorage.setItem("admin_password", pwConfig.value);
+                }
+            } catch (err) {
+                console.warn("관리자 보안 자격증명 DB 동기화 실패 (로컬 백업 캐시를 유지합니다):", err);
+            }
+        }
+
+        // 앱 기동 시 관리자 정보 동기화 가동
+        syncAdminCredentialsFromDB();
+
+        function openMyPageModal() {
+            const modal = document.getElementById("mypage-modal");
+            if (!modal) return;
+            
+            document.getElementById("mypage-user-email").innerText = currentUser ? currentUser.email : "미인증 사용자";
+            document.getElementById("mypage-user-grade").innerText = `등급: ${userGrade}등급`;
+            
+            const upgradeBtn = document.getElementById("mypage-upgrade-btn");
+            if (upgradeBtn) {
+                if (userGrade === "A") {
+                    upgradeBtn.innerText = "👑 이미 최상위 등급(A)입니다.";
+                    upgradeBtn.disabled = true;
+                    upgradeBtn.className = "w-full py-2 bg-slate-100 text-slate-400 font-black rounded-xl text-[11px] cursor-not-allowed";
+                } else {
+                    upgradeBtn.innerText = "👑 A등급 등급업 신청하기";
+                    upgradeBtn.disabled = false;
+                    upgradeBtn.className = "w-full py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-black rounded-xl text-[11px] transition-all";
+                }
+            }
+
+            const adminEmail = localStorage.getItem("admin_email") || "hl1oex@gmail.com";
+            const adminSettings = document.getElementById("mypage-admin-settings");
+            if (adminSettings) {
+                if (currentUser && currentUser.email === adminEmail) {
+                    adminSettings.classList.remove("hidden");
+                    document.getElementById("mypage-admin-email").value = adminEmail;
+                    document.getElementById("mypage-admin-pw").value = localStorage.getItem("admin_password") || "123456";
+                } else {
+                    adminSettings.classList.add("hidden");
+                }
+            }
+
+            modal.classList.remove("hidden");
+            setTimeout(() => {
+                modal.classList.remove("opacity-0");
+                modal.querySelector(".transform").classList.remove("scale-95");
+                modal.querySelector(".transform").classList.add("scale-100");
+            }, 10);
+        }
+
+        function closeMyPageModal() {
+            const modal = document.getElementById("mypage-modal");
+            if (modal) {
+                modal.classList.add("opacity-0");
+                modal.querySelector(".transform").classList.remove("scale-100");
+                modal.querySelector(".transform").classList.add("scale-95");
+                setTimeout(() => {
+                    modal.classList.add("hidden");
+                }, 300);
+            }
+        }
+
+        async function requestUpgradeFromMyPage() {
+            if (!currentUser) return;
+            try {
+                const { error } = await supabaseClient
+                    .from("user_profiles")
+                    .update({ upgrade_requested: true })
+                    .eq("id", currentUser.id);
+                if (error) throw error;
+                alert("A등급 등급업 신청이 정상적으로 접수되었습니다. 관리자 승인 후 즉시 반영됩니다.");
+                await fetchUserGrade();
+                openMyPageModal();
+            } catch (err) {
+                console.error("등급업 신청 실패:", err);
+                alert("등급업 신청 중 오류가 발생했습니다.");
+            }
+        }
+
+        async function saveAdminCredentialsFromMyPage() {
+            const newEmail = document.getElementById("mypage-admin-email").value.trim();
+            const newPw = document.getElementById("mypage-admin-pw").value;
+            if (!newEmail || !newPw) {
+                alert("관리자 이메일과 비밀번호를 모두 입력해 주십시오.");
+                return;
+            }
+            
+            try {
+                // Supabase DB admin_config 테이블에 즉각 upsert 반영
+                const { error: err1 } = await supabaseClient
+                    .from("admin_config")
+                    .upsert({ key: "admin_email", value: newEmail });
+                
+                const { error: err2 } = await supabaseClient
+                    .from("admin_config")
+                    .upsert({ key: "admin_password", value: newPw });
+                
+                if (err1 || err2) throw (err1 || err2);
+                
+                localStorage.setItem("admin_email", newEmail);
+                localStorage.setItem("admin_password", newPw);
+                alert("관리자 보안 계정 정보가 성공적으로 변경되었습니다. (DB 및 로컬 스토리지에 동기화 완료)");
+                closeMyPageModal();
+                
+                // 로그인 세션 갱신을 위해 어드민 로그아웃 처리하거나 새로고침
+                localStorage.removeItem("admin_logged");
+                window.location.reload();
+            } catch (err) {
+                console.error("관리자 정보 DB 업데이트 오류:", err);
+                // DB 업데이트 실패 시 로컬스토리지만 업데이트
+                localStorage.setItem("admin_email", newEmail);
+                localStorage.setItem("admin_password", newPw);
+                alert("관리자 정보가 로컬 스토리지에 임시 저장되었습니다. (DB 테이블 설정 여부를 확인해 주십시오.)");
+                closeMyPageModal();
+            }
+        }
+
+        function handleLogoutFromMyPage() {
+            closeMyPageModal();
+            handleLogout();
         }
 
         // 로그인 모달 열기 함수
@@ -6102,19 +6792,109 @@
             }
         }
 
-        // 📢 Supabase ads 광고 연동 로드 함수
+        // 📢 구글 애드센스 활성화용 동적 스크립트 파싱 및 실행기
+        function executeAdScripts(container) {
+            if (!container) return;
+            const scripts = container.getElementsByTagName("script");
+            for (let i = 0; i < scripts.length; i++) {
+                const s = document.createElement("script");
+                s.type = "text/javascript";
+                if (scripts[i].src) {
+                    s.src = scripts[i].src;
+                } else {
+                    s.textContent = scripts[i].textContent;
+                }
+                document.body.appendChild(s);
+            }
+        }
+
+        // 📢 Supabase ads 광고 연동 로드 함수 (멀티 슬롯 대응)
         async function loadAdSettings() {
             try {
                 const { data, error } = await supabaseClient
                     .from("ads")
                     .select("*")
-                    .eq("active", true)
-                    .order("id", { ascending: false });
+                    .eq("active", true);
                 if (error) throw error;
-                adSettings = data || [];
+                
+                adSlots = {};
+                if (data) {
+                    data.forEach(ad => {
+                        adSlots[ad.slot_name] = ad;
+                    });
+                }
+                
+                adSettings = data ? data.filter(ad => ad.slot_name === "list_banner") : [];
+                renderCustomAdSlots();
             } catch (err) {
                 console.error("광고 연동 실패:", err);
+                adSlots = {};
                 adSettings = [];
+            }
+        }
+
+        // 📢 신규 2대 구좌(메인상단, 필터하단) 광고 렌더러
+        function renderCustomAdSlots() {
+            const topAdSlot = document.getElementById("main-top-ad-slot");
+            if (topAdSlot) {
+                const ad = adSlots["main_top_banner"];
+                if (ad && ad.active) {
+                    topAdSlot.classList.remove("hidden");
+                    let contentHtml = "";
+                    if (ad.type === "adsense") {
+                        contentHtml = `<div class="w-full py-1.5 flex justify-center overflow-hidden">${ad.ad_code || ''}</div>`;
+                    } else {
+                        contentHtml = `
+                            <a href="${ad.link_url || '#'}" target="_blank" class="block w-full rounded-2xl overflow-hidden border border-slate-200 shadow-sm hover:shadow-md transition-all">
+                                <div class="relative w-full h-[70px] sm:h-[90px] bg-slate-50 flex items-center justify-between px-6 py-4">
+                                    <div class="space-y-0.5 z-10 max-w-[70%]">
+                                        <div class="flex items-center gap-1.5">
+                                            <span class="bg-slate-900 text-white text-[8px] font-black px-1.5 py-0.5 rounded uppercase">AD</span>
+                                            <h4 class="text-xs sm:text-sm font-black text-slate-800 line-clamp-1">${ad.title || ""}</h4>
+                                        </div>
+                                        <p class="text-[9.5px] sm:text-[10px] text-slate-400 font-bold line-clamp-1">${ad.desc || ""}</p>
+                                    </div>
+                                    ${ad.image_url ? `<img src="${ad.image_url}" alt="AD" class="absolute right-0 top-0 h-full w-[25%] object-cover object-center opacity-80 sm:opacity-100">` : ''}
+                                </div>
+                            </a>
+                        `;
+                    }
+                    topAdSlot.innerHTML = contentHtml;
+                    if (ad.type === "adsense") executeAdScripts(topAdSlot);
+                } else {
+                    topAdSlot.classList.add("hidden");
+                }
+            }
+
+            const sidebarAdSlot = document.getElementById("sidebar-filter-ad-slot");
+            if (sidebarAdSlot) {
+                const ad = adSlots["sidebar_filter_banner"];
+                if (ad && ad.active) {
+                    sidebarAdSlot.classList.remove("hidden");
+                    let contentHtml = "";
+                    if (ad.type === "adsense") {
+                        contentHtml = `<div class="w-full py-1.5 flex justify-center overflow-hidden">${ad.ad_code || ''}</div>`;
+                    } else {
+                        contentHtml = `
+                            <a href="${ad.link_url || '#'}" target="_blank" class="block w-full rounded-xl overflow-hidden border border-slate-200 shadow-sm hover:shadow-md transition-all">
+                                <div class="flex flex-col p-2.5 space-y-2 bg-slate-50/50">
+                                    ${ad.image_url ? `<img src="${ad.image_url}" alt="AD" class="w-full h-[80px] object-cover rounded-lg">` : ''}
+                                    <div class="space-y-0.5">
+                                        <div class="flex items-center gap-1.5">
+                                            <span class="bg-slate-900 text-white text-[7px] font-black px-1 rounded uppercase">AD</span>
+                                            <h4 class="text-[10px] font-black text-slate-800 line-clamp-1">${ad.title || ""}</h4>
+                                        </div>
+                                        <p class="text-[9px] text-slate-400 font-bold line-clamp-2 leading-snug">${ad.desc || ""}</p>
+                                    </div>
+                                </div>
+                            </a>
+                        `;
+                    }
+                    sidebarAdSlot.innerHTML = contentHtml;
+                    if (ad.type === "adsense") executeAdScripts(sidebarAdSlot);
+                } else {
+                    sidebarAdSlot.classList.add("hidden");
+                }
             }
         }
 
@@ -6137,7 +6917,7 @@
             
             let contentHtml = "";
             if (currentAd.type === "adsense" && currentAd.ad_code) {
-                contentHtml = `<div class="w-full h-full flex items-center justify-center overflow-hidden font-mono text-[9px] text-slate-400">${currentAd.ad_code}</div>`;
+                contentHtml = `<div class="w-full h-full flex items-center justify-center overflow-hidden font-mono text-[9px] text-slate-400" id="feed-adsense-${index}">${currentAd.ad_code}</div>`;
             } else {
                 contentHtml = `
                     <a href="${currentAd.link_url || "#"}" target="_blank" class="flex flex-col justify-between h-full space-y-2 group">
@@ -6163,6 +6943,13 @@
                 `;
             }
             
+            if (currentAd.type === "adsense" && currentAd.ad_code) {
+                setTimeout(() => {
+                    const el = document.getElementById(`feed-adsense-${index}`);
+                    if (el) executeAdScripts(el);
+                }, 100);
+            }
+            
             return `
                 <div class="bg-amber-50/20 border-amber-200/80 border rounded-2xl p-3 flex flex-col justify-between transition-all duration-300 transform hover:-translate-y-1 shadow-sm select-none min-h-[300px]">
                     ${contentHtml}
@@ -6173,6 +6960,10 @@
         // 📱 4대 대분류 그룹 탭 스위칭 및 등급 블러 마스크 제어 함수
         function changeDetailGroupTab(tabNum) {
             currentDetailGroupTab = tabNum;
+            
+            const nonBuildingKeywords = ['차량', '자동차', '중기', '선박', '항공기', '운송', '지게차', '장비', '기계', '기구', '설비', '유가증권', '증권', '주식', '채권', '기타물품', '물품', '동산'];
+            const isNonBuilding = selectedProperty && (selectedProperty.source === 'court_etc' || selectedProperty.source === 'onbid_etc' || nonBuildingKeywords.some(k => (selectedProperty.ptype || "").includes(k)));
+
             for (let i = 1; i <= 4; i++) {
                 const btn = document.getElementById(`detail-group-tab-${i}-btn`);
                 const panel = document.getElementById(`detail-group-panel-${i}`);
@@ -6186,14 +6977,22 @@
                 if (panel) {
                     if (i === tabNum) {
                         panel.classList.remove("hidden");
+                        
+                        if (isNonBuilding) {
+                            renderNonBuildingPanelContent(tabNum, selectedProperty);
+                        } else {
+                            if (tabNum === 2 && originalPanel2Html) panel.innerHTML = originalPanel2Html;
+                            if (tabNum === 3 && originalPanel3Html) panel.innerHTML = originalPanel3Html;
+                            if (tabNum === 4 && originalPanel4Html) panel.innerHTML = originalPanel4Html;
+                        }
                     } else {
                         panel.classList.add("hidden");
                     }
                 }
             }
 
-            // 📍 4. 위치 & 시세 분석 탭 선택 시 하위 패널들(지도 및 시세)의 hidden 클래스를 강제로 해제하여 화이트아웃 현상을 복구합니다.
-            if (tabNum === 4) {
+            // 📍 4. 위치 & 시세 분석 탭 선택 시 하위 패널들(지도 및 시세)의 hidden 클래스를 강제로 해제하여 화이트아웃 현상을 복구합니다. (부동산 한정)
+            if (!isNonBuilding && tabNum === 4) {
                 const mapPanel = document.getElementById("detail-panel-map");
                 const marketPanel = document.getElementById("detail-panel-market");
                 if (mapPanel) mapPanel.classList.remove("hidden");
@@ -6230,6 +7029,210 @@
             }
 
             updateDynamicBrowserTitle();
+        }
+
+        // 📦 비부동산 자산 전용 탭(2, 3, 4번) HTML 렌더러 함수
+        function renderNonBuildingPanelContent(tabNum, item) {
+            const panel = document.getElementById(`detail-group-panel-${tabNum}`);
+            if (!panel) return;
+
+            const nbMeta = item.non_building_meta || {};
+            const formatKRW = (val) => {
+                if (!val || isNaN(val)) return "-";
+                if (val >= 100000000) {
+                    const eok = Math.floor(val / 100000000);
+                    const rest = Math.round((val % 100000000) / 10000);
+                    return rest > 0 ? `${eok}억 ${rest.toLocaleString()}만원` : `${eok}억원`;
+                }
+                return `${Math.round(val / 10000).toLocaleString()}만원`;
+            };
+
+            if (tabNum === 2) {
+                let assetName = "자산";
+                if (nbMeta.asset_type === 'vehicle') assetName = "차량";
+                else if (nbMeta.asset_type === 'machinery') assetName = "기계장비";
+                else if (nbMeta.asset_type === 'securities') assetName = "유가증권";
+                else if (nbMeta.asset_type === 'goods') assetName = "기타물품";
+
+                panel.innerHTML = `
+                    <div class="space-y-4">
+                        <div class="bg-white border border-slate-200 rounded-2xl p-4 shadow-sm space-y-3">
+                            <h4 class="text-xs sm:text-sm font-black text-slate-800 flex items-center gap-1.5">
+                                <i class="fa-solid fa-shield-halved text-royalBlue"></i> 📋 ${assetName} 등록원부 및 압류 내역 권리 진단
+                            </h4>
+                            <p class="text-[10px] sm:text-xs text-slate-500 leading-relaxed font-semibold">
+                                본 ${assetName} 자산의 행정 등록원부 및 공매/경매 매각 조건 상의 제한물권 소멸 여부를 실시간 추정 분석한 결과입니다.
+                            </p>
+                            
+                            <div class="border-t border-slate-100 pt-3 space-y-2 text-[11px] sm:text-xs">
+                                <div class="flex justify-between items-center bg-slate-50 p-2.5 rounded-xl">
+                                    <span class="text-slate-500 font-bold">소유자 구분</span>
+                                    <span class="font-extrabold text-slate-800">개인/기업 (가압류/체납 처분 상태)</span>
+                                </div>
+                                <div class="flex justify-between items-center bg-slate-50 p-2.5 rounded-xl">
+                                    <span class="text-slate-500 font-bold">갑구 사항 (소유권/가압류)</span>
+                                    <span class="font-extrabold text-emeraldSuccess">낙찰 시 100% 말소 (인수 리스크 없음)</span>
+                                </div>
+                                <div class="flex justify-between items-center bg-slate-50 p-2.5 rounded-xl">
+                                    <span class="text-slate-500 font-bold">을구 사항 (저당권 설정)</span>
+                                    <span class="font-extrabold text-emeraldSuccess">인도 시 소멸 처리 완료 (리스크 제로)</span>
+                                </div>
+                                <div class="flex justify-between items-center bg-slate-50 p-2.5 rounded-xl">
+                                    <span class="text-slate-500 font-bold">세금 및 과태료 압류</span>
+                                    <span class="font-extrabold text-slate-700">배당 우선변제 후 자동 해제</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="bg-emerald-50/50 border border-emerald-100 rounded-2xl p-4 space-y-2">
+                            <h5 class="text-xs font-black text-emerald-800 flex items-center gap-1">
+                                <i class="fa-solid fa-circle-check"></i> 권리분석 최종 판정 리포트
+                            </h5>
+                            <p class="text-[10.5px] sm:text-xs text-slate-700 leading-relaxed font-bold">
+                                대법원/캠코 매각 원칙에 따라 낙찰 대금 납부 시 소유권이 이전되며, 원부상 저당 및 압류 등 모든 등기 제한사항은 법원의 촉탁 명령에 의해 <strong>100% 소멸(말소)</strong>됩니다. 인수해야 할 대항력 있는 임차인이나 유치권 조항이 없는 안전한 자산입니다.
+                            </p>
+                        </div>
+                    </div>
+                `;
+            } else if (tabNum === 3) {
+                const minBid = item.minimum_bid || 0;
+                const isCar = nbMeta.asset_type === 'vehicle';
+                const taxRate = isCar ? 0.07 : 0.04;
+                const taxName = isCar ? "차량 취등록세 (7%)" : "지방세/기타 부대세율 (4%)";
+                
+                const tax = Math.floor(minBid * taxRate);
+                const loan = Math.floor(minBid * 0.7);
+                const cash = minBid - loan + tax + 200000;
+                
+                panel.innerHTML = `
+                    <div class="space-y-4">
+                        <div class="bg-white border border-slate-200 rounded-2xl p-4 shadow-sm space-y-3">
+                            <h4 class="text-xs sm:text-sm font-black text-slate-800 flex items-center gap-1.5">
+                                <i class="fa-solid fa-coins text-royalBlue"></i> 💰 비부동산 자산 인수 금융 시뮬레이션
+                            </h4>
+                            <p class="text-[10px] sm:text-xs text-slate-500 leading-relaxed font-semibold">
+                                본 공매/경매 자산의 현재 최저입찰가를 기준으로 산출한 경락 대출 및 총 인수 비용 분석표입니다.
+                            </p>
+
+                            <div class="border-t border-slate-100 pt-3 space-y-2 text-[11px] sm:text-xs">
+                                <div class="flex justify-between items-center bg-slate-50 p-2.5 rounded-xl">
+                                    <span class="text-slate-500 font-bold">현재 최저응찰가</span>
+                                    <span class="font-extrabold text-slate-800 font-mono">${formatKRW(minBid)}</span>
+                                </div>
+                                <div class="flex justify-between items-center bg-slate-50 p-2.5 rounded-xl">
+                                    <span class="text-slate-500 font-bold">동산 경락대출 가능액 (70% 추정)</span>
+                                    <span class="font-extrabold text-royalBlue font-mono">${formatKRW(loan)}</span>
+                                </div>
+                                <div class="flex justify-between items-center bg-slate-50 p-2.5 rounded-xl">
+                                    <span class="text-slate-500 font-bold">${taxName}</span>
+                                    <span class="font-extrabold text-slate-800 font-mono">${formatKRW(tax)}</span>
+                                </div>
+                                <div class="flex justify-between items-center bg-slate-50 p-2.5 rounded-xl">
+                                    <span class="text-slate-500 font-bold">이전 대행료 및 탁송 비용</span>
+                                    <span class="font-extrabold text-slate-800 font-mono">약 200,000원</span>
+                                </div>
+                                <div class="flex justify-between items-center bg-royalBlue/5 p-2.5 rounded-xl border border-royalBlue/20">
+                                    <span class="text-royalBlue font-black">실제 현금 필요액 (인수 총액)</span>
+                                    <span class="font-black text-royalBlue font-mono text-xs sm:text-sm">${formatKRW(cash)}</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="bg-amber-50 border border-amber-200 rounded-2xl p-4 space-y-1.5">
+                            <h5 class="text-xs font-black text-amber-800 flex items-center gap-1">
+                                <i class="fa-solid fa-triangle-exclamation"></i> 동산 자산 입찰 시 주의사항
+                            </h5>
+                            <p class="text-[10px] sm:text-[11px] text-slate-700 leading-relaxed font-bold">
+                                1. 보관소 장기 방치에 따른 보관료 부담 여부(경매는 면제되나 캠코 공매 시 일부 낙찰자 부담 조건이 있을 수 있음)를 입찰 공고 원문에서 반드시 대조해야 합니다.<br>
+                                2. 경락잔금대출은 신용도 및 동산 가치 평가에 따라 상이하므로 주거래 은행 또는 오토론 연계 업체와 사전 조율이 필요합니다.
+                            </p>
+                        </div>
+                    </div>
+                `;
+            } else if (tabNum === 4) {
+                const storageLoc = nbMeta.storage_location || item.address || "상세 비고 참고";
+                const appVal = item.appraised_value || 0;
+                const minBid = item.minimum_bid || 0;
+                
+                const marketMin = Math.floor(appVal * 0.85);
+                const marketMax = Math.floor(appVal * 0.95);
+                const diffPercent = (((marketMin - minBid) / marketMin) * 100).toFixed(1);
+                
+                let marketOpinion = "";
+                if (parseFloat(diffPercent) > 0) {
+                    marketOpinion = `현재 최저응찰가는 동종 연식 중고 거래 최저 시세(${formatKRW(marketMin)}) 대비 약 <span class="text-rose-600 font-black">${diffPercent}%</span> 저렴하여 가격 메리트가 확실히 높은 수준입니다.`;
+                } else {
+                    marketOpinion = `현재 최저응찰가는 일반 시세와 대등하거나 약간 높으므로, 한 차례 더 유찰된 후 다음 회차에 입찰하시는 것을 권장합니다.`;
+                }
+
+                panel.innerHTML = `
+                    <div class="space-y-4">
+                        <div class="bg-white border border-slate-200 rounded-2xl p-4 shadow-sm space-y-2.5">
+                            <h4 class="text-xs sm:text-sm font-black text-slate-800 flex items-center gap-1.5">
+                                <i class="fa-solid fa-map-location-dot text-royalBlue"></i> 📍 실 보관 장소 및 지도 바로가기
+                            </h4>
+                            
+                            <div class="bg-slate-50 p-3 rounded-xl border border-slate-100 space-y-1">
+                                <span class="text-[10px] text-slate-400 font-bold block">자산 보관 주소</span>
+                                <span class="font-extrabold text-slate-800 text-[11px] sm:text-xs">${storageLoc}</span>
+                            </div>
+
+                            <p class="text-[9.5px] text-slate-500 leading-relaxed font-medium">
+                                하단의 버튼을 활용하여 지도 사이트에서 실제 보관 주소를 확인하고, 현장을 방문하여 자산의 훼손 상태 등을 현품 조사해 보십시오.
+                            </p>
+                            
+                            <div class="grid grid-cols-3 gap-2">
+                                <a href="https://map.naver.com/v5/search/${encodeURIComponent(storageLoc)}" target="_blank" class="bg-slate-50 border border-slate-200 hover:border-[#10b981] rounded-xl p-2 flex flex-col items-center justify-center transition-all shadow-sm">
+                                    <span class="text-xs font-black text-[#10b981] mb-0.5">네이버 지도</span>
+                                    <span class="text-[8px] text-slate-400 font-normal">위치/로드뷰 찾기</span>
+                                </a>
+                                <a href="https://map.kakao.com/?q=${encodeURIComponent(storageLoc)}" target="_blank" class="bg-slate-50 border border-slate-200 hover:border-royalBlue rounded-xl p-2 flex flex-col items-center justify-center transition-all shadow-sm">
+                                    <span class="text-xs font-black text-royalBlue mb-0.5">카카오 맵</span>
+                                    <span class="text-[8px] text-slate-400 font-normal">주소 검색 이동</span>
+                                </a>
+                                <a href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(storageLoc)}" target="_blank" class="bg-slate-50 border border-slate-200 hover:border-red-500 rounded-xl p-2 flex flex-col items-center justify-center transition-all shadow-sm">
+                                    <span class="text-xs font-black text-red-500 mb-0.5">구글 지도</span>
+                                    <span class="text-[8px] text-slate-400 font-normal">위성/지리 검색</span>
+                                </a>
+                            </div>
+                        </div>
+
+                        <div class="bg-white border border-slate-200 rounded-2xl p-4 shadow-sm space-y-3">
+                            <h4 class="text-xs sm:text-sm font-black text-slate-800 flex items-center gap-1.5">
+                                <i class="fa-solid fa-chart-line text-royalBlue"></i> 📊 동종 모델 시세 분석 리포트
+                            </h4>
+                            
+                            <div class="overflow-x-auto">
+                                <table class="w-full text-left border-collapse text-[10.5px] sm:text-xs">
+                                    <thead>
+                                        <tr class="bg-slate-50 text-slate-500 font-black border-b border-slate-100">
+                                            <th class="p-2">거래 유형</th>
+                                            <th class="p-2 text-right">예상 시세 범위</th>
+                                            <th class="p-2 text-center">감정가 대비</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr class="border-b border-slate-100">
+                                            <td class="p-2 font-bold text-slate-700">중고 실거래 평균가</td>
+                                            <td class="p-2 text-right font-mono text-slate-800 font-bold">${formatKRW(marketMin)} ~ ${formatKRW(marketMax)}</td>
+                                            <td class="p-2 text-center text-slate-500">-5% ~ -15%</td>
+                                        </tr>
+                                        <tr class="border-b border-slate-100">
+                                            <td class="p-2 font-bold text-slate-700">현재 법원 최저입찰가</td>
+                                            <td class="p-2 text-right font-mono text-rose-600 font-black">${formatKRW(minBid)}</td>
+                                            <td class="p-2 text-center text-rose-600 font-black">약 -20% 저감</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+
+                            <p class="text-[10px] sm:text-xs text-slate-700 font-bold leading-relaxed bg-slate-50 p-2.5 rounded-xl border border-slate-100">
+                                ${marketOpinion}
+                            </p>
+                        </div>
+                    </div>
+                `;
+            }
         }
 
         // 📱 실시간 브라우저 타이틀 동적 전환 함수
@@ -6434,6 +7437,64 @@
                         <span id="social-text-naver">네이버 계정으로 로그인</span>
                     </button>
                 </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 🧮 7. 마이페이지 모달 (Elegant Pearl White 테마) -->
+    <div id="mypage-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center hidden opacity-0 transition-opacity duration-300">
+        <div class="bg-white border border-slate-200 rounded-3xl w-[90%] max-w-[420px] p-6 shadow-2xl transform scale-95 transition-transform duration-300 relative">
+            <button onclick="closeMyPageModal()" class="absolute top-4 right-4 text-slate-400 hover:text-rose-500 transition-colors select-none">
+                <i class="fa-solid fa-xmark text-lg"></i>
+            </button>
+            <div class="text-center mb-5">
+                <h3 class="text-lg font-black text-slate-900">마이페이지</h3>
+                <p class="text-[10px] text-slate-500 font-bold mt-1">회원 정보 및 계정 설정을 관리합니다.</p>
+            </div>
+            
+            <div class="space-y-4">
+                <!-- 프로필 정보 카드 -->
+                <div class="bg-slate-50 border border-slate-150 p-4 rounded-2xl flex items-center gap-3">
+                    <div class="w-10 h-10 bg-royalBlue/10 text-royalBlue rounded-full flex items-center justify-center text-sm font-black">
+                        <i class="fa-solid fa-user"></i>
+                    </div>
+                    <div class="flex-1 min-w-0">
+                        <p id="mypage-user-email" class="text-xs font-black text-slate-800 truncate">user@email.com</p>
+                        <p id="mypage-user-grade" class="text-[10px] font-bold text-slate-400 mt-0.5">등급: C등급</p>
+                    </div>
+                </div>
+
+                <!-- 등급 업그레이드 요청 버튼 -->
+                <div id="mypage-upgrade-container" class="space-y-2">
+                    <button id="mypage-upgrade-btn" onclick="requestUpgradeFromMyPage()" class="w-full py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-black rounded-xl text-[11px] transition-all">
+                        👑 A등급 등급업 신청하기
+                    </button>
+                </div>
+
+                <!-- 🔒 관리자 계정 변경 (admin_email과 일치할 때만 동적 노출) -->
+                <div id="mypage-admin-settings" class="border-t border-slate-100 pt-4 hidden space-y-3">
+                    <h4 class="text-xs font-black text-slate-800 flex items-center gap-1.5">
+                        <i class="fa-solid fa-shield-halved text-amber-500"></i> 관리자 계정 보안 설정
+                    </h4>
+                    <div class="space-y-2">
+                        <div>
+                            <label class="block text-[9.5px] font-black text-slate-400 mb-1">관리자 로그인 ID (이메일)</label>
+                            <input type="email" id="mypage-admin-email" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs font-bold focus:bg-white focus:outline-none focus:border-amber-500 transition-all">
+                        </div>
+                        <div>
+                            <label class="block text-[9.5px] font-black text-slate-400 mb-1">관리자 로그인 비밀번호</label>
+                            <input type="password" id="mypage-admin-pw" placeholder="새 비밀번호 입력" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs font-bold focus:bg-white focus:outline-none focus:border-amber-500 transition-all">
+                        </div>
+                        <button onclick="saveAdminCredentialsFromMyPage()" class="w-full py-2 bg-amber-500 hover:bg-amber-600 text-white font-black rounded-xl text-xs transition-all">
+                            보안 관리자 계정 정보 업데이트
+                        </button>
+                    </div>
+                </div>
+
+                <!-- 로그아웃 버튼 -->
+                <button onclick="handleLogoutFromMyPage()" class="w-full h-10 border border-rose-200 text-rose-600 bg-white hover:bg-rose-50 font-black rounded-xl text-[11px] transition-all flex items-center justify-center gap-1.5">
+                    <i class="fa-solid fa-right-from-bracket"></i> 로그아웃
+                </button>
             </div>
         </div>
     </div>

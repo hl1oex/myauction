@@ -251,6 +251,73 @@ def clean_address(address):
     address = re.sub(r'\[상세내역\]|\[상세\]', '', address).strip()
     return address
 
+def extract_non_building_meta(text, ptype=""):
+    """제목 및 설명 내용 텍스트로부터 차량/기계장비/유가증권/기타물품의 실속성 정보를 정교하게 파싱합니다."""
+    meta = {}
+    if not text:
+        return meta
+        
+    p_clean = (ptype or "").lower()
+    text_clean = text.replace("\n", " ").replace("  ", " ").strip()
+    
+    # 1. 차량/운송장비 분석 (자동차, 중기, 차량, 선박, 항공기 등)
+    if any(k in p_clean for k in ["차량", "자동차", "중기", "선박", "항공기", "운송"]):
+        meta["asset_type"] = "vehicle"
+        year_match = re.search(r'(?:연식|제작년도|제작연도)\s*:\s*(\d{4})|(\d{4})\s*년식|(\d{4})\s*년\s*형', text_clean)
+        if year_match:
+            meta["model_year"] = f"{year_match.group(1) or year_match.group(2) or year_match.group(3)}년식"
+            
+        mileage_match = re.search(r'(?:주행거리|주행)\s*:\s*([\d,]+)\s*(?:km|키로)?|([\d,]+)\s*(?:km|키로)\b', text_clean)
+        if mileage_match:
+            meta["mileage"] = f"{mileage_match.group(1) or mileage_match.group(2)} km"
+            
+        no_match = re.search(r'(?:등록번호|차량번호|차대번호)\s*:\s*([가-힣\d\w\s\-]+?)(?:\s|$|,|\||\()', text_clean)
+        if no_match:
+            meta["vehicle_no"] = no_match.group(1).strip()
+            
+        name_match = re.search(r'(?:차명|모델명)\s*:\s*([가-힣\d\w\s\-]+?)(?:\s|$|,|\||\()', text_clean)
+        if name_match:
+            meta["model_name"] = name_match.group(1).strip()
+
+    # 2. 기계장비 분석 (기계, 기구, 설비 등)
+    elif any(k in p_clean for k in ["기계", "기구", "설비", "장비"]):
+        meta["asset_type"] = "machinery"
+        spec_match = re.search(r'(?:규격|형식|성능)\s*:\s*([가-힣\w\s\-\(\)\/,.]+?)(?:\s\s|$|,|\|)', text_clean)
+        if spec_match:
+            meta["specification"] = spec_match.group(1).strip()
+            
+        maker_match = re.search(r'(?:제조사|제작사|제조국)\s*:\s*([가-힣\w\s\-]+?)(?:\s|$|,|\|)', text_clean)
+        if maker_match:
+            meta["manufacturer"] = maker_match.group(1).strip()
+            
+        qty_match = re.search(r'(?:수량|수량\s*:\s*)(\d+)\s*(?:대|세트|개|조)', text_clean)
+        if qty_match:
+            meta["quantity"] = f"{qty_match.group(1)}대"
+
+    # 3. 유가증권 분석 (주식, 증권 등)
+    elif any(k in p_clean for k in ["주식", "증권", "채권", "출자"]):
+        meta["asset_type"] = "securities"
+        qty_match = re.search(r'([\d,]+)\s*주\b|주식\s*수량\s*:\s*([\d,]+)', text_clean)
+        if qty_match:
+            meta["quantity"] = f"{qty_match.group(1) or qty_match.group(2)}주"
+            
+        company_match = re.search(r'([가-힣\w\s]+(?:주식회사|제약|테크|홀딩스|바이오|건설|정밀|산업))', text_clean)
+        if company_match:
+            meta["company_name"] = company_match.group(1).strip()
+
+    # 4. 기타물품 분석 (물품, 동산 등)
+    else:
+        meta["asset_type"] = "goods"
+        qty_match = re.search(r'(?:수량|개수)\s*:\s*([\d,]+)\s*([가-힣]+)|([\d,]+)\s*(?:개|세트|박스|톤)\b', text_clean)
+        if qty_match:
+            meta["quantity"] = f"{qty_match.group(1) or qty_match.group(3)}개"
+            
+        loc_match = re.search(r'(?:보관장소|보관지|소재지)\s*:\s*([가-힣\w\s\-]+?)(?:\s\s|$|,|\|)', text_clean)
+        if loc_match:
+            meta["storage_location"] = loc_match.group(1).strip()
+            
+    return meta
+
 # 시도/구 단위 대략적인 토지 ㎡당 평균 단가 (감정가 대비 역산용)
 LAND_UNIT_PRICES = {
     "서울": 4500000,      # 평당 약 1500만원
@@ -1092,6 +1159,11 @@ def scrape_court_data():
                                 {"deal_date": "2025-11", "deal_price": int(base_deal * 0.95), "floor": 18 - (addr_hash % 8)}
                             ]
 
+                        non_building_meta = {}
+                        if is_etc_asset:
+                            parse_target_text = f"{cs_no} {address} {desc} {notes}"
+                            non_building_meta = extract_non_building_meta(parse_target_text, ptype)
+
                         area_meta = {
                             "exclusive_area": ex_area,
                             "supply_area": su_area,
@@ -1107,7 +1179,8 @@ def scrape_court_data():
                             "exclusive_area_estimation_type": excl_est_type,
                             "building_total_floors": total_floors,
                             "building_total_area": total_area,
-                            "floor_areas": floor_areas
+                            "floor_areas": floor_areas,
+                            "non_building_meta": non_building_meta
                         }
                         meta_json = json.dumps(area_meta, ensure_ascii=False)
                         final_notes = notes or "검출된 법적 리스크 권리 인수 특이사항이 없습니다."

@@ -1,0 +1,710 @@
+﻿diff --git a/mobile-app/src/screens/DetailScreen.tsx b/mobile-app/src/screens/DetailScreen.tsx
+index 095c323..aba8144 100644
+--- a/mobile-app/src/screens/DetailScreen.tsx
++++ b/mobile-app/src/screens/DetailScreen.tsx
+@@ -78,6 +78,180 @@ const maskName = (name: string | undefined) => {
+   return clean[0] + "??.repeat(Math.max(1, clean.length - 1));
+ };
+ 
++const extractNonBuildingMetaMobile = (text: string, ptype: string) => {
++  const meta: any = {};
++  if (!text) return meta;
++  const p_clean = (ptype || "").toLowerCase();
++  const text_clean = text.replace(/\n/g, " ").replace(/\s\s+/g, " ").trim();
++  
++  const isVehicle = p_clean.includes("李⑤웾") || p_clean.includes("?먮룞李?) || p_clean.includes("以묎린") || p_clean.includes("?좊컯") || p_clean.includes("??났湲?) || p_clean.includes("?댁넚") || p_clean.includes("吏寃뚯감") || p_clean.includes("?λ퉬");
++  
++  // 怨듬갚?대굹 ?뺣젹???욎씤 ?띿뒪?몄뿉??媛???ぉ???뺣??섍쾶 異붿텧?섍린 ?꾪빐 ?ㅼ쨷 ?ㅼ썙??留듭쓣 ?좎뼵?⑸땲??
++  const keywordsMap: Record<string, string[]> = {
++    base_location: ['?ъ슜蹂멸굅吏', '?ъ슜 蹂멸굅吏', '蹂멸굅吏'],
++    vehicle_no: ['?깅줉踰덊샇', '李⑤웾?깅줉踰덊샇', '李⑤웾踰덊샇', '?깅줉 踰덊샇'],
++    model_name: ['李⑤챸', '紐⑤뜽紐?, '李?紐?, '紐⑤뜽 紐?],
++    model_year: ['?곗떇', '????, '?쒖옉?꾨룄', '?쒖옉?곕룄', '?쒖옉 ?꾨룄', '?쒖옉 ?곕룄', '????'],
++    vehicle_type: ['李⑥쥌', '李?醫?],
++    vin: ['李⑤?踰덊샇', '李⑤? 踰덊샇'],
++    engine_type: ['?먮룞湲고삎??, '?먮룞湲??뺤떇', '?먮룞湲?],
++    storage_location: ['蹂닿??μ냼', '蹂닿? ?μ냼', '蹂닿?吏', '?뚯옱吏', '蹂닿?'],
++    spec_no: ['?쒖썝愿由щ쾲??, '?쒖썝 愿由щ쾲??, '愿由щ쾲??, '?쒖썝踰덊샇'],
++    fuel: ['?곕즺', '??猷?],
++    displacement: ['諛곌린??, '諛곌린 ??],
++    color: ['?됱긽', '????]
++  };
++
++  const matches: { key: string; alias: string; start: number; end: number }[] = [];
++  for (const [key, aliases] of Object.entries(keywordsMap)) {
++    for (const alias of aliases) {
++      // ?ㅼ썙???ㅼ뿉 肄쒕줎???댁뼱吏???⑦꽩??李얠븘 ?뺥솗???쒖옉怨????ㅽ봽?뗭쓣 援ы빀?덈떎.
++      const regexStr = alias.replace(/\s+/g, "\\s*") + "\\s*:\\s*";
++      const regex = new RegExp(regexStr, "gi");
++      let match;
++      while ((match = regex.exec(text_clean)) !== null) {
++        matches.push({
++          key: key,
++          alias: alias,
++          start: match.index,
++          end: regex.lastIndex
++        });
++      }
++    }
++  }
++
++  // ?몃뜳???ㅻ쾭?⑹쓣 諛⑹??섍린 ?꾪빐 ?뺣젹 ??以묐났 留ㅼ묶???꾪꽣留곹빀?덈떎.
++  matches.sort((a, b) => a.start - b.start);
++  const filteredMatches: typeof matches = [];
++  let lastEnd = -1;
++  for (const m of matches) {
++    if (m.start >= lastEnd) {
++      filteredMatches.push(m);
++      lastEnd = m.end;
++    }
++  }
++
++  // 留ㅼ묶 ?뺣낫 媛꾩쓽 ?띿뒪???щ씪?댁떛???듯빐 媛믪쓣 寃곗젙?⑸땲??
++  const parsed: Record<string, string> = {};
++  for (let i = 0; i < filteredMatches.length; i++) {
++    const current = filteredMatches[i];
++    const next = filteredMatches[i + 1];
++    const valueStart = current.end;
++    const valueEnd = next ? next.start : text_clean.length;
++    let value = text_clean.substring(valueStart, valueEnd).trim();
++    // ?띿뒪??寃쎄퀎???⑥? 湲고샇?ㅼ쓣 ?뺤젣?⑸땲??
++    value = value.replace(/^[,\s:|#;]+|[,\s:|#;]+$/g, "").trim();
++    parsed[current.key] = value;
++  }
++
++  if (isVehicle) {
++    meta.asset_type = "vehicle";
++    
++    // 異붿텧???뺣낫瑜?媛앹껜??留듯븨?⑸땲??
++    meta.model_year = parsed.model_year ? (parsed.model_year.includes("??) ? parsed.model_year : parsed.model_year + "?꾩떇") : null;
++    meta.mileage = parsed.displacement && parsed.displacement.includes("km") ? parsed.displacement : (parsed.mileage ? (parsed.mileage.includes("km") ? parsed.mileage : parsed.mileage + " km") : null);
++    meta.vehicle_no = parsed.vehicle_no || null;
++    meta.model_name = parsed.model_name || null;
++    meta.vehicle_type = parsed.vehicle_type || null;
++    meta.vin = parsed.vin || null;
++    meta.engine_type = parsed.engine_type || null;
++    meta.storage_location = parsed.storage_location || null;
++    meta.base_location = parsed.base_location || null;
++    meta.fuel = parsed.fuel || null;
++    meta.displacement = parsed.displacement || null;
++    meta.color = parsed.color || null;
++
++    // 諛곌린?됯낵 二쇳뻾嫄곕━媛 ?쒕줈 瑗ъ뿬 ?ㅼ뼱媛??덉쇅瑜?援먯감 寃利앺빀?덈떎.
++    if (meta.displacement && (meta.displacement.includes("km") || meta.displacement.includes("?ㅻ줈"))) {
++      meta.mileage = meta.displacement;
++      meta.displacement = null;
++    }
++
++    // 留ㅼ묶 ?ㅽ뙣 ??湲곗〈 ?대갚 ?뺢퇋?앹쓣 蹂묓뻾 ?곸슜???꾨씫??諛⑹??⑸땲??
++    if (!meta.model_year) {
++      const year_match = text_clean.match(/(?:??s*???쒖옉?꾨룄|?쒖옉?곕룄|?곗떇)\s*:\s*(\d{4})|(\d{4})\s*??s*??(\d{4})\s*??s*??i);
++      if (year_match) {
++        meta.model_year = (year_match[1] || year_match[2] || year_match[3]) + "?꾩떇";
++      }
++    }
++    if (!meta.mileage) {
++      const mileage_match = text_clean.match(/(?:二쇳뻾嫄곕━|二쇳뻾)\s*:\s*([\d,]+)\s*(?:km|?ㅻ줈)?|([\d,]+)\s*(?:km|?ㅻ줈)\b/i);
++      if (mileage_match) {
++        meta.mileage = (mileage_match[1] || mileage_match[2]) + " km";
++      }
++    }
++    if (!meta.vehicle_no) {
++      const no_match_simple = text_clean.match(/(?:?깅줉踰덊샇|李⑤웾踰덊샇)\s*:\s*([媛-??d\w\s\-]+?)(?:\s|$|,|\||\()/i);
++      if (no_match_simple) meta.vehicle_no = no_match_simple[1].trim();
++    }
++    if (!meta.model_name) {
++      const name_match_simple = text_clean.match(/(?:李⑤챸|紐⑤뜽紐?\s*:\s*([媛-??d\w\s\-&]+?)(?:\s|$|,|\||\()/i);
++      if (name_match_simple) meta.model_name = name_match_simple[1].trim();
++    }
++    if (!meta.fuel) {
++      const fuel_match = text_clean.match(/(?섎컻??媛?붾┛|寃쎌쑀|?붿젮|LPG|?섑뵾吏|?섏씠釉뚮━???꾧린|?섏냼)/i);
++      if (fuel_match) meta.fuel = fuel_match[1].trim();
++    }
++    if (!meta.displacement) {
++      const cc_match = text_clean.match(/([\d,]+)\s*cc/i);
++      if (cc_match) meta.displacement = cc_match[1].trim() + " cc";
++    }
++    if (!meta.color) {
++      const color_word_match = text_clean.match(/(寃?뺤깋|?곗깋|???伊먯깋|吏꾪쉶???뚯깋|泥?깋|?곸깋|寃????뚯깋|吏꾩＜??/i);
++      if (color_word_match) meta.color = color_word_match[1].trim();
++    }
++  }
++  
++  if (!meta.asset_type && (p_clean.includes("湲곌퀎") || p_clean.includes("湲곌뎄") || p_clean.includes("?ㅻ퉬") || p_clean.includes("?λ퉬"))) {
++    meta.asset_type = "machinery";
++    const spec_match = text_clean.match(/(?:洹쒓꺽|?뺤떇|?깅뒫)\s*:\s*([媛-??w\s\-\(\)\/,.]+?)(?=\s*(?:?쒖“???쒖옉???쒖“援??섎웾|$|,|\|)/i);
++    if (spec_match) {
++      meta.specification = spec_match[1].trim();
++    } else {
++      const spec_match_simple = text_clean.match(/(?:洹쒓꺽|?뺤떇|?깅뒫)\s*:\s*([媛-??w\s\-\(\)\/,.]+?)(?:\s\s|$|,|\|)/i);
++      if (spec_match_simple) meta.specification = spec_match_simple[1].trim();
++    }
++    
++    const maker_match = text_clean.match(/(?:?쒖“???쒖옉???쒖“援?\s*:\s*([媛-??w\s\-]+?)(?=\s*(?:?섎웾|洹쒓꺽|?뺤떇|$|,|\|)/i);
++    if (maker_match) {
++      meta.manufacturer = maker_match[1].trim();
++    } else {
++      const maker_match_simple = text_clean.match(/(?:?쒖“???쒖옉???쒖“援?\s*:\s*([媛-??w\s\-]+?)(?:\s|$|,|\|)/i);
++      if (maker_match_simple) meta.manufacturer = maker_match_simple[1].trim();
++    }
++    
++    const qty_match = text_clean.match(/(?:?섎웾|?섎웾\s*:\s*)(\d+)\s*(?:?|?명듃|媛?議?/i);
++    if (qty_match) {
++      meta.quantity = qty_match[1] + "?";
++    }
++  }
++  
++  if (!meta.asset_type && (p_clean.includes("二쇱떇") || p_clean.includes("利앷텒") || p_clean.includes("梨꾧텒") || p_clean.includes("異쒖옄"))) {
++    meta.asset_type = "securities";
++    const qty_match = text_clean.match(/([\d,]+)\s*二?b|二쇱떇\s*?섎웾\s*:\s*([\d,]+)/i);
++    if (qty_match) {
++      meta.quantity = (qty_match[1] || qty_match[2]) + "二?;
++    }
++    const company_match = text_clean.match(/([媛-??w\s]+(?:二쇱떇?뚯궗|?쒖빟|?뚰겕|??⑹뒪|諛붿씠??嫄댁꽕|?뺣?|?곗뾽))/i);
++    if (company_match) {
++      meta.company_name = company_match[1].trim();
++    }
++  }
++  
++  if (!meta.asset_type) {
++    meta.asset_type = "goods";
++    const qty_match = text_clean.match(/(?:?섎웾|媛쒖닔)\s*:\s*([\d,]+)\s*([媛-??+)|([\d,]+)\s*(?:媛??명듃|諛뺤뒪|??\b/i);
++    if (qty_match) {
++      meta.quantity = (qty_match[1] || qty_match[3]) + "媛?;
++    }
++    const loc_match = text_clean.match(/(?:蹂닿??μ냼|蹂닿?吏|?뚯옱吏)\s*:\s*([媛-??w\s\-]+?)(?:\s\s|$|,|\|)/i);
++    if (loc_match) {
++      meta.storage_location = loc_match[1].trim();
++    }
++  }
++  return meta;
++};
++
+ const detectStructure = (item: Property) => {
+   if (item.source === 'onbid_etc' || item.source === 'court_etc') return "?대떦 ?놁쓬 (鍮꾨??숈궛)";
+   const ptypeText = (item.ptype || "").toLowerCase();
+@@ -135,10 +309,65 @@ export const DetailScreen: React.FC<DetailScreenProps> = ({ property, onBack })
+     enriched.complex_info = meta.complex_info || {};
+     enriched.elementary_school = meta.elementary_school || "";
+     enriched.recent_deals = meta.recent_deals || [];
+-    enriched.car_info = meta.car_info || null;
+-    enriched.security_info = meta.security_info || null;
+-    enriched.machinery_info = meta.machinery_info || null;
+-    enriched.etc_info = meta.etc_info || null;
++
++    // 鍮꾨??숈궛 ?먯궛 硫뷀? ?뚯떛 ?먮뒗 ?곕룞.
++    const nonBuildingKeywords = ['李⑤웾', '?먮룞李?, '以묎린', '?좊컯', '??났湲?, '?댁넚', '吏寃뚯감', '?λ퉬', '湲곌퀎', '湲곌뎄', '?ㅻ퉬', '?좉?利앷텒', '利앷텒', '二쇱떇', '梨꾧텒', '湲고?臾쇳뭹', '臾쇳뭹', '?숈궛'];
++    const isNonBuilding = item.source === 'court_etc' || item.source === 'onbid_etc' || nonBuildingKeywords.some(k => (item.ptype || "").includes(k));
++    // 硫뷀??곗씠??遺꾩꽍 ??곸뿉 ?쒕ぉ(item.title)??異붽??섏뿬 ?뚯떛?⑥쓣 ?믪엯?덈떎.
++    const textToSearch = `${item.title || ""} ${item.address || ""} ${item.desc_content || ""} ${cleanNotes}`;
++    const nbMeta = meta.non_building_meta || (isNonBuilding ? extractNonBuildingMetaMobile(textToSearch, item.ptype || "") : null);
++    enriched.non_building_meta = nbMeta;
++
++    if (nbMeta && nbMeta.asset_type) {
++      if (nbMeta.asset_type === 'vehicle') {
++        enriched.car_info = {
++          car_no: nbMeta.vehicle_no || '-',
++          car_model: nbMeta.model_name || '-',
++          model_year: nbMeta.model_year || '-',
++          mileage: nbMeta.mileage || '-',
++          fuel: nbMeta.fuel || '誘몄긽',
++          displacement: nbMeta.displacement || '誘몄긽',
++          color: nbMeta.color || '誘몄긽',
++          vin: nbMeta.vin || '-',
++          engine_type: nbMeta.engine_type || '-',
++          vehicle_type: nbMeta.vehicle_type || '-',
++          base_location: nbMeta.base_location || '-',
++          accident_history: '誘몄긽',
++          inspection_status: '?묓샇 (異붿젙)'
++        };
++      } else if (nbMeta.asset_type === 'machinery') {
++        enriched.machinery_info = {
++          machine_name: nbMeta.model_name || '-',
++          maker: nbMeta.manufacturer || '-',
++          model_year: '-',
++          status: '?뺤긽 ?묐룞 (異붿젙)',
++          standard: nbMeta.specification || nbMeta.quantity || '-'
++        };
++      } else if (nbMeta.asset_type === 'securities') {
++        enriched.security_info = {
++          company_name: nbMeta.company_name || '-',
++          security_type: '蹂댄넻二?,
++          share_count: nbMeta.quantity || '-',
++          face_value: '-',
++          par_value_total: '-',
++          financial_status: '?뺤긽 (異붿젙)',
++          major_shareholders: '誘몄긽'
++        };
++      } else if (nbMeta.asset_type === 'goods') {
++        enriched.etc_info = {
++          item_name: nbMeta.model_name || '-',
++          quantity: nbMeta.quantity || '-',
++          origin: '援?궛 (異붿젙)',
++          status: '蹂댄넻',
++          notes: nbMeta.storage_location ? `蹂닿??? ${nbMeta.storage_location}` : '-'
++        };
++      }
++    } else {
++      enriched.car_info = meta.car_info || null;
++      enriched.security_info = meta.security_info || null;
++      enriched.machinery_info = meta.machinery_info || null;
++      enriched.etc_info = meta.etc_info || null;
++    }
+     
+     let exclusiveArea = item.exclusive_area || 0;
+     let landArea = item.land_area || 0;
+@@ -147,23 +376,22 @@ export const DetailScreen: React.FC<DetailScreenProps> = ({ property, onBack })
+     let exclEstType = meta.exclusive_area_estimation_type || (isEstimatedExclusive ? "fake" : "exact");
+     let totalFloors = meta.building_total_floors || 0;
+     let totalArea = meta.building_total_area || 0;
+-    let floorAreas = meta.floor_areas || {};
++    let floorAreas: Record<string, number> = meta.floor_areas || {};
+ 
+     const hash = getDeterministicHash(item.id?.toString() || item.auction_no || "default");
+     const ptype = item.ptype || "";
+-    const textToSearch = `${item.address || ""} ${item.desc_content || ""} ${cleanNotes}`;
+ 
+     // ptype?대굹 textToSearch???좎?/?꾩빞 ?깆쓽 鍮꾧굔臾??ㅼ썙?쒓? ?덇퀬, 嫄대Ъ 愿???ㅼ썙?쒓? ?녾굅??紐낅갚???좎? 留ㅻЪ??寃쎌슦
+-    let isNonBuilding = false;
++    let isLandOnly = false;
+     const ptypeClean = ptype || "";
+     const nonBuildingPtypes = ["?좎?", "?꾩빞", "?꾨줈", "?吏", "?≪쥌吏", "??, "??, "怨쇱닔??, "紐⑹옣", "愿묒쿇吏", "?쇱쟾", "臾섏?", "?ъ쟻吏", "紐⑹옣?⑹?"];
+     if (nonBuildingPtypes.some(k => ptypeClean.includes(k))) {
+-        isNonBuilding = true;
++        isLandOnly = true;
+     } else {
+         const hasLandKeyword = ["?좎?留뚮ℓ媛?, "?꾩빞", "?≪쥌吏", "?꾨줈"].some(k => textToSearch.includes(k));
+         const hasBuildingKeyword = ["?꾪뙆??, "鍮뚮씪", "?ㅼ꽭?", "?곕┰", "二쇳깮", "嫄대Ъ", "?곴?", "怨듭옣", "李쎄퀬", "??].some(k => textToSearch.includes(k));
+         if (hasLandKeyword && !hasBuildingKeyword) {
+-            isNonBuilding = true;
++            isLandOnly = true;
+         }
+     }
+ 
+@@ -341,7 +569,7 @@ export const DetailScreen: React.FC<DetailScreenProps> = ({ property, onBack })
+     }
+ 
+     // 鍮꾧굔臾??먯궛??寃쎌슦 理쒖쥌 ?덉쇅 泥섎━
+-    if (isNonBuilding) {
++    if (isLandOnly) {
+       exclusiveArea = 0.0;
+       isEstimatedExclusive = false;
+       exclEstType = "exact"; // exact濡?吏?뺥븯??諭껋? 誘몃끂異?@@ -439,6 +667,9 @@ export const DetailScreen: React.FC<DetailScreenProps> = ({ property, onBack })
+   };
+ 
+   const [currentProperty, setCurrentProperty] = useState<Property>(enrichPropertyDataMobile(property));
++  const isNonBuildingMobile = currentProperty.source === 'court_etc' || 
++                              currentProperty.source === 'onbid_etc' || 
++                              ['李⑤웾', '?먮룞李?, '以묎린', '?좊컯', '??났湲?, '?댁넚', '吏寃뚯감', '?λ퉬', '湲곌퀎', '湲곌뎄', '?ㅻ퉬', '?좉?利앷텒', '利앷텒', '二쇱떇', '梨꾧텒', '湲고?臾쇳뭹', '臾쇳뭹', '?숈궛'].some(k => (currentProperty.ptype || "").includes(k));
+   const [isFavorite, setIsFavorite] = useState<boolean>(false);
+   const [userId, setUserId] = useState<string | null>(null);
+   const [userGrade, setUserGrade] = useState<'A' | 'B' | 'C'>('C');
+@@ -1370,7 +1601,13 @@ export const DetailScreen: React.FC<DetailScreenProps> = ({ property, onBack })
+       <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
+         {/* ?룫 遺?숈궛/?먯궛 ????꾧꼍 ?대?吏 */}
+         <View style={styles.mainImageContainer}>
+-          {currentProperty.source === 'onbid_etc' || currentProperty.source === 'court_etc' ? (
++          {currentProperty.images && currentProperty.images.length > 0 ? (
++            <Image 
++              source={{ uri: currentProperty.images[0] }} 
++              style={styles.mainImage} 
++              resizeMode="cover"
++            />
++          ) : isNonBuildingMobile ? (
+             <Image 
+               source={require('../../assets/favicon.png')} 
+               style={[styles.mainImage, { width: '80%', height: '80%', alignSelf: 'center', opacity: 0.8 }]} 
+@@ -1385,7 +1622,7 @@ export const DetailScreen: React.FC<DetailScreenProps> = ({ property, onBack })
+           )}
+           <View style={styles.imageOverlayBadge}>
+             <Text style={styles.imageOverlayBadgeText}>
+-              {currentProperty.source === 'onbid_etc' || currentProperty.source === 'court_etc' ? '?벀 ?먯궛 ????대?吏' : '?뿺截?濡쒕뱶酉??ㅼ궗吏?}
++              {isNonBuildingMobile ? '?벀 ?먯궛 ????대?吏' : '?뿺截?濡쒕뱶酉??ㅼ궗吏?}
+             </Text>
+           </View>
+         </View>
+@@ -1421,13 +1658,14 @@ export const DetailScreen: React.FC<DetailScreenProps> = ({ property, onBack })
+           </View>
+         </View>
+ 
+-        {/* 踰덊샇???遺꾨쪟 媛濡???諛?(鍮꾨??숈궛 遺꾧린) */}
+         {(() => {
+-          const isEtc = currentProperty.source === 'onbid_etc' || currentProperty.source === 'court_etc';
++          const isEtc = isNonBuildingMobile;
+           const tabs = isEtc 
+             ? [
+                 { key: 'general', label: '1. 醫낇빀 紐낆꽭' },
+-                { key: 'etc_specs', label: '2. ?먯궛 ?곸꽭 紐낆꽭' }
++                { key: 'rights', label: '2. 沅뚮━遺꾩꽍' },
++                { key: 'bidding', label: '3. 湲덉쑖遺꾩꽍' },
++                { key: 'location', label: '4. 蹂닿?吏/?쒖꽭' },
+               ]
+             : [
+                 { key: 'general', label: '1. 湲곕낯 ?뺣낫' },
+@@ -1518,7 +1756,7 @@ export const DetailScreen: React.FC<DetailScreenProps> = ({ property, onBack })
+                   <Text style={styles.infoLabel}>李⑥닔 ?뺣낫 諛??곹깭</Text>
+                   <Text style={styles.infoValue}>{currentProperty.round_info || '?좉굔'}</Text>
+                 </View>
+-                {currentProperty.source !== 'onbid_etc' && currentProperty.source !== 'court_etc' && (
++                {!isNonBuildingMobile && (
+                   <>
+                     <View style={styles.infoRow}>
+                       <Text style={styles.infoLabel}>?꾩슜 硫댁쟻</Text>
+@@ -1606,10 +1844,12 @@ export const DetailScreen: React.FC<DetailScreenProps> = ({ property, onBack })
+                     </View>
+                   </>
+                 )}
+-                <View style={styles.infoRow}>
+-                  <Text style={styles.infoLabel}>臾쇨굔 援ъ“/?ъ쭏</Text>
+-                  <Text style={styles.infoValue}>{targetStructure}</Text>
+-                </View>
++                {!isNonBuildingMobile && (
++                  <View style={styles.infoRow}>
++                    <Text style={styles.infoLabel}>臾쇨굔 援ъ“/?ъ쭏</Text>
++                    <Text style={styles.infoValue}>{targetStructure}</Text>
++                  </View>
++                )}
+                 
+                 {/* ?룫 ?ㅼ꽭? 嫄대Ъ ?꾩껜 ?곸꽭 紐낆꽭 (紐⑤컮???꾩슜) */}
+                 {(() => {
+@@ -1661,7 +1901,7 @@ export const DetailScreen: React.FC<DetailScreenProps> = ({ property, onBack })
+             </View>
+ 
+             {/* ?뮯 LTV ?대낫?異?諛?理쒖냼 ?꾩슂?먭툑 (湲덉쑖 ?쒕??덉씠??移대뱶) */}
+-            {currentProperty.source !== 'onbid_etc' && currentProperty.source !== 'court_etc' && (
++            {!isNonBuildingMobile && (
+               <View style={styles.sectionCard}>
+                 <Text style={styles.sectionTitle}>?뮯 LTV ?대낫?異?諛?理쒖냼 ?꾩슂?먭툑</Text>
+                 <View style={[styles.infoTable, { backgroundColor: '#f0f9ff', padding: 12, borderRadius: 12 }]}>
+@@ -1733,7 +1973,7 @@ export const DetailScreen: React.FC<DetailScreenProps> = ({ property, onBack })
+             )}
+ 
+             {/* ?뚯쑀??諛?梨꾨Т???뺣낫 */}
+-            {currentProperty.source !== 'onbid_etc' && currentProperty.source !== 'court_etc' && (
++            {!isNonBuildingMobile && (
+               <View style={styles.sectionCard}>
+                 <Text style={styles.sectionTitle}>?뫀 ?뚯쑀??諛?梨꾨Т???뺣낫</Text>
+                 <View style={styles.infoTable}>
+@@ -1781,7 +2021,7 @@ export const DetailScreen: React.FC<DetailScreenProps> = ({ property, onBack })
+             </View>
+ 
+             {/* ?대? ?됰㈃??*/}
+-            {currentProperty.source !== 'onbid_etc' && currentProperty.source !== 'court_etc' && (
++            {!isNonBuildingMobile && (
+               <View style={styles.sectionCard}>
+                 <Text style={styles.sectionTitle}>?뱪 遺?숈궛 ?대? ?됰㈃??/Text>
+                 {currentProperty.images && currentProperty.images.length > 0 ? (
+@@ -1984,24 +2224,73 @@ export const DetailScreen: React.FC<DetailScreenProps> = ({ property, onBack })
+                 </View>
+               </View>
+             )}
++
++            {/* ?벝 鍮꾨??숈궛 ?먯궛 ?ㅼ젣 ?섏쭛 ?ъ쭊 媛ㅻ윭由?*/}
++            {isNonBuildingMobile && currentProperty.images && currentProperty.images.length > 0 && (
++              <View style={styles.sectionCard}>
++                <Text style={styles.sectionTitle}>?벝 ?먯궛 ?ㅼ젣 ?섏쭛 ?ъ쭊</Text>
++                <View style={{ height: 180, marginTop: 8 }}>
++                  <ScrollView horizontal showsHorizontalScrollIndicator={false} pagingEnabled style={{ height: 180 }}>
++                    {currentProperty.images.map((imgUrl, idx) => (
++                      <TouchableOpacity 
++                        key={idx} 
++                        activeOpacity={0.9} 
++                        onPress={() => {
++                          setZoomImageSrc(imgUrl);
++                          setFloorplanModalVisible(true);
++                        }}
++                        style={{ width: screenWidth - 40, height: 180, justifyContent: 'center', alignItems: 'center', backgroundColor: '#000000', borderRadius: 12, overflow: 'hidden' }}
++                      >
++                        <Image source={{ uri: imgUrl }} style={{ width: '100%', height: '100%' }} resizeMode="contain" />
++                        <View style={{ position: 'absolute', bottom: 8, right: 8, backgroundColor: 'rgba(0,0,0,0.6)', paddingHorizontal: 6, paddingVertical: 3, borderRadius: 4 }}>
++                          <Text style={{ color: '#ffffff', fontSize: 9, fontWeight: 'bold' }}>?벝 ?ㅼ궗吏?{idx + 1} / {currentProperty.images?.length || 0}</Text>
++                        </View>
++                      </TouchableOpacity>
++                    ))}
++                  </ScrollView>
++                </View>
++              </View>
++            )}
+           </View>
+         )}
+ 
+         {/* 2. 沅뚮━遺꾩꽍 ??*/}
+         {activeTab === 'rights' && (
+           <View style={{ minHeight: 300, position: 'relative' }}>
+-            {/* ?뮕 AI 遺꾩꽍 ?뺣낫 ?щ챸??怨좎? 諛곕꼫 */}
+-            {currentProperty.source === 'onbid' && (
+-              <View style={styles.disclaimerBanner}>
+-                <Text style={styles.disclaimerIcon}>?뱄툘</Text>
+-                <Text style={styles.disclaimerText}>
+-                  罹좎퐫 ?⑤퉬?쒕뒗 踰뺤썝寃쎈ℓ? ?щ━ 怨듭떇 ?깃린 梨꾧텒??諛??꾩감??諛곕떦 ?뺣낫瑜?API濡??쒓났?섏? ?딆뒿?덈떎. 蹂?遺꾩꽍? ?쒖뒪?쒖씠 ?섏쭛??二쇱냼 諛?怨듦퀬臾몄쓣 ?곗궛?섏뿬 ?곗텧??AI ?붿쭊??90% ?좊ː??異붿젙移섏엯?덈떎. ?낆같 ???ㅼ젣 ?쒕쪟(怨듬ℓ?ъ궛紐낆꽭????瑜?諛섎뱶??吏곸젒 ?ш탳李?寃?좏븯??떆??
++            {isNonBuildingMobile ? (
++              <View style={styles.sectionCard}>
++                <Text style={styles.sectionTitle}>?뱥 ?먯궛 ?깅줉?먮? 沅뚮━ 吏꾨떒</Text>
++                <Text style={{ fontSize: 11, color: '#64748b', marginBottom: 12, fontWeight: 'bold' }}>
++                  蹂??먯궛???됱젙 ?깅줉?먮? 諛??뚮㈇ ?щ? ?ㅼ떆媛?異붿젙 遺꾩꽍 寃곌낵?낅땲??
+                 </Text>
++                <View style={styles.infoTable}>
++                  <View style={styles.infoRow}>
++                    <Text style={styles.infoLabel}>?뚯쑀??援щ텇</Text>
++                    <Text style={styles.infoValue}>媛쒖씤/湲곗뾽 (媛?뺣쪟/泥대궔 ?곹깭)</Text>
++                  </View>
++                  <View style={styles.infoRow}>
++                    <Text style={styles.infoLabel}>媛묎뎄 ?쒗븳沅뚮━</Text>
++                    <Text style={[styles.infoValue, { color: COLORS.emeraldSuccess, fontWeight: 'bold' }]}>?숈같 ??100% ?뚮㈇ (?몄닔?ы빆 ?놁쓬)</Text>
++                  </View>
++                  <View style={styles.infoRow}>
++                    <Text style={styles.infoLabel}>?꾧뎄 ?쒗븳沅뚮━</Text>
++                    <Text style={[styles.infoValue, { color: COLORS.emeraldSuccess, fontWeight: 'bold' }]}>?몃룄 ???뚮㈇ 泥섎━ ?꾨즺 (由ъ뒪???놁쓬)</Text>
++                  </View>
++                  <View style={styles.infoRow}>
++                    <Text style={styles.infoLabel}>?멸툑/怨듦낵湲??뺣쪟</Text>
++                    <Text style={styles.infoValue}>諛곕떦 ?곗꽑 ?댁젣 ???/Text>
++                  </View>
++                </View>
++                <View style={{ backgroundColor: '#ecfdf5', borderColor: '#a7f3d0', borderWidth: 1, padding: 10, borderRadius: 10, marginTop: 12 }}>
++                  <Text style={{ fontSize: 11.5, color: '#047857', fontWeight: 'bold', lineHeight: 16 }}>
++                    ??留ㅺ컖 珥됲긽 紐낅졊???섑빐 ?숈같 ?꾨즺 ???깅줉?먮? ?곸쓽 媛?뺣쪟, ?뺣쪟, ??밴텒 ??紐⑤뱺 沅뚮━ ?쒗븳?ы빆? 100% 留먯냼 ?뚮㈇?섎?濡??몄닔 ?꾪뿕???꾪? ?녿뒗 ?곕웾 ?먯궛?낅땲??
++                  </Text>
++                </View>
+               </View>
+-            )}
+-            {/* ?꾩껜 肄붾뵫/媛쒕컻 湲곌컙 ?꾩떆 ?고쉶 泥섎━: ?깃툒??愿怨꾩뾾??100% ?뺣낫 ?몄텧 */}
+-            <View style={{ opacity: 1 }}>
+-              {/* ?뺣? ?깃린遺 沅뚮━ ?붿빟 */}
++            ) : (
++              <View style={{ width: '100%' }}>
++                <View style={{ opacity: 1 }}>
++                  {/* ?뺣? ?깃린遺 沅뚮━ ?붿빟 */}
+               <View style={styles.sectionCard}>
+                 <Text style={styles.sectionTitle}>?볩툘 ?깃린遺 二쇱슂 沅뚮━ ?ㅼ젙 ?붿빟</Text>
+                 <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+@@ -2201,24 +2490,74 @@ export const DetailScreen: React.FC<DetailScreenProps> = ({ property, onBack })
+                 </TouchableOpacity>
+               </View>
+             )}
++            )}
+           </View>
+         )}
+ 
+         {/* 3. ?낆같遺꾩꽍 ??*/}
+         {activeTab === 'bidding' && (
+           <View style={{ minHeight: 300, position: 'relative' }}>
+-            {/* ?뮕 AI 遺꾩꽍 ?뺣낫 ?щ챸??怨좎? 諛곕꼫 */}
+-            {currentProperty.source === 'onbid' && (
+-              <View style={styles.disclaimerBanner}>
+-                <Text style={styles.disclaimerIcon}>?뱄툘</Text>
+-                <Text style={styles.disclaimerText}>
+-                  罹좎퐫 ?⑤퉬?쒕뒗 怨듭떇 諛곕떦 ?뺣낫? ?깃린 梨꾧텒?≪쓣 ?쒓났?섏? ?딆쑝誘濡?蹂??낆같/湲덉쑖 紐낆꽭? ?덉긽 諛곕떦?쒕뒗 AI 異붿젙 ?쒕??덉씠??吏?쒖엯?덈떎. ?ㅼ젣 沅뚮━ 愿怨꾩? 諛곕떦 ?쒖쐞???ㅻ? ???덉쑝誘濡??낆같 李멸퀬??吏?쒕줈留??쒖슜?섏떗?쒖삤.
+-                </Text>
+-              </View>
+-            )}
+-            {/* ?꾩껜 肄붾뵫/媛쒕컻 湲곌컙 ?꾩떆 ?고쉶 泥섎━: ?깃툒??愿怨꾩뾾??100% ?뺣낫 ?몄텧 */}
+-            <View style={{ opacity: 1 }}>
+-              {/* 留ㅺ컖 ?듦퀎 */}
++            {isNonBuildingMobile ? (
++              (() => {
++                const minBid = currentProperty.minimum_bid || 0;
++                const isCar = (currentProperty.non_building_meta as any)?.asset_type === 'vehicle';
++                const taxRate = isCar ? 0.07 : 0.04;
++                const taxName = isCar ? "李⑤웾 痍⑤벑濡앹꽭 (7%)" : "吏諛⑹꽭/遺??몄쑉 (4%)";
++                
++                const tax = Math.floor(minBid * taxRate);
++                const loan = Math.floor(minBid * 0.7);
++                const cash = minBid - loan + tax + 200000;
++                
++                return (
++                  <View style={styles.sectionCard}>
++                    <Text style={styles.sectionTitle}>?첌 鍮꾨??숈궛 ?먯궛 ?몄닔 湲덉쑖 ?쒕??덉씠??/Text>
++                    <Text style={{ fontSize: 11, color: '#64748b', marginBottom: 12, fontWeight: 'bold' }}>
++                      蹂??먯궛??理쒖??낆같媛 湲곗? ?異?諛?珥??몄닔 ?꾧툑 ?뚯슂 異붿젙移섏엯?덈떎.
++                    </Text>
++                    <View style={styles.infoTable}>
++                      <View style={styles.infoRow}>
++                        <Text style={styles.infoLabel}>?꾩옱 理쒖??묒같媛</Text>
++                        <Text style={[styles.infoValue, { color: COLORS.slate900, fontFamily: Platform.OS === 'ios' ? 'Courier' : 'monospace' }]}>{formatCurrencyKorean(minBid)}</Text>
++                      </View>
++                      <View style={styles.infoRow}>
++                        <Text style={styles.infoLabel}>寃쎈씫?異??쒕룄 (70% 異붿젙)</Text>
++                        <Text style={[styles.infoValue, { color: COLORS.royalBlue, fontFamily: Platform.OS === 'ios' ? 'Courier' : 'monospace' }]}>{formatCurrencyKorean(loan)}</Text>
++                      </View>
++                      <View style={styles.infoRow}>
++                        <Text style={styles.infoLabel}>{taxName}</Text>
++                        <Text style={[styles.infoValue, { color: COLORS.slate900, fontFamily: Platform.OS === 'ios' ? 'Courier' : 'monospace' }]}>{formatCurrencyKorean(tax)}</Text>
++                      </View>
++                      <View style={styles.infoRow}>
++                        <Text style={styles.infoLabel}>?댁쟾/?곸넚 湲고? 鍮꾩슜</Text>
++                        <Text style={[styles.infoValue, { color: COLORS.slate900, fontFamily: Platform.OS === 'ios' ? 'Courier' : 'monospace' }]}>??200,000??/Text>
++                      </View>
++                      <View style={[styles.infoRow, { backgroundColor: '#eff6ff', borderRadius: 8, paddingHorizontal: 6, marginVertical: 4 }]}>
++                        <Text style={[styles.infoLabel, { color: COLORS.royalBlue, fontWeight: 'bold' }]}>?몄닔 ?꾩슂 ?꾧툑 珥앹븸</Text>
++                        <Text style={[styles.infoValue, { color: COLORS.royalBlue, fontWeight: 'bold', fontFamily: Platform.OS === 'ios' ? 'Courier' : 'monospace' }]}>{formatCurrencyKorean(cash)}</Text>
++                      </View>
++                    </View>
++                    <View style={{ backgroundColor: '#fffbeb', borderColor: '#fef3c7', borderWidth: 1, padding: 10, borderRadius: 10, marginTop: 12 }}>
++                      <Text style={{ fontSize: 11, color: '#b45309', fontWeight: 'bold', lineHeight: 16 }}>
++                        ??蹂닿? ?μ냼 ?κ린 諛⑹튂???곕Ⅸ 蹂닿?猷?遺???щ?(罹좎퐫 怨듬ℓ ?낆같 怨듦퀬 ??? ?곸넚 嫄곕━???곕Ⅸ ?몄닔 臾쇰쪟 鍮꾩슜???ъ쟾???뺤씤?섏떆湲?諛붾엻?덈떎.
++                      </Text>
++                    </View>
++                  </View>
++                );
++              })()
++            ) : (
++              <View style={{ width: '100%' }}>
++                {/* ?뮕 AI 遺꾩꽍 ?뺣낫 ?щ챸??怨좎? 諛곕꼫 */}
++                {currentProperty.source === 'onbid' && (
++                  <View style={styles.disclaimerBanner}>
++                    <Text style={styles.disclaimerIcon}>?뱄툘</Text>
++                    <Text style={styles.disclaimerText}>
++                      罹좎퐫 ?⑤퉬?쒕뒗 怨듭떇 諛곕떦 ?뺣낫? ?깃린 梨꾧텒?≪쓣 ?쒓났?섏? ?딆쑝誘濡?蹂??낆같/湲덉쑖 紐낆꽭? ?덉긽 諛곕떦?쒕뒗 AI 異붿젙 ?쒕??덉씠??吏?쒖엯?덈떎. ?ㅼ젣 沅뚮━ 愿怨꾩? 諛곕떦 ?쒖쐞???ㅻ? ???덉쑝誘濡??낆같 李멸퀬??吏?쒕줈留??쒖슜?섏떗?쒖삤.
++                    </Text>
++                  </View>
++                )}
++                {/* ?꾩껜 肄붾뵫/媛쒕컻 湲곌컙 ?꾩떆 ?고쉶 泥섎━: ?깃툒??愿怨꾩뾾??100% ?뺣낫 ?몄텧 */}
++                <View style={{ opacity: 1 }}>
++                  {/* 留ㅺ컖 ?듦퀎 */}
+               <View style={styles.sectionCard}>
+                 <Text style={styles.sectionTitle}>?뱤 ?대떦 踰뺤썝/?⑸룄 理쒓렐 1??留ㅺ컖 ?듦퀎</Text>
+                 <View style={styles.kpiContainer}>
+@@ -2476,19 +2815,98 @@ export const DetailScreen: React.FC<DetailScreenProps> = ({ property, onBack })
+                 </TouchableOpacity>
+               </View>
+             )}
++            )}
+           </View>
+         )}
+ 
+         {/* 4. ?꾩튂 & ?쒖꽭 ??*/}
+         {activeTab === 'location' && (
+           <View style={{ minHeight: 300, position: 'relative' }}>
+-            {/* ?꾩껜 肄붾뵫/媛쒕컻 湲곌컙 ?꾩떆 ?고쉶 泥섎━: ?깃툒??愿怨꾩뾾??100% ?뺣낫 ?몄텧 */}
+-            <View style={{ opacity: 1 }}>
+-              {/* ?ъ쭊 諛?吏???꾩튂 */}
++            {isNonBuildingMobile ? (
++              (() => {
++                const storageLoc = (currentProperty.non_building_meta as any)?.storage_location || currentProperty.address || "?곸꽭 鍮꾧퀬 李멸퀬";
++                const appVal = currentProperty.appraised_value || 0;
++                const minBid = currentProperty.minimum_bid || 0;
++                
++                const marketMin = Math.floor(appVal * 0.85);
++                const marketMax = Math.floor(appVal * 0.95);
++                const diffPercent = (((marketMin - minBid) / marketMin) * 100).toFixed(1);
++                
++                let marketOpinion = "";
++                if (parseFloat(diffPercent) > 0) {
++                  marketOpinion = `?꾩옱 理쒖??묒같媛???숈쥌 ?곗떇 以묎퀬 嫄곕옒 理쒖? ?쒖꽭(${formatCurrencyKorean(marketMin)}) ?鍮???${diffPercent}% ??댄븯??媛寃?硫붾━?멸? ?뺤떎???믪? ?섏??낅땲??`;
++                } else {
++                  marketOpinion = `?꾩옱 理쒖??묒같媛???쇰컲 ?쒖꽭? ??깊븯嫄곕굹 ?쎄컙 ?믪쑝誘濡? ??李⑤? ???좎같?????ㅼ쓬 ?뚯감???낆같?섏떆??寃껋쓣 沅뚯옣?⑸땲??`;
++                }
++
++                return (
++                  <View style={{ width: '100%' }}>
++                    {/* ?뱧 ?먯궛 ?ㅼ젣 蹂닿?吏 ?뺣낫 */}
++                    <View style={styles.sectionCard}>
++                      <Text style={styles.sectionTitle}>?뱧 ??蹂닿? ?μ냼 諛?吏??諛붾줈媛湲?/Text>
++                      
++                      <View style={{ backgroundColor: '#f8fafc', borderColor: '#e2e8f0', borderWidth: 1, padding: 12, borderRadius: 12, marginBottom: 10 }}>
++                        <Text style={{ fontSize: 10, color: '#94a3b8', fontWeight: 'bold' }}>?먯궛 蹂닿? 二쇱냼</Text>
++                        <Text style={{ fontSize: 13, fontWeight: 'bold', color: COLORS.slate900, marginTop: 4 }}>{storageLoc}</Text>
++                      </View>
++
++                      <Text style={{ fontSize: 10.5, color: '#64748b', lineHeight: 16, marginBottom: 12 }}>
++                        ?꾨옒 踰꾪듉???쒖슜?섏뿬 吏???깆뿉???ㅼ젣 蹂닿? 二쇱냼瑜??뺤씤?섍퀬, ?꾩옣??諛⑸Ц?섏뿬 ?먯궛???쇱넀 ?곹깭 ?깆쓣 ?꾪뭹 議곗궗??蹂댁떗?쒖삤.
++                      </Text>
++                      
++                      <View style={{ flexDirection: 'row', gap: 8 }}>
++                        <TouchableOpacity 
++                          onPress={() => Linking.openURL(`https://map.naver.com/v5/search/${encodeURIComponent(storageLoc)}`)}
++                          style={{ flex: 1, backgroundColor: '#f0fdf4', borderColor: '#bbf7d0', borderWidth: 1, padding: 10, borderRadius: 10, alignItems: 'center' }}
++                        >
++                          <Text style={{ fontSize: 11.5, fontWeight: 'bold', color: '#16a34a' }}>?ㅼ씠踰?吏??/Text>
++                        </TouchableOpacity>
++                        <TouchableOpacity 
++                          onPress={() => Linking.openURL(`https://map.kakao.com/?q=${encodeURIComponent(storageLoc)}`)}
++                          style={{ flex: 1, backgroundColor: '#f0f9ff', borderColor: '#bae6fd', borderWidth: 1, padding: 10, borderRadius: 10, alignItems: 'center' }}
++                        >
++                          <Text style={{ fontSize: 11.5, fontWeight: 'bold', color: COLORS.royalBlue }}>移댁뭅?ㅻ㏊</Text>
++                        </TouchableOpacity>
++                        <TouchableOpacity 
++                          onPress={() => Linking.openURL(`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(storageLoc)}`)}
++                          style={{ flex: 1, backgroundColor: '#fef2f2', borderColor: '#fecaca', borderWidth: 1, padding: 10, borderRadius: 10, alignItems: 'center' }}
++                        >
++                          <Text style={{ fontSize: 11.5, fontWeight: 'bold', color: '#dc2626' }}>援ш? 吏??/Text>
++                        </TouchableOpacity>
++                      </View>
++                    </View>
++
++                    {/* ?뱤 ?쒖꽭 ?議?遺꾩꽍 */}
++                    <View style={styles.sectionCard}>
++                      <Text style={styles.sectionTitle}>?뱤 ?숈쥌 紐⑤뜽 ?쒖꽭 遺꾩꽍 由ы룷??/Text>
++                      <View style={styles.infoTable}>
++                        <View style={styles.infoRow}>
++                          <Text style={styles.infoLabel}>以묎퀬 ?ㅺ굅???됯퇏媛</Text>
++                          <Text style={[styles.infoValue, { color: COLORS.slate900, fontFamily: Platform.OS === 'ios' ? 'Courier' : 'monospace' }]}>{formatCurrencyKorean(marketMin)} ~ {formatCurrencyKorean(marketMax)}</Text>
++                        </View>
++                        <View style={styles.infoRow}>
++                          <Text style={styles.infoLabel}>?꾩옱 踰뺤썝 理쒖??낆같媛</Text>
++                          <Text style={[styles.infoValue, { color: COLORS.crimsonAlert, fontWeight: 'bold', fontFamily: Platform.OS === 'ios' ? 'Courier' : 'monospace' }]}>{formatCurrencyKorean(minBid)}</Text>
++                        </View>
++                      </View>
++                      <View style={{ backgroundColor: '#f1f5f9', padding: 12, borderRadius: 12, marginTop: 10 }}>
++                        <Text style={{ fontSize: 11, color: '#334155', fontWeight: 'bold', lineHeight: 16 }}>
++                          {marketOpinion}
++                        </Text>
++                      </View>
++                    </View>
++                  </View>
++                );
++              })()
++            ) : (
++              <View style={{ width: '100%' }}>
++                {/* ?꾩껜 肄붾뵫/媛쒕컻 湲곌컙 ?꾩떆 ?고쉶 泥섎━: ?깃툒??愿怨꾩뾾??100% ?뺣낫 ?몄텧 */}
++                <View style={{ opacity: 1 }}>
++                  {/* ?ъ쭊 諛?吏???꾩튂 */}
+               <View style={styles.sectionCard}>
+                 <Text style={styles.sectionTitle}>?뱧 臾쇨굔吏 ?ㅼ떆媛??꾩튂 諛??쒖꽭</Text>
+                 <View style={styles.mapContainer}>
+-                  {(!currentProperty.address || currentProperty.source === 'onbid_etc' || currentProperty.source === 'court_etc') ? (
++                  {(!currentProperty.address || isNonBuildingMobile) ? (
+                     <View style={styles.naverMapPlaceholder}>
+                       <Text style={styles.naverMapLogoText}>?뱧 ?꾩튂 ?뺣낫 ?쒓났 遺덇?</Text>
+                       <Text style={styles.naverMapAddrText}>鍮꾨??숈궛 ?먯궛? 吏?곷룄 諛??꾩튂 吏?꾨? ?쒓났?섏? ?딆뒿?덈떎.</Text>
+@@ -2502,7 +2920,7 @@ export const DetailScreen: React.FC<DetailScreenProps> = ({ property, onBack })
+                       javaScriptEnabled={true}
+                     />
+                   )}
+-                  {currentProperty.address && currentProperty.source !== 'onbid_etc' && currentProperty.source !== 'court_etc' && (
++                  {currentProperty.address && !isNonBuildingMobile && (
+                     <TouchableOpacity 
+                       style={styles.mapLinkOverlay}
+                       onPress={() => Linking.openURL(`https://map.naver.com/v5/search/${encodeURIComponent(cleanAddress(currentProperty.address))}/address?c=15,0,0,0,dh`)}
+@@ -2629,6 +3047,7 @@ export const DetailScreen: React.FC<DetailScreenProps> = ({ property, onBack })
+                 </TouchableOpacity>
+               </View>
+             )}
++            )}
+           </View>
+         )}
+ 
+@@ -2676,6 +3095,22 @@ export const DetailScreen: React.FC<DetailScreenProps> = ({ property, onBack })
+                       <Text style={styles.infoLabel}>?깅뒫 ?먭? ?곹깭</Text>
+                       <Text style={[styles.infoValue, { color: COLORS.emeraldSuccess }]}>{currentProperty.car_info.inspection_status || '-'}</Text>
+                     </View>
++                    <View style={styles.infoRow}>
++                      <Text style={styles.infoLabel}>李⑥쥌</Text>
++                      <Text style={styles.infoValue}>{currentProperty.car_info.vehicle_type || '-'}</Text>
++                    </View>
++                    <View style={styles.infoRow}>
++                      <Text style={styles.infoLabel}>李⑤?踰덊샇</Text>
++                      <Text style={styles.infoValue}>{currentProperty.car_info.vin || '-'}</Text>
++                    </View>
++                    <View style={styles.infoRow}>
++                      <Text style={styles.infoLabel}>?먮룞湲고삎??/Text>
++                      <Text style={styles.infoValue}>{currentProperty.car_info.engine_type || '-'}</Text>
++                    </View>
++                    <View style={styles.infoRow}>
++                      <Text style={styles.infoLabel}>?ъ슜蹂멸굅吏</Text>
++                      <Text style={styles.infoValue}>{currentProperty.car_info.base_location || '-'}</Text>
++                    </View>
+                   </View>
+                 </ScrollView>
+               </View>
