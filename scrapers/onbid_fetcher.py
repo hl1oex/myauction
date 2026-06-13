@@ -9,6 +9,7 @@ import time
 import sqlite3
 import urllib.parse
 import random
+import re
 from bs4 import BeautifulSoup
 
 # SQLite 인메모리 데이터베이스를 활용하여 로컬 I/O 생성을 완전히 차단합니다.
@@ -225,6 +226,214 @@ HARDFILTER_RULES = {
     "추가비용": ["인수", "선순위", "선순위 임차인", "대항력", "임차권", "보증금 인수"],
     "정보부족": ["서류없음", "확인불가", "열람불가", "자료없음"]
 }
+
+def extract_court_areas(st_text, ptype=""):
+    """주소 및 소재지 내역 텍스트(st)로부터 층수, 층별 면적 리스트, 그리고 최종 해당 호수의 면적을 추정 및 정밀 추출합니다."""
+    exclusive_area = 0.0
+    land_area = 0.0
+    is_estimated_exclusive = True
+    is_estimated_land = True
+    
+    # 신규 분석 정보
+    excl_est_type = "fake"  # 기본값은 "거의 허수"
+    total_floors = 0
+    total_area = 0.0
+    floor_areas = {}
+
+    if not st_text:
+        return (
+            exclusive_area, land_area, is_estimated_exclusive, is_estimated_land,
+            excl_est_type, total_floors, total_area, floor_areas
+        )
+
+    # ptype이나 st_text에 토지/임야 등의 비건물 키워드가 있고, 건물 관련 키워드가 없거나 명백한 토지 매물인 경우
+    is_non_building = False
+    ptype_clean = ptype or ""
+    non_building_ptypes = ["토지", "임야", "도로", "대지", "잡종지", "전", "답", "과수원", "목장", "광천지", "염전", "묘지", "사적지", "목장용지"]
+    if any(k in ptype_clean for k in non_building_ptypes):
+        is_non_building = True
+    elif st_text:
+        has_land_keyword = any(k in st_text for k in ["토지만매각", "임야", "잡종지", "도로"])
+        has_building_keyword = any(k in st_text for k in ["아파트", "빌라", "다세대", "연립", "주택", "건물", "상가", "공장", "창고", "호"])
+        if has_land_keyword and not has_building_keyword:
+            is_non_building = True
+
+    # 1. 대지권 면적 추출 시도 (기존 로직 유지 및 개선)
+    land_match = re.search(r'(?:대지권|토지대지권|대지)\s*(\d+(?:\.\d+)?)\s*㎡', st_text)
+    if land_match:
+        try:
+            land_area = float(land_match.group(1))
+            is_estimated_land = False
+        except ValueError:
+            pass
+
+    # 2. 층수 및 호수 파싱 (예: 3층02호, 2층201호, 지층01호, 지하101호, 302호 등)
+    target_floor = None
+    target_room = None
+    
+    # 2-1. 명시적인 '층'과 '호' 패턴
+    floor_room_match = re.search(r'(?:(?:지하|지층)\s*(\d+)|(\d+))\s*층\s*([가-힣\d\-]+)\s*호', st_text)
+    if floor_room_match:
+        is_basement = "지하" in floor_room_match.group(0) or "지층" in floor_room_match.group(0)
+        floor_num = floor_room_match.group(1) or floor_room_match.group(2)
+        target_floor = f"지하{floor_num}층" if is_basement else f"{floor_num}층"
+        target_room = floor_room_match.group(3)
+    else:
+        # 2-2. '지층xx호' 형태
+        basement_room_match = re.search(r'지층\s*([가-힣\d\-]+)\s*호', st_text)
+        if basement_room_match:
+            target_floor = "지층"
+            target_room = basement_room_match.group(1)
+        else:
+            # 2-3. 'xxx호' 숫자만 있는 형태 (예: 302호 -> 3층, 1201호 -> 12층)
+            room_only_match = re.search(r'\b(\d{3,4})\s*호', st_text)
+            if room_only_match:
+                room_str = room_only_match.group(1)
+                target_room = room_str
+                if len(room_str) == 3:
+                    target_floor = f"{room_str[0]}층"
+                elif len(room_str) == 4:
+                    target_floor = f"{room_str[:2]}층"
+
+    # 3. 층별 면적 정보 딕셔너리 구축 (예: "1층 118.39㎡ 2층 118.39㎡" -> {'1층': 118.39, '2층': 118.39})
+    floor_area_matches = re.finditer(r'(지층|지하\s*\d*층|\d+층)\s*(\d+(?:\.\d+)?)\s*㎡', st_text)
+    for m in floor_area_matches:
+        f_name = m.group(1).replace(" ", "")
+        try:
+            floor_areas[f_name] = float(m.group(2))
+        except ValueError:
+            pass
+
+    # 몇 층 건물인지 계산 (지층 포함 고유한 층의 개수)
+    total_floors = len(floor_areas)
+    # 층수 파싱 예외 대응 (텍스트 내 '4층 다세대주택' 혹은 '4층건물' 등 전체 층수 명시 텍스트 검색)
+    total_floors_match = re.search(r'(\d+)\s*층\s*(?:다세대주택|연립주택|빌라|건물|아파트)', st_text)
+    if total_floors_match:
+        try:
+            total_floors = max(total_floors, int(total_floors_match.group(1)))
+        except ValueError:
+            pass
+
+    # 면적 합계 계산
+    total_area = round(sum(floor_areas.values()), 2)
+
+    # 4. 단독 기재된 전용면적 후보 추출 (층별 면적 리스트에 잡히지 않은 단독 면적 수치들을 찾습니다.)
+    all_area_matches = re.findall(r'(\d+(?:\.\d+)?)\s*㎡', st_text)
+    candidate_exclusive_areas = []
+    for val_str in all_area_matches:
+        try:
+            val = float(val_str)
+            if val not in floor_areas.values() and val != land_area:
+                candidate_exclusive_areas.append(val)
+        except ValueError:
+            pass
+
+    # 5. 전용면적 결정
+    # 5-1. 건물전용, 전용면적, 전용 등의 키워드와 함께 등장하는 단독 면적이 있는지 확인합니다.
+    excl_keyword_match = re.search(r'(?:건물전용|전용면적|전용|건물)\s*(\d+(?:\.\d+)?)\s*㎡', st_text)
+    if excl_keyword_match:
+        try:
+            val = float(excl_keyword_match.group(1))
+            exclusive_area = val
+            is_estimated_exclusive = False
+            excl_est_type = "exact"  # 명시적인 실제 면적
+        except ValueError:
+            pass
+
+    # 5-2. "전용" 키워드는 없지만, 층별 면적에 포함되지 않는 단독 면적이 맨 뒤나 중간에 존재하는 경우
+    if exclusive_area == 0.0 and candidate_exclusive_areas:
+        # 단독 면적 후보 중 가장 마지막에 나오는 면적을 채택합니다.
+        exclusive_area = candidate_exclusive_areas[-1]
+        is_estimated_exclusive = False
+        excl_est_type = "exact"  # 공부상 단독 전용면적 기재 건이므로 실제 면적으로 채택
+
+    # 5-3. 단독 면적이 존재하지 않고, 오직 층별 면적 리스트만 있는 경우 (추정이 필요한 경우)
+    if exclusive_area == 0.0 and floor_areas:
+        total_floor_area = 0.0
+        if target_floor and target_floor in floor_areas:
+            total_floor_area = floor_areas[target_floor]
+        else:
+            total_floor_area = max(floor_areas.values())
+            
+        # 다세대 여부 판별 (소재지 텍스트의 키워드 기준)
+        is_villa = any(k in st_text for k in ["다세대", "빌라", "연립"])
+        
+        # 층당 세대수 결정 (divisor)
+        divisor = 2  # 기본값: 2세대 분할
+        if target_room:
+            # 방 번호에서 숫자만 추출합니다.
+            room_digits = re.sub(r'\D', '', target_room)
+            if room_digits:
+                try:
+                    room_num = int(room_digits)
+                    # 다세대를 제외한 아파트, 오피스텔 등 일반 건물은 호수 번호의 백의 자리(혹은 천의 자리)를 divisor로 채택합니다.
+                    if not is_villa:
+                        if room_num >= 100:
+                            # 3자리(예: 302호)면 3분할, 4자리(예: 1204호)면 12분할을 적용하되, 백의 자리가 1 이하면 2분할로 방어 처리합니다.
+                            est_divisor = room_num // 100
+                            if est_divisor <= 1:
+                                divisor = 2
+                            else:
+                                divisor = est_divisor
+                        else:
+                            divisor = room_num if room_num > 1 else 2
+                    else:
+                        # 다세대의 경우 기존 끝자리 기반 divisor 방식을 적용합니다.
+                        last_digit = room_num % 10
+                        if last_digit in [1, 2]:
+                            divisor = 2
+                        elif last_digit in [3, 4]:
+                            divisor = 4
+                        elif last_digit in [5, 6]:
+                            divisor = 6
+                        elif last_digit > 6:
+                            divisor = last_digit
+                except ValueError:
+                    pass
+                    
+        # 면적 추정 계산 수행
+        if is_villa:
+            # 다세대의 경우 별도의 표기가 없으면 지층부터 합계된 모든 면적(total_area)을 기준으로 전체 세대수(층수 * divisor)로 나눕니다.
+            est_total_floors = total_floors if total_floors > 0 else 1
+            exclusive_area = round(total_area / (est_total_floors * divisor), 2)
+        else:
+            # 일반 건물의 경우 해당 층별 면적을 divisor로 분할합니다.
+            exclusive_area = round(total_floor_area / divisor, 2)
+            
+        is_estimated_exclusive = True
+        excl_est_type = "estimated"  # 층별 면적을 근거로 분할했으므로 최대 근사값 추정
+
+    # 6. 폴백 처리 (기존 로직 보존 및 고도화)
+    if exclusive_area == 0.0 and not land_match:
+        single_match = re.search(r'(\d+(?:\.\d+)?)\s*㎡', st_text)
+        if single_match:
+            try:
+                val = float(single_match.group(1))
+                has_land_keywords = any(k in st_text for k in ["임야", "토지", "대지", "잡종지", "대", "전", "답"])
+                if has_land_keywords and not any(k in st_text for k in ["아파트", "빌라", "다세대", "연립", "주택", "건물", "상가", "공장", "창고", "호"]):
+                    land_area = val
+                    is_estimated_land = False
+                else:
+                    exclusive_area = val
+                    is_estimated_exclusive = False
+                    excl_est_type = "exact"  # 제목에 층별 면적 목록이 없고 이 단일 수치만 존재하므로, 실제 전용면적으로 자동 격상
+            except ValueError:
+                pass
+
+    # 최종 폴백으로 전용면적이 여전히 0이면 거의 허수(fake)
+    if exclusive_area == 0.0:
+        excl_est_type = "fake"
+
+    # 비건물 자산인 경우 최종 예외 처리
+    if is_non_building:
+        exclusive_area = 0.0
+        is_estimated_exclusive = False
+        excl_est_type = "exact"  # exact로 지정하여 뱃지 미노출 유도
+
+    return (
+        exclusive_area, land_area, is_estimated_exclusive, is_estimated_land,
+        excl_est_type, total_floors, total_area, floor_areas
+    )
 
 def safe_int(val_str, default=0):
     if not val_str:
@@ -534,6 +743,33 @@ def process_single_item(raw_info, service_key):
     ld_area = clean_float(land_area_text)
     bu_area = clean_float(bdng_area_text)
     
+    # ------------------ 고도화된 면적 추정 기능 적용 ------------------
+    is_est_ex = ex_area <= 0
+    is_est_ld = ld_area <= 0
+    excl_est_type = "exact"
+    total_floors = 0
+    total_area = 0.0
+    floor_areas = {}
+
+    # 만약 온비드 API가 넘겨준 면적이 0이거나 유효하지 않은 경우, 제목(desc)을 분석하여 면적을 추정합니다.
+    if ex_area <= 0 or ld_area <= 0:
+        (
+            parsed_ex, parsed_ld, parsed_is_est_ex, parsed_is_est_ld,
+            parsed_excl_est_type, parsed_total_floors, parsed_total_area, parsed_floor_areas
+        ) = extract_court_areas(desc, ptype)
+        
+        if ex_area <= 0 and parsed_ex > 0:
+            ex_area = parsed_ex
+            is_est_ex = parsed_is_est_ex
+            excl_est_type = parsed_excl_est_type
+            total_floors = parsed_total_floors
+            total_area = parsed_total_area
+            floor_areas = parsed_floor_areas
+        if ld_area <= 0 and parsed_ld > 0:
+            ld_area = parsed_ld
+            is_est_ld = parsed_is_est_ld
+    # ------------------------------------------------------------------
+    
     su_area = round(ex_area * 1.35, 2) if ex_area > 0 else 0.0
     if bu_area <= 0:
         bu_area = ex_area
@@ -589,10 +825,10 @@ def process_single_item(raw_info, service_key):
         "supply_area": su_area,
         "land_area": ld_area,
         "building_area": bu_area,
-        "is_estimated_exclusive": ex_area <= 0,
+        "is_estimated_exclusive": is_est_ex,
         "is_estimated_supply": True if ex_area > 0 else False,
-        "is_estimated_land": ld_area <= 0,
-        "is_estimated_building": bu_area <= 0,
+        "is_estimated_land": is_est_ld,
+        "is_estimated_building": is_est_ex,
         "complex_info": complex_info,
         "elementary_school": elementary_school,
         "recent_deals": recent_deals,
@@ -601,7 +837,10 @@ def process_single_item(raw_info, service_key):
         "lease_method": lease_method,
         "lease_term": lease_term,
         "images": images,
-        "exclusive_area_estimation_type": "exact"
+        "exclusive_area_estimation_type": excl_est_type,
+        "building_total_floors": total_floors,
+        "building_total_area": total_area,
+        "floor_areas": floor_areas
     }
     
     meta_json = json.dumps(area_meta, ensure_ascii=False)
