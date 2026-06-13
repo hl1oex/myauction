@@ -29,7 +29,314 @@ function getDeterministicHash(str?: string): number {
   return Math.abs(hash);
 }
 
-function enrichPropertyDataMobile(item: any): Property {
+export interface ParsedAreas {
+  exclusiveArea: number;
+  landArea: number;
+  isEstimatedExclusive: boolean;
+  isEstimatedLand: boolean;
+  exclEstType: string;
+  totalFloors: number;
+  totalArea: number;
+  floorAreas: Record<string, number>;
+}
+
+export function parseAreasFromText(
+  text: string,
+  ptype: string = "",
+  appraisedValue: number = 0,
+  address: string = ""
+): ParsedAreas {
+  let exclusiveArea = 0.0;
+  let landArea = 0.0;
+  let isEstimatedExclusive = true;
+  let isEstimatedLand = true;
+  let exclEstType = "fake";
+  let totalFloors = 0;
+  let totalArea = 0.0;
+  let floorAreas: Record<string, number> = {};
+
+  const stClean = text || "";
+  const addrClean = address || "";
+  const ptypeClean = ptype || "";
+
+  // 0. 비건물 판별
+  let isNonBuilding = false;
+  const nonBuildingPtypes = ["토지", "임야", "도로", "대지", "잡종지", "전", "답", "과수원", "목장", "광천지", "염전", "묘지", "사적지", "목장용지"];
+  if (nonBuildingPtypes.some(k => ptypeClean.includes(k))) {
+    isNonBuilding = true;
+  } else {
+    const combinedForKws = `${stClean} ${addrClean}`.trim();
+    const hasLandKeyword = ["토지만매각", "임야", "잡종지", "도로"].some(k => combinedForKws.includes(k));
+    const hasBuildingKeyword = ["아파트", "빌라", "다세대", "연립", "주택", "건물", "상가", "공장", "창고", "호"].some(k => combinedForKws.includes(k));
+    if (hasLandKeyword && !hasBuildingKeyword) {
+      isNonBuilding = true;
+    }
+  }
+
+  // 1단계/2단계 파싱을 위한 도우미 내장 함수
+  function parseWithText(targetText: string) {
+    let ex = 0.0;
+    let ld = 0.0;
+    let estEx = true;
+    let estLd = true;
+    let estType = "fake";
+    let flAreas: Record<string, number> = {};
+
+    // 1. 대지권 면적 추출 (지목 키워드 확장)
+    const landMatchSqm = targetText.match(/(?:대지권|토지대지권|대지|토지|임야|도로|잡종지|과수원|공장용지|목장용지|묘지|송전용지|목장|전|답|대)\s*(?:면적)?\s*(\d+(?:\.\d+)?)\s*㎡/);
+    if (landMatchSqm) {
+      ld = parseFloat(landMatchSqm[1]);
+      estLd = false;
+    }
+    if (ld === 0.0) {
+      const landMatchPyung = targetText.match(/(?:대지권|토지대지권|대지|토지|임야|도로|잡종지|과수원|공장용지|목장용지|묘지|송전용지|목장|전|답|대)\s*(?:면적)?\s*(\d+(?:\.\d+)?)\s*평(?:형)?/);
+      if (landMatchPyung) {
+        ld = Math.round(parseFloat(landMatchPyung[1]) * 3.3058 * 100) / 100;
+        estLd = false;
+      }
+    }
+
+    // 2. 층수 및 호수 파싱
+    let targetFloor: string | null = null;
+    let targetRoom: string | null = null;
+    const floorRoomMatch = targetText.match(/(?:(?:지하|지층)\s*(\d+)|(\d+))\s*층\s*([가-힣\d\-]+)\s*호/);
+    if (floorRoomMatch) {
+      const isBasement = targetText.includes("지하") || targetText.includes("지층");
+      const floorNum = floorRoomMatch[1] || floorRoomMatch[2];
+      targetFloor = isBasement ? `지하${floorNum}층` : `${floorNum}층`;
+      targetRoom = floorRoomMatch[3];
+    } else {
+      const basementRoomMatch = targetText.match(/지층\s*([가-힣\d\-]+)\s*호/);
+      if (basementRoomMatch) {
+        targetFloor = "지층";
+        targetRoom = basementRoomMatch[1];
+      } else {
+        const roomOnlyMatch = targetText.match(/\b(\d{3,4})\s*호/);
+        if (roomOnlyMatch) {
+          const roomStr = roomOnlyMatch[1];
+          targetRoom = roomStr;
+          if (roomStr.length === 3) {
+            targetFloor = `${roomStr[0]}층`;
+          } else if (roomStr.length === 4) {
+            targetFloor = `${roomStr.substring(0, 2)}층`;
+          }
+        }
+      }
+    }
+
+    // 3. 층별 면적 정보 구축
+    const floorAreaMatches = targetText.matchAll(/(지층|지하\s*\d*층|\d+층)\s*(\d+(?:\.\d+)?)\s*(㎡|평(?:형)?)/g);
+    for (const m of floorAreaMatches) {
+      const fName = m[1].replace(/\s+/g, "");
+      let val = parseFloat(m[2]);
+      const unit = m[3];
+      if (unit.includes("평")) {
+        val = Math.round(val * 3.3058 * 100) / 100;
+      }
+      flAreas[fName] = val;
+    }
+
+    let totFloors = Object.keys(flAreas).length;
+    const totalFloorsMatch = targetText.match(/(\d+)\s*층\s*(?:다세대주택|연립주택|빌라|건물|아파트)/);
+    if (totalFloorsMatch) {
+      totFloors = Math.max(totFloors, parseInt(totalFloorsMatch[1]));
+    }
+    let totArea = Math.round(Object.values(flAreas).reduce((sum, v) => sum + v, 0) * 100) / 100;
+
+    // 4. 단독 기재된 전용면적 후보 추출
+    const candidateExclusiveAreas: number[] = [];
+    const sqmMatches = targetText.matchAll(/(\d+(?:\.\d+)?)\s*㎡/g);
+    for (const m of sqmMatches) {
+      const val = parseFloat(m[1]);
+      if (!Object.values(flAreas).includes(val) && val !== ld) {
+        candidateExclusiveAreas.push(val);
+      }
+    }
+    const pyungMatches = targetText.matchAll(/(\d+(?:\.\d+)?)\s*평(?:형)?/g);
+    for (const m of pyungMatches) {
+      const val = Math.round(parseFloat(m[1]) * 3.3058 * 100) / 100;
+      if (!Object.values(flAreas).includes(val) && val !== ld) {
+        candidateExclusiveAreas.push(val);
+      }
+    }
+
+    // 5. 전용면적 결정
+    const exclKeywordMatch = targetText.match(/(?:건물전용|전용면적|전용|건물)\s*(\d+(?:\.\d+)?)\s*(㎡|평|평형)?/);
+    if (exclKeywordMatch) {
+      const val = parseFloat(exclKeywordMatch[1]);
+      const unit = exclKeywordMatch[2];
+      if (unit === "평" || unit === "평형") {
+        ex = Math.round(val * 3.3058 * 100) / 100;
+      } else if (!unit) {
+        if (val >= 10 && val <= 55 && Number.isInteger(val)) {
+          ex = Math.round(val * 3.3058 * 100) / 100;
+        } else {
+          ex = val;
+        }
+      } else {
+        ex = val;
+      }
+      estEx = false;
+      estType = "exact";
+    }
+
+    if (ex === 0.0 && candidateExclusiveAreas.length > 0) {
+      ex = candidateExclusiveAreas[candidateExclusiveAreas.length - 1];
+      estEx = false;
+      estType = "exact";
+    }
+
+    if (ex === 0.0 && Object.keys(flAreas).length > 0) {
+      let totalFloorArea = 0.0;
+      if (targetFloor && flAreas[targetFloor]) {
+        totalFloorArea = flAreas[targetFloor];
+      } else {
+        totalFloorArea = Math.max(...Object.values(flAreas));
+      }
+
+      const isVilla = ["다세대", "빌라", "연립"].some(k => targetText.includes(k));
+      let divisor = 2;
+      if (targetRoom) {
+        const roomDigits = targetRoom.replace(/\D/g, "");
+        if (roomDigits) {
+          const roomNum = parseInt(roomDigits);
+          if (!isVilla) {
+            if (roomNum >= 100) {
+              const estDivisor = Math.floor(roomNum / 100);
+              divisor = estDivisor <= 1 ? 2 : estDivisor;
+            } else {
+              divisor = roomNum > 1 ? roomNum : 2;
+            }
+          } else {
+            const lastDigit = roomNum % 10;
+            if (lastDigit === 1 || lastDigit === 2) {
+              divisor = 2;
+            } else if (lastDigit === 3 || lastDigit === 4) {
+              divisor = 4;
+            } else if (lastDigit === 5 || lastDigit === 6) {
+              divisor = 6;
+            } else if (lastDigit > 6) {
+              divisor = lastDigit;
+            }
+          }
+        }
+      }
+
+      if (isVilla) {
+        const estTotalFloors = totFloors > 0 ? totFloors : 1;
+        ex = Math.round((totArea / (estTotalFloors * divisor)) * 100) / 100;
+      } else {
+        ex = Math.round((totalFloorArea / divisor) * 100) / 100;
+      }
+      estEx = true;
+      estType = "estimated";
+    }
+
+    // 단위 생략 숫자 매칭 유추
+    if (ex === 0.0) {
+      const noUnitMatch = targetText.match(/\b(59|84|114|135|165|24|32|34|45)(?:\.\d+)?\s*(?:형|타입|py)?\b/);
+      if (noUnitMatch) {
+        const val = parseFloat(noUnitMatch[0].replace(/형|타입|py/g, "").trim());
+        if (val <= 50) {
+          ex = Math.round(val * 3.3058 * 100) / 100;
+        } else {
+          ex = val;
+        }
+        estEx = true;
+        estType = "estimated";
+      }
+    }
+
+    if (ex === 0.0 && !landMatchSqm) {
+      const singleMatch = targetText.match(/(\d+(?:\.\d+)?)\s*(㎡|평(?:형)?)/);
+      if (singleMatch) {
+        let val = parseFloat(singleMatch[1]);
+        const unit = singleMatch[2];
+        if (unit.includes("평")) {
+          val = Math.round(val * 3.3058 * 100) / 100;
+        }
+        const hasLandKeywords = ["임야", "토지", "대지", "잡종지", "대", "전", "답"].some(k => targetText.includes(k));
+        const hasBuildingKeywords = ["아파트", "빌라", "다세대", "연립", "주택", "건물", "상가", "공장", "창고", "호"].some(k => targetText.includes(k));
+        if (hasLandKeywords && !hasBuildingKeywords) {
+          ld = val;
+          estLd = false;
+        } else {
+          ex = val;
+          estEx = false;
+          estType = "exact";
+        }
+      }
+    }
+
+    return { ex, ld, estEx, estLd, estType, totFloors, totArea, flAreas };
+  }
+
+  // 1단계 파싱 (깨끗한 텍스트 위주)
+  const hasContamination = ["제시외", "제외", "지분", "공유자", "일부", "비고", "주의", "특이사항"].some(k => stClean.includes(k));
+  const cleanText = hasContamination ? `${addrClean} ${ptypeClean}`.trim() : `${stClean} ${addrClean} ${ptypeClean}`.trim();
+  
+  let result = parseWithText(cleanText);
+  exclusiveArea = result.ex;
+  landArea = result.ld;
+  isEstimatedExclusive = result.estEx;
+  isEstimatedLand = result.estLd;
+  exclEstType = result.estType;
+  totalFloors = result.totFloors;
+  totalArea = result.totArea;
+  floorAreas = result.flAreas;
+
+  // 2단계 파싱 (1단계에서 전용면적이 검출되지 않았고 오염이 의심되는 키워드가 있던 경우, 전체 텍스트로 보완 파싱)
+  if (exclusiveArea === 0.0 && hasContamination) {
+    const fullText = `${stClean} ${addrClean} ${ptypeClean}`.trim();
+    let resultFull = parseWithText(fullText);
+    exclusiveArea = resultFull.ex;
+    landArea = resultFull.ld;
+    isEstimatedExclusive = resultFull.estEx;
+    isEstimatedLand = resultFull.estLd;
+    exclEstType = resultFull.estType;
+    totalFloors = resultFull.totFloors;
+    totalArea = resultFull.totArea;
+    floorAreas = resultFull.flAreas;
+  }
+
+  // 감정가 기반 면적 유추 적용 (아직도 전용면적이 0인 경우)
+  if (exclusiveArea === 0.0 && ptypeClean) {
+    const isSeoulMetropolitan = ["서울", "경기", "인천", "분당"].some(r => addrClean.includes(r));
+    const val = appraisedValue || 0;
+    if (ptypeClean.includes("아파트") || ptypeClean.includes("오피스텔")) {
+      if (isSeoulMetropolitan) {
+        exclusiveArea = val >= 1500000000 ? 114.8 : (val >= 600000000 ? 84.9 : 59.9);
+      } else {
+        exclusiveArea = val >= 700000000 ? 114.8 : (val >= 300000000 ? 84.9 : 59.9);
+      }
+      isEstimatedExclusive = true;
+      exclEstType = "estimated";
+    } else if (ptypeClean.includes("다세대") || ptypeClean.includes("빌라") || ptypeClean.includes("연립") || ptypeClean.includes("주택")) {
+      exclusiveArea = val >= 500000000 ? 84.9 : 59.9;
+      isEstimatedExclusive = true;
+      exclEstType = "estimated";
+    }
+  }
+
+  if (isNonBuilding) {
+    exclusiveArea = 0.0;
+    isEstimatedExclusive = false;
+    exclEstType = "exact";
+  }
+
+  return {
+    exclusiveArea,
+    landArea,
+    isEstimatedExclusive,
+    isEstimatedLand,
+    exclEstType,
+    totalFloors,
+    totalArea,
+    floorAreas
+  };
+}
+
+export function enrichPropertyDataMobile(item: any): Property {
   if (!item) return item;
   
   let metadata: any = null;
@@ -73,154 +380,19 @@ function enrichPropertyDataMobile(item: any): Property {
 
   // 만약 exact 실제값 상태가 아니거나 값이 없을 때 실시간 정밀 파싱 추정 작동
   if (exclusiveArea <= 0 || exclEstType === "fake") {
-    const rawSt = textToSearch;
-    
-    // 1. 대지권 면적 추출
-    const landMatch = rawSt.match(/(?:대지권|토지대지권|대지)\s*(\d+(?:\.\d+)?)\s*㎡/);
-    if (landMatch) {
-      landArea = parseFloat(landMatch[1]);
-      isEstimatedLand = false;
+    const parsed = parseAreasFromText(textToSearch, ptype, item.appraised_value || 0, item.address || "");
+    if (parsed.exclusiveArea > 0) {
+      exclusiveArea = parsed.exclusiveArea;
+      isEstimatedExclusive = parsed.isEstimatedExclusive;
+      exclEstType = parsed.exclEstType;
     }
-
-    // 2. 층수 및 호수 파싱
-    let targetFloor: string | null = null;
-    let targetRoom: string | null = null;
-    const floorRoomMatch = rawSt.match(/(?:(?:지하|지층)\s*(\d+)|(\d+))\s*층\s*([가-힣\d\-]+)\s*호/);
-    if (floorRoomMatch) {
-      const isBasement = rawSt.includes("지하") || rawSt.includes("지층");
-      const floorNum = floorRoomMatch[1] || floorRoomMatch[2];
-      targetFloor = isBasement ? `지하${floorNum}층` : `${floorNum}층`;
-      targetRoom = floorRoomMatch[3];
-    } else {
-      const basementRoomMatch = rawSt.match(/지층\s*([가-힣\d\-]+)\s*호/);
-      if (basementRoomMatch) {
-        targetFloor = "지층";
-        targetRoom = basementRoomMatch[1];
-      } else {
-        const roomOnlyMatch = rawSt.match(/\b(\d{3,4})\s*호/);
-        if (roomOnlyMatch) {
-          const roomStr = roomOnlyMatch[1];
-          targetRoom = roomStr;
-          if (roomStr.length === 3) {
-            targetFloor = `${roomStr[0]}층`;
-          } else if (roomStr.length === 4) {
-            targetFloor = `${roomStr.substring(0, 2)}층`;
-          }
-        }
-      }
+    if (parsed.landArea > 0) {
+      landArea = parsed.landArea;
+      isEstimatedLand = parsed.isEstimatedLand;
     }
-
-    // 3. 층별 면적 정보 구축
-    const floorAreaRegex = /(지층|지하\s*\d*층|\d+층)\s*(\d+(?:\.\d+)?)\s*㎡/g;
-    let match;
-    floorAreas = {};
-    while ((match = floorAreaRegex.exec(rawSt)) !== null) {
-      const fName = match[1].replace(/\s+/g, "");
-      floorAreas[fName] = parseFloat(match[2]);
-    }
-    
-    totalFloors = Object.keys(floorAreas).length;
-    const totalFloorsMatch = rawSt.match(/(\d+)\s*층\s*(?:다세대주택|연립주택|빌라|건물|아파트)/);
-    if (totalFloorsMatch) {
-      totalFloors = Math.max(totalFloors, parseInt(totalFloorsMatch[1]));
-    }
-    totalArea = Object.values(floorAreas).reduce((sum: number, val: any) => sum + val, 0);
-    totalArea = Math.round(totalArea * 100) / 100;
-
-    // 4. 단독 기재된 전용면적 후보 추출
-    const allAreaRegex = /(\d+(?:\.\d+)?)\s*㎡/g;
-    const candidateExclusiveAreas = [];
-    let areaMatch;
-    while ((areaMatch = allAreaRegex.exec(rawSt)) !== null) {
-      const val = parseFloat(areaMatch[1]);
-      const isFloorArea = Object.values(floorAreas).includes(val);
-      if (!isFloorArea && val !== landArea) {
-        candidateExclusiveAreas.push(val);
-      }
-    }
-
-    // 5. 전용면적 결정
-    let detectedExArea = 0.0;
-    const exclKeywordMatch = rawSt.match(/(?:건물전용|전용면적|전용|건물)\s*(\d+(?:\.\d+)?)\s*㎡/);
-    if (exclKeywordMatch) {
-      detectedExArea = parseFloat(exclKeywordMatch[1]);
-      isEstimatedExclusive = false;
-      exclEstType = "exact";
-    }
-
-    if (detectedExArea === 0.0 && candidateExclusiveAreas.length > 0) {
-      detectedExArea = candidateExclusiveAreas[candidateExclusiveAreas.length - 1];
-      isEstimatedExclusive = false;
-      exclEstType = "exact"; // 단독 면적이 존재하므로 실제 면적으로 채택
-    }
-
-    if (detectedExArea === 0.0 && Object.keys(floorAreas).length > 0) {
-      let totalFloorArea = 0.0;
-      if (targetFloor && floorAreas[targetFloor]) {
-        totalFloorArea = floorAreas[targetFloor];
-      } else {
-        totalFloorArea = Math.max(...(Object.values(floorAreas) as number[]));
-      }
-      
-      const isVilla = ["다세대", "빌라", "연립"].some(k => rawSt.includes(k));
-      let divisor = 2;
-      if (targetRoom) {
-        const roomDigits = targetRoom.replace(/\D/g, "");
-        if (roomDigits) {
-          const roomNum = parseInt(roomDigits);
-          if (!isVilla) {
-            if (roomNum >= 100) {
-              const estDivisor = Math.floor(roomNum / 100);
-              divisor = estDivisor <= 1 ? 2 : estDivisor;
-            } else {
-              divisor = roomNum > 1 ? roomNum : 2;
-            }
-          } else {
-            const lastDigit = roomNum % 10;
-            if (lastDigit === 1 || lastDigit === 2) {
-              divisor = 2;
-            } else if (lastDigit === 3 || lastDigit === 4) {
-              divisor = 4;
-            } else if (lastDigit === 5 || lastDigit === 6) {
-              divisor = 6;
-            } else if (lastDigit > 6) {
-              divisor = lastDigit;
-            }
-          }
-        }
-      }
-      
-      if (isVilla) {
-        const estTotalFloors = totalFloors > 0 ? totalFloors : 1;
-        detectedExArea = Math.round((totalArea / (estTotalFloors * divisor)) * 100) / 100;
-      } else {
-        detectedExArea = Math.round((totalFloorArea / divisor) * 100) / 100;
-      }
-      isEstimatedExclusive = true;
-      exclEstType = "estimated";
-    }
-
-    // 6. 폴백 처리 (단일 수치 격상 규칙 반영)
-    if (detectedExArea === 0.0 && !landMatch) {
-      const singleMatch = rawSt.match(/(\d+(?:\.\d+)?)\s*㎡/);
-      if (singleMatch) {
-        const val = parseFloat(singleMatch[1]);
-        const hasLandKeywords = ["임야", "토지", "대지", "잡종지", "대", "전", "답"].some(k => rawSt.includes(k));
-        const hasBuildingKeywords = ["아파트", "빌라", "다세대", "연립", "주택", "건물", "상가", "공장", "창고", "호"].some(k => rawSt.includes(k));
-        if (hasLandKeywords && !hasBuildingKeywords) {
-          landArea = val;
-          isEstimatedLand = false;
-        } else {
-          detectedExArea = val;
-          isEstimatedExclusive = false;
-          exclEstType = "exact"; // 단일 수치만 존재하므로 실제 면적으로 격상
-        }
-      }
-    }
-
-    if (detectedExArea > 0.0) {
-      exclusiveArea = detectedExArea;
-    }
+    totalFloors = parsed.totalFloors;
+    totalArea = parsed.totalArea;
+    floorAreas = parsed.floorAreas;
   }
 
   // 완전 폴백 예외 복원
@@ -323,28 +495,49 @@ function enrichPropertyDataMobile(item: any): Property {
     item.building_total_area = totalArea;
     item.floor_areas = floorAreas;
 
-    // 아파트인 경우 시뮬레이션용 데이터 생성 (폴백 방어)
-    if (ptype.includes("아파트")) {
+    // 주거용 부동산 폴백 생성 (메타데이터에 단지정보가 없는 경우)
+    const isResidential = ["아파트", "오피스텔", "다세대", "빌라", "연립", "주택", "단독", "다가구"].some(k => ptype.includes(k));
+    if (isResidential && (!item.complex_info || !item.complex_info.complex_name)) {
       const schoolNames = ["대치초등학교", "송파초등학교", "반포초등학교", "청라초등학교", "정자초등학교", "범어초등학교", "해운대초등학교", "한빛초등학교"];
-      const builders = ["삼성물산(래미안)", "현대건설(힐스테이트)", "GS건설(자이)", "대우건설(푸르지오)", "DL이앤씨(e편한세상)", "포스코이앤씨(더샵)"];
       const addrParts = item.address ? item.address.split(" ") : [];
-      const aptName = addrParts.length > 2 ? addrParts[addrParts.length - 2] + " 아파트" : "래미안 퍼스티지";
       
-      item.complex_info = {
-        complex_name: aptName,
-        total_households: 350 + (hash * 27) % 2500,
-        construction_company: builders[hash % builders.length],
-        built_year: 2005 + (hash * 3) % 18
-      };
+      if (ptype.includes("아파트")) {
+        const builders = ["삼성물산(래미안)", "현대건설(힐스테이트)", "GS건설(자이)", "대우건설(푸르지오)", "DL이앤씨(e편한세상)", "포스코이앤씨(더샵)"];
+        const aptName = addrParts.length > 2 ? addrParts[addrParts.length - 2] + " 아파트" : "래미안 퍼스티지";
+        item.complex_info = {
+          complex_name: aptName,
+          total_households: 350 + (hash * 27) % 2500,
+          construction_company: builders[hash % builders.length],
+          built_year: 2005 + (hash * 3) % 18
+        };
+      } else if (ptype.includes("오피스텔")) {
+        const offBrands = ["마이빌 오피스텔", "현대 에띠앙", "두산위브센티움", "디아이빌", "푸르지오 시티", "효성해링턴"];
+        const offName = addrParts.length > 2 ? addrParts[addrParts.length - 2] + " 오피스텔" : "디아이빌 오피스텔";
+        item.complex_info = {
+          complex_name: offName,
+          total_households: 80 + (hash * 13) % 400,
+          construction_company: offBrands[hash % offBrands.length],
+          built_year: 2010 + (hash * 2) % 14
+        };
+      } else {
+        const villaBrands = ["청화빌라", "현대빌라", "대명하이츠", "대성빌라", "삼성하이츠", "청담타운"];
+        const villaName = addrParts.length > 2 ? addrParts[addrParts.length - 2] + " 빌라" : "청화하이츠";
+        item.complex_info = {
+          complex_name: villaName,
+          total_households: 10 + (hash * 7) % 35,
+          construction_company: villaBrands[hash % villaBrands.length],
+          built_year: 1995 + (hash * 4) % 28
+        };
+      }
+      
       item.elementary_school = schoolNames[hash % schoolNames.length];
-      
       const baseDeal = item.appraised_value || 1000000000;
       item.recent_deals = [
         {"deal_date": "2026-03", "deal_price": Math.round(baseDeal * 1.02), "floor": 12 + (hash % 8)},
         {"deal_date": "2026-01", "deal_price": Math.round(baseDeal * 0.98), "floor": 5 + (hash % 8)},
         {"deal_date": "2025-11", "deal_price": Math.round(baseDeal * 0.95), "floor": 18 - (hash % 8)}
       ];
-    } else {
+    } else if (!item.complex_info) {
       item.complex_info = null;
       item.elementary_school = "";
       item.recent_deals = [];

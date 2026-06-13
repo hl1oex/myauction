@@ -32,7 +32,24 @@ def search_keywords(file_path, keywords):
                     safe_snippet += f"[{ord(char)}]"
             print(f"  - Position {idx}: ... {safe_snippet} ...")
 
-search_keywords("mobile-app/src/screens/FeedScreen.tsx", ["ad", "banner", "adsense"])
+def dump_loadDetailView(file_path):
+    with open(file_path, 'r', encoding='utf-8') as f:
+        content = f.read()
+    idx = content.find("function loadDetailView(item)")
+    if idx != -1:
+        snippet = content[idx:idx+12000].replace('\n', ' [NL] ')
+        safe_snippet = ""
+        for char in snippet:
+            if ord(char) < 128:
+                safe_snippet += char
+            else:
+                safe_snippet += f"[{ord(char)}]"
+        print(safe_snippet)
+
+search_keywords("index.html", ["complex_name", "elementary_school", "recent_deals", "detail-panel-complex"])
+
+
+
 
 
 

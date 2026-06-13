@@ -39,6 +39,7 @@ export interface Property {
     deal_date: string;
     deal_price: number;
     floor: number;
+    change?: string;
   }[];
   is_estimated?: boolean;
   is_lease?: boolean;

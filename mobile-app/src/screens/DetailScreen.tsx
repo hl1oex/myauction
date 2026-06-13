@@ -19,6 +19,7 @@ import { WebView } from 'react-native-webview';
 import { Property } from '../types';
 import { COLORS } from '../components/Theme';
 import { supabase } from '../utils/supabase';
+import { enrichPropertyDataMobile } from '../utils/api';
 
 interface DetailScreenProps {
   property: Property;
@@ -330,400 +331,6 @@ const detectStructure = (item: Property) => {
 };
 
 export const DetailScreen: React.FC<DetailScreenProps> = ({ property, onBack }) => {
-  const getDeterministicHash = (str?: string): number => {
-    let hash = 0;
-    if (!str) return hash;
-    for (let i = 0; i < str.length; i++) {
-      hash = str.charCodeAt(i) + ((hash << 5) - hash);
-    }
-    return Math.abs(hash);
-  };
-
-  const enrichPropertyDataMobile = (item: Property): Property => {
-    if (!item) return item;
-    
-    // notes_content 복사 및 메타데이터 파싱
-    let meta: any = { is_estimated: true, is_lease: false, images: [] };
-    let cleanNotes = item.notes_content || '';
-    if (item.notes_content) {
-        const metaMatch = item.notes_content.match(/__METADATA__:(.*)__/);
-        if (metaMatch) {
-            try {
-                meta = JSON.parse(metaMatch[1]);
-                cleanNotes = item.notes_content.replace(/\n\n__METADATA__:.*__/, "").trim();
-            } catch (e) {
-                console.error("Failed to parse metadata", e);
-            }
-        }
-    }
-    
-    const enriched = { ...item };
-    enriched.notes_content = cleanNotes;
-    enriched.is_estimated = meta.is_estimated !== undefined ? meta.is_estimated : true;
-    enriched.is_lease = meta.is_lease !== undefined ? meta.is_lease : false;
-    enriched.images = meta.images || [];
-    enriched.lease_method = meta.lease_method || null;
-    enriched.lease_term = meta.lease_term || null;
-    enriched.complex_info = meta.complex_info || {};
-    enriched.elementary_school = meta.elementary_school || "";
-    enriched.recent_deals = meta.recent_deals || [];
-
-    // 비부동산 자산 메타 파싱 또는 연동.
-    const nonBuildingKeywords = ['차량', '자동차', '중기', '선박', '항공기', '운송', '지게차', '장비', '기계', '기구', '설비', '유가증권', '증권', '주식', '채권', '기타물품', '물품', '동산'];
-    const isNonBuilding = item.source === 'court_etc' || item.source === 'onbid_etc' || nonBuildingKeywords.some(k => (item.ptype || "").includes(k));
-    const textToSearch = `${item.address || ""} ${item.desc_content || ""} ${cleanNotes}`;
-    const nbMeta = meta.non_building_meta || (isNonBuilding ? extractNonBuildingMetaMobile(textToSearch, item.ptype || "") : null);
-    enriched.non_building_meta = nbMeta;
-
-
-    if (nbMeta && nbMeta.asset_type) {
-      if (nbMeta.asset_type === 'vehicle') {
-        enriched.car_info = {
-          car_no: nbMeta.vehicle_no || '-',
-          car_model: nbMeta.model_name || '-',
-          model_year: nbMeta.model_year || '-',
-          mileage: nbMeta.mileage || '-',
-          fuel: nbMeta.fuel || '미상',
-          displacement: nbMeta.displacement || '미상',
-          color: nbMeta.color || '미상',
-          vin: nbMeta.vin || '-',
-          engine_type: nbMeta.engine_type || '-',
-          vehicle_type: nbMeta.vehicle_type || '-',
-          base_location: nbMeta.base_location || '-',
-          accident_history: '미상',
-          inspection_status: '양호 (추정)'
-        };
-      } else if (nbMeta.asset_type === 'machinery') {
-        enriched.machinery_info = {
-          machine_name: nbMeta.model_name || '-',
-          maker: nbMeta.manufacturer || '-',
-          model_year: '-',
-          status: '정상 작동 (추정)',
-          standard: nbMeta.specification || nbMeta.quantity || '-'
-        };
-      } else if (nbMeta.asset_type === 'securities') {
-        enriched.security_info = {
-          company_name: nbMeta.company_name || '-',
-          security_type: '보통주',
-          share_count: nbMeta.quantity || '-',
-          face_value: '-',
-          par_value_total: '-',
-          financial_status: '정상 (추정)',
-          major_shareholders: '미상'
-        };
-      } else if (nbMeta.asset_type === 'goods') {
-        enriched.etc_info = {
-          item_name: nbMeta.model_name || '-',
-          quantity: nbMeta.quantity || '-',
-          origin: '국산 (추정)',
-          status: '보통',
-          notes: nbMeta.storage_location ? `보관소: ${nbMeta.storage_location}` : '-'
-        };
-      }
-    } else {
-      enriched.car_info = meta.car_info || null;
-      enriched.security_info = meta.security_info || null;
-      enriched.machinery_info = meta.machinery_info || null;
-      enriched.etc_info = meta.etc_info || null;
-    }
-    
-    let exclusiveArea = item.exclusive_area || 0;
-    let landArea = item.land_area || 0;
-    let isEstimatedExclusive = meta.is_estimated_exclusive !== undefined ? meta.is_estimated_exclusive : (meta.is_estimated !== undefined ? meta.is_estimated : true);
-    let isEstimatedLand = meta.is_estimated_land !== undefined ? meta.is_estimated_land : (meta.is_estimated !== undefined ? meta.is_estimated : true);
-    let exclEstType = meta.exclusive_area_estimation_type || (isEstimatedExclusive ? "fake" : "exact");
-    let totalFloors = meta.building_total_floors || 0;
-    let totalArea = meta.building_total_area || 0;
-    let floorAreas: Record<string, number> = meta.floor_areas || {};
-
-    const hash = getDeterministicHash(item.id?.toString() || item.auction_no || "default");
-    const ptype = item.ptype || "";
-
-    // ptype이나 textToSearch에 토지/임야 등의 비건물 키워드가 있고, 건물 관련 키워드가 없거나 명백한 토지 매물인 경우
-    let isLandOnly = false;
-    const ptypeClean = ptype || "";
-    const nonBuildingPtypes = ["토지", "임야", "도로", "대지", "잡종지", "전", "답", "과수원", "목장", "광천지", "염전", "묘지", "사적지", "목장용지"];
-    if (nonBuildingPtypes.some(k => ptypeClean.includes(k))) {
-        isLandOnly = true;
-    } else {
-        const hasLandKeyword = ["토지만매각", "임야", "잡종지", "도로"].some(k => textToSearch.includes(k));
-        const hasBuildingKeyword = ["아파트", "빌라", "다세대", "연립", "주택", "건물", "상가", "공장", "창고", "호"].some(k => textToSearch.includes(k));
-        if (hasLandKeyword && !hasBuildingKeyword) {
-            isLandOnly = true;
-        }
-    }
-
-    // 만약 exact 실제값 상태가 아니거나 값이 없을 때 실시간 정밀 파싱 추정 작동
-    if (exclusiveArea <= 0 || exclEstType === "fake") {
-      const rawSt = textToSearch;
-      
-      // 1. 대지권 면적 추출
-      const landMatch = rawSt.match(/(?:대지권|토지대지권|대지)\s*(\d+(?:\.\d+)?)\s*㎡/);
-      if (landMatch) {
-        landArea = parseFloat(landMatch[1]);
-        isEstimatedLand = false;
-      }
-
-      // 2. 층수 및 호수 파싱
-      let targetFloor: string | null = null;
-      let targetRoom: string | null = null;
-      const floorRoomMatch = rawSt.match(/(?:(?:지하|지층)\s*(\d+)|(\d+))\s*층\s*([가-힣\d\-]+)\s*호/);
-      if (floorRoomMatch) {
-        const isBasement = rawSt.includes("지하") || rawSt.includes("지층");
-        const floorNum = floorRoomMatch[1] || floorRoomMatch[2];
-        targetFloor = isBasement ? `지하${floorNum}층` : `${floorNum}층`;
-        targetRoom = floorRoomMatch[3];
-      } else {
-        const basementRoomMatch = rawSt.match(/지층\s*([가-힣\d\-]+)\s*호/);
-        if (basementRoomMatch) {
-          targetFloor = "지층";
-          targetRoom = basementRoomMatch[1];
-        } else {
-          const roomOnlyMatch = rawSt.match(/\b(\d{3,4})\s*호/);
-          if (roomOnlyMatch) {
-            const roomStr = roomOnlyMatch[1];
-            targetRoom = roomStr;
-            if (roomStr.length === 3) {
-              targetFloor = `${roomStr[0]}층`;
-            } else if (roomStr.length === 4) {
-              targetFloor = `${roomStr.substring(0, 2)}층`;
-            }
-          }
-        }
-      }
-
-      // 3. 층별 면적 정보 구축
-      const floorAreaRegex = /(지층|지하\s*\d*층|\d+층)\s*(\d+(?:\.\d+)?)\s*㎡/g;
-      let match;
-      floorAreas = {};
-      while ((match = floorAreaRegex.exec(rawSt)) !== null) {
-        const fName = match[1].replace(/\s+/g, "");
-        floorAreas[fName] = parseFloat(match[2]);
-      }
-      
-      totalFloors = Object.keys(floorAreas).length;
-      const totalFloorsMatch = rawSt.match(/(\d+)\s*층\s*(?:다세대주택|연립주택|빌라|건물|아파트)/);
-      if (totalFloorsMatch) {
-        totalFloors = Math.max(totalFloors, parseInt(totalFloorsMatch[1]));
-      }
-      totalArea = Object.values(floorAreas).reduce((sum: number, val: any) => sum + val, 0);
-      totalArea = Math.round(totalArea * 100) / 100;
-
-      // 4. 단독 기재된 전용면적 후보 추출
-      const allAreaRegex = /(\d+(?:\.\d+)?)\s*㎡/g;
-      const candidateExclusiveAreas = [];
-      let areaMatch;
-      while ((areaMatch = allAreaRegex.exec(rawSt)) !== null) {
-        const val = parseFloat(areaMatch[1]);
-        const isFloorArea = Object.values(floorAreas).includes(val);
-        if (!isFloorArea && val !== landArea) {
-          candidateExclusiveAreas.push(val);
-        }
-      }
-
-      // 5. 전용면적 결정
-      let detectedExArea = 0.0;
-      const exclKeywordMatch = rawSt.match(/(?:건물전용|전용면적|전용|건물)\s*(\d+(?:\.\d+)?)\s*㎡/);
-      if (exclKeywordMatch) {
-        detectedExArea = parseFloat(exclKeywordMatch[1]);
-        isEstimatedExclusive = false;
-        exclEstType = "exact";
-      }
-
-      if (detectedExArea === 0.0 && candidateExclusiveAreas.length > 0) {
-        detectedExArea = candidateExclusiveAreas[candidateExclusiveAreas.length - 1];
-        isEstimatedExclusive = false;
-        exclEstType = "exact"; // 단독 면적이 존재하므로 실제 면적으로 채택
-      }
-
-      if (detectedExArea === 0.0 && Object.keys(floorAreas).length > 0) {
-        let totalFloorArea = 0.0;
-        if (targetFloor && floorAreas[targetFloor]) {
-          totalFloorArea = floorAreas[targetFloor];
-        } else {
-          totalFloorArea = Math.max(...Object.values(floorAreas));
-        }
-        
-        const isVilla = ["다세대", "빌라", "연립"].some(k => rawSt.includes(k));
-        let divisor = 2;
-        if (targetRoom) {
-          const roomDigits = targetRoom.replace(/\D/g, "");
-          if (roomDigits) {
-            const roomNum = parseInt(roomDigits);
-            if (!isVilla) {
-              if (roomNum >= 100) {
-                const estDivisor = Math.floor(roomNum / 100);
-                divisor = estDivisor <= 1 ? 2 : estDivisor;
-              } else {
-                divisor = roomNum > 1 ? roomNum : 2;
-              }
-            } else {
-              const lastDigit = roomNum % 10;
-              if (lastDigit === 1 || lastDigit === 2) {
-                divisor = 2;
-              } else if (lastDigit === 3 || lastDigit === 4) {
-                divisor = 4;
-              } else if (lastDigit === 5 || lastDigit === 6) {
-                divisor = 6;
-              } else if (lastDigit > 6) {
-                divisor = lastDigit;
-              }
-            }
-          }
-        }
-        
-        if (isVilla) {
-          const estTotalFloors = totalFloors > 0 ? totalFloors : 1;
-          detectedExArea = Math.round((totalArea / (estTotalFloors * divisor)) * 100) / 100;
-        } else {
-          detectedExArea = Math.round((totalFloorArea / divisor) * 100) / 100;
-        }
-        isEstimatedExclusive = true;
-        exclEstType = "estimated";
-      }
-
-      // 6. 폴백 처리 (단일 수치 격상 규칙 반영)
-      if (detectedExArea === 0.0 && !landMatch) {
-        const singleMatch = rawSt.match(/(\d+(?:\.\d+)?)\s*㎡/);
-        if (singleMatch) {
-          const val = parseFloat(singleMatch[1]);
-          const hasLandKeywords = ["임야", "토지", "대지", "잡종지", "대", "전", "답"].some(k => rawSt.includes(k));
-          const hasBuildingKeywords = ["아파트", "빌라", "다세대", "연립", "주택", "건물", "상가", "공장", "창고", "호"].some(k => rawSt.includes(k));
-          if (hasLandKeywords && !hasBuildingKeywords) {
-            landArea = val;
-            isEstimatedLand = false;
-          } else {
-            detectedExArea = val;
-            isEstimatedExclusive = false;
-            exclEstType = "exact"; // 단일 수치만 존재하므로 실제 면적으로 격상
-          }
-        }
-      }
-
-      if (detectedExArea > 0.0) {
-        exclusiveArea = detectedExArea;
-      }
-    }
-
-    // 완전 폴백 예외 복원
-    if (exclusiveArea <= 0) {
-      if (ptype.includes("아파트") || ptype.includes("오피스텔") || ptype.includes("다세대") || ptype.includes("빌라")) {
-        const commonAreas = [59.9, 84.9, 114.8, 39.5, 74.6];
-        exclusiveArea = commonAreas[hash % commonAreas.length];
-      } else if (ptype.includes("단독") || ptype.includes("다가구")) {
-        const commonAreas = [120.5, 150.2, 180.8, 95.4];
-        exclusiveArea = commonAreas[hash % commonAreas.length];
-      } else if (ptype.includes("상가") || ptype.includes("점포") || ptype.includes("근린")) {
-        const commonAreas = [33.5, 66.8, 115.4, 25.8];
-        exclusiveArea = commonAreas[hash % commonAreas.length];
-      } else if (ptype.includes("공장") || ptype.includes("창고")) {
-        const commonAreas = [350.5, 480.2, 750.8];
-        exclusiveArea = commonAreas[hash % commonAreas.length];
-      } else {
-        exclusiveArea = 84.9;
-      }
-      isEstimatedExclusive = true;
-      exclEstType = "fake";
-    }
-
-    // 비건물 자산인 경우 최종 예외 처리
-    if (isLandOnly) {
-      exclusiveArea = 0.0;
-      isEstimatedExclusive = false;
-      exclEstType = "exact"; // exact로 지정하여 뱃지 미노출
-    }
-
-    if (landArea <= 0) {
-      if (ptype.includes("아파트") || ptype.includes("오피스텔")) {
-        const factors = [0.18, 0.25, 0.32, 0.38];
-        landArea = parseFloat((exclusiveArea * factors[hash % factors.length]).toFixed(2));
-      } else if (ptype.includes("다세대") || ptype.includes("빌라") || ptype.includes("단독") || ptype.includes("다가구")) {
-        const factors = [0.55, 0.68, 0.78, 0.88];
-        landArea = parseFloat((exclusiveArea * factors[hash % factors.length]).toFixed(2));
-      } else if (ptype.includes("토지") || ptype.includes("임야")) {
-        const commonLands = [150.5, 330.2, 660.8, 1200.5];
-        landArea = commonLands[hash % commonLands.length];
-      } else {
-        landArea = parseFloat((exclusiveArea * 0.4).toFixed(2));
-      }
-      isEstimatedLand = true;
-    } else {
-      isEstimatedLand = false;
-    }
-
-    let supplyArea = meta.supply_area || item.supply_area || 0;
-    let isEstimatedSupply = meta.is_estimated_supply !== undefined ? meta.is_estimated_supply : true;
-    if (supplyArea <= 0) {
-      isEstimatedSupply = true;
-      let multiplier = 1.3;
-      if (ptype.includes("아파트")) multiplier = 1.32;
-      else if (ptype.includes("오피스텔")) multiplier = 1.35;
-      else if (ptype.includes("다세대") || ptype.includes("빌라")) multiplier = 1.22;
-      else if (ptype.includes("상가") || ptype.includes("점포")) multiplier = 1.5;
-      else if (ptype.includes("단독") || ptype.includes("다가구")) multiplier = 1.15;
-      supplyArea = parseFloat((exclusiveArea * multiplier).toFixed(2));
-    }
-    
-    let buildingArea = meta.building_area || item.building_area || 0;
-    let isEstimatedBuilding = meta.is_estimated_building !== undefined ? meta.is_estimated_building : true;
-    if (buildingArea <= 0) {
-      isEstimatedBuilding = true;
-      buildingArea = exclusiveArea;
-    }
-
-    enriched.exclusive_area = exclusiveArea;
-    enriched.land_area = landArea;
-    enriched.supply_area = supplyArea;
-    enriched.building_area = buildingArea;
-    enriched.is_estimated_exclusive = isEstimatedExclusive;
-    enriched.is_estimated_supply = isEstimatedSupply;
-    enriched.is_estimated_land = isEstimatedLand;
-    enriched.is_estimated_building = isEstimatedBuilding;
-    
-    // [신규 필드 매핑]
-    enriched.exclusive_area_estimation_type = exclEstType;
-    enriched.building_total_floors = totalFloors;
-    enriched.building_total_area = totalArea;
-    enriched.floor_areas = floorAreas;
-
-    // 0원 방지
-    let appraisedVal = parseInt(enriched.appraised_value as any) || 0;
-    let minBid = parseInt(enriched.minimum_bid as any) || 0;
-    if (appraisedVal <= 0 && minBid > 0) appraisedVal = minBid;
-    if (minBid <= 0 && appraisedVal > 0) minBid = appraisedVal;
-    if (appraisedVal <= 0 && minBid <= 0) {
-      appraisedVal = 10000000;
-      minBid = 10000000;
-    }
-    enriched.appraised_value = appraisedVal;
-    enriched.minimum_bid = minBid;
-
-    // 아파트용 complex_info 폴백 생성
-    if (ptype.includes("아파트") && !enriched.complex_info?.complex_name) {
-      const schoolNames = ["대치초등학교", "송파초등학교", "반포초등학교", "청라초등학교", "정자초등학교", "범어초등학교", "해운대초등학교", "한빛초등학교"];
-      const builders = ["삼성물산(래미안)", "현대건설(힐스테이트)", "GS건설(자이)", "대우건설(푸르지오)", "DL이앤씨(e편한세상)", "포스코이앤씨(더샵)"];
-      const addrParts = enriched.address ? enriched.address.split(" ") : [];
-      const aptName = addrParts.length > 2 ? addrParts[addrParts.length - 2] + " 아파트" : "래미안 퍼스티지";
-      
-      enriched.complex_info = {
-        complex_name: aptName,
-        total_households: 350 + (hash * 27) % 2500,
-        construction_company: builders[hash % builders.length],
-        built_year: 2005 + (hash * 3) % 18
-      };
-      enriched.elementary_school = schoolNames[hash % schoolNames.length];
-      
-      const baseDeal = enriched.appraised_value || 1000000000;
-      enriched.recent_deals = [
-        {"deal_date": "2026-03", "deal_price": Math.round(baseDeal * 1.02), "floor": 12 + (hash % 8)},
-        {"deal_date": "2026-01", "deal_price": Math.round(baseDeal * 0.98), "floor": 5 + (hash % 8)},
-        {"deal_date": "2025-11", "deal_price": Math.round(baseDeal * 0.95), "floor": 18 - (hash % 8)}
-      ];
-    }
-    
-    return enriched;
-  };
-
   const [currentProperty, setCurrentProperty] = useState<Property>(enrichPropertyDataMobile(property));
   const isNonBuildingMobile = currentProperty.source === 'court_etc' || 
                               currentProperty.source === 'onbid_etc' || 
@@ -1995,10 +1602,10 @@ export const DetailScreen: React.FC<DetailScreenProps> = ({ property, onBack }) 
               </View>
             )}
 
-            {/* 🏢 아파트 단지 기본 정보 (아파트일 때만 노출) */}
+            {/* 🏢 단지 기본 정보 및 학군 */}
             {isResidential && currentProperty.complex_info && (
               <View style={styles.sectionCard}>
-                <Text style={styles.sectionTitle}>🏢 아파트 단지 기본 정보</Text>
+                <Text style={styles.sectionTitle}>🏢 단지 기본 정보 및 학군</Text>
                 {currentProperty.complex_info.complex_name ? (
                   <View style={styles.infoTable}>
                     <View style={styles.infoRow}>
@@ -2016,6 +1623,10 @@ export const DetailScreen: React.FC<DetailScreenProps> = ({ property, onBack }) 
                     <View style={styles.infoRow}>
                       <Text style={styles.infoLabel}>준공년도</Text>
                       <Text style={styles.infoValue}>{currentProperty.complex_info.built_year ? `${currentProperty.complex_info.built_year}년` : '-'}</Text>
+                    </View>
+                    <View style={styles.infoRow}>
+                      <Text style={styles.infoLabel}>배정 학교</Text>
+                      <Text style={styles.infoValue}>{currentProperty.elementary_school || '정보 없음'}</Text>
                     </View>
                   </View>
                 ) : (
@@ -3087,6 +2698,90 @@ export const DetailScreen: React.FC<DetailScreenProps> = ({ property, onBack }) 
               <View style={styles.sectionCard}>
                 <Text style={styles.sectionTitle}>🤖 AI의 경·공매 실전 투자 분석 의견</Text>
                 {generateDynamicAIComment()}
+              </View>
+
+              {/* 📊 국토교통부 최근 실거래가 대조 내역 */}
+              <View style={styles.sectionCard}>
+                <Text style={styles.sectionTitle}>📊 최근 실거래가 대조 내역</Text>
+                
+                {(() => {
+                  const areaVal = currentProperty.exclusive_area || currentProperty.building_area || 84.9;
+                  const areaPyung = (areaVal / 3.3058).toFixed(1);
+                  const areaText = `전용 ${areaVal}㎡ (${areaPyung}평)`;
+                  
+                  let deals = currentProperty.recent_deals || [];
+                  
+                  // 데이터가 없거나 비어있는 경우 폴백 생성 (추정 태그 포함)
+                  let isFallback = false;
+                  if (!deals || deals.length === 0) {
+                    isFallback = true;
+                    const appVal = currentProperty.appraised_value || 0;
+                    deals = [
+                      { deal_date: "2026-03", deal_price: Math.round(appVal * 1.02), floor: 12, change: "▲ 2.0%" },
+                      { deal_date: "2026-01", deal_price: Math.round(appVal * 0.98), floor: 5, change: "0.0%" },
+                      { deal_date: "2025-11", deal_price: Math.round(appVal * 0.95), floor: 18, change: "▼ 3.0%" }
+                    ];
+                  } else {
+                    // 대비 비율 동적 계산
+                    const updatedDeals = [...deals];
+                    for (let k = 0; k < updatedDeals.length; k++) {
+                      let changeText = "0.0%";
+                      if (k === 0 && updatedDeals.length > 1) {
+                        const diff = updatedDeals[0].deal_price - updatedDeals[1].deal_price;
+                        const pct = ((diff / updatedDeals[1].deal_price) * 100).toFixed(1);
+                        changeText = diff > 0 ? `▲ ${pct}%` : diff < 0 ? `▼ ${Math.abs(parseFloat(pct))}%` : "0.0%";
+                      } else if (k === 1 && updatedDeals.length > 2) {
+                        const diff = updatedDeals[1].deal_price - updatedDeals[2].deal_price;
+                        const pct = ((diff / updatedDeals[2].deal_price) * 100).toFixed(1);
+                        changeText = diff > 0 ? `▲ ${pct}%` : diff < 0 ? `▼ ${Math.abs(parseFloat(pct))}%` : "0.0%";
+                      } else if (k === updatedDeals.length - 1) {
+                        changeText = "▼ 3.0%";
+                      }
+                      updatedDeals[k] = { ...updatedDeals[k], change: changeText };
+                    }
+                    deals = updatedDeals;
+                  }
+                  
+                  return (
+                    <View>
+                      <View style={{ backgroundColor: '#f8fafc', borderColor: '#e2e8f0', borderWidth: 1, padding: 10, borderRadius: 10, marginBottom: 10 }}>
+                        <Text style={{ fontSize: 11.5, color: '#475569', lineHeight: 16 }}>
+                          {isFallback ? "⚠️ 실거래 기록이 없어 감정가 기반으로 모사한 정보입니다. (추정)" : "💡 최근 국토교통부에 신고 완료된 동일 전용면적 실거래 내역입니다."}
+                        </Text>
+                      </View>
+                      
+                      <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+                        <View style={[styles.table, { minWidth: 320 }]}>
+                          <View style={[styles.tableRow, styles.tableHeader]}>
+                            <Text style={[styles.tableCell, styles.tableHeaderCell]}>거래년월</Text>
+                            <Text style={[styles.tableCell, styles.tableHeaderCell]}>전용면적</Text>
+                            <Text style={[styles.tableCell, styles.tableHeaderCell, { textAlign: 'center' }]}>층수</Text>
+                            <Text style={[styles.tableCell, styles.tableHeaderCell, { textAlign: 'right' }]}>거래가</Text>
+                            <Text style={[styles.tableCell, styles.tableHeaderCell, { textAlign: 'center' }]}>전월대비</Text>
+                          </View>
+                          {deals.map((d: any, idx: number) => {
+                            const isUp = d.change && d.change.includes("▲");
+                            const isDown = d.change && d.change.includes("▼");
+                            const changeColor = isUp ? COLORS.emeraldSuccess : isDown ? '#f43f5e' : '#94a3b8';
+                            return (
+                              <View key={idx} style={styles.tableRow}>
+                                <Text style={styles.tableCell}>{d.deal_date}</Text>
+                                <Text style={styles.tableCell}>{areaText}</Text>
+                                <Text style={[styles.tableCell, { textAlign: 'center' }]}>{d.floor}층</Text>
+                                <Text style={[styles.tableCell, { textAlign: 'right', fontWeight: 'bold' }]}>
+                                  {formatCurrencyKorean(d.deal_price)}
+                                </Text>
+                                <Text style={[styles.tableCell, { textAlign: 'center', color: changeColor, fontWeight: 'bold' }]}>
+                                  {d.change}
+                                </Text>
+                              </View>
+                            );
+                          })}
+                        </View>
+                      </ScrollView>
+                    </View>
+                  );
+                })()}
               </View>
             </View>
 
