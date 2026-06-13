@@ -1,0 +1,199 @@
+﻿diff --git a/admin.html b/admin.html
+index dfa3fdd..3c8e4c1 100644
+--- a/admin.html
++++ b/admin.html
+@@ -76,6 +76,10 @@
+                 </div>
+             </div>
+             <div class="flex items-center gap-3">
++                <span id="admin-user-badge" class="hidden text-xs font-black text-royalBlue bg-blue-50 border border-blue-200 px-3 py-1.5 rounded-xl"></span>
++                <button id="admin-logout-btn" onclick="adminLogout()" class="hidden bg-rose-50 border border-rose-200 text-rose-600 hover:bg-rose-100 text-[10.5px] sm:text-xs font-black px-3.5 py-2 rounded-xl transition-all select-none">
++                    濡쒓렇?꾩썐
++                </button>
+                 <a href="./index.html" class="bg-slate-100 hover:bg-slate-200 text-slate-600 text-[10.5px] sm:text-xs font-black px-3.5 py-2 rounded-xl border border-slate-200 flex items-center gap-1.5 transition-all select-none">
+                     <i class="fa-solid fa-home"></i> ???쇰뱶濡??대룞
+                 </a>
+@@ -83,6 +87,60 @@
+         </div>
+     </header>
+ 
++    <!-- ?뭿 ?대뱶誘?濡쒓렇??紐⑤떖李?(Priceit 濡쒓렇???ㅽ??? 怨⑤뱶/?ㅽ겕 誘뱀뒪 ?꾨━誘몄뾼 ?붿옄?? -->
++    <div id="admin-login-overlay" class="fixed inset-0 bg-slate-900/80 backdrop-blur-md z-50 flex items-center justify-center p-4">
++        <div class="bg-slate-900 border border-amber-500/30 rounded-3xl p-8 w-full max-w-md shadow-[0_0_50px_rgba(217,119,6,0.15)] space-y-6 relative overflow-hidden">
++            <!-- ?곗퐫 洹몃씪?곗씠????-->
++            <div class="absolute -top-10 -right-10 w-32 h-32 bg-amber-500/10 rounded-full blur-2xl"></div>
++            <div class="absolute -bottom-10 -left-10 w-32 h-32 bg-blue-500/10 rounded-full blur-2xl"></div>
++            
++            <div class="text-center space-y-2">
++                <div class="inline-flex bg-gradient-to-r from-amber-500 to-yellow-500 text-white w-14 h-14 rounded-2xl items-center justify-center shadow-lg shadow-amber-500/20">
++                    <i class="fa-solid fa-user-shield text-xl"></i>
++                </div>
++                <h3 class="text-white text-xl font-black tracking-tight font-outfit">遺?숈궛寃쎄났留?愿由ъ옄 ?몄쬆</h3>
++                <p class="text-[10.5px] text-slate-400 font-bold leading-normal">?듯빀愿由??쒖뒪??諛깆뿏???듭젣?ㅼ뿉 ?묎렐?섍린 ?꾪빐 濡쒓렇?명빐 二쇱떗?쒖삤.</p>
++            </div>
++            
++            <div class="space-y-4">
++                <div>
++                    <label class="block text-[10.5px] font-black text-amber-500/80 uppercase tracking-wider mb-1.5">愿由ъ옄 怨꾩젙</label>
++                    <input type="email" id="admin-email-input" class="w-full text-xs font-bold p-3 border border-slate-700 rounded-xl bg-slate-800/80 text-slate-200 outline-none cursor-not-allowed select-none" value="hl1oex@gmail.com" readonly>
++                </div>
++                <div>
++                    <label class="block text-[10.5px] font-black text-amber-500/80 uppercase tracking-wider mb-1.5">?묎렐 蹂댁븞 ?뷀샇</label>
++                    <input type="password" id="admin-password-input" class="w-full text-xs font-bold p-3 border border-slate-700 rounded-xl bg-slate-800/80 text-white focus:border-amber-500 focus:ring-1 focus:ring-amber-500/30 outline-none transition-all placeholder-slate-600" placeholder="蹂댁븞 鍮꾨?踰덊샇 ?낅젰" onkeydown="if(event.key === 'Enter') adminLogin();">
++                </div>
++            </div>
++
++            <button onclick="adminLogin()" class="w-full bg-gradient-to-r from-amber-500 to-yellow-500 hover:from-amber-600 hover:to-yellow-600 text-white text-xs font-black py-3.5 rounded-xl shadow-lg shadow-amber-500/10 transition-all active:scale-[0.98] select-none">
++                蹂댁븞 愿由ъ떎 ?묒냽
++            </button>
++        </div>
++    </div>
++
++    <!-- ?뱚 諛곕꼫 ?대?吏 ?먯깋湲??앹뾽 紐⑤떖 -->
++    <div id="image-explorer-overlay" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
++        <div class="bg-white border border-slate-200 rounded-3xl p-6 w-full max-w-2xl shadow-2xl space-y-4 flex flex-col max-h-[90vh]">
++            <div class="flex justify-between items-center pb-2 border-b border-slate-100">
++                <h3 class="text-slate-900 text-sm font-black flex items-center gap-1.5">
++                    <i class="fa-solid fa-folder-open text-amber-500"></i> 諛곕꼫 ?대?吏 ?먯깋湲?(?쒕쾭 由ъ냼??紐⑸줉)
++                </h3>
++                <button onclick="closeImageExplorer()" class="text-slate-400 hover:text-rose-500 transition-colors"><i class="fa-solid fa-xmark text-sm"></i></button>
++            </div>
++            <p class="text-[10px] text-slate-400 font-bold">?먰븯???대?吏瑜??붾툝?대┃(?먮뒗 ?대┃ ???좏깮 踰꾪듉 ?대┃)?섏떆硫?諛곕꼫 二쇱냼李쎌뿉 ?먮룞 ?낅젰?⑸땲??</p>
++            
++            <div id="image-explorer-grid" class="flex-1 overflow-y-auto grid grid-cols-2 sm:grid-cols-3 gap-3 p-1 custom-scrollbar min-h-[300px]">
++                <!-- ?숈쟻?쇰줈 由ъ냼?ㅻ? 李얠븘 ?뚮뜑留?-->
++            </div>
++
++            <div class="flex justify-end gap-2 pt-2 border-t border-slate-100">
++                <button onclick="closeImageExplorer()" class="bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-black px-4 py-2.5 rounded-xl transition-all">痍⑥냼</button>
++                <button onclick="selectExplorerImage()" class="bg-royalBlue hover:bg-royalHover text-white text-xs font-black px-4 py-2.5 rounded-xl transition-all">?좏깮 ?곸슜</button>
++            </div>
++        </div>
++    </div>
++
+     <main class="flex-1 max-w-7xl w-full mx-auto p-4 sm:p-6 lg:p-8 grid grid-cols-1 lg:grid-cols-4 gap-6">
+         <!-- ?뭿 醫뚯륫 ??컮 而⑦듃濡ㅻ윭 -->
+         <aside class="lg:col-span-1 space-y-2">
+@@ -160,7 +218,12 @@
+                             </div>
+                             <div>
+                                 <label class="block text-[11px] font-black text-slate-500 mb-1">諛곕꼫 ?대?吏 ?뚯씪 二쇱냼 (URL)</label>
+-                                <input type="text" id="ad-image-url" oninput="updatePreview('direct')" class="w-full text-xs font-bold p-2.5 border border-slate-200 rounded-xl bg-slate-50 focus:bg-white focus:border-royalBlue outline-none" placeholder="?? ./apartment_elegant_facade.png">
++                                <div class="flex gap-2">
++                                    <input type="text" id="ad-image-url" oninput="updatePreview('direct')" class="flex-1 text-xs font-bold p-2.5 border border-slate-200 rounded-xl bg-slate-50 focus:bg-white focus:border-royalBlue outline-none" placeholder="?? ./apartment_elegant_facade.png">
++                                    <button type="button" onclick="openImageExplorer()" class="bg-slate-100 hover:bg-slate-200 border border-slate-200 text-slate-700 text-xs font-black px-3.5 py-2.5 rounded-xl transition-all flex items-center gap-1.5 whitespace-nowrap">
++                                        <i class="fa-solid fa-folder-open text-amber-500"></i> ?먯깋湲?+                                    </button>
++                                </div>
+                                 <span class="text-[9.5px] text-slate-400 font-bold block mt-1">?뮕 沅뚯옣 ?대?吏 ?ш린: 媛濡?800px * ?몃줈 260px (?먮뒗 3:1 鍮꾩쑉) / ???移대뱶 ?뚮뜑留곸뿉 理쒖쟻?붾릺???덉뒿?덈떎.</span>
+                             </div>
+                             <div>
+@@ -311,13 +374,108 @@ CREATE TRIGGER on_auth_user_created
+         let currentTabId = "ad-tab";
+         let adSettings = { slot_name: 'list_banner', is_active: true, type: 'direct', image_url: '', link_url: '', code: '' };
+         let usersList = [];
++        let selectedImagePath = "";
++
++        // ?대?吏 ?먯깋湲????由ъ냼??紐⑸줉 ?뺤쓽
++        const serverImages = [
++            { path: "./apartment_elegant_facade.png", name: "怨좏뭹寃??꾨? ?꾪뙆???멸?" },
++            { path: "./floorplan_modern_apartment.png", name: "紐⑤뜕 ?꾪뙆??異붿젙 ?됰㈃?? },
++            { path: "./favicon.png", name: "?쒖뒪??怨듭떇 ?뚮퉬肄? }
++        ];
+ 
+         window.onload = function() {
+-            loadAdSettings();
+-            loadUsersList();
++            // 濡쒖뺄 ?ㅽ넗由ъ???愿由ъ옄 ?몄쬆 ?곹깭媛 ?좎??섍퀬 ?덈뒗吏 ?뺤씤?⑸땲??
++            const adminEmail = localStorage.getItem("adminEmail");
++            if (adminEmail === "hl1oex@gmail.com") {
++                document.getElementById("admin-login-overlay").classList.add("hidden");
++                document.getElementById("admin-user-badge").innerText = "?뵎 hl1oex (?대뱶誘?";
++                document.getElementById("admin-user-badge").classList.remove("hidden");
++                document.getElementById("admin-logout-btn").classList.remove("hidden");
++                loadAdSettings();
++                loadUsersList();
++            }
+             document.title = "遺?숈궛寃쎄났留?寃?됱떆?ㅽ뀥 - 諛깆뿏??愿由ъ옄";
+         };
+ 
++        // 愿由ъ옄 濡쒓렇???⑥닔 (鍮꾨?踰덊샇 寃利???媛寃?遺꾩꽍 ?쒖뒪???ㅽ???援ы쁽)
++        function adminLogin() {
++            const password = document.getElementById("admin-password-input").value;
++            if (!password) {
++                alert("鍮꾨?踰덊샇瑜??낅젰??二쇱떗?쒖삤.");
++                return;
++            }
++            // hl1oex@gmail.com 濡쒓렇?몄슜 留덉뒪???꾩떆 鍮꾨?踰덊샇 ?ㅼ젙 (1234)
++            if (password === "1234") {
++                localStorage.setItem("adminEmail", "hl1oex@gmail.com");
++                document.getElementById("admin-login-overlay").classList.add("hidden");
++                document.getElementById("admin-user-badge").innerText = "?뵎 hl1oex (?대뱶誘?";
++                document.getElementById("admin-user-badge").classList.remove("hidden");
++                document.getElementById("admin-logout-btn").classList.remove("hidden");
++                loadAdSettings();
++                loadUsersList();
++                alert("愿由ъ옄 ?몄쬆???깃났?곸쑝濡??꾨즺?섏뿀?듬땲??");
++            } else {
++                alert("鍮꾨?踰덊샇媛 ?щ컮瑜댁? ?딆뒿?덈떎. ?ㅼ떆 ?쒕룄??二쇱떗?쒖삤.");
++            }
++        }
++
++        // 濡쒓렇?꾩썐
++        function adminLogout() {
++            localStorage.removeItem("adminEmail");
++            alert("愿由ъ옄 ?몄뀡???댁젣?섏뿀?듬땲??");
++            window.location.reload();
++        }
++
++        // ?뱚 ?대?吏 ?먯깋湲??앹뾽 ?몃뱾??+        function openImageExplorer() {
++            const overlay = document.getElementById("image-explorer-overlay");
++            const grid = document.getElementById("image-explorer-grid");
++            
++            grid.innerHTML = serverImages.map(img => `
++                <div onclick="clickExplorerImage(this, '${img.path}')" ondblclick="doubleClickExplorerImage('${img.path}')" class="explorer-card border border-slate-200 hover:border-royalBlue rounded-2xl p-2.5 bg-slate-50 hover:bg-white text-center cursor-pointer transition-all flex flex-col justify-between items-center gap-2 select-none group">
++                    <div class="w-full h-[85px] bg-white rounded-xl overflow-hidden border border-slate-150 flex items-center justify-center">
++                        <img src="${img.path}" alt="${img.name}" class="w-full h-full object-contain group-hover:scale-105 transition-transform duration-300">
++                    </div>
++                    <div>
++                        <strong class="block text-[10px] font-black text-slate-800 truncate">${img.name}</strong>
++                        <span class="text-[8.5px] font-mono text-slate-400 block mt-0.5 truncate">${img.path}</span>
++                    </div>
++                </div>
++            `).join('');
++            
++            overlay.classList.remove("hidden");
++            selectedImagePath = "";
++        }
++
++        function clickExplorerImage(element, path) {
++            // 湲곗〈 移대뱶 ?뚮몢由?由ъ뀑
++            document.querySelectorAll(".explorer-card").forEach(el => {
++                el.classList.remove("border-royalBlue", "bg-blue-50/30");
++            });
++            element.classList.add("border-royalBlue", "bg-blue-50/30");
++            selectedImagePath = path;
++        }
++
++        function doubleClickExplorerImage(path) {
++            document.getElementById("ad-image-url").value = path;
++            updatePreview("direct");
++            closeImageExplorer();
++        }
++
++        function selectExplorerImage() {
++            if (!selectedImagePath) {
++                alert("?곸슜???대?吏瑜??대┃???좏깮?댁＜?쒓린 諛붾엻?덈떎.");
++                return;
++            }
++            document.getElementById("ad-image-url").value = selectedImagePath;
++            updatePreview("direct");
++            closeImageExplorer();
++        }
++
++        function closeImageExplorer() {
++            document.getElementById("image-explorer-overlay").classList.add("hidden");
++        }
++
+         // ???좉?留?援ы쁽
+         function switchTab(tabId) {
+             const tabs = ['ad-tab', 'user-tab', 'db-tab'];

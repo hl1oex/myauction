@@ -1,0 +1,171 @@
+﻿diff --git a/index.html b/index.html
+index caa0507..395a1d9 100644
+--- a/index.html
++++ b/index.html
+@@ -29,6 +29,8 @@
+     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+     <!-- 💎 5. Supabase Web SDK CDN 연동 -->
+     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
++    <!-- 🗺️ 카카오 지도/로드뷰 SDK 로딩 (무료 API 키 기반 동적 지도 시각화 실사진화 목적) -->
++    <script type="text/javascript" src="https://dapi.kakao.com/v2/maps/sdk.js?appkey=ec7b35c73770fbe949e52bf3ff940346&libraries=services"></script>
+     
+     <script>
+         const supabaseUrl = "https://ubaxyfxcsxsvrryowswb.supabase.co";
+@@ -1299,7 +1301,7 @@
+             </div>
+ 
+             <!-- 평면 정보 가이드 및 도면 발급 안내 -->
+-            <div class="bg-white border border-slate-200 rounded-2xl p-3.5 sm:p-4 space-y-3 shadow-sm">
++            <div id="detail-floorplan-guide-card" class="bg-white border border-slate-200 rounded-2xl p-3.5 sm:p-4 space-y-3 shadow-sm">
+                 <h4 class="text-xs sm:text-sm font-black text-slate-800 flex items-center gap-1.5 pb-2 border-b border-slate-100">
+                     <i class="fa-solid fa-file-pdf text-royalBlue"></i> 공식 건축물대장 현황도면 발급 안내
+                 </h4>
+@@ -1515,7 +1517,7 @@
+             </div>
+ 
+             <!-- 🧮 세법 스마트 낙찰 계획서 계산기 -->
+-            <div class="bg-white border border-slate-200 rounded-2xl p-3.5 sm:p-4 shadow-sm space-y-3">
++            <div class="bg-white border border-slate-200 rounded-2xl p-3.5 sm:p-4 shadow-sm space-y-3 max-w-[720px] mx-auto w-full">
+                 <div class="flex items-center justify-between pb-2 border-b border-slate-100">
+                     <h4 class="text-xs sm:text-sm font-black text-slate-800 flex items-center gap-1.5">
+                         <i class="fa-solid fa-calculator text-royalBlue"></i> 스마트 정밀 소요자금 계획서
+@@ -3222,6 +3224,47 @@
+             }
+         }
+ 
++        // 🗺️ 카카오 지도/로드뷰 SDK 기반의 인터랙티브 로드뷰 사진 로드 함수
++        function loadKakaoRoadview(address) {
++            const roadviewContainer = document.getElementById("detail-roadview");
++            const fallbackContainer = document.getElementById("detail-roadview-fallback");
++            if (!roadviewContainer) return;
++
++            roadviewContainer.innerHTML = "";
++            if (fallbackContainer) fallbackContainer.classList.add("hidden");
++
++            if (!address || address.trim() === "") {
++                if (fallbackContainer) fallbackContainer.classList.remove("hidden");
++                return;
++            }
++
++            if (typeof kakao === "undefined" || !kakao.maps || !kakao.maps.services) {
++                console.warn("Kakao maps SDK not loaded yet.");
++                if (fallbackContainer) fallbackContainer.classList.remove("hidden");
++                return;
++            }
++
++            const geocoder = new kakao.maps.services.Geocoder();
++            geocoder.addressSearch(address, function(result, status) {
++                if (status === kakao.maps.services.Status.OK) {
++                    const coords = new kakao.maps.LatLng(result[0].y, result[0].x);
++                    
++                    const rv = new kakao.maps.Roadview(roadviewContainer);
++                    const rvClient = new kakao.maps.RoadviewClient();
++
++                    rvClient.getNearestPanoId(coords, 50, function(panoId) {
++                        if (panoId) {
++                            rv.setPanoId(panoId, coords);
++                        } else {
++                            if (fallbackContainer) fallbackContainer.classList.remove("hidden");
++                        }
++                    });
++                } else {
++                    if (fallbackContainer) fallbackContainer.classList.remove("hidden");
++                }
++            });
++        }
++
+         // 💎 씨:리얼 부동산종합정보 주소 복사 후 새 창 연동 함수
+         function copyAddressToClipboardAndOpenSeeReal() {
+             if (selectedProperty && selectedProperty.address) {
+@@ -3876,16 +3919,12 @@
+             const extra = analyzePropertyDetailExtra(item);
+             const est = estimateAuctionRounds(item.appraised_value, item.minimum_bid, item.source);
+ 
+-            // 주소까지만 깔끔하게 분리하여 정제 (시/도 시/군/구 동/읍/면/리 지번 번지까지만 매칭)
+-            let cleanedTitleAddress = item.address || "";
+-            const bracketIndex = cleanedTitleAddress.search(/[\[\({]/);
+-            if (bracketIndex !== -1) {
+-                cleanedTitleAddress = cleanedTitleAddress.substring(0, bracketIndex).trim();
+-            }
+-            const addressMatch = cleanedTitleAddress.match(/^([가-힣a-zA-Z0-9\s-]+(?:시|도)\s+[가-힣a-zA-Z0-9\s-]+(?:구|군|시)\s+[가-힣a-zA-Z0-9\s-]+(?:동|읍|면|리)?\s+\d+(?:-\d+)?)/);
+-            if (addressMatch && addressMatch[1]) {
+-                cleanedTitleAddress = addressMatch[1].trim();
+-            }
++            // 주소 부분은 정확히 냅두고 대괄호, 소괄호, 중괄호 및 그 내부 텍스트(예: 용도, 유의사항 등)만 제거하여 제목이 중간에 잘리지 않도록 정제합니다.
++            let cleanedTitleAddress = (item.address || "")
++                .replace(/\[[^\]]*\]/g, "")
++                .replace(/\([^)]*\)/g, "")
++                .replace(/\{[^}]*\}/g, "")
++                .trim();
+ 
+             document.getElementById("detail-address").innerText = cleanedTitleAddress;
+             document.getElementById("detail-no").innerText = `사건번호/관리번호 : ${item.auction_no} (${item.round_info})`;
+@@ -3976,10 +4015,15 @@
+             const landPy = (landArea * 0.3025).toFixed(1);
+             const buildingPy = (buildingArea * 0.3025).toFixed(1);
+ 
+-            document.getElementById("detail-spec-exclusive-py").innerText = `${exclusiveArea.toFixed(1)} ㎡ (${exclusivePy} 평)`;
+-            document.getElementById("detail-spec-supply-py").innerText = `${supplyArea.toFixed(1)} ㎡ (${supplyPy} 평)`;
+-            document.getElementById("detail-spec-land-py").innerText = `${landArea.toFixed(1)} ㎡ (${landPy} 평)`;
+-            document.getElementById("detail-spec-building-py").innerText = `${buildingArea.toFixed(1)} ㎡ (${buildingPy} 평)`;
++            const estExSuffix = item.is_estimated_exclusive ? " 추정(허수)" : "";
++            const estSpSuffix = item.is_estimated_supply ? " 추정(허수)" : "";
++            const estLdSuffix = item.is_estimated_land ? " 추정(허수)" : "";
++            const estBdSuffix = item.is_estimated_building ? " 추정(허수)" : "";
++
++            document.getElementById("detail-spec-exclusive-py").innerText = `${exclusiveArea.toFixed(1)} ㎡ (${exclusivePy} 평)${estExSuffix}`;
++            document.getElementById("detail-spec-supply-py").innerText = `${supplyArea.toFixed(1)} ㎡ (${supplyPy} 평)${estSpSuffix}`;
++            document.getElementById("detail-spec-land-py").innerText = `${landArea.toFixed(1)} ㎡ (${landPy} 평)${estLdSuffix}`;
++            document.getElementById("detail-spec-building-py").innerText = `${buildingArea.toFixed(1)} ㎡ (${buildingPy} 평)${estBdSuffix}`;
+ 
+             // 📅 기일 진행 이력 표 렌더링
+             const giilTbody = document.getElementById("detail-giiil-tbody");
+@@ -4225,20 +4269,19 @@
+                 }
+             }
+ 
+-            // 📐 평형별 평면도 이미지 매칭
+-            const fpImg = document.getElementById("detail-floorplan-img");
+-            let fpSrc = "./floorplan_84.png";
+-            if (exclusiveArea > 0) {
+-                if (exclusiveArea < 70) {
+-                    fpSrc = "./floorplan_59.png";
+-                } else if (exclusiveArea >= 70 && exclusiveArea < 100) {
+-                    fpSrc = "./floorplan_84.png";
+-                } else {
+-                    fpSrc = "./floorplan_114.png";
+-                }
+-            }
+-            if (fpImg) {
+-                fpImg.src = fpSrc;
++            // 📐 평형별 평면도 이미지 매칭 비활성화 (실 평면도가 아닐 시 추정 평면도를 보여주지 않고 빈칸으로 방치)
++            const fpImgContainer = document.getElementById("detail-floorplan-img-container");
++            const guideCard = document.getElementById("detail-floorplan-guide-card");
++            if (fpImgContainer && (!item.images || item.images.length === 0)) {
++                fpImgContainer.innerHTML = `
++                    <div class="w-full h-full flex flex-col items-center justify-center bg-white text-slate-400 text-xs font-bold select-none border-2 border-dashed border-slate-200 rounded-xl">
++                        💡 등록된 실제 내부 평면도가 없습니다.
++                    </div>
++                `;
++                fpImgContainer.onclick = null;
++                if (guideCard) guideCard.classList.add("hidden");
++            } else if (guideCard) {
++                guideCard.classList.add("hidden");
+             }
+ 
+             // ⚖️ 법정 서류 요약 테이블 및 상시 노출형 카드 데이터 동적 바인딩
+@@ -5826,6 +5869,14 @@
+                 }
+             }
+ 
++            // 📍 4. 위치 & 시세 분석 탭 선택 시 하위 패널들(지도 및 시세)의 hidden 클래스를 강제로 해제하여 화이트아웃 현상을 복구합니다.
++            if (tabNum === 4) {
++                const mapPanel = document.getElementById("detail-panel-map");
++                const marketPanel = document.getElementById("detail-panel-market");
++                if (mapPanel) mapPanel.classList.remove("hidden");
++                if (marketPanel) marketPanel.classList.remove("hidden");
++            }
++
+             const mask2 = document.getElementById("group-mask-2");
+             const mask3 = document.getElementById("group-mask-3");
+             const mask4 = document.getElementById("group-mask-4");

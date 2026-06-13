@@ -2,7 +2,7 @@
 
 export interface Property {
   id: number;
-  source: 'court' | 'onbid' | 'onbid_etc' | 'private';
+  source: 'court' | 'court_etc' | 'onbid' | 'onbid_etc' | 'private';
   auction_no: string;
   address: string;
   ptype: string;
@@ -83,7 +83,7 @@ export interface Property {
 
 export interface FilterState {
   search: string;
-  source: ('court' | 'onbid' | 'onbid_etc' | 'private')[];
+  source: ('court' | 'court_etc' | 'onbid' | 'onbid_etc' | 'private')[];
   ptype: ('apart' | 'officetel' | 'villa' | 'house' | 'store' | 'land' | 'factory' | 'vehicle' | 'security' | 'machinery' | 'etc_goods')[];
   sido: string[];
   sigungu: string;

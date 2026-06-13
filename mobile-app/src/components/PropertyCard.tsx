@@ -65,7 +65,7 @@ export const PropertyCard: React.FC<PropertyCardProps> = ({ property, onPress, i
   const isResidence = isResidential;
 
   const gradeStyle = getGradeStyle(property.grade);
-  const sourceLabel = property.source === 'court' ? (property.is_lease ? '⚖️ 법원임대' : '⚖️ 법원경매') : property.source === 'onbid' ? (property.is_lease ? '🏢 캠코임대' : '🏢 캠코공매') : property.source === 'onbid_etc' ? '🏢 온비드자산' : '📁 사설';
+  const sourceLabel = property.source === 'court' ? (property.is_lease ? '⚖️ 법원임대' : '⚖️ 법원경매') : property.source === 'court_etc' ? '⚖️ 법원자산' : property.source === 'onbid' ? (property.is_lease ? '🏢 캠코임대' : '🏢 캠코공매') : property.source === 'onbid_etc' ? '🏢 온비드자산' : '📁 사설';
 
   return (
     <TouchableOpacity style={styles.card} onPress={onPress} activeOpacity={0.85}>

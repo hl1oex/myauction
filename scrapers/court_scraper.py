@@ -251,7 +251,7 @@ def clean_address(address):
     address = re.sub(r'\[상세내역\]|\[상세\]', '', address).strip()
     return address
 
-def extract_court_areas(st_text):
+def extract_court_areas(st_text, ptype=""):
     """주소 및 소재지 내역 텍스트(st)로부터 층수, 층별 면적 리스트, 그리고 최종 해당 호수의 면적을 추정 및 정밀 추출합니다."""
     exclusive_area = 0.0
     land_area = 0.0
@@ -269,6 +269,18 @@ def extract_court_areas(st_text):
             exclusive_area, land_area, is_estimated_exclusive, is_estimated_land,
             excl_est_type, total_floors, total_area, floor_areas
         )
+
+    # ptype이나 st_text에 토지/임야 등의 비건물 키워드가 있고, 건물 관련 키워드가 없거나 명백한 토지 매물인 경우
+    is_non_building = False
+    ptype_clean = ptype or ""
+    non_building_ptypes = ["토지", "임야", "도로", "대지", "잡종지", "전", "답", "과수원", "목장", "광천지", "염전", "묘지", "사적지", "목장용지"]
+    if any(k in ptype_clean for k in non_building_ptypes):
+        is_non_building = True
+    elif st_text:
+        has_land_keyword = any(k in st_text for k in ["토지만매각", "임야", "잡종지", "도로"])
+        has_building_keyword = any(k in st_text for k in ["아파트", "빌라", "다세대", "연립", "주택", "건물", "상가", "공장", "창고", "호"])
+        if has_land_keyword and not has_building_keyword:
+            is_non_building = True
 
     # 1. 대지권 면적 추출 시도 (기존 로직 유지 및 개선)
     land_match = re.search(r'(?:대지권|토지대지권|대지)\s*(\d+(?:\.\d+)?)\s*㎡', st_text)
@@ -360,10 +372,17 @@ def extract_court_areas(st_text):
         excl_est_type = "exact"  # 공부상 단독 전용면적 기재 건이므로 실제 면적으로 채택
 
     # 5-3. 단독 면적이 존재하지 않고, 오직 층별 면적 리스트만 있는 경우 (추정이 필요한 경우)
-    if exclusive_area == 0.0 and target_floor and target_floor in floor_areas:
-        total_floor_area = floor_areas[target_floor]
+    if exclusive_area == 0.0 and floor_areas:
+        total_floor_area = 0.0
+        if target_floor and target_floor in floor_areas:
+            total_floor_area = floor_areas[target_floor]
+        else:
+            total_floor_area = max(floor_areas.values())
+            
+        # 다세대 여부 판별 (소재지 텍스트의 키워드 기준)
+        is_villa = any(k in st_text for k in ["다세대", "빌라", "연립"])
         
-        # 층당 세대수 결정 (호수 번호 끝자리 기반)
+        # 층당 세대수 결정 (divisor)
         divisor = 2  # 기본값: 2세대 분할
         if target_room:
             # 방 번호에서 숫자만 추출합니다.
@@ -371,43 +390,69 @@ def extract_court_areas(st_text):
             if room_digits:
                 try:
                     room_num = int(room_digits)
-                    last_digit = room_num % 10
-                    
-                    if last_digit in [1, 2]:
-                        divisor = 2
-                    elif last_digit in [3, 4]:
-                        divisor = 4
-                    elif last_digit in [5, 6]:
-                        divisor = 6
-                    elif last_digit > 6:
-                        divisor = last_digit
+                    # 다세대를 제외한 아파트, 오피스텔 등 일반 건물은 호수 번호의 백의 자리(혹은 천의 자리)를 divisor로 채택합니다.
+                    if not is_villa:
+                        if room_num >= 100:
+                            # 3자리(예: 302호)면 3분할, 4자리(예: 1204호)면 12분할을 적용하되, 백의 자리가 1 이하면 2분할로 방어 처리합니다.
+                            est_divisor = room_num // 100
+                            if est_divisor <= 1:
+                                divisor = 2
+                            else:
+                                divisor = est_divisor
+                        else:
+                            divisor = room_num if room_num > 1 else 2
+                    else:
+                        # 다세대의 경우 기존 끝자리 기반 divisor 방식을 적용합니다.
+                        last_digit = room_num % 10
+                        if last_digit in [1, 2]:
+                            divisor = 2
+                        elif last_digit in [3, 4]:
+                            divisor = 4
+                        elif last_digit in [5, 6]:
+                            divisor = 6
+                        elif last_digit > 6:
+                            divisor = last_digit
                 except ValueError:
                     pass
                     
         # 면적 추정 계산 수행
-        exclusive_area = round(total_floor_area / divisor, 2)
+        if is_villa:
+            # 다세대의 경우 별도의 표기가 없으면 지층부터 합계된 모든 면적(total_area)을 기준으로 전체 세대수(층수 * divisor)로 나눕니다.
+            est_total_floors = total_floors if total_floors > 0 else 1
+            exclusive_area = round(total_area / (est_total_floors * divisor), 2)
+        else:
+            # 일반 건물의 경우 해당 층별 면적을 divisor로 분할합니다.
+            exclusive_area = round(total_floor_area / divisor, 2)
+            
         is_estimated_exclusive = True
         excl_est_type = "estimated"  # 층별 면적을 근거로 분할했으므로 최대 근사값 추정
 
-    # 6. 폴백 처리 (기존 로직 보존)
+    # 6. 폴백 처리 (기존 로직 보존 및 고도화)
     if exclusive_area == 0.0 and not land_match:
         single_match = re.search(r'(\d+(?:\.\d+)?)\s*㎡', st_text)
         if single_match:
             try:
                 val = float(single_match.group(1))
-                if any(k in st_text for k in ["임야", "토지", "대지", "잡종지", "대", "전", "답"]):
+                has_land_keywords = any(k in st_text for k in ["임야", "토지", "대지", "잡종지", "대", "전", "답"])
+                if has_land_keywords and not any(k in st_text for k in ["아파트", "빌라", "다세대", "연립", "주택", "건물", "상가", "공장", "창고", "호"]):
                     land_area = val
                     is_estimated_land = False
                 else:
                     exclusive_area = val
-                    is_estimated_exclusive = True
-                    excl_est_type = "fake"  # 정보가 부족해 단일 수치로 임의 매핑
+                    is_estimated_exclusive = False
+                    excl_est_type = "exact"  # 제목에 층별 면적 목록이 없고 이 단일 수치만 존재하므로, 실제 전용면적으로 자동 격상
             except ValueError:
                 pass
 
     # 최종 폴백으로 전용면적이 여전히 0이면 거의 허수(fake)
     if exclusive_area == 0.0:
         excl_est_type = "fake"
+
+    # 비건물 자산인 경우 최종 예외 처리
+    if is_non_building:
+        exclusive_area = 0.0
+        is_estimated_exclusive = False
+        excl_est_type = "exact"  # exact로 지정하여 뱃지 미노출 유도
 
     return (
         exclusive_area, land_area, is_estimated_exclusive, is_estimated_land,
@@ -579,14 +624,18 @@ def generate_simulated_court_data():
         ("광주지방법원", "2026타경6024", "광주광역시 남구 봉선동 402", "아파트", 980000000, "B", 89, "봉선동 학원 밀집 구역 명품 학군 주거단지."),
         ("울산지방법원", "2026타경1104", "울산광역시 남구 옥동 50-3", "아파트", 620000000, "B", 85, "울산대공원 도보 생활권. 신축급 아파트 단지."),
         ("전주지방법원", "2026타경1894", "전라북도 전주시 완산구 효자동3가 120-1", "아파트", 450000000, "B", 88, "전북도청 인접 최고 신축 아파트 단지. 권리 하자 없음."),
-        ("제주지방법원", "2026타경5041", "제주특별자치도 제주시 노형동 204", "아파트", 870000000, "A", 92, "제주 노형동 중심 상업지 핵심 아파트 단지.")
+        ("제주지방법원", "2026타경5041", "제주특별자치도 제주시 노형동 204", "아파트", 870000000, "A", 92, "제주 노형동 중심 상업지 핵심 아파트 단지."),
+        ("인천지방법원", "2026타경2031", "인천광역시 서구 청라동 102 (차량등록지)", "차량/운송장비", 32000000, "A", 94, "제네시스 GV80 2022년식. 주행거리 32,000km 내외관 상태 극상."),
+        ("서울중앙지방법원", "2026타경4052", "서울특별시 영등포구 여의도동 10 (유가증권 보관소)", "유가증권", 150000000, "B", 88, "주식회사 한국테크 비상장 주식 15,000주 일괄 매각."),
+        ("수원지방법원", "2026타경6073", "경기도 안산시 단원구 성곡동 203 (공장 내)", "기계장비", 85000000, "A", 91, "독일제 고정밀 5축 CNC 머시닝 센터 기계 설비."),
+        ("부산지방법원", "2026타경9084", "부산광역시 중구 중앙동 5-2 (보관 창고)", "기타물품", 8000000, "B", 85, "수입 의류 및 패션 잡화 보관 물품 일괄 매각.")
     ]
     
-    for i in range(85):
+    for i in range(100):
         base = regions[i % len(regions)]
         court_name = base[0]
         auction_no = f"{court_name} 2026타경{10001 + i}"
-        address = base[2] + f" {101 + i}동 {102 + (i*3)%15}호"
+        address = base[2]
         ptype = base[3]
         appraised = int(base[4] + (i * 9500000))
         minimum = int(appraised * 0.7) if i % 2 == 0 else int(appraised * 0.8)
@@ -597,76 +646,82 @@ def generate_simulated_court_data():
         rem_days = 4 + (i * 4) % 55
         close_date = (datetime.date.today() + datetime.timedelta(days=rem_days)).strftime("%Y-%m-%d")
         
+        # 비부동산 판별을 수행합니다.
+        is_etc = any(kw in ptype for kw in ["차량", "운송", "유가증권", "주식", "기계", "장비", "물품", "동산"])
+        
         # 시뮬레이션용 면적 데이터 생성
         ex_area = 84.9
-        if "아파트" in ptype:
-            # 39.5㎡(12평), 59.9㎡(18평), 84.9㎡(25.7평), 114.8㎡(34.7평), 135.5㎡(41평), 165.2㎡(50평)
-            apt_areas = [59.9, 84.9, 114.8, 135.5, 165.2, 84.9, 59.9, 114.8]
-            ex_area = apt_areas[i % len(apt_areas)]
-            if appraised >= 1500000000 and ex_area < 114.8:
-                ex_area = 135.5 if i % 2 == 0 else 165.2
-        elif "오피스텔" in ptype:
-            # 24.5㎡(7.4평), 39.8㎡(12평), 59.9㎡(18평), 84.9㎡(25.7평)
-            off_areas = [24.5, 39.8, 59.9, 84.9]
-            ex_area = off_areas[i % len(off_areas)]
-        elif "다세대" in ptype or "빌라" in ptype or "연립" in ptype:
-            # 39.5㎡, 49.8㎡, 59.9㎡, 74.6㎡, 84.9㎡
-            villa_areas = [39.5, 49.8, 59.9, 74.6, 84.9]
-            ex_area = villa_areas[i % len(villa_areas)]
-        elif "상가" in ptype or "점포" in ptype or "근린" in ptype:
-            # 15.5㎡, 33.2㎡, 66.5㎡, 115.8㎡, 250.4㎡
-            shop_areas = [15.5, 33.2, 66.5, 115.8, 250.4]
-            ex_area = shop_areas[i % len(shop_areas)]
-        elif "공장" in ptype or "창고" in ptype:
-            fact_areas = [150.2, 350.5, 680.4, 1200.8]
-            ex_area = fact_areas[i % len(fact_areas)]
-        elif "토지" in ptype or "임야" in ptype or "대지" in ptype:
-            land_areas = [99.5, 250.2, 550.8, 1100.5, 3300.2]
-            ex_area = land_areas[i % len(land_areas)]
-        else:
-            house_areas = [84.9, 120.5, 150.8, 220.4]
-            ex_area = house_areas[i % len(house_areas)]
-
-        # 대지권 면적
-        if "아파트" in ptype or "오피스텔" in ptype:
-            factors = [0.22, 0.31, 0.38, 0.44]
-            ld_area = round(ex_area * factors[i % len(factors)], 2)
-        elif "다세대" in ptype or "빌라" in ptype or "연립" in ptype:
-            factors = [0.55, 0.65, 0.72, 0.81]
-            ld_area = round(ex_area * factors[i % len(factors)], 2)
-        elif any(k in ptype for k in ["토지", "임야", "대지", "전", "답", "과수원", "잡종지", "목장용지"]):
-            ld_area = ex_area
+        if is_etc:
             ex_area = 0.0
-        elif "공장" in ptype or "창고" in ptype:
-            factors = [1.2, 1.5, 1.8]
-            ld_area = round(ex_area * factors[i % len(factors)], 2)
-        else:
-            factors = [1.1, 1.3, 1.6]
-            ld_area = round(ex_area * factors[i % len(factors)], 2)
-
-        # 공급면적
-        if any(k in ptype for k in ["토지", "임야", "대지", "전", "답", "과수원", "잡종지", "목장용지"]):
+            ld_area = 0.0
             su_area = 0.0
+            bu_area = 0.0
         else:
-            multiplier = 1.32
+            address = address + f" {101 + i}동 {102 + (i*3)%15}호"
             if "아파트" in ptype:
-                multiplier = 1.32
+                apt_areas = [59.9, 84.9, 114.8, 135.5, 165.2, 84.9, 59.9, 114.8]
+                ex_area = apt_areas[i % len(apt_areas)]
+                if appraised >= 1500000000 and ex_area < 114.8:
+                    ex_area = 135.5 if i % 2 == 0 else 165.2
             elif "오피스텔" in ptype:
-                multiplier = 1.35
-            elif "다세대" in ptype or "빌라" in ptype:
-                multiplier = 1.22
-            elif "상가" in ptype:
-                multiplier = 1.45
-            su_area = round(ex_area * multiplier, 2)
-            
-        bu_area = ex_area
+                off_areas = [24.5, 39.8, 59.9, 84.9]
+                ex_area = off_areas[i % len(off_areas)]
+            elif "다세대" in ptype or "빌라" in ptype or "연립" in ptype:
+                villa_areas = [39.5, 49.8, 59.9, 74.6, 84.9]
+                ex_area = villa_areas[i % len(villa_areas)]
+            elif "상가" in ptype or "점포" in ptype or "근린" in ptype:
+                shop_areas = [15.5, 33.2, 66.5, 115.8, 250.4]
+                ex_area = shop_areas[i % len(shop_areas)]
+            elif "공장" in ptype or "창고" in ptype:
+                fact_areas = [150.2, 350.5, 680.4, 1200.8]
+                ex_area = fact_areas[i % len(fact_areas)]
+            elif "토지" in ptype or "임야" in ptype or "대지" in ptype:
+                land_areas = [99.5, 250.2, 550.8, 1100.5, 3300.2]
+                ex_area = land_areas[i % len(land_areas)]
+            else:
+                house_areas = [84.9, 120.5, 150.8, 220.4]
+                ex_area = house_areas[i % len(house_areas)]
+
+            # 대지권 면적
+            if "아파트" in ptype or "오피스텔" in ptype:
+                factors = [0.22, 0.31, 0.38, 0.44]
+                ld_area = round(ex_area * factors[i % len(factors)], 2)
+            elif "다세대" in ptype or "빌라" in ptype or "연립" in ptype:
+                factors = [0.55, 0.65, 0.72, 0.81]
+                ld_area = round(ex_area * factors[i % len(factors)], 2)
+            elif any(k in ptype for k in ["토지", "임야", "대지", "전", "답", "과수원", "잡종지", "목장용지"]):
+                ld_area = ex_area
+                ex_area = 0.0
+            elif "공장" in ptype or "창고" in ptype:
+                factors = [1.2, 1.5, 1.8]
+                ld_area = round(ex_area * factors[i % len(factors)], 2)
+            else:
+                factors = [1.1, 1.3, 1.6]
+                ld_area = round(ex_area * factors[i % len(factors)], 2)
+
+            # 공급면적
+            if any(k in ptype for k in ["토지", "임야", "대지", "전", "답", "과수원", "잡종지", "목장용지"]):
+                su_area = 0.0
+            else:
+                multiplier = 1.32
+                if "아파트" in ptype:
+                    multiplier = 1.32
+                elif "오피스텔" in ptype:
+                    multiplier = 1.35
+                elif "다세대" in ptype or "빌라" in ptype:
+                    multiplier = 1.22
+                elif "상가" in ptype:
+                    multiplier = 1.45
+                su_area = round(ex_area * multiplier, 2)
+                
+            bu_area = ex_area
 
         # 아파트 단지 정보 및 학군, 최근 실거래가 모사 데이터 생성
         complex_info = {}
         elementary_school = ""
         recent_deals = []
         
-        if "아파트" in ptype:
+        if "아파트" in ptype and not is_etc:
             school_names = ["대치초등학교", "송파초등학교", "반포초등학교", "청라초등학교", "정자초등학교", "범어초등학교", "해운대초등학교", "한빛초등학교"]
             builders = ["삼성물산(래미안)", "현대건설(힐스테이트)", "GS건설(자이)", "대우건설(푸르지오)", "DL이앤씨(e편한세상)", "포스코이앤씨(더샵)"]
             
@@ -678,7 +733,7 @@ def generate_simulated_court_data():
             }
             elementary_school = school_names[i % len(school_names)]
             
-            # 최근 실거래가 3건 목록 모사 (감정가의 92%~105% 범위로 생성)
+            # 최근 실거래가 3건 목록 모사 (감정가의 92%~105% 범위로 생성합니다)
             base_deal = appraised
             recent_deals = [
                 {"deal_date": "2026-03", "deal_price": int(base_deal * 1.02), "floor": 12 + (i % 8)},
@@ -703,7 +758,7 @@ def generate_simulated_court_data():
         sim_notes = f"AI 정밀 권리분석 완료. 말소기준권리(최초근저당) 이하 모든 등기상 권리 소멸. 선순위 인수 조건 및 유치권 분쟁 가능성 0% 안전 확인 매물.\n\n__METADATA__:{meta_json}__"
 
         properties.append({
-            "source": "court",
+            "source": "court_etc" if is_etc else "court",
             "auction_no": auction_no,
             "address": address,
             "appraised_value": appraised,
@@ -885,14 +940,13 @@ def scrape_court_data():
                         price = extract_price(raw_item.get("lwsDspslPrc", "0"))
                         ptype = raw_item.get("dspslUsgNm", "") or raw_item.get("usgNm", "기타")
                         
-                        # 비부동산 데이터 차단
+                        # 비부동산 여부 감지 및 소스 분류를 수행합니다.
                         ptype_lower = ptype.lower()
-                        if any(kw in ptype_lower for kw in ["자동차", "중기", "선박", "항공기", "기계", "기구", "차량", "동산", "유가증권", "물품", "어업권", "광업권"]):
-                            continue
-                            
                         address_lower = address.lower()
-                        if any(kw in address_lower for kw in ["등록번호:", "차명:", "차대번호:", "원동기형식:"]):
-                            continue
+                        
+                        is_etc_asset = any(kw in ptype_lower for kw in ["자동차", "중기", "선박", "항공기", "기계", "기구", "차량", "동산", "유가증권", "물품", "어업권", "광업권"]) or any(kw in address_lower for kw in ["등록번호:", "차명:", "차대번호:", "원동기형식:"])
+                        
+                        current_source = "court_etc" if is_etc_asset else "court"
                             
                         close_date_raw = target.get("dspslDxdyYmd", "")
                         close_date = ""
@@ -926,7 +980,7 @@ def scrape_court_data():
                         (
                             ex_area, ld_area, is_est_ex, is_est_ld,
                             excl_est_type, total_floors, total_area, floor_areas
-                        ) = extract_court_areas(raw_st)
+                        ) = extract_court_areas(raw_st, ptype)
                         su_area = round(ex_area * 1.32, 2) if ex_area > 0 else 0.0
                         bu_area = ex_area
                         
@@ -982,7 +1036,7 @@ def scrape_court_data():
                         final_notes = final_notes + f"\n\n__METADATA__:{meta_json}__"
 
                         combined_results.append({
-                            "source": "court",
+                            "source": current_source,
                             "auction_no": f"{court_name} {cs_no}",
                             "address": address,
                             "appraised_value": appraisal,
