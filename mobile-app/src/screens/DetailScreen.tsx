@@ -1490,8 +1490,8 @@ export const DetailScreen: React.FC<DetailScreenProps> = ({ property, onBack }) 
                   </TouchableOpacity>
                 </View>
               </View>
-              <View style={{ backgroundColor: '#fff5f5', borderColor: '#fee2e2', borderWidth: 1, padding: 8, borderRadius: 8, marginBottom: 12 }}>
-                <Text style={{ fontSize: 9.5, color: '#be123c', fontWeight: 'bold', lineHeight: 14 }}>
+              <View style={{ backgroundColor: '#fff5f5', borderColor: '#fee2e2', borderWidth: 1, padding: 10, borderRadius: 10, marginBottom: 12 }}>
+                <Text style={{ fontSize: 11.5, color: '#be123c', fontWeight: 'bold', lineHeight: 16 }}>
                   ⚠️ 경매 데이터베이스 누락 건의 경우, 알고리즘 환산 및 해시 추정값(허수)이 노출될 수 있으므로 실제 대장 정보와 대조하시기 바랍니다.
                 </Text>
               </View>
@@ -2304,8 +2304,8 @@ export const DetailScreen: React.FC<DetailScreenProps> = ({ property, onBack }) 
                   <View style={styles.receiptContainer}>
                     <View style={styles.receiptHeader}>
                       <Text style={styles.receiptHeaderText}>정밀 소요자금 계산 영수증</Text>
-                      <View style={{ backgroundColor: taxRate === 0.046 ? '#fffbeb' : '#f0f9ff', paddingHorizontal: 6, paddingVertical: 2, borderRadius: 4, borderWidth: 1, borderColor: taxRate === 0.046 ? '#fde68a' : '#bae6fd' }}>
-                        <Text style={{ fontSize: 9, fontWeight: 'bold', color: taxRate === 0.046 ? '#b45309' : COLORS.royalBlue }}>{rateLabel}</Text>
+                      <View style={{ backgroundColor: taxRate === 0.046 ? '#fffbeb' : '#f0f9ff', paddingHorizontal: 8, paddingVertical: 3, borderRadius: 6, borderWidth: 1, borderColor: taxRate === 0.046 ? '#fde68a' : '#bae6fd' }}>
+                        <Text style={{ fontSize: 11, fontWeight: 'bold', color: taxRate === 0.046 ? '#b45309' : COLORS.royalBlue }}>{rateLabel}</Text>
                       </View>
                     </View>
 
@@ -2869,78 +2869,78 @@ export const DetailScreen: React.FC<DetailScreenProps> = ({ property, onBack }) 
           <View style={styles.rightsTableCard}>
             <ScrollView horizontal showsHorizontalScrollIndicator={false}>
               <View style={[styles.table, styles.tableMinWidth]}>
-              <View style={[styles.tableRow, styles.tableHeader, { backgroundColor: '#f8fafc' }]}>
-                <Text style={[styles.tableCell, styles.tableHeaderCell, { flex: 1.1 }]}>서류 구분</Text>
-                <Text style={[styles.tableCell, styles.tableHeaderCell, { flex: 2.2 }]}>세부 분석 명세</Text>
-                <Text style={[styles.tableCell, styles.tableHeaderCell, { flex: 1.7 }]}>최종 분석 의견</Text>
-              </View>
-              
-              {/* 1. 감정평가서 */}
-              <View style={[styles.tableRow, { backgroundColor: '#ffffff', borderBottomWidth: 1, borderBottomColor: '#f1f5f9' }]}>
-                <View style={[styles.tableCell, { flex: 1.1 }]}>
-                  <Text style={{ fontWeight: 'bold', color: '#16a34a', fontSize: 11 }}>📋 감정평가서</Text>
-                  <Text style={{ fontSize: 9, color: COLORS.slate400, marginTop: 2 }}>공식감정보고</Text>
+                <View style={[styles.tableRow, styles.tableHeader]}>
+                  <Text style={[styles.tableCell, styles.tableHeaderCell, { flex: 1.1 }]}>서류 구분</Text>
+                  <Text style={[styles.tableCell, styles.tableHeaderCell, { flex: 2.2 }]}>세부 분석 명세</Text>
+                  <Text style={[styles.tableCell, styles.tableHeaderCell, { flex: 1.7 }]}>최종 분석 의견</Text>
                 </View>
-                <View style={[styles.tableCell, { flex: 2.2, paddingLeft: 4 }]}>
-                  <Text style={styles.tableCellText}>• 감정가: {formatCurrency(currentProperty.appraised_value)}</Text>
-                  <Text style={styles.tableCellText}>• 토지분: {formatCurrency(Math.floor(currentProperty.appraised_value * 0.4))}</Text>
-                  <Text style={styles.tableCellText}>• 건물분: {formatCurrency(Math.floor(currentProperty.appraised_value * 0.6))}</Text>
-                  <Text style={styles.tableCellText}>• 조사일: {currentProperty.bidding_date || '2026-05-11'}</Text>
+                
+                {/* 1. 감정평가서 */}
+                <View style={styles.tableRow}>
+                  <View style={[styles.tableCell, { flex: 1.1 }]}>
+                    <Text style={{ fontWeight: 'bold', color: '#16a34a', fontSize: 13 }}>📋 감정평가서</Text>
+                    <Text style={{ fontSize: 11, color: COLORS.slate500, marginTop: 2 }}>공식감정보고</Text>
+                  </View>
+                  <View style={[styles.tableCell, { flex: 2.2, paddingLeft: 4 }]}>
+                    <Text style={styles.tableCellText}>• 감정가: {formatCurrency(currentProperty.appraised_value)}</Text>
+                    <Text style={styles.tableCellText}>• 토지분: {formatCurrency(Math.floor(currentProperty.appraised_value * 0.4))}</Text>
+                    <Text style={styles.tableCellText}>• 건물분: {formatCurrency(Math.floor(currentProperty.appraised_value * 0.6))}</Text>
+                    <Text style={styles.tableCellText}>• 조사일: {currentProperty.bidding_date || '2026-05-11'}</Text>
+                  </View>
+                  <View style={[styles.tableCell, { flex: 1.7 }]}>
+                    <Text style={{ fontSize: 12, color: COLORS.slate600, lineHeight: 16 }}>인근 매물 및 실거래 낙찰 추세 대비 감정가는 합리적으로 책정되었습니다.</Text>
+                  </View>
                 </View>
-                <View style={[styles.tableCell, { flex: 1.7 }]}>
-                  <Text style={{ fontSize: 9.5, color: COLORS.slate600, lineHeight: 14 }}>인근 매물 및 실거래 낙찰 추세 대비 감정가는 합리적으로 책정되었습니다.</Text>
-                </View>
-              </View>
 
-              {/* 2. 현황조사서 */}
-              <View style={[styles.tableRow, { backgroundColor: '#ffffff', borderBottomWidth: 1, borderBottomColor: '#f1f5f9' }]}>
-                <View style={[styles.tableCell, { flex: 1.1 }]}>
-                  <Text style={{ fontWeight: 'bold', color: '#2563eb', fontSize: 11 }}>🔍 현황조사서</Text>
-                  <Text style={{ fontSize: 9, color: COLORS.slate400, marginTop: 2 }}>점유실태조사</Text>
+                {/* 2. 현황조사서 */}
+                <View style={styles.tableRow}>
+                  <View style={[styles.tableCell, { flex: 1.1 }]}>
+                    <Text style={{ fontWeight: 'bold', color: '#2563eb', fontSize: 13 }}>🔍 현황조사서</Text>
+                    <Text style={{ fontSize: 11, color: COLORS.slate500, marginTop: 2 }}>점유실태조사</Text>
+                  </View>
+                  <View style={[styles.tableCell, { flex: 2.2, paddingLeft: 4 }]}>
+                    <Text style={styles.tableCellText}>• 점유현황: {!extra.daehangStatus.includes("대항력 없음") ? "임차인 점유 중" : "임차인 없음 (소유자)"}</Text>
+                    <Text style={styles.tableCellText}>• 점유자: {!extra.daehangStatus.includes("대항력 없음") ? "강ㅇㅇ (임차인)" : "소유자 세대"}</Text>
+                    <Text style={styles.tableCellText}>• 전입일: {!extra.daehangStatus.includes("대항력 없음") ? "2023-04-15" : "해당 없음"}</Text>
+                  </View>
+                  <View style={[styles.tableCell, { flex: 1.7 }]}>
+                    <Text style={{ fontSize: 12, color: COLORS.slate600, lineHeight: 16 }}>{extra.daehangStatus.includes("주의") ? "선순위 전입자가 있으므로 보증금 인수 주의." : "인수할 명도 및 점유 리스크 없음."}</Text>
+                  </View>
                 </View>
-                <View style={[styles.tableCell, { flex: 2.2, paddingLeft: 4 }]}>
-                  <Text style={styles.tableCellText}>• 점유현황: {!extra.daehangStatus.includes("대항력 없음") ? "임차인 점유 중" : "임차인 없음 (소유자)"}</Text>
-                  <Text style={styles.tableCellText}>• 점유자: {!extra.daehangStatus.includes("대항력 없음") ? "강ㅇㅇ (임차인)" : "소유자 세대"}</Text>
-                  <Text style={styles.tableCellText}>• 전입일: {!extra.daehangStatus.includes("대항력 없음") ? "2023-04-15" : "해당 없음"}</Text>
-                </View>
-                <View style={[styles.tableCell, { flex: 1.7 }]}>
-                  <Text style={{ fontSize: 9.5, color: COLORS.slate600, lineHeight: 14 }}>{extra.daehangStatus.includes("주의") ? "선순위 전입자가 있으므로 보증금 인수 주의." : "인수할 명도 및 점유 리스크 없음."}</Text>
-                </View>
-              </View>
 
-              {/* 3. 매각물건명세서 */}
-              <View style={[styles.tableRow, { backgroundColor: '#ffffff', borderBottomWidth: 1, borderBottomColor: '#f1f5f9' }]}>
-                <View style={[styles.tableCell, { flex: 1.1 }]}>
-                  <Text style={{ fontWeight: 'bold', color: '#d97706', fontSize: 11 }}>📝 물건명세서</Text>
-                  <Text style={{ fontSize: 9, color: COLORS.slate400, marginTop: 2 }}>법원매각공인</Text>
+                {/* 3. 매각물건명세서 */}
+                <View style={styles.tableRow}>
+                  <View style={[styles.tableCell, { flex: 1.1 }]}>
+                    <Text style={{ fontWeight: 'bold', color: '#d97706', fontSize: 13 }}>📝 물건명세서</Text>
+                    <Text style={{ fontSize: 11, color: COLORS.slate500, marginTop: 2 }}>법원매각공인</Text>
+                  </View>
+                  <View style={[styles.tableCell, { flex: 2.2, paddingLeft: 4 }]}>
+                    <Text style={styles.tableCellText}>• 말소기준: 2023-05-10 근저당</Text>
+                    <Text style={styles.tableCellText}>• 대항력: {extra.daehangStatus}</Text>
+                    <Text style={styles.tableCellText}>• 배당요구: {!extra.daehangStatus.includes("대항력 없음") ? "신청 완료 (2026-03-10)" : "해당 없음"}</Text>
+                  </View>
+                  <View style={[styles.tableCell, { flex: 1.7 }]}>
+                    <Text style={{ fontSize: 12, color: COLORS.slate600, lineHeight: 16 }}>매각물건명세서상 하자 인수 권리(유치권, 지상권 등)는 존재하지 않습니다.</Text>
+                  </View>
                 </View>
-                <View style={[styles.tableCell, { flex: 2.2, paddingLeft: 4 }]}>
-                  <Text style={styles.tableCellText}>• 말소기준: 2023-05-10 근저당</Text>
-                  <Text style={styles.tableCellText}>• 대항력: {extra.daehangStatus}</Text>
-                  <Text style={styles.tableCellText}>• 배당요구: {!extra.daehangStatus.includes("대항력 없음") ? "신청 완료 (2026-03-10)" : "해당 없음"}</Text>
-                </View>
-                <View style={[styles.tableCell, { flex: 1.7 }]}>
-                  <Text style={{ fontSize: 9.5, color: COLORS.slate600, lineHeight: 14 }}>매각물건명세서상 하자 인수 권리(유치권, 지상권 등)는 존재하지 않습니다.</Text>
-                </View>
-              </View>
 
-              {/* 4. 사건진행이력 */}
-              <View style={[styles.tableRow, { backgroundColor: '#ffffff' }]}>
-                <View style={[styles.tableCell, { flex: 1.1 }]}>
-                  <Text style={{ fontWeight: 'bold', color: '#475569', fontSize: 11 }}>🕒 사건내역</Text>
-                  <Text style={{ fontSize: 9, color: COLORS.slate400, marginTop: 2 }}>사법진행상황</Text>
-                </View>
-                <View style={[styles.tableCell, { flex: 2.2, paddingLeft: 4 }]}>
-                  <Text style={styles.tableCellText}>• 경매개시: 2025-11-20 결정</Text>
-                  <Text style={styles.tableCellText}>• 배당종기: 2026-03-10 완료</Text>
-                  <Text style={styles.tableCellText}>• 진행상태: 기일 진행 대기 중</Text>
-                </View>
-                <View style={[styles.tableCell, { flex: 1.7 }]}>
-                  <Text style={{ fontSize: 9.5, color: COLORS.slate600, lineHeight: 14 }}>절차적 하자 없이 기일입찰 및 사법 절차가 정상 속도로 집행 중입니다.</Text>
+                {/* 4. 사건진행이력 */}
+                <View style={styles.tableRow}>
+                  <View style={[styles.tableCell, { flex: 1.1 }]}>
+                    <Text style={{ fontWeight: 'bold', color: '#475569', fontSize: 13 }}>🕒 사건내역</Text>
+                    <Text style={{ fontSize: 11, color: COLORS.slate500, marginTop: 2 }}>사법진행상황</Text>
+                  </View>
+                  <View style={[styles.tableCell, { flex: 2.2, paddingLeft: 4 }]}>
+                    <Text style={styles.tableCellText}>• 경매개시: 2025-11-20 결정</Text>
+                    <Text style={styles.tableCellText}>• 배당종기: 2026-03-10 완료</Text>
+                    <Text style={styles.tableCellText}>• 진행상태: 기일 진행 대기 중</Text>
+                  </View>
+                  <View style={[styles.tableCell, { flex: 1.7 }]}>
+                    <Text style={{ fontSize: 12, color: COLORS.slate600, lineHeight: 16 }}>절차적 하자 없이 기일입찰 및 사법 절차가 정상 속도로 집행 중입니다.</Text>
+                  </View>
                 </View>
               </View>
-            </View>
-          </ScrollView>
+            </ScrollView>
             
             {/* 통합 아웃링크 버튼 */}
             <TouchableOpacity
@@ -3511,8 +3511,8 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderBottomColor: COLORS.slate100,
     alignItems: 'center',
-    paddingVertical: 8,
-    paddingHorizontal: 10,
+    paddingVertical: 10,
+    paddingHorizontal: 12,
   },
   tableHeader: {
     backgroundColor: COLORS.slate50,
@@ -3521,13 +3521,13 @@ const styles = StyleSheet.create({
   },
   tableCell: {
     flex: 1,
-    fontSize: 14, // 글자 크기를 시원하게 키움
+    fontSize: 13,
     color: COLORS.slate700,
   },
   tableHeaderCell: {
     fontWeight: 'bold',
-    color: COLORS.slate800,
-    fontSize: 14,
+    color: COLORS.slate900,
+    fontSize: 13.5,
   },
   textCenter: {
     textAlign: 'center',
@@ -4445,6 +4445,6 @@ const styles = StyleSheet.create({
     textShadowRadius: 0.8,
   },
   tableMinWidth: {
-    minWidth: 550,
+    minWidth: 640,
   },
 });

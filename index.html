@@ -1171,107 +1171,107 @@
                     <i class="fa-solid fa-scale-balanced text-royalBlue"></i> ⚖️ 법정 주요 서류 및 사건 기록
                 </h4>
                 <p class="text-[9.5px] text-slate-500 leading-relaxed font-semibold">대법원 경매 및 감정 법원에서 공식 발행된 법정 주요 서류의 정밀 분석 명세 테이블입니다.</p>
-                <div class="overflow-x-auto">
-                    <table class="w-full text-left border-collapse text-[10.5px] sm:text-xs">
+                <div class="overflow-x-auto border border-slate-200 rounded-xl overflow-hidden shadow-sm bg-white">
+                    <table class="w-full text-left border-collapse text-[13px] document-view">
                         <thead>
-                            <tr class="border-b border-slate-200 text-slate-400 font-extrabold text-[9.5px] sm:text-[10px] bg-slate-50/50">
-                                <th class="p-2.5 pl-3 w-[20%] text-slate-800">서류 구분</th>
-                                <th class="p-2.5 w-[35%] text-slate-800">세부 항목 분석 명세</th>
-                                <th class="p-2.5 w-[35%] text-slate-800">집행법원 / 사법보좌관 의견 및 권리 진단</th>
-                                <th class="p-2.5 pr-3 text-right w-[10%] text-slate-800">바로가기</th>
+                            <tr class="bg-slate-50 border-b border-slate-200 text-slate-800 font-extrabold text-[12px]">
+                                <th class="p-3 pl-4 w-[20%] text-slate-900">서류 구분</th>
+                                <th class="p-3 w-[35%] text-slate-900">세부 항목 분석 명세</th>
+                                <th class="p-3 w-[35%] text-slate-900">집행법원 / 사법보좌관 의견 및 권리 진단</th>
+                                <th class="p-3 pr-4 text-right w-[10%] text-slate-900">바로가기</th>
                             </tr>
                         </thead>
                         <tbody class="text-slate-700 font-medium">
                             <!-- 1. 감정평가서 행 -->
                             <tr class="border-b border-slate-100 hover:bg-slate-50/40 transition-colors">
-                                <td class="p-2.5 pl-3 font-extrabold text-slate-800">
+                                <td class="p-3 pl-4 font-extrabold text-slate-850">
                                     <div class="flex flex-col space-y-0.5">
-                                        <span class="text-slate-900">📋 감정평가서</span>
-                                        <span id="table-doc-appraisal-summary" class="text-[9px] text-slate-400 font-bold">공식 자산 감정 보고서</span>
+                                        <span class="text-slate-900 text-[12.5px]">📋 감정평가서</span>
+                                        <span id="table-doc-appraisal-summary" class="text-[10.5px] text-slate-450 font-bold">공식 자산 감정 보고서</span>
                                     </div>
                                 </td>
-                                <td class="p-2.5">
-                                    <div class="space-y-1 text-[10px] font-bold text-slate-600">
+                                <td class="p-3">
+                                    <div class="space-y-1 text-[11.5px] sm:text-[12px] font-bold text-slate-600">
                                         <div class="flex justify-between max-w-[240px]"><span>감정 평가 가액</span><strong id="card-appraisal-total" class="text-slate-900 font-extrabold">-</strong></div>
                                         <div class="flex justify-between max-w-[240px]"><span>토지 평가 금액</span><strong id="card-appraisal-land" class="text-slate-700">-</strong></div>
                                         <div class="flex justify-between max-w-[240px]"><span>건물 평가 금액</span><strong id="card-appraisal-building" class="text-slate-700">-</strong></div>
                                         <div class="flex justify-between max-w-[240px]"><span>가격 조사 기일</span><strong id="card-appraisal-date" class="font-mono text-slate-700">-</strong></div>
                                     </div>
                                 </td>
-                                <td class="p-2.5 text-[10px] text-slate-500 font-bold leading-normal" id="card-appraisal-opinion">
+                                <td class="p-3 text-[11.5px] sm:text-[12px] text-slate-600 font-bold leading-normal" id="card-appraisal-opinion">
                                     -
                                 </td>
-                                <td class="p-2.5 pr-3 text-right">
-                                    <a id="btn-doc-appraisal" href="#" target="_blank" class="inline-block bg-emerald-50 hover:bg-emeraldSuccess text-emeraldSuccess hover:text-white px-2 py-1 rounded font-black text-[10px] transition-colors">조회</a>
+                                <td class="p-3 pr-4 text-right">
+                                    <a id="btn-doc-appraisal" href="#" target="_blank" class="inline-block bg-emerald-50 hover:bg-emeraldSuccess text-emeraldSuccess hover:text-white px-2 py-1 rounded font-black text-[11px] transition-colors">조회</a>
                                 </td>
                             </tr>
                             <!-- 2. 현황조사서 행 -->
                             <tr class="border-b border-slate-100 hover:bg-slate-50/40 transition-colors">
-                                <td class="p-2.5 pl-3 font-extrabold text-slate-800">
+                                <td class="p-3 pl-4 font-extrabold text-slate-850">
                                     <div class="flex flex-col space-y-0.5">
-                                        <span class="text-slate-900">🔍 현황조사서</span>
-                                        <span id="table-doc-survey-summary" class="text-[9px] text-slate-400 font-bold">부동산 점유 실태 기록</span>
+                                        <span class="text-slate-900 text-[12.5px]">🔍 현황조사서</span>
+                                        <span id="table-doc-survey-summary" class="text-[10.5px] text-slate-450 font-bold">부동산 점유 실태 기록</span>
                                     </div>
                                 </td>
-                                <td class="p-2.5">
-                                    <div class="space-y-1 text-[10px] font-bold text-slate-600">
+                                <td class="p-3">
+                                    <div class="space-y-1 text-[11.5px] sm:text-[12px] font-bold text-slate-600">
                                         <div class="flex justify-between max-w-[240px]"><span>부동산 점유 현황</span><strong id="card-survey-occupy" class="text-slate-900 font-extrabold">-</strong></div>
                                         <div class="flex justify-between max-w-[240px]"><span>점유자 성명</span><strong id="card-survey-name" class="text-slate-700">-</strong></div>
                                         <div class="flex justify-between max-w-[240px]"><span>전입 신고 일자</span><strong id="card-survey-date" class="font-mono text-slate-700">-</strong></div>
                                         <div class="flex justify-between max-w-[240px]"><span>기타 안내사항</span><strong id="card-survey-note" class="text-slate-700 truncate max-w-[140px]">-</strong></div>
                                     </div>
                                 </td>
-                                <td class="p-2.5 text-[10px] text-slate-500 font-bold leading-normal" id="card-survey-opinion">
+                                <td class="p-3 text-[11.5px] sm:text-[12px] text-slate-600 font-bold leading-normal" id="card-survey-opinion">
                                     -
                                 </td>
-                                <td class="p-2.5 pr-3 text-right">
-                                    <a id="btn-doc-survey" href="#" target="_blank" class="inline-block bg-blue-50 hover:bg-royalBlue text-royalBlue hover:text-white px-2 py-1 rounded font-black text-[10px] transition-colors">열람</a>
+                                <td class="p-3 pr-4 text-right">
+                                    <a id="btn-doc-survey" href="#" target="_blank" class="inline-block bg-blue-50 hover:bg-royalBlue text-royalBlue hover:text-white px-2 py-1 rounded font-black text-[11px] transition-colors">열람</a>
                                 </td>
                             </tr>
                             <!-- 3. 매각물건명세서 행 -->
                             <tr class="border-b border-slate-100 hover:bg-slate-50/40 transition-colors">
-                                <td class="p-2.5 pl-3 font-extrabold text-slate-800">
+                                <td class="p-3 pl-4 font-extrabold text-slate-850">
                                     <div class="flex flex-col space-y-0.5">
-                                        <span class="text-slate-900">📝 물건명세서</span>
-                                        <span id="table-doc-spec-summary" class="text-[9px] text-slate-400 font-bold">법원 공인 권리 분석서</span>
+                                        <span class="text-slate-900 text-[12.5px]">📝 물건명세서</span>
+                                        <span id="table-doc-spec-summary" class="text-[10.5px] text-slate-450 font-bold">법원 공인 권리 분석서</span>
                                     </div>
                                 </td>
-                                <td class="p-2.5">
-                                    <div class="space-y-1 text-[10px] font-bold text-slate-600">
+                                <td class="p-3">
+                                    <div class="space-y-1 text-[11.5px] sm:text-[12px] font-bold text-slate-600">
                                         <div class="flex justify-between max-w-[240px]"><span>최초 설정 근저당</span><strong id="card-spec-malso" class="text-slate-900 font-extrabold">-</strong></div>
                                         <div class="flex justify-between max-w-[240px]"><span>임차인 대항력 여부</span><strong id="card-spec-daehang" class="font-black">-</strong></div>
                                         <div class="flex justify-between max-w-[240px]"><span>배당요구 신청 여부</span><strong id="card-spec-baedang" class="text-slate-700">-</strong></div>
                                         <div class="flex justify-between max-w-[240px]"><span>특별 매각 조건</span><strong id="card-spec-special" class="text-slate-700">-</strong></div>
                                     </div>
                                 </td>
-                                <td class="p-2.5 text-[10px] text-slate-500 font-bold leading-normal" id="card-spec-opinion">
+                                <td class="p-3 text-[11.5px] sm:text-[12px] text-slate-600 font-bold leading-normal" id="card-spec-opinion">
                                     -
                                 </td>
-                                <td class="p-2.5 pr-3 text-right">
-                                    <a id="btn-doc-spec" href="#" target="_blank" class="inline-block bg-blue-50 hover:bg-royalBlue text-royalBlue hover:text-white px-2 py-1 rounded font-black text-[10px] transition-colors">확인</a>
+                                <td class="p-3 pr-4 text-right">
+                                    <a id="btn-doc-spec" href="#" target="_blank" class="inline-block bg-blue-50 hover:bg-royalBlue text-royalBlue hover:text-white px-2 py-1 rounded font-black text-[11px] transition-colors">확인</a>
                                 </td>
                             </tr>
                             <!-- 4. 사건내역 행 -->
                             <tr class="hover:bg-slate-50/40 transition-colors">
-                                <td class="p-2.5 pl-3 font-extrabold text-slate-800">
+                                <td class="p-3 pl-4 font-extrabold text-slate-850">
                                     <div class="flex flex-col space-y-0.5">
-                                        <span class="text-slate-900">⚖️ 사건내역</span>
-                                        <span id="table-doc-history-summary" class="text-[9px] text-slate-400 font-bold">전체 경매 진행 사건 정보</span>
+                                        <span class="text-slate-900 text-[12.5px]">⚖️ 사건내역</span>
+                                        <span id="table-doc-history-summary" class="text-[10.5px] text-slate-450 font-bold">전체 경매 진행 사건 정보</span>
                                     </div>
                                 </td>
-                                <td class="p-2.5">
-                                    <div class="space-y-1 text-[10px] font-bold text-slate-600">
+                                <td class="p-3">
+                                    <div class="space-y-1 text-[11.5px] sm:text-[12px] font-bold text-slate-600">
                                         <div class="flex justify-between max-w-[240px]"><span>경매 개시 결정</span><strong id="card-history-start" class="text-slate-900 font-extrabold">-</strong></div>
                                         <div class="flex justify-between max-w-[240px]"><span>배당요구 종기 기한</span><strong id="card-history-end" class="font-mono text-slate-700">-</strong></div>
                                         <div class="flex justify-between max-w-[240px]"><span>경매 진행 상태</span><strong id="card-history-status" class="text-slate-700">-</strong></div>
                                         <div class="flex justify-between max-w-[240px]"><span>최저 매각 비율</span><strong id="card-history-ratio" class="text-slate-700">-</strong></div>
                                     </div>
                                 </td>
-                                <td class="p-2.5 text-[10px] text-slate-500 font-bold leading-normal" id="card-history-opinion">
+                                <td class="p-3 text-[11.5px] sm:text-[12px] text-slate-600 font-bold leading-normal" id="card-history-opinion">
                                     -
                                 </td>
-                                <td class="p-2.5 pr-3 text-right">
-                                    <a id="btn-doc-history" href="#" target="_blank" class="inline-block bg-blue-50 hover:bg-royalBlue text-royalBlue hover:text-white px-2 py-1 rounded font-black text-[10px] transition-colors">이동</a>
+                                <td class="p-3 pr-4 text-right">
+                                    <a id="btn-doc-history" href="#" target="_blank" class="inline-block bg-blue-50 hover:bg-royalBlue text-royalBlue hover:text-white px-2 py-1 rounded font-black text-[11px] transition-colors">이동</a>
                                 </td>
                             </tr>
                         </tbody>
@@ -1287,17 +1287,17 @@
                 <h4 class="text-xs sm:text-sm font-black text-slate-800 flex items-center gap-1.5 mb-2.5">
                     <i class="fa-solid fa-calendar-days text-royalBlue"></i> 📅 경매 진행 기일 이력
                 </h4>
-                <div class="overflow-x-auto">
-                    <table class="w-full text-left border-collapse">
+                <div class="overflow-x-auto border border-slate-200 rounded-xl overflow-hidden shadow-sm bg-white">
+                    <table class="w-full text-left border-collapse text-[13px] document-view">
                         <thead>
-                            <tr class="border-b border-slate-200 text-[10px] sm:text-xs text-slate-400 font-extrabold">
-                                <th class="p-2 w-1/4">회차</th>
-                                <th class="p-2 w-1/3">입찰 기일</th>
-                                <th class="p-2 text-right">최저 매각 가격</th>
-                                <th class="p-2 text-center">결과</th>
+                            <tr class="bg-slate-50 border-b border-slate-200 text-slate-800 font-extrabold text-[12px]">
+                                <th class="p-3 pl-4 w-1/4">회차</th>
+                                <th class="p-3 w-1/3">입찰 기일</th>
+                                <th class="p-3 text-right text-slate-800">최저 매각 가격</th>
+                                <th class="p-3 pr-4 text-center">결과</th>
                             </tr>
                         </thead>
-                        <tbody id="detail-giiil-tbody" class="text-xs">
+                        <tbody id="detail-giiil-tbody" class="text-slate-700 font-medium">
                             <!-- 동적 주입 -->
                         </tbody>
                     </table>
@@ -1308,9 +1308,9 @@
                 <h4 class="text-xs sm:text-sm font-black text-slate-800 flex items-center gap-1.5 pb-2 border-b border-slate-100">
                     <i class="fa-solid fa-circle-info text-royalBlue"></i> 단지 기본 정보 및 시설 명세
                 </h4>
-                <div class="overflow-x-auto">
-                    <table class="w-full text-left border-collapse text-[11px] document-view">
-                        <tbody id="detail-complex-tbody" class="text-slate-600 font-medium">
+                <div class="overflow-x-auto border border-slate-200 rounded-xl overflow-hidden shadow-sm bg-white">
+                    <table class="w-full text-left border-collapse text-[13px] document-view">
+                        <tbody id="detail-complex-tbody" class="text-slate-700 font-medium">
                             <!-- 동적 생성 -->
                         </tbody>
                     </table>
@@ -1465,17 +1465,17 @@
                 <h4 class="text-xs sm:text-sm font-black text-slate-800 flex items-center gap-1.5 pb-2 border-b border-slate-100">
                     <i class="fa-solid fa-triangle-exclamation text-rose-600"></i> 낙찰자 인수 리스크 분석
                 </h4>
-                <div class="overflow-x-auto">
-                    <table class="w-full text-left border-collapse text-[11px] document-view">
+                <div class="overflow-x-auto border border-slate-200 rounded-xl overflow-hidden shadow-sm bg-white">
+                    <table class="w-full text-left border-collapse text-[13px] document-view">
                         <thead>
-                            <tr class="bg-slate-50 border-b border-slate-200 text-slate-705 font-extrabold">
-                                <th class="p-2 border-b">위험 항목</th>
-                                <th class="p-2 border-b">권리 내용</th>
-                                <th class="p-2 border-b text-right">예상 인수액</th>
-                                <th class="p-2 border-b">진단 및 의견</th>
+                            <tr class="bg-slate-50 border-b border-slate-200 text-slate-800 font-extrabold text-[12px]">
+                                <th class="p-3 pl-4 border-b">위험 항목</th>
+                                <th class="p-3 border-b">권리 내용</th>
+                                <th class="p-3 border-b text-right">예상 인수액</th>
+                                <th class="p-3 pr-4 border-b">진단 및 의견</th>
                             </tr>
                         </thead>
-                        <tbody id="detail-takeover-tbody" class="text-slate-600 font-medium">
+                        <tbody id="detail-takeover-tbody" class="text-slate-700 font-medium">
                             <!-- 동적 생성 -->
                         </tbody>
                     </table>
@@ -1489,18 +1489,18 @@
                 <h4 class="text-xs sm:text-sm font-black text-slate-800 flex items-center gap-1.5 pb-2 border-b border-slate-100">
                     <i class="fa-solid fa-door-closed text-royalBlue"></i> 임차인 및 점유자 관계 명세
                 </h4>
-                <div class="overflow-x-auto">
-                    <table class="w-full text-left border-collapse text-[11px] document-view">
+                <div class="overflow-x-auto border border-slate-200 rounded-xl overflow-hidden shadow-sm bg-white">
+                    <table class="w-full text-left border-collapse text-[13px] document-view">
                         <thead>
-                            <tr class="bg-slate-50 border-b border-slate-200 text-slate-705 font-extrabold">
-                                <th class="p-2 border-b">점유자 구분</th>
-                                <th class="p-2 border-b">전입일자</th>
-                                <th class="p-2 border-b">확정일자</th>
-                                <th class="p-2 border-b text-right">보증금/차임</th>
-                                <th class="p-2 border-b text-center">대항력</th>
+                            <tr class="bg-slate-50 border-b border-slate-200 text-slate-800 font-extrabold text-[12px]">
+                                <th class="p-3 pl-4 border-b">점유자 구분</th>
+                                <th class="p-3 border-b">전입일자</th>
+                                <th class="p-3 border-b">확정일자</th>
+                                <th class="p-3 border-b text-right">보증금/차임</th>
+                                <th class="p-3 pr-4 border-b text-center">대항력</th>
                             </tr>
                         </thead>
-                        <tbody id="detail-occupancy-tbody" class="text-slate-600 font-medium">
+                        <tbody id="detail-occupancy-tbody" class="text-slate-700 font-medium">
                             <!-- 동적 생성 -->
                         </tbody>
                     </table>
@@ -1514,18 +1514,18 @@
                 <h4 class="text-xs sm:text-sm font-black text-slate-800 flex items-center gap-1.5 pb-2 border-b border-slate-100">
                     <i class="fa-solid fa-book-open text-royalBlue"></i> 등기부등본 주요 권리 설정 요약
                 </h4>
-                <div class="overflow-x-auto">
-                    <table class="w-full text-left border-collapse text-[11px] document-view">
+                <div class="overflow-x-auto border border-slate-200 rounded-xl overflow-hidden shadow-sm bg-white">
+                    <table class="w-full text-left border-collapse text-[13px] document-view">
                         <thead>
-                            <tr class="bg-slate-50 border-b border-slate-200 text-slate-705 font-extrabold">
-                                <th class="p-2 border-b">구분</th>
-                                <th class="p-2 border-b">등기목적</th>
-                                <th class="p-2 border-b">접수일자</th>
-                                <th class="p-2 border-b">권리자 및 채권액</th>
-                                <th class="p-2 border-b text-center">낙찰후 효력</th>
+                            <tr class="bg-slate-50 border-b border-slate-200 text-slate-800 font-extrabold text-[12px]">
+                                <th class="p-3 pl-4 border-b">구분</th>
+                                <th class="p-3 border-b">등기목적</th>
+                                <th class="p-3 border-b">접수일자</th>
+                                <th class="p-3 border-b">권리자 및 채권액</th>
+                                <th class="p-3 pr-4 border-b text-center">낙찰후 효력</th>
                             </tr>
                         </thead>
-                        <tbody id="detail-registry-tbody" class="text-slate-600 font-medium">
+                        <tbody id="detail-registry-tbody" class="text-slate-700 font-medium">
                             <!-- 동적 생성 -->
                         </tbody>
                     </table>
@@ -1732,18 +1732,18 @@
                 <p class="text-[10px] text-slate-500 leading-relaxed font-bold">
                     낙찰금액을 감정평가액 기준으로 배당 순위에 따라 자동 분배한 시뮬레이션입니다. 실제 채무 권리 조정에 따라 변동될 수 있습니다.
                 </p>
-                <div class="overflow-x-auto">
-                    <table class="w-full text-left border-collapse text-[11px] document-view">
+                <div class="overflow-x-auto border border-slate-200 rounded-xl overflow-hidden shadow-sm bg-white">
+                    <table class="w-full text-left border-collapse text-[13px] document-view">
                         <thead>
-                            <tr class="bg-slate-50 border-b border-slate-200 text-slate-705 font-extrabold">
-                                <th class="p-2 border-b">순위</th>
-                                <th class="p-2 border-b">채권자 (권리)</th>
-                                <th class="p-2 border-b text-right">채권액/보증금</th>
-                                <th class="p-2 border-b text-right">예상배당액</th>
-                                <th class="p-2 border-b text-center">소멸여부</th>
+                            <tr class="bg-slate-50 border-b border-slate-200 text-slate-800 font-extrabold text-[12px]">
+                                <th class="p-3 pl-4 border-b">순위</th>
+                                <th class="p-3 border-b">채권자 (권리)</th>
+                                <th class="p-3 border-b text-right">채권액/보증금</th>
+                                <th class="p-3 border-b text-right">예상배당액</th>
+                                <th class="p-3 pr-4 border-b text-center">소멸여부</th>
                             </tr>
                         </thead>
-                        <tbody id="detail-dividend-tbody" class="text-slate-600 font-medium">
+                        <tbody id="detail-dividend-tbody" class="text-slate-700 font-medium">
                             <!-- 동적 생성 -->
                         </tbody>
                     </table>
@@ -1770,19 +1770,19 @@
                 <h4 class="text-xs sm:text-sm font-black text-slate-800 flex items-center gap-1.5 pb-2 border-b border-slate-100">
                     <i class="fa-solid fa-chart-line text-royalBlue"></i> 🏆 시나리오별 입찰 수익성 시뮬레이션
                 </h4>
-                <div class="overflow-x-auto">
-                    <table class="w-full text-left border-collapse text-[10px] sm:text-xs">
+                <div class="overflow-x-auto border border-slate-200 rounded-xl overflow-hidden shadow-sm bg-white">
+                    <table class="w-full text-left border-collapse text-[13px] document-view">
                         <thead>
-                            <tr class="border-b border-slate-200 text-slate-400 font-extrabold">
-                                <th class="p-2">구분 (입찰가율)</th>
-                                <th class="p-2 text-right">예상 입찰가</th>
-                                <th class="p-2 text-right">대출 (70%)</th>
-                                <th class="p-2 text-right">필요 자본금</th>
-                                <th class="p-2 text-right">연 이자 (4.5%)</th>
-                                <th class="p-2 text-right text-rose-600">예측 ROI</th>
+                            <tr class="bg-slate-50 border-b border-slate-200 text-slate-800 font-extrabold text-[12px]">
+                                <th class="p-3 pl-4">구분 (입찰가율)</th>
+                                <th class="p-3 text-right">예상 입찰가</th>
+                                <th class="p-3 text-right">대출 (70%)</th>
+                                <th class="p-3 text-right">필요 자본금</th>
+                                <th class="p-3 text-right">연 이자 (4.5%)</th>
+                                <th class="p-3 pr-4 text-right text-rose-600">예측 ROI</th>
                             </tr>
                         </thead>
-                        <tbody id="detail-scenario-tbody">
+                        <tbody id="detail-scenario-tbody" class="text-slate-700 font-medium">
                             <!-- 동적 주입 -->
                         </tbody>
                     </table>
@@ -1810,11 +1810,9 @@
         </div>
         <div id="detail-group-panel-4" class="flex-1 overflow-y-auto p-4 sm:p-5 space-y-4 sm:space-y-5 custom-scrollbar bg-slate-50/50 hidden relative">
             <div id="group-content-4" class="space-y-4 sm:space-y-5 w-full">
-                <!-- PC 2열 그리드 래퍼 (위치 & 시세 분석) -->
-                <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-5">
-                    <!-- 왼쪽 컬럼 (지도, 네이버 지도 연동 허브, 토지이용계획) -->
-                    <div class="space-y-4 sm:space-y-5">
-                        <div id="detail-panel-map" class="space-y-4 sm:space-y-5">
+                <!-- 위치 & 시세 분석 1열 스택 레이아웃 -->
+                <div class="space-y-4 sm:space-y-5">
+                    <div id="detail-panel-map" class="space-y-4 sm:space-y-5">
             <!-- 📍 물건지 실시간 위치 지도 -->
             <div class="bg-white border border-slate-200 rounded-2xl p-3.5 sm:p-4 space-y-2.5 shadow-sm">
                 <h4 class="text-xs sm:text-sm font-black text-slate-800 flex items-center gap-1.5">
@@ -1896,14 +1894,11 @@
                 <a id="btn-official-eum" href="#" onclick="event.preventDefault(); copyAddressAndOpenEum();" class="w-full bg-emeraldSuccess text-white py-2 rounded-xl text-xs font-black hover:bg-emerald-700 transition-all flex items-center justify-center gap-1 select-none cursor-pointer text-center">
                     국토부 토지이음(eum.go.kr) 공식 조회하기
                 </a>
-                            </div>
                         </div>
                     </div>
 
-                    <!-- 오른쪽 컬럼 (실거래 시세 대조) -->
-                    <div class="space-y-4 sm:space-y-5">
-                        <div id="detail-panel-market" class="space-y-4 sm:space-y-5">
-                            <div class="bg-white border border-slate-200 rounded-2xl p-4 shadow-sm space-y-3">
+                    <div id="detail-panel-market" class="space-y-4 sm:space-y-5">
+                        <div class="bg-white border border-slate-200 rounded-2xl p-4 shadow-sm space-y-3">
                 <div class="flex items-center justify-between pb-2 border-b border-slate-100">
                     <h4 class="text-xs sm:text-sm font-black text-slate-800 flex items-center gap-1.5">
                         <i class="fa-solid fa-tags text-royalBlue"></i> 주변 아파트 실거래 시세 대조
@@ -1913,17 +1908,17 @@
                     </button>
                 </div>
                                 <div class="overflow-x-auto border border-slate-200 rounded-xl overflow-hidden mt-3 shadow-sm bg-white">
-                                    <table class="w-full text-left border-collapse text-[13px] sm:text-[14px]">
+                                    <table class="w-full text-left border-collapse text-[13px] document-view">
                                         <thead>
-                                            <tr class="border-b border-slate-200 text-slate-700 font-bold text-[12px] sm:text-[13px] bg-slate-100/80">
-                                                <th class="p-3">거래일자</th>
+                                            <tr class="bg-slate-50 border-b border-slate-200 text-slate-800 font-extrabold text-[12px]">
+                                                <th class="p-3 pl-4">거래일자</th>
                                                 <th class="p-3">면적 (전용)</th>
                                                 <th class="p-3 text-center">층수</th>
                                                 <th class="p-3 text-right">거래금액</th>
-                                                <th class="p-3 text-center">변동률</th>
+                                                <th class="p-3 pr-4 text-center">변동률</th>
                                             </tr>
                                         </thead>
-                                        <tbody id="detail-market-tbody" class="text-slate-650 font-medium">
+                                        <tbody id="detail-market-tbody" class="text-slate-700 font-medium">
                                             <!-- 동적 생성 -->
                                         </tbody>
                                     </table>
@@ -1931,7 +1926,6 @@
                             </div>
                         </div>
                     </div>
-                </div>
             </div>
             <div id="group-mask-4" class="absolute inset-0 bg-slate-900/60 backdrop-blur-sm z-30 flex flex-col items-center justify-center text-center p-6 hidden">
                 <div class="bg-white border border-slate-200 rounded-2xl p-6 max-w-sm shadow-2xl space-y-3">
