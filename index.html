@@ -4201,10 +4201,17 @@
                 if (item.is_estimated_building) estBdSuffix = ` <span class="inline-flex items-center gap-0.5 px-2 py-0.5 ml-1.5 rounded-full text-[10px] font-black bg-rose-500 text-white select-none animate-pulse">⚠️ 허수</span>`;
             }
 
-            document.getElementById("detail-spec-exclusive-py").innerHTML = `${exclusiveArea.toFixed(1)} ㎡ (${exclusivePy} 평)${estExSuffix}`;
-            document.getElementById("detail-spec-supply-py").innerHTML = `${supplyArea.toFixed(1)} ㎡ (${supplyPy} 평)${estSpSuffix}`;
-            document.getElementById("detail-spec-land-py").innerHTML = `${landArea.toFixed(1)} ㎡ (${landPy} 평)${estLdSuffix}`;
-            document.getElementById("detail-spec-building-py").innerHTML = `${buildingArea.toFixed(1)} ㎡ (${buildingPy} 평)${estBdSuffix}`;
+            const formatAreaHtml = (area, py, suffix) => {
+                if (!area || area <= 0) {
+                    return `<span class="text-slate-400 font-normal">미상</span>`;
+                }
+                return `${area.toFixed(1)} ㎡ (${py} 평)${suffix}`;
+            };
+
+            document.getElementById("detail-spec-exclusive-py").innerHTML = formatAreaHtml(exclusiveArea, exclusivePy, estExSuffix);
+            document.getElementById("detail-spec-supply-py").innerHTML = formatAreaHtml(supplyArea, supplyPy, estSpSuffix);
+            document.getElementById("detail-spec-land-py").innerHTML = formatAreaHtml(landArea, landPy, estLdSuffix);
+            document.getElementById("detail-spec-building-py").innerHTML = formatAreaHtml(buildingArea, buildingPy, estBdSuffix);
 
             // 🏢 다세대 건물 전체 명세 바인딩
             const villaPanel = document.getElementById("detail-villa-building-info");

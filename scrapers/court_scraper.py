@@ -251,7 +251,65 @@ def clean_address(address):
     address = re.sub(r'\[상세내역\]|\[상세\]', '', address).strip()
     return address
 
-def extract_court_areas(st_text, ptype=""):
+# 시도/구 단위 대략적인 토지 ㎡당 평균 단가 (감정가 대비 역산용)
+LAND_UNIT_PRICES = {
+    "서울": 4500000,      # 평당 약 1500만원
+    "강남": 10000000,    # 평당 약 3300만원
+    "서초": 10000000,
+    "송파": 8000000,
+    "경기": 1500000,      # 평당 약 500만원
+    "분당": 3000000,
+    "인천": 1000000,      # 평당 약 330만원
+    "부산": 1200000,
+    "대구": 1000000,
+    "대전": 1000000,
+    "광주": 800000,
+    "울산": 800000,
+    "세종": 1500000,
+    "지방": 300000        # 평당 약 100만원 (기본값)
+}
+
+def estimate_land_area(address, appraised_value):
+    if not appraised_value or appraised_value <= 0:
+        return 0.0
+    addr = address or ""
+    price_per_sqm = LAND_UNIT_PRICES["지방"]
+    for region, val in LAND_UNIT_PRICES.items():
+        if region in addr:
+            price_per_sqm = val
+            break
+            
+    if any(gu in addr for gu in ["강남구", "서초구"]):
+        price_per_sqm = LAND_UNIT_PRICES["강남"]
+    elif "송파구" in addr:
+        price_per_sqm = LAND_UNIT_PRICES["송파"]
+    elif "분당구" in addr:
+        price_per_sqm = LAND_UNIT_PRICES["분당"]
+        
+    est_area = round(appraised_value / price_per_sqm, 2)
+    return est_area
+
+def estimate_apartment_area(address, appraised_value):
+    addr = address or ""
+    val = appraised_value or 0
+    is_seoul_metropolitan = any(r in addr for r in ["서울", "경기", "인천", "분당"])
+    
+    if is_seoul_metropolitan:
+        if val >= 1500000000:
+            return 114.8
+        elif val >= 600000000:
+            return 84.9
+        else:
+            return 59.9
+    else:
+        if val >= 700000000:
+            return 114.8
+        elif val >= 300000000:
+            return 84.9
+        else:
+            return 59.9
+
+def extract_court_areas(st_text, ptype="", appraised_value=0, address=""):
     """주소 및 소재지 내역 텍스트(st)로부터 층수, 층별 면적 리스트, 그리고 최종 해당 호수의 면적을 추정 및 정밀 추출합니다."""
     exclusive_area = 0.0
     land_area = 0.0
@@ -443,6 +501,26 @@ def extract_court_areas(st_text, ptype=""):
                     excl_est_type = "exact"  # 제목에 층별 면적 목록이 없고 이 단일 수치만 존재하므로, 실제 전용면적으로 자동 격상
             except ValueError:
                 pass
+
+    # 감정가 기반 면적 고도화 유도 (제목이나 내역에 면적이 아예 없는 경우)
+    if exclusive_area == 0.0 and ptype:
+        ptype_clean = ptype or ""
+        if any(k in ptype_clean for k in ["아파트", "오피스텔"]):
+            exclusive_area = estimate_apartment_area(address, appraised_value)
+            is_estimated_exclusive = True
+            excl_est_type = "estimated"
+        elif any(k in ptype_clean for k in ["다세대", "빌라", "연립", "주택"]):
+            val = appraised_value or 0
+            if val >= 500000000:
+                exclusive_area = 84.9
+            else:
+                exclusive_area = 59.9
+            is_estimated_exclusive = True
+            excl_est_type = "estimated"
+        elif any(k in ptype_clean for k in ["토지", "임야", "대지", "전", "답", "과수원", "잡종지", "도로"]):
+            if land_area == 0.0:
+                land_area = estimate_land_area(address, appraised_value)
+                is_estimated_land = True
 
     # 최종 폴백으로 전용면적이 여전히 0이면 거의 허수(fake)
     if exclusive_area == 0.0:
@@ -980,7 +1058,7 @@ def scrape_court_data():
                         (
                             ex_area, ld_area, is_est_ex, is_est_ld,
                             excl_est_type, total_floors, total_area, floor_areas
-                        ) = extract_court_areas(raw_st, ptype)
+                        ) = extract_court_areas(raw_st, ptype, appraisal, address)
                         su_area = round(ex_area * 1.32, 2) if ex_area > 0 else 0.0
                         bu_area = ex_area
                         

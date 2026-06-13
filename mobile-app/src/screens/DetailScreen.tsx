@@ -1523,60 +1523,84 @@ export const DetailScreen: React.FC<DetailScreenProps> = ({ property, onBack }) 
                     <View style={styles.infoRow}>
                       <Text style={styles.infoLabel}>전용 면적</Text>
                       <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                        <Text style={[styles.infoValue, { color: COLORS.royalBlue, fontFamily: Platform.OS === 'ios' ? 'Courier' : 'monospace' }]}>
-                          {targetExclusiveArea}㎡ (약 {(targetExclusiveArea * 0.3025).toFixed(1)}평)
-                        </Text>
-                        {isEstimatedExclusive && (
-                          <View style={{ marginLeft: 6, paddingHorizontal: 8, paddingVertical: 2, borderRadius: 9999, backgroundColor: estType === 'estimated' ? '#f59e0b' : '#ef4444' }}>
-                            <Text style={{ fontSize: 10, fontWeight: 'bold', color: '#ffffff' }}>
-                              {estType === 'estimated' ? '⚠️ 추정' : '⚠️ 허수'}
+                        {targetExclusiveArea > 0 ? (
+                          <>
+                            <Text style={[styles.infoValue, { color: COLORS.royalBlue, fontFamily: Platform.OS === 'ios' ? 'Courier' : 'monospace' }]}>
+                              {targetExclusiveArea}㎡ (약 {(targetExclusiveArea * 0.3025).toFixed(1)}평)
                             </Text>
-                          </View>
+                            {isEstimatedExclusive && (
+                              <View style={{ marginLeft: 6, paddingHorizontal: 8, paddingVertical: 2, borderRadius: 9999, backgroundColor: estType === 'estimated' ? '#f59e0b' : '#ef4444' }}>
+                                <Text style={{ fontSize: 10, fontWeight: 'bold', color: '#ffffff' }}>
+                                  {estType === 'estimated' ? '⚠️ 추정' : '⚠️ 허수'}
+                                </Text>
+                              </View>
+                            )}
+                          </>
+                        ) : (
+                          <Text style={[styles.infoValue, { color: '#94a3b8', fontWeight: 'normal' }]}>미상</Text>
                         )}
                       </View>
                     </View>
                     <View style={styles.infoRow}>
                       <Text style={styles.infoLabel}>공급 면적</Text>
                       <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                        <Text style={[styles.infoValue, { color: COLORS.royalBlue, fontFamily: Platform.OS === 'ios' ? 'Courier' : 'monospace' }]}>
-                          {targetSupplyArea}㎡ (약 {(targetSupplyArea * 0.3025).toFixed(1)}평)
-                        </Text>
-                        {isEstimatedSupply && (
-                          <View style={{ marginLeft: 6, paddingHorizontal: 8, paddingVertical: 2, borderRadius: 9999, backgroundColor: estType === 'estimated' ? '#f59e0b' : '#ef4444' }}>
-                            <Text style={{ fontSize: 10, fontWeight: 'bold', color: '#ffffff' }}>
-                              {estType === 'estimated' ? '⚠️ 추정' : '⚠️ 허수'}
+                        {targetSupplyArea > 0 ? (
+                          <>
+                            <Text style={[styles.infoValue, { color: COLORS.royalBlue, fontFamily: Platform.OS === 'ios' ? 'Courier' : 'monospace' }]}>
+                              {targetSupplyArea}㎡ (약 {(targetSupplyArea * 0.3025).toFixed(1)}평)
                             </Text>
-                          </View>
+                            {isEstimatedSupply && (
+                              <View style={{ marginLeft: 6, paddingHorizontal: 8, paddingVertical: 2, borderRadius: 9999, backgroundColor: estType === 'estimated' ? '#f59e0b' : '#ef4444' }}>
+                                <Text style={{ fontSize: 10, fontWeight: 'bold', color: '#ffffff' }}>
+                                  {estType === 'estimated' ? '⚠️ 추정' : '⚠️ 허수'}
+                                </Text>
+                              </View>
+                            )}
+                          </>
+                        ) : (
+                          <Text style={[styles.infoValue, { color: '#94a3b8', fontWeight: 'normal' }]}>미상</Text>
                         )}
                       </View>
                     </View>
                     <View style={styles.infoRow}>
                       <Text style={styles.infoLabel}>토지 대지권</Text>
                       <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                        <Text style={[styles.infoValue, { color: COLORS.royalBlue, fontFamily: Platform.OS === 'ios' ? 'Courier' : 'monospace' }]}>
-                          {targetLandArea}㎡ (약 {(targetLandArea * 0.3025).toFixed(1)}평)
-                        </Text>
-                        {isEstimatedLand && (
-                          <View style={{ marginLeft: 6, paddingHorizontal: 8, paddingVertical: 2, borderRadius: 9999, backgroundColor: estType === 'estimated' ? '#f59e0b' : '#ef4444' }}>
-                            <Text style={{ fontSize: 10, fontWeight: 'bold', color: '#ffffff' }}>
-                              {estType === 'estimated' ? '⚠️ 추정' : '⚠️ 허수'}
+                        {targetLandArea > 0 ? (
+                          <>
+                            <Text style={[styles.infoValue, { color: COLORS.royalBlue, fontFamily: Platform.OS === 'ios' ? 'Courier' : 'monospace' }]}>
+                              {targetLandArea}㎡ (약 {(targetLandArea * 0.3025).toFixed(1)}평)
                             </Text>
-                          </View>
+                            {isEstimatedLand && (
+                              <View style={{ marginLeft: 6, paddingHorizontal: 8, paddingVertical: 2, borderRadius: 9999, backgroundColor: estType === 'estimated' ? '#f59e0b' : '#ef4444' }}>
+                                <Text style={{ fontSize: 10, fontWeight: 'bold', color: '#ffffff' }}>
+                                  {estType === 'estimated' ? '⚠️ 추정' : '⚠️ 허수'}
+                                </Text>
+                              </View>
+                            )}
+                          </>
+                        ) : (
+                          <Text style={[styles.infoValue, { color: '#94a3b8', fontWeight: 'normal' }]}>미상</Text>
                         )}
                       </View>
                     </View>
                     <View style={styles.infoRow}>
                       <Text style={styles.infoLabel}>건물 전용</Text>
                       <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                        <Text style={[styles.infoValue, { color: COLORS.royalBlue, fontFamily: Platform.OS === 'ios' ? 'Courier' : 'monospace' }]}>
-                          {targetBuildingArea}㎡ (약 {(targetBuildingArea * 0.3025).toFixed(1)}평)
-                        </Text>
-                        {isEstimatedBuilding && (
-                          <View style={{ marginLeft: 6, paddingHorizontal: 8, paddingVertical: 2, borderRadius: 9999, backgroundColor: estType === 'estimated' ? '#f59e0b' : '#ef4444' }}>
-                            <Text style={{ fontSize: 10, fontWeight: 'bold', color: '#ffffff' }}>
-                              {estType === 'estimated' ? '⚠️ 추정' : '⚠️ 허수'}
+                        {targetBuildingArea > 0 ? (
+                          <>
+                            <Text style={[styles.infoValue, { color: COLORS.royalBlue, fontFamily: Platform.OS === 'ios' ? 'Courier' : 'monospace' }]}>
+                              {targetBuildingArea}㎡ (약 {(targetBuildingArea * 0.3025).toFixed(1)}평)
                             </Text>
-                          </View>
+                            {isEstimatedBuilding && (
+                              <View style={{ marginLeft: 6, paddingHorizontal: 8, paddingVertical: 2, borderRadius: 9999, backgroundColor: estType === 'estimated' ? '#f59e0b' : '#ef4444' }}>
+                                <Text style={{ fontSize: 10, fontWeight: 'bold', color: '#ffffff' }}>
+                                  {estType === 'estimated' ? '⚠️ 추정' : '⚠️ 허수'}
+                                </Text>
+                              </View>
+                            )}
+                          </>
+                        ) : (
+                          <Text style={[styles.infoValue, { color: '#94a3b8', fontWeight: 'normal' }]}>미상</Text>
                         )}
                       </View>
                     </View>
