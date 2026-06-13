@@ -1835,26 +1835,26 @@ export const DetailScreen: React.FC<DetailScreenProps> = ({ property, onBack }) 
                             <Image source={estSource} style={{ width: '100%', height: '100%', opacity: 0.8 }} resizeMode="contain" />
                             {/* 추정/허수 배지 */}
                             {(() => {
-                              let badgeText = "⚠️추정";
+                              let badgeText = "⚠️ 추정";
                               let badgeColor = "#3b82f6"; // estimated: 파란색
                               if (estType === "fake" || isEstimatedExclusive) {
-                                badgeText = "⚠️허수";
+                                badgeText = "⚠️ 허수";
                                 badgeColor = "#f43f5e"; // fake: 로즈색
                               }
                               if (isEstimatedExclusive && estType === "estimated") {
-                                badgeText = "⚠️추정";
+                                badgeText = "⚠️ 추정";
                                 badgeColor = "#f59e0b"; // estimated: 주황색
                               }
                               
                               return (
-                                <View style={{ position: 'absolute', top: 10, right: 10, backgroundColor: badgeColor, paddingHorizontal: 8, paddingVertical: 3, borderRadius: 6 }}>
-                                  <Text style={{ color: '#ffffff', fontSize: 9, fontWeight: 'bold' }}>{badgeText}</Text>
+                                <View style={{ position: 'absolute', top: 10, right: 10, backgroundColor: badgeColor, paddingHorizontal: 10, paddingVertical: 4, borderRadius: 9999 }}>
+                                  <Text style={{ color: '#ffffff', fontSize: 10, fontWeight: 'bold' }}>{badgeText}</Text>
                                 </View>
                               );
                             })()}
 
-                            <View style={{ position: 'absolute', bottom: 10, left: 10, backgroundColor: 'rgba(30, 41, 59, 0.8)', paddingHorizontal: 8, paddingVertical: 3, borderRadius: 6 }}>
-                              <Text style={{ color: '#ffffff', fontSize: 9, fontWeight: 'bold' }}>{sizeLabel}</Text>
+                            <View style={{ position: 'absolute', bottom: 10, left: 10, backgroundColor: 'rgba(30, 41, 59, 0.8)', paddingHorizontal: 10, paddingVertical: 4, borderRadius: 9999 }}>
+                              <Text style={{ color: '#ffffff', fontSize: 10, fontWeight: 'bold' }}>{sizeLabel}</Text>
                             </View>
                           </TouchableOpacity>
                         </View>

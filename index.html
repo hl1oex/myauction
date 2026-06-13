@@ -4190,21 +4190,21 @@
 
             const estType = item.exclusive_area_estimation_type || "exact";
             if (estType === "estimated") {
-                if (item.is_estimated_exclusive) estExSuffix = " (⚠️추정)";
-                if (item.is_estimated_supply) estSpSuffix = " (⚠️추정)";
-                if (item.is_estimated_land) estLdSuffix = " (⚠️추정)";
-                if (item.is_estimated_building) estBdSuffix = " (⚠️추정)";
+                if (item.is_estimated_exclusive) estExSuffix = ` <span class="inline-flex items-center gap-0.5 px-2 py-0.5 ml-1.5 rounded-full text-[10px] font-black bg-amber-500 text-white select-none">⚠️ 추정</span>`;
+                if (item.is_estimated_supply) estSpSuffix = ` <span class="inline-flex items-center gap-0.5 px-2 py-0.5 ml-1.5 rounded-full text-[10px] font-black bg-amber-500 text-white select-none">⚠️ 추정</span>`;
+                if (item.is_estimated_land) estLdSuffix = ` <span class="inline-flex items-center gap-0.5 px-2 py-0.5 ml-1.5 rounded-full text-[10px] font-black bg-amber-500 text-white select-none">⚠️ 추정</span>`;
+                if (item.is_estimated_building) estBdSuffix = ` <span class="inline-flex items-center gap-0.5 px-2 py-0.5 ml-1.5 rounded-full text-[10px] font-black bg-amber-500 text-white select-none">⚠️ 추정</span>`;
             } else if (estType === "fake") {
-                if (item.is_estimated_exclusive) estExSuffix = " (⚠️허수)";
-                if (item.is_estimated_supply) estSpSuffix = " (⚠️허수)";
-                if (item.is_estimated_land) estLdSuffix = " (⚠️허수)";
-                if (item.is_estimated_building) estBdSuffix = " (⚠️허수)";
+                if (item.is_estimated_exclusive) estExSuffix = ` <span class="inline-flex items-center gap-0.5 px-2 py-0.5 ml-1.5 rounded-full text-[10px] font-black bg-rose-500 text-white select-none animate-pulse">⚠️ 허수</span>`;
+                if (item.is_estimated_supply) estSpSuffix = ` <span class="inline-flex items-center gap-0.5 px-2 py-0.5 ml-1.5 rounded-full text-[10px] font-black bg-rose-500 text-white select-none animate-pulse">⚠️ 허수</span>`;
+                if (item.is_estimated_land) estLdSuffix = ` <span class="inline-flex items-center gap-0.5 px-2 py-0.5 ml-1.5 rounded-full text-[10px] font-black bg-rose-500 text-white select-none animate-pulse">⚠️ 허수</span>`;
+                if (item.is_estimated_building) estBdSuffix = ` <span class="inline-flex items-center gap-0.5 px-2 py-0.5 ml-1.5 rounded-full text-[10px] font-black bg-rose-500 text-white select-none animate-pulse">⚠️ 허수</span>`;
             }
 
-            document.getElementById("detail-spec-exclusive-py").innerText = `${exclusiveArea.toFixed(1)} ㎡ (${exclusivePy} 평)${estExSuffix}`;
-            document.getElementById("detail-spec-supply-py").innerText = `${supplyArea.toFixed(1)} ㎡ (${supplyPy} 평)${estSpSuffix}`;
-            document.getElementById("detail-spec-land-py").innerText = `${landArea.toFixed(1)} ㎡ (${landPy} 평)${estLdSuffix}`;
-            document.getElementById("detail-spec-building-py").innerText = `${buildingArea.toFixed(1)} ㎡ (${buildingPy} 평)${estBdSuffix}`;
+            document.getElementById("detail-spec-exclusive-py").innerHTML = `${exclusiveArea.toFixed(1)} ㎡ (${exclusivePy} 평)${estExSuffix}`;
+            document.getElementById("detail-spec-supply-py").innerHTML = `${supplyArea.toFixed(1)} ㎡ (${supplyPy} 평)${estSpSuffix}`;
+            document.getElementById("detail-spec-land-py").innerHTML = `${landArea.toFixed(1)} ㎡ (${landPy} 평)${estLdSuffix}`;
+            document.getElementById("detail-spec-building-py").innerHTML = `${buildingArea.toFixed(1)} ㎡ (${buildingPy} 평)${estBdSuffix}`;
 
             // 🏢 다세대 건물 전체 명세 바인딩
             const villaPanel = document.getElementById("detail-villa-building-info");
@@ -4561,22 +4561,22 @@
                         }
                     }
 
-                    let badgeText = "⚠️추정";
+                    let badgeText = "⚠️ 추정";
                     let badgeColor = "bg-amber-500";
                     if (item.exclusive_area_estimation_type === "fake") {
-                        badgeText = "⚠️허수";
+                        badgeText = "⚠️ 허수";
                         badgeColor = "bg-rose-500 animate-pulse";
                     } else if (item.exclusive_area_estimation_type === "estimated") {
-                        badgeText = "⚠️추정";
+                        badgeText = "⚠️ 추정";
                         badgeColor = "bg-blue-500";
                     }
 
                     fpImgContainer.innerHTML = `
                         <img id="detail-floorplan-img" src="${estImg}" alt="부동산 추정 평면도" class="w-full h-full object-contain opacity-80">
-                        <div class="absolute top-2.5 right-2.5 ${badgeColor} text-white text-[9px] font-black px-2 py-0.5 rounded-md shadow-sm select-none z-10">
+                        <div class="absolute top-2.5 right-2.5 ${badgeColor} text-white text-[10px] font-black px-2.5 py-0.5 rounded-full shadow-sm select-none z-10 flex items-center justify-center">
                             ${badgeText}
                         </div>
-                        <div class="absolute bottom-2.5 left-2.5 bg-slate-800/80 text-white text-[9px] font-bold px-2 py-0.5 rounded-md select-none z-10">
+                        <div class="absolute bottom-2.5 left-2.5 bg-slate-800/80 text-white text-[10px] font-bold px-2.5 py-0.5 rounded-full select-none z-10">
                             ${sizeLabel}AI 추정 구조도
                         </div>
                     `;
