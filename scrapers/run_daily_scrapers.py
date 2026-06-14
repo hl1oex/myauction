@@ -13,7 +13,8 @@ def send_email(subject, body):
     smtp_user = os.environ.get("SMTP_USER")
     smtp_pass = os.environ.get("SMTP_PASS")
     smtp_host = os.environ.get("SMTP_HOST", "smtp.gmail.com")
-    smtp_port = int(os.environ.get("SMTP_PORT", "587"))
+    smtp_port_raw = os.environ.get("SMTP_PORT", "587")
+    smtp_port = int(smtp_port_raw)
     recipient = "hl1oex@gmail.com"
 
     if not smtp_user or not smtp_pass:
@@ -28,17 +29,37 @@ def send_email(subject, body):
         msg["Subject"] = subject
         msg.attach(MIMEText(body, "plain", "utf-8"))
 
-        # SMTP 연결을 생성하고 TLS 보안 인증을 수행합니다.
-        server = smtplib.SMTP(smtp_host, smtp_port)
-        server.starttls()
-        server.login(smtp_user, smtp_pass)
+        if smtp_port == 465:
+            server = smtplib.SMTP_SSL(smtp_host, smtp_port, timeout=15)
+            server.login(smtp_user, smtp_pass)
+        else:
+            server = smtplib.SMTP(smtp_host, smtp_port, timeout=15)
+            server.starttls()
+            server.login(smtp_user, smtp_pass)
+            
         server.sendmail(smtp_user, recipient, msg.as_string())
         server.close()
         print(f"[+] 성공/실패 결과를 {recipient} 메일로 성공적으로 리포트하였습니다.")
         return True
     except Exception as e:
-        print(f"[!] 이메일 발송 중 오류가 발생하였습니다. {str(e)}")
-        return False
+        print(f"[-] 1차 SMTP 전송 실패 ({str(e)}). 포트/보안 방식 자동 전환 폴백 재시도를 수행합니다.")
+        try:
+            fallback_port = 465 if smtp_port != 465 else 587
+            if fallback_port == 465:
+                server = smtplib.SMTP_SSL(smtp_host, fallback_port, timeout=15)
+                server.login(smtp_user, smtp_pass)
+            else:
+                server = smtplib.SMTP(smtp_host, fallback_port, timeout=15)
+                server.starttls()
+                server.login(smtp_user, smtp_pass)
+            server.sendmail(smtp_user, recipient, msg.as_string())
+            server.close()
+            print(f"[+] 포트 전환 폴백으로 결과를 {recipient} 메일로 성공적으로 리포트하였습니다.")
+            return True
+        except Exception as fallback_e:
+            print(f"[!] 이메일 발송 중 최종 오류가 발생하였습니다. {str(fallback_e)}")
+            print("[*] TIP: Gmail SMTP 사용 시 일반 비밀번호 대신 구글 계정 설정의 '앱 비밀번호(App Password)'를 생성해 사용해야 인증이 성공합니다.")
+            return False
 
 def main():
     print("[*] 부동산경공매 검색시스템 일일 통합 크롤러 가동을 시작합니다.")

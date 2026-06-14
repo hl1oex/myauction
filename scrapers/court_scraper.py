@@ -261,43 +261,63 @@ def extract_non_building_meta(text, ptype=""):
     text_clean = text.replace("\n", " ").replace("  ", " ").strip()
     
     # 1. 차량/운송장비 분석 (자동차, 중기, 차량, 선박, 항공기 등)
-    if any(k in p_clean for k in ["차량", "자동차", "중기", "선박", "항공기", "운송"]):
+    if any(k in p_clean for k in ["차량", "자동차", "중기", "선박", "항공기", "운송", "카"]):
         meta["asset_type"] = "vehicle"
-        year_match = re.search(r'(?:연식|제작년도|제작연도)\s*:\s*(\d{4})|(\d{4})\s*년식|(\d{4})\s*년\s*형', text_clean)
+        year_match = re.search(r'(?:연식|제작년도|제작연도|연형)\s*[:=]\s*(\d{4})|(\d{4})\s*년식|(\d{4})\s*년\s*형|(\d{4})\s*년형', text_clean, re.I)
         if year_match:
-            meta["model_year"] = f"{year_match.group(1) or year_match.group(2) or year_match.group(3)}년식"
+            meta["model_year"] = f"{year_match.group(1) or year_match.group(2) or year_match.group(3) or year_match.group(4)}년식"
             
-        mileage_match = re.search(r'(?:주행거리|주행)\s*:\s*([\d,]+)\s*(?:km|키로)?|([\d,]+)\s*(?:km|키로)\b', text_clean)
+        mileage_match = re.search(r'(?:주행거리|주행)\s*[:=]\s*([\d,]+)\s*(?:km|키로)?|([\d,]+)\s*(?:km|키로)\b', text_clean, re.I)
         if mileage_match:
             meta["mileage"] = f"{mileage_match.group(1) or mileage_match.group(2)} km"
             
-        no_match = re.search(r'(?:등록번호|차량번호|차대번호)\s*:\s*([가-힣\d\w\s\-]+?)(?:\s|$|,|\||\()', text_clean)
+        no_match = re.search(r'(?:등록번호|차량번호)\s*[:=]\s*([가-힣\d\w\s\-]+?)(?:\s\s|$|,|\||\()', text_clean)
         if no_match:
             meta["vehicle_no"] = no_match.group(1).strip()
             
-        name_match = re.search(r'(?:차명|모델명)\s*:\s*([가-힣\d\w\s\-]+?)(?:\s|$|,|\||\()', text_clean)
+        vin_match = re.search(r'(?:차대번호|차대\s*번호)\s*[:=]\s*([A-Z\d\-\*]{10,20})', text_clean, re.I)
+        if vin_match:
+            meta["vin"] = vin_match.group(1).strip()
+            
+        name_match = re.search(r'(?:차명|모델명|차종)\s*[:=]\s*([가-힣\d\w\s\-]+?)(?:\s\s|$|,|\||\()', text_clean)
         if name_match:
             meta["model_name"] = name_match.group(1).strip()
+
+        engine_match = re.search(r'(?:원동기형식|원동기|엔진형식)\s*[:=]\s*([가-힣\d\w\s\-]+?)(?:\s\s|$|,|\||\()', text_clean)
+        if engine_match:
+            meta["engine_type"] = engine_match.group(1).strip()
+
+        fuel_match = re.search(r'(?:연료구분|연료)\s*[:=]\s*(경유|휘발유|가솔린|디젤|LPG|전기|하이브리드|수소)', text_clean, re.I)
+        if fuel_match:
+            meta["fuel"] = fuel_match.group(1).strip()
+
+        base_match = re.search(r'(?:사용본거지|본거지|등록지|주소|사용\s*본거지)\s*[:=]\s*([가-힣\w\s\d\-\(\),]+?)(?:보관장소|보관소|보관지|차명|차량|$)', text_clean)
+        if base_match:
+            meta["base_location"] = base_match.group(1).strip()
+
+        storage_match = re.search(r'(?:보관장소|보관소|보관지|소재지)\s*[:=]\s*([가-힣\w\s\d\-\(\),]+?)(?:사용본거지|본거지|차명|$)', text_clean)
+        if storage_match:
+            meta["storage_location"] = storage_match.group(1).strip()
 
     # 2. 기계장비 분석 (기계, 기구, 설비 등)
     elif any(k in p_clean for k in ["기계", "기구", "설비", "장비"]):
         meta["asset_type"] = "machinery"
-        spec_match = re.search(r'(?:규격|형식|성능)\s*:\s*([가-힣\w\s\-\(\)\/,.]+?)(?:\s\s|$|,|\|)', text_clean)
+        spec_match = re.search(r'(?:규격|형식|성능)\s*[:=]\s*([가-힣\w\s\-\(\)\/,.]+?)(?:\s\s|$|,|\|)', text_clean)
         if spec_match:
             meta["specification"] = spec_match.group(1).strip()
             
-        maker_match = re.search(r'(?:제조사|제작사|제조국)\s*:\s*([가-힣\w\s\-]+?)(?:\s|$|,|\|)', text_clean)
+        maker_match = re.search(r'(?:제조사|제작사|제조국)\s*[:=]\s*([가-힣\w\s\-]+?)(?:\s|$|,|\|)', text_clean)
         if maker_match:
             meta["manufacturer"] = maker_match.group(1).strip()
             
-        qty_match = re.search(r'(?:수량|수량\s*:\s*)(\d+)\s*(?:대|세트|개|조)', text_clean)
+        qty_match = re.search(r'(?:수량|수량\s*[:=]\s*)(\d+)\s*(?:대|세트|개|조)', text_clean)
         if qty_match:
             meta["quantity"] = f"{qty_match.group(1)}대"
 
     # 3. 유가증권 분석 (주식, 증권 등)
     elif any(k in p_clean for k in ["주식", "증권", "채권", "출자"]):
         meta["asset_type"] = "securities"
-        qty_match = re.search(r'([\d,]+)\s*주\b|주식\s*수량\s*:\s*([\d,]+)', text_clean)
+        qty_match = re.search(r'([\d,]+)\s*주\b|주식\s*수량\s*[:=]\s*([\d,]+)', text_clean)
         if qty_match:
             meta["quantity"] = f"{qty_match.group(1) or qty_match.group(2)}주"
             
@@ -308,11 +328,11 @@ def extract_non_building_meta(text, ptype=""):
     # 4. 기타물품 분석 (물품, 동산 등)
     else:
         meta["asset_type"] = "goods"
-        qty_match = re.search(r'(?:수량|개수)\s*:\s*([\d,]+)\s*([가-힣]+)|([\d,]+)\s*(?:개|세트|박스|톤)\b', text_clean)
+        qty_match = re.search(r'(?:수량|개수)\s*[:=]\s*([\d,]+)\s*([가-힣]+)|([\d,]+)\s*(?:개|세트|박스|톤)\b', text_clean)
         if qty_match:
             meta["quantity"] = f"{qty_match.group(1) or qty_match.group(3)}개"
             
-        loc_match = re.search(r'(?:보관장소|보관지|소재지)\s*:\s*([가-힣\w\s\-]+?)(?:\s\s|$|,|\|)', text_clean)
+        loc_match = re.search(r'(?:보관장소|보관지|소재지)\s*[:=]\s*([가-힣\w\s\-]+?)(?:\s\s|$|,|\|)', text_clean)
         if loc_match:
             meta["storage_location"] = loc_match.group(1).strip()
             
@@ -1042,6 +1062,16 @@ def scrape_court_data():
                 proxy_index += 1
                 if proxy_index > len(proxies_list):
                     break
+                    
+        if not warmup_success:
+            print("[!] 프록시 우회 웜업이 실패하여, 로컬 IP 다이렉트 세션 모드로 강제 기동합니다.")
+            try:
+                headers["User-Agent"] = random.choice(USER_AGENTS)
+                r_warmup = session.get(warmup_url, headers=headers, timeout=10)
+                if r_warmup.status_code == 200:
+                    print("[+] 로컬 IP 다이렉트 웜업 페이지 접근 성공!")
+            except Exception as direct_err:
+                print(f"[-] 로컬 IP 다이렉트 웜업 오류 발생 ({direct_err}). 무시하고 크롤링 단계를 기동합니다.")
         
         # 6개월 윈도우 생성 (무삭제 수집 유지)
         query_months = []
@@ -1057,18 +1087,19 @@ def scrape_court_data():
         sessions_list = []
         target_courts = list(COURT_CODES.items())
         
-        for ymd in query_months:
-            for court_code, court_name in target_courts:
-                if time.time() - start_time > 180:
-                    raise TimeoutError("대법원 크롤링 시간 초과(180초)로 시뮬레이션 폴백을 기동합니다.")
-                payload = {
-                    "dma_srchDspslPbanc": {
-                        "srchYmd": ymd,
-                        "cortOfcCd": court_code,
-                        "bidDvsCd": "000331",
-                        "srchBtnYn": "Y"
+        for bid_dvs in ["000331", "000332"]:
+            for ymd in query_months:
+                for court_code, court_name in target_courts:
+                    if time.time() - start_time > 250:
+                        raise TimeoutError("대법원 크롤링 시간 초과(250초)로 시뮬레이션 폴백을 기동합니다.")
+                    payload = {
+                        "dma_srchDspslPbanc": {
+                            "srchYmd": ymd,
+                            "cortOfcCd": court_code,
+                            "bidDvsCd": bid_dvs,
+                            "srchBtnYn": "Y"
+                        }
                     }
-                }
                 
                 # 랜덤 딜레이 적용 (Jitter)
                 time.sleep(0.01 + random.random() * 0.02)
@@ -1107,8 +1138,8 @@ def scrape_court_data():
         
         # 상세 수집 루프
         for idx, target in enumerate(sessions_list):
-            if time.time() - start_time > 180:
-                raise TimeoutError("대법원 크롤링 시간 초과(180초)로 시뮬레이션 폴백을 기동합니다.")
+            if time.time() - start_time > 300:
+                raise TimeoutError("대법원 크롤링 시간 초과(300초)로 시뮬레이션 폴백을 기동합니다.")
             detail_payload = {
                 "dma_srchGnrlPbanc": {
                     "dspslRealId": target.get("dspslRealId"),

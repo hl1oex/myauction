@@ -654,10 +654,6 @@ def estimate_apartment_area(address, appraised_value):
         else:
             return 59.9
 
-                            divisor = last_digit
-                except ValueError:
-                    pass
-                    
         # 면적 추정 계산 수행
         if is_villa:
             # 다세대의 경우 별도의 표기가 없으면 지층부터 합계된 모든 면적(total_area)을 기준으로 전체 세대수(층수 * divisor)로 나눕니다.
