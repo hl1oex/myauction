@@ -199,6 +199,11 @@
 - **타입 정의 보완**. 모바일 앱 `types/index.ts` 내 `Property` 인터페이스의 `car_info` 에 `vin`, `engine_type`, `vehicle_type`, `base_location` 등 누락된 차량 정보 메타 속성을 명시적으로 정의하여 DetailScreen 내 속성 대입 에러를 해결하였습니다.
 - **인자 매칭 및 변수 정의 누락 복구**. `DetailScreen.tsx` 의 `enrichPropertyDataMobile` 함수 내부에서 `textToSearch` 변수 선언이 누락되었던 문제를 복구하였습니다. 또한, `extractNonBuildingMetaMobile` 함수에 정의되지 않은 매개변수였던 `item.title`을 제거하고 2개의 인자(textToSearch, ptype)만 정상 전달하도록 수정하였습니다.
 - **정규식 매치 인덱스 예외 가드**. `DetailScreen.tsx` 에서 정규식 `match` 실행 시 `index`가 `undefined`일 가능성에 대비하여 3항 연산자를 활용한 널 디펜스(null-safety) 코드를 추가하였습니다.
-- **COLORS 속성 및 API 타입 검증**. `FeedScreen.tsx` 내 존재하지 않는 `COLORS.slate950` 색상 코드를 정상 탑재된 `COLORS.slate900`으로 변경하였습니다. 또한, `api.ts` 에서 `Object.values(floorAreas)`를 `Math.max` 에 전달할 때 발생하는 타입 불일치 에러를 해결하기 위해 `as number[]` 강제 캐스팅을 선언하여 타입 호환성을 확보하였습니다.
+- **COLORS 속성 및 API 타입 검증**: `FeedScreen.tsx` 내 존재하지 않는 `COLORS.slate950` 색상 코드를 정상 탑재된 `COLORS.slate900`으로 변경하였습니다. 또한, `api.ts` 에서 `Object.values(floorAreas)`를 `Math.max` 에 전달할 때 발생하는 타입 불일치 에러를 해결하기 위해 `as number[]` 강제 캐스팅을 선언하여 타입 호환성을 확보하였습니다.
 
-
+### 상세페이지 반응형 2열/1열 그리드 자동 전환 레이아웃 적용 (2026-06-14)
+- **사용자 피드백 반영**: 사용자의 의견에 따라 고정 1열 배치 대신, 화면 폭에 대응해 2열과 1열을 자동으로 스위칭하고 그 안에서도 가변적으로 늘어나는 반응형 구조를 정립하였습니다.
+- **상세 Drawer 가로폭 가변화**: 데스크톱 대화면 해상도(`xl`, `2xl`)일 때 상세 드로어(`detail-drawer`)의 너비를 가변적으로 확대(`xl:max-w-[1050px] 2xl:max-w-[1280px]`)하여 넓은 화면 공간을 효율적으로 채우도록 하였습니다.
+- **자동 2열/1열 스위칭 그리드**: 상세페이지 탭 1 및 탭 2 내의 주요 요약 및 정보 카드 배치를 `grid-cols-1 xl:grid-cols-2`로 설정하여, 드로어 폭이 좁은 모바일이나 창 크기에서는 1열 스택으로 단정하게 표시되고 넓은 화면에서는 좌우 2열 그리드로 정렬되도록 반응형 흐름을 구현하였습니다.
+- **모바일 웹 및 하이브리드 앱 검증**: 모바일 환경(`DetailScreen.tsx`)은 기본 1열 스택 구조의 반응형 여백 마진을 안전하게 유지하였습니다.
+- **실서버 배포 및 E2E 자동화 검증**: `deploy.ps1`을 가동하여 Metro 번들링 후 Firebase Hosting(`https://action-b8c75.web.app`) 배포를 수행하였으며, 브라우저 서브에이전트 E2E 검증을 거쳐 해상도별(500px 및 1400px) 수직/수평 offset 좌표 렌더링이 정확하게 일치함을 검증 완료하였습니다.
