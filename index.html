@@ -4928,6 +4928,16 @@
             const nonBuildingKeywords = ['차량', '자동차', '중기', '선박', '항공기', '운송', '지게차', '장비', '기계', '기구', '설비', '유가증권', '증권', '주식', '채권', '기타물품', '물품', '동산'];
             const isNonBuilding = item.source === 'court_etc' || item.source === 'onbid_etc' || nonBuildingKeywords.some(k => (item.ptype || "").includes(k));
 
+            // 부동산일 때 비부동산 조회 흔적을 원복하기 위해 패널들을 원본 부동산 뼈대 템플릿으로 원복합니다.
+            if (!isNonBuilding) {
+                const p2 = document.getElementById("detail-group-panel-2");
+                const p3 = document.getElementById("detail-group-panel-3");
+                const p4 = document.getElementById("detail-group-panel-4");
+                if (p2 && originalPanel2Html) p2.innerHTML = originalPanel2Html;
+                if (p3 && originalPanel3Html) p3.innerHTML = originalPanel3Html;
+                if (p4 && originalPanel4Html) p4.innerHTML = originalPanel4Html;
+            }
+
             if (isNonBuilding) {
                 if (rvTitle) rvTitle.innerHTML = `<i class="fa-solid fa-image text-royalBlue"></i> 📦 자산 대표 이미지`;
                 if (rvFallbackText) rvFallbackText.innerText = "비부동산 자산은 로드뷰를 제공하지 않습니다.";
@@ -7549,9 +7559,7 @@
                         if (isNonBuilding) {
                             renderNonBuildingPanelContent(tabNum, selectedProperty);
                         } else {
-                            if (tabNum === 2 && originalPanel2Html) panel.innerHTML = originalPanel2Html;
-                            if (tabNum === 3 && originalPanel3Html) panel.innerHTML = originalPanel3Html;
-                            if (tabNum === 4 && originalPanel4Html) panel.innerHTML = originalPanel4Html;
+                            // 부동산일 때는 이미 loadDetailView 시점에 바인딩을 완료했으므로 innerHTML을 초기화하지 않습니다.
                         }
                     } else {
                         panel.classList.add("hidden");

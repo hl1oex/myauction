@@ -501,12 +501,41 @@ def extract_court_areas(st_text, ptype="", appraised_value=0, address=""):
             is_est_ex = True
             est_type = "estimated"
 
+        # 동/호수 뒤에 인접하여 단독 기재된 전용면적 유추 (예: '102호 84.95', '303호 29.24')
+        if ex_area == 0.0:
+            room_area_match = re.search(r'\b\d+호\s*(\d+(?:\.\d+)?)\b', target_text)
+            if room_area_match:
+                try:
+                    val = float(room_area_match.group(1))
+                    if 10.0 <= val <= 300.0:
+                        ex_area = val
+                        is_est_ex = True
+                        est_type = "estimated"
+                except ValueError:
+                    pass
+
         # 단위 생략 숫자 매칭 유추 (예: '아파트 84.95', '오피스텔 59')
         if ex_area == 0.0:
+            # 59, 84 등 하드코딩된 리스트 외에도 일반적인 범위의 실수와 정수를 유추 가능하도록 확장
             no_unit_match = re.search(r'\b(59|84|114|135|165|24|32|34|45)(?:\.\d+)?\s*(?:형|타입|py)?\b', target_text)
             if no_unit_match:
                 try:
                     val = float(no_unit_match.group(0).split()[0].replace("형", "").replace("타입", ""))
+                    if val <= 50:
+                        ex_area = round(val * 3.3058, 2)
+                    else:
+                        ex_area = val
+                    is_est_ex = True
+                    est_type = "estimated"
+                except ValueError:
+                    pass
+
+        # 단위 생략 일반적인 전용면적 범위의 단독 숫자 매칭 백업
+        if ex_area == 0.0:
+            general_num_match = re.search(r'\b(1[0-9]|[2-9][0-9]|1[0-9]{2}|2[0-9]{2})\b(?:\.\d+)?\s*(?:형|타입|py)?\b', target_text)
+            if general_num_match:
+                try:
+                    val = float(general_num_match.group(0).split()[0].replace("형", "").replace("타입", ""))
                     if val <= 50:
                         ex_area = round(val * 3.3058, 2)
                     else:
