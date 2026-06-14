@@ -2024,7 +2024,7 @@ export const DetailScreen: React.FC<DetailScreenProps> = ({ property, onBack }) 
                     </View>
                     {extra.daehangStatus !== "대항력 없음 (안전)" ? (
                       <View style={styles.tableRow}>
-                        <Text style={[styles.tableCell, { flex: 1.2, fontWeight: 'bold' }]}>{maskName(currentProperty.owner)} (임차인)</Text>
+                        <Text style={[styles.tableCell, { flex: 1.2, fontWeight: 'bold' }]}>강ㅇㅇ (임차인)</Text>
                         <Text style={[styles.tableCell, styles.textCenter]}>2024-05-12</Text>
                         <Text style={[styles.tableCell, styles.textCenter]}>2024-05-14</Text>
                         <Text style={[styles.tableCell, styles.textRight]}>{formatCurrencyKorean(tenantDeposit)}</Text>

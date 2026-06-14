@@ -232,11 +232,39 @@ export function parseAreasFromText(
       estType = "estimated";
     }
 
+    // 동/호수 뒤에 인접하여 단독 기재된 전용면적 유추 (예: '102호 84.95', '303호 29.24')
+    if (ex === 0.0) {
+      const roomAreaMatch = targetText.match(/\b\d+호\s*(\d+(?:\.\d+)?)\b/);
+      if (roomAreaMatch) {
+        const val = parseFloat(roomAreaMatch[1]);
+        if (val >= 10.0 && val <= 300.0) {
+          ex = val;
+          estEx = true;
+          estType = "estimated";
+        }
+      }
+    }
+
     // 단위 생략 숫자 매칭 유추
     if (ex === 0.0) {
       const noUnitMatch = targetText.match(/\b(59|84|114|135|165|24|32|34|45)(?:\.\d+)?\s*(?:형|타입|py)?\b/);
       if (noUnitMatch) {
         const val = parseFloat(noUnitMatch[0].replace(/형|타입|py/g, "").trim());
+        if (val <= 50) {
+          ex = Math.round(val * 3.3058 * 100) / 100;
+        } else {
+          ex = val;
+        }
+        estEx = true;
+        estType = "estimated";
+      }
+    }
+
+    // 단위 생략 일반적인 전용면적 범위의 단독 숫자 매칭 백업
+    if (ex === 0.0) {
+      const generalNumMatch = targetText.match(/\b(1[0-9]|[2-9][0-9]|1[0-9]{2}|2[0-9]{2})\b(?:\.\d+)?\s*(?:형|타입|py)?\b/);
+      if (generalNumMatch) {
+        const val = parseFloat(generalNumMatch[0].replace(/형|타입|py/g, "").trim());
         if (val <= 50) {
           ex = Math.round(val * 3.3058 * 100) / 100;
         } else {
@@ -351,18 +379,50 @@ export function enrichPropertyDataMobile(item: any): Property {
       }
     }
   }
-  let exclusiveArea = item.exclusive_area || 0;
-  let landArea = item.land_area || 0;
-  let isEstimatedExclusive = item.is_estimated_exclusive !== undefined ? item.is_estimated_exclusive : true;
-  let isEstimatedLand = item.is_estimated_land !== undefined ? item.is_estimated_land : true;
-  let exclEstType = item.exclusive_area_estimation_type || "fake";
-  let totalFloors = item.building_total_floors || 0;
-  let totalArea = item.building_total_area || 0;
-  let floorAreas: Record<string, number> = item.floor_areas || {};
+
+  // 기본값 할당 (DB 값 우선 -> 메타데이터 값 우선 -> 0)
+  let exclusiveArea = item.exclusive_area || (metadata ? metadata.exclusive_area : 0) || 0;
+  let landArea = item.land_area || (metadata ? metadata.land_area : 0) || 0;
+  let isEstimatedExclusive = item.is_estimated_exclusive !== undefined ? item.is_estimated_exclusive : (metadata && metadata.is_estimated_exclusive !== undefined ? metadata.is_estimated_exclusive : true);
+  let isEstimatedLand = item.is_estimated_land !== undefined ? item.is_estimated_land : (metadata && metadata.is_estimated_land !== undefined ? metadata.is_estimated_land : true);
+  let exclEstType = item.exclusive_area_estimation_type || (metadata ? metadata.exclusive_area_estimation_type : "") || "fake";
+  let totalFloors = item.building_total_floors || (metadata ? metadata.building_total_floors : 0) || 0;
+  let totalArea = item.building_total_area || (metadata ? metadata.building_total_area : 0) || 0;
+  let floorAreas: Record<string, number> = item.floor_areas || (metadata ? metadata.floor_areas : null) || {};
 
   const hash = getDeterministicHash(item.id?.toString() || item.auction_no || "default");
   const ptype = item.ptype || "";
   const textToSearch = `${item.address || ""} ${item.desc_content || ""} ${item.notes_content || ""}`;
+
+  // 소유자 및 채무자 텍스트 파싱
+  let owner = item.owner || "";
+  let debtor = item.debtor || "";
+  
+  if (!owner || owner === "미상" || owner === "-") {
+    const ownerMatch = textToSearch.match(/(?:소유자겸채무자|소유자 겸 채무자|채무자 겸 소유자|소유주|소유자)\s*[:\s]*([가-힣\s]{2,5})/i);
+    if (ownerMatch) {
+      owner = ownerMatch[1].replace(/\s+/g, "").trim();
+      if (owner.length > 4) owner = owner.substring(0, 3);
+    }
+  }
+  if (!debtor || debtor === "미상" || debtor === "-") {
+    const debtorMatch = textToSearch.match(/(?:소유자겸채무자|소유자 겸 채무자|채무자 겸 소유자|채무자)\s*[:\s]*([가-힣\s]{2,5})/i);
+    if (debtorMatch) {
+      debtor = debtorMatch[1].replace(/\s+/g, "").trim();
+      if (debtor.length > 4) debtor = debtor.substring(0, 3);
+    }
+  }
+  if (owner && !debtor) {
+    const isCombo = textToSearch.includes("소유자겸채무자") || textToSearch.includes("소유자 겸 채무자") || textToSearch.includes("채무자 겸 소유자");
+    if (isCombo) debtor = owner;
+  }
+  if (debtor && !owner) {
+    const isCombo = textToSearch.includes("소유자겸채무자") || textToSearch.includes("소유자 겸 채무자") || textToSearch.includes("채무자 겸 소유자");
+    if (isCombo) owner = debtor;
+  }
+  
+  item.owner = owner || "--";
+  item.debtor = debtor || "--";
 
   // ptype이나 textToSearch에 토지/임야 등의 비건물 키워드가 있고, 건물 관련 키워드가 없거나 명백한 토지 매물인 경우
   let isNonBuilding = false;
@@ -441,8 +501,8 @@ export function enrichPropertyDataMobile(item: any): Property {
     isEstimatedLand = false;
   }
 
-  let supplyArea = item.supply_area || 0;
-  let isEstimatedSupply = false;
+  let supplyArea = item.supply_area || (metadata ? metadata.supply_area : 0) || 0;
+  let isEstimatedSupply = item.is_estimated_supply !== undefined ? item.is_estimated_supply : (metadata && metadata.is_estimated_supply !== undefined ? metadata.is_estimated_supply : false);
   if (supplyArea <= 0) {
     isEstimatedSupply = true;
     let multiplier = 1.3;
@@ -454,48 +514,35 @@ export function enrichPropertyDataMobile(item: any): Property {
     supplyArea = parseFloat((exclusiveArea * multiplier).toFixed(2));
   }
   
-  let buildingArea = item.building_area || 0;
-  let isEstimatedBuilding = false;
+  let buildingArea = item.building_area || (metadata ? metadata.building_area : 0) || 0;
+  let isEstimatedBuilding = item.is_estimated_building !== undefined ? item.is_estimated_building : (metadata && metadata.is_estimated_building !== undefined ? metadata.is_estimated_building : false);
   if (buildingArea <= 0) {
     isEstimatedBuilding = true;
     buildingArea = exclusiveArea;
   }
 
-  if (metadata) {
-    item.exclusive_area = metadata.exclusive_area || 0;
-    item.land_area = metadata.land_area || 0;
-    item.supply_area = metadata.supply_area || 0;
-    item.building_area = metadata.building_area || 0;
-    item.is_estimated_exclusive = metadata.is_estimated_exclusive !== false;
-    item.is_estimated_supply = metadata.is_estimated_supply !== false;
-    item.is_estimated_land = metadata.is_estimated_land !== false;
-    item.is_estimated_building = metadata.is_estimated_building !== false;
-    item.complex_info = metadata.complex_info || null;
+  // 최종 아이템 정보 매핑
+  item.exclusive_area = exclusiveArea;
+  item.land_area = landArea;
+  item.supply_area = supplyArea;
+  item.building_area = buildingArea;
+  item.is_estimated_exclusive = isEstimatedExclusive;
+  item.is_estimated_supply = isEstimatedSupply;
+  item.is_estimated_land = isEstimatedLand;
+  item.is_estimated_building = isEstimatedBuilding;
+
+  item.exclusive_area_estimation_type = exclEstType;
+  item.building_total_floors = totalFloors;
+  item.building_total_area = totalArea;
+  item.floor_areas = floorAreas;
+
+  // 단지 정보 및 최근 거래, 초등학교 정보 병합
+  if (metadata && metadata.complex_info) {
+    item.complex_info = metadata.complex_info;
     item.elementary_school = metadata.elementary_school || "";
     item.recent_deals = metadata.recent_deals || [];
-    
-    // [신규 필드 매핑]
-    item.exclusive_area_estimation_type = metadata.exclusive_area_estimation_type || (item.is_estimated_exclusive ? "fake" : "exact");
-    item.building_total_floors = metadata.building_total_floors || 0;
-    item.building_total_area = metadata.building_total_area || 0;
-    item.floor_areas = metadata.floor_areas || {};
   } else {
-    item.exclusive_area = exclusiveArea;
-    item.land_area = landArea;
-    item.supply_area = supplyArea;
-    item.building_area = buildingArea;
-    item.is_estimated_exclusive = isEstimatedExclusive;
-    item.is_estimated_supply = isEstimatedSupply;
-    item.is_estimated_land = isEstimatedLand;
-    item.is_estimated_building = isEstimatedBuilding;
-
-    // [신규 필드 매핑 폴백]
-    item.exclusive_area_estimation_type = exclEstType;
-    item.building_total_floors = totalFloors;
-    item.building_total_area = totalArea;
-    item.floor_areas = floorAreas;
-
-    // 주거용 부동산 폴백 생성 (메타데이터에 단지정보가 없는 경우)
+    // 주거용 부동산 폴백 생성
     const isResidential = ["아파트", "오피스텔", "다세대", "빌라", "연립", "주택", "단독", "다가구"].some(k => ptype.includes(k));
     if (isResidential && (!item.complex_info || !item.complex_info.complex_name)) {
       const schoolNames = ["대치초등학교", "송파초등학교", "반포초등학교", "청라초등학교", "정자초등학교", "범어초등학교", "해운대초등학교", "한빛초등학교"];
@@ -543,8 +590,8 @@ export function enrichPropertyDataMobile(item: any): Property {
       item.recent_deals = [];
     }
   }
-  
-  // 최저입찰가 및 감정평가액 0원 방어 폴백 처리 (문자열 타입 대비 및 0원 필터 강화)
+
+  // 최저입찰가 및 감정평가액 0원 방어 폴백 처리
   let appraisedVal = parseInt(item.appraised_value) || 0;
   let minBid = parseInt(item.minimum_bid) || 0;
   
@@ -555,7 +602,7 @@ export function enrichPropertyDataMobile(item: any): Property {
     minBid = appraisedVal;
   }
   if (appraisedVal <= 0 && minBid <= 0) {
-    appraisedVal = 10000000; // 1천만원 최소 폴백.
+    appraisedVal = 10000000;
     minBid = 10000000;
   }
   item.appraised_value = appraisedVal;
