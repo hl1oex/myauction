@@ -219,6 +219,27 @@ const extractNonBuildingMetaMobile = (text: string, ptype: string, title?: strin
     meta.displacement = parsed.displacement || null;
     meta.color = parsed.color || null;
 
+    // 제목(title)에 포함된 보관장소, 사용본거지/주소 정보를 정밀 탐색합니다.
+    if (title) {
+      const title_clean = title.replace(/\n/g, " ").replace(/\s\s+/g, " ").trim();
+      
+      // 1. 보관소/보관장소 매칭 (예: 보관소: 대구..., 보관소-대구..., 보관장소-...)
+      if (!meta.storage_location) {
+        const storageMatch = title_clean.match(/(?:보관장소|보관소|보관지|소재지)\s*[:\-]\s*([가-힣\s\d\-]+?)(?:\s\s|$|,|\||\()/i);
+        if (storageMatch) {
+          meta.storage_location = storageMatch[1].trim();
+        }
+      }
+
+      // 2. 사용본거지 매칭 (예: 사용본거지: 대전..., 사용본거지-대전..., 주소-...)
+      if (!meta.base_location) {
+        const baseMatch = title_clean.match(/(?:사용본거지|본거지|주소)\s*[:\-]\s*([가-힣\s\d\-]+?)(?:\s\s|$|,|\||\()/i);
+        if (baseMatch) {
+          meta.base_location = baseMatch[1].trim();
+        }
+      }
+    }
+
     // 배기량과 주행거리가 서로 꼬여 들어간 예외를 교차 검증합니다.
     if (meta.displacement && (meta.displacement.includes("km") || meta.displacement.includes("키로"))) {
       meta.mileage = meta.displacement;
@@ -1510,7 +1531,92 @@ export const DetailScreen: React.FC<DetailScreenProps> = ({ property, onBack }) 
                   <Text style={styles.infoLabel}>차수 정보 및 상태</Text>
                   <Text style={styles.infoValue}>{currentProperty.round_info || '신건'}</Text>
                 </View>
-                {!isNonBuildingMobile && (
+                {isNonBuildingMobile ? (
+                  (() => {
+                    const nbMeta = currentProperty.non_building_meta || {};
+                    if (nbMeta.asset_type === 'vehicle') {
+                      return (
+                        <>
+                          <View style={styles.infoRow}>
+                            <Text style={styles.infoLabel}>차종/모델명</Text>
+                            <Text style={styles.infoValue}>{nbMeta.model_name || "미상"}</Text>
+                          </View>
+                          <View style={styles.infoRow}>
+                            <Text style={styles.infoLabel}>차량 등록번호</Text>
+                            <Text style={styles.infoValue}>{nbMeta.vehicle_no || "미상"}</Text>
+                          </View>
+                          <View style={styles.infoRow}>
+                            <Text style={styles.infoLabel}>모델 연식</Text>
+                            <Text style={styles.infoValue}>{nbMeta.model_year || "미상"}</Text>
+                          </View>
+                          <View style={styles.infoRow}>
+                            <Text style={styles.infoLabel}>누적 주행거리</Text>
+                            <Text style={[styles.infoValue, { color: COLORS.royalBlue, fontWeight: 'bold' }]}>{nbMeta.mileage || "미상"}</Text>
+                          </View>
+                          <View style={styles.infoRow}>
+                            <Text style={styles.infoLabel}>원동기 형식</Text>
+                            <Text style={styles.infoValue}>{nbMeta.engine_type || "-"}</Text>
+                          </View>
+                          <View style={styles.infoRow}>
+                            <Text style={styles.infoLabel}>연료 구분</Text>
+                            <Text style={styles.infoValue}>{nbMeta.fuel || "미상"}</Text>
+                          </View>
+                          <View style={styles.infoRow}>
+                            <Text style={styles.infoLabel}>차대 번호</Text>
+                            <Text style={styles.infoValue}>{nbMeta.vin || "-"}</Text>
+                          </View>
+                          <View style={styles.infoRow}>
+                            <Text style={styles.infoLabel}>보관 장소</Text>
+                            <Text style={styles.infoValue}>{nbMeta.storage_location || "-"}</Text>
+                          </View>
+                        </>
+                      );
+                    } else if (nbMeta.asset_type === 'machinery') {
+                      return (
+                        <>
+                          <View style={styles.infoRow}>
+                            <Text style={styles.infoLabel}>장비 규격/형식</Text>
+                            <Text style={styles.infoValue}>{nbMeta.specification || "미상"}</Text>
+                          </View>
+                          <View style={styles.infoRow}>
+                            <Text style={styles.infoLabel}>제조회사</Text>
+                            <Text style={styles.infoValue}>{nbMeta.manufacturer || "미상"}</Text>
+                          </View>
+                          <View style={styles.infoRow}>
+                            <Text style={styles.infoLabel}>공매 수량</Text>
+                            <Text style={styles.infoValue}>{nbMeta.quantity || "1대 (기본)"}</Text>
+                          </View>
+                        </>
+                      );
+                    } else if (nbMeta.asset_type === 'securities') {
+                      return (
+                        <>
+                          <View style={styles.infoRow}>
+                            <Text style={styles.infoLabel}>발행 회사명</Text>
+                            <Text style={styles.infoValue}>{nbMeta.company_name || "미상"}</Text>
+                          </View>
+                          <View style={styles.infoRow}>
+                            <Text style={styles.infoLabel}>인수 주식수</Text>
+                            <Text style={[styles.infoValue, { color: COLORS.royalBlue, fontWeight: 'bold' }]}>{nbMeta.quantity || "미상"}</Text>
+                          </View>
+                        </>
+                      );
+                    } else {
+                      return (
+                        <>
+                          <View style={styles.infoRow}>
+                            <Text style={styles.infoLabel}>공매 수량</Text>
+                            <Text style={styles.infoValue}>{nbMeta.quantity || "미상"}</Text>
+                          </View>
+                          <View style={styles.infoRow}>
+                            <Text style={styles.infoLabel}>보관 장소</Text>
+                            <Text style={styles.infoValue}>{nbMeta.storage_location || "상세 내역 참고"}</Text>
+                          </View>
+                        </>
+                      );
+                    }
+                  })()
+                ) : (
                   <>
                     <View style={styles.infoRow}>
                       <Text style={styles.infoLabel}>전용 면적</Text>
@@ -1596,13 +1702,11 @@ export const DetailScreen: React.FC<DetailScreenProps> = ({ property, onBack }) 
                         )}
                       </View>
                     </View>
+                    <View style={styles.infoRow}>
+                      <Text style={styles.infoLabel}>물건 구조/재질</Text>
+                      <Text style={styles.infoValue}>{targetStructure}</Text>
+                    </View>
                   </>
-                )}
-                {!isNonBuildingMobile && (
-                  <View style={styles.infoRow}>
-                    <Text style={styles.infoLabel}>물건 구조/재질</Text>
-                    <Text style={styles.infoValue}>{targetStructure}</Text>
-                  </View>
                 )}
                 
                 {/* 🏢 다세대 건물 전체 상세 명세 (모바일 전용) */}
@@ -3331,7 +3435,12 @@ export const DetailScreen: React.FC<DetailScreenProps> = ({ property, onBack }) 
               </View>
             </TouchableOpacity>
             <TouchableOpacity 
-              onPress={() => Linking.openURL(`https://map.naver.com/v5/search/${encodeURIComponent(cleanAddress(currentProperty.address))}`)}
+              onPress={() => {
+                const targetAddr = isNonBuildingMobile 
+                  ? (currentProperty.non_building_meta?.storage_location || currentProperty.non_building_meta?.base_location || currentProperty.address || "") 
+                  : currentProperty.address;
+                Linking.openURL(`https://map.naver.com/v5/search/${encodeURIComponent(cleanAddress(targetAddr))}`);
+              }}
               style={styles.networkButton}
             >
               <View style={[styles.networkIconContainer, { backgroundColor: '#e6fbf0' }]}>
@@ -3344,12 +3453,15 @@ export const DetailScreen: React.FC<DetailScreenProps> = ({ property, onBack }) 
             </TouchableOpacity>
             <TouchableOpacity 
               onPress={() => {
+                const targetAddr = isNonBuildingMobile 
+                  ? (currentProperty.non_building_meta?.storage_location || currentProperty.non_building_meta?.base_location || currentProperty.address || "") 
+                  : currentProperty.address;
                 const isComplexProperty = (currentProperty.ptype && (currentProperty.ptype.includes("아파트") || currentProperty.ptype.includes("오피스텔"))) ||
                                           (currentProperty.address && (currentProperty.address.includes("아파트") || currentProperty.address.includes("오피스텔") || currentProperty.address.includes("맨션")));
-                if (isComplexProperty) {
-                  Linking.openURL(`https://new.land.naver.com/complexes?searchQuery=${encodeURIComponent(cleanAddress(currentProperty.address))}`);
+                if (isComplexProperty && !isNonBuildingMobile) {
+                  Linking.openURL(`https://new.land.naver.com/complexes?searchQuery=${encodeURIComponent(cleanAddress(targetAddr))}`);
                 } else {
-                  Linking.openURL(`https://new.land.naver.com/search?searchQuery=${encodeURIComponent(currentProperty.address)}`);
+                  Linking.openURL(`https://new.land.naver.com/search?searchQuery=${encodeURIComponent(targetAddr)}`);
                 }
               }}
               style={styles.networkButton}

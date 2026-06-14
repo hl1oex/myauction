@@ -4213,6 +4213,27 @@
                 meta.displacement = parsed.displacement || null;
                 meta.color = parsed.color || null;
 
+                // 제목(title)에 포함된 보관장소, 사용본거지/주소 정보를 정밀 탐색합니다.
+                if (title) {
+                    const title_clean = title.replace(/\n/g, " ").replace(/\s\s+/g, " ").trim();
+                    
+                    // 1. 보관소/보관장소 매칭 (예: 보관소: 대구..., 보관소-대구..., 보관장소-...)
+                    if (!meta.storage_location) {
+                        const storageMatch = title_clean.match(/(?:보관장소|보관소|보관지|소재지)\s*[:\-]\s*([가-힣\s\d\-]+?)(?:\s\s|$|,|\||\()/i);
+                        if (storageMatch) {
+                            meta.storage_location = storageMatch[1].trim();
+                        }
+                    }
+
+                    // 2. 사용본거지 매칭 (예: 사용본거지: 대전..., 사용본거지-대전..., 주소-...)
+                    if (!meta.base_location) {
+                        const baseMatch = title_clean.match(/(?:사용본거지|본거지|주소)\s*[:\-]\s*([가-힣\s\d\-]+?)(?:\s\s|$|,|\||\()/i);
+                        if (baseMatch) {
+                            meta.base_location = baseMatch[1].trim();
+                        }
+                    }
+                }
+
                 // 배기량과 주행거리가 서로 꼬여 들어간 예외를 교차 검증합니다.
                 if (meta.displacement && (meta.displacement.includes("km") || meta.displacement.includes("키로"))) {
                     meta.mileage = meta.displacement;
@@ -5460,6 +5481,9 @@
  
             // 아웃링크 동적 맵핑 (상세화)
             let rawAddress = item.address || "";
+            if (isNonBuilding) {
+                rawAddress = (item.non_building_meta && (item.non_building_meta.storage_location || item.non_building_meta.base_location)) || item.address || "";
+            }
             let cleanedNavAddress = rawAddress;
             // 최초로 출현하는 번지수(숫자 혹은 숫자-숫자)까지만 주소를 정제하여 상세 동호수/아파트명을 제거합니다.
             const navAddrMatch = rawAddress.match(/^([가-힣a-zA-Z0-9\s]+?\d+(?:-\d+)?)/);
@@ -5470,12 +5494,12 @@
             const isComplexProperty = (item.ptype && (item.ptype.includes("아파트") || item.ptype.includes("오피스텔"))) || 
                                       (item.address && (item.address.includes("아파트") || item.address.includes("오피스텔") || item.address.includes("맨션")));
             const cleanedQuery = getCleanedLandSearchQuery(rawAddress);
-            document.getElementById("btn-naver-map").href = `https://map.naver.com/v5/search/${encodeURIComponent(cleanedNavAddress)}`;
+            document.getElementById("btn-naver-map").href = `https://map.naver.com/v5/search/${encodeURIComponent(cleanedNavAddress || rawAddress)}`;
             document.getElementById("btn-official-site").href = item.link_url || "https://www.courtauction.go.kr";
             
             const naverLandPriceBtn = document.getElementById("btn-naver-land-price");
             if (naverLandPriceBtn) {
-                if (isComplexProperty) {
+                if (isComplexProperty && !isNonBuilding) {
                     naverLandPriceBtn.href = `https://new.land.naver.com/complexes?searchQuery=${encodeURIComponent(cleanedQuery)}`;
                 } else {
                     naverLandPriceBtn.href = `https://new.land.naver.com/search?searchQuery=${encodeURIComponent(rawAddress)}`;
@@ -5486,7 +5510,7 @@
             if (floorplanLink) {
                 if (item.auction_no === "2025타경502931" || (item.address && item.address.includes("한빛아파트"))) {
                     floorplanLink.href = "https://new.land.naver.com/complexes?ms=36.360155,127.354157,16&a=APT:OPST:ABRD:OBYG&e=RETAIL";
-                } else if (isComplexProperty) {
+                } else if (isComplexProperty && !isNonBuilding) {
                     floorplanLink.href = `https://new.land.naver.com/complexes?searchQuery=${encodeURIComponent(cleanedQuery)}`;
                 } else {
                     floorplanLink.href = `https://new.land.naver.com/search?searchQuery=${encodeURIComponent(rawAddress)}`;
