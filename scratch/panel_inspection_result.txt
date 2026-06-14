@@ -1,0 +1,339 @@
+=== detail-group-panel 검사 결과 ===
+패널 ID: detail-group-panel-1 -> 매칭 라인 번호들: [1057, 6034]
+패널 ID: detail-group-panel-2 -> 매칭 라인 번호들: [1440, 2523, 4777]
+패널 ID: detail-group-panel-3 -> 매칭 라인 번호들: [1545, 2524, 4778]
+패널 ID: detail-group-panel-4 -> 매칭 라인 번호들: [1809, 2525, 4779]
+
+=== 패널 주변 코드 세부 추출 ===
+
+--- detail-group-panel-1 (Line 1027 ~ 1107) ---
+1027:         <!-- 상세 헤더 (반응형 모바일 스코어 배치 및 빈칸 여백 줄임) -->
+1028:         <div class="relative p-3.5 sm:p-4 border-b border-slate-200 bg-slate-50 flex flex-col sm:flex-row justify-between sm:items-start gap-2.5 sm:gap-3 pr-24 sm:pr-5">
+1029:             <div class="space-y-1 sm:space-y-1.5 flex-1">
+1030:                 <span id="detail-badge" class="inline-block text-[10px] sm:text-xs font-black px-2 py-0.5 sm:px-2.5 sm:py-1 rounded-md"></span>
+1031:                 <h3 id="detail-address" class="text-xs sm:text-lg font-extrabold text-slate-900 leading-snug sm:leading-tight"></h3>
+1032:                 <p id="detail-no" class="text-[10px] sm:text-xs font-bold text-slate-500 mt-1"></p>
+1033:             </div>
+1034:             
+1035:             <!-- 우측 스코어 영역 -->
+1036:             <div class="flex items-center gap-2 sm:gap-3 absolute top-4 right-14 sm:static flex-shrink-0">
+1037:                 <div id="detail-score-circle" class="w-9 h-9 sm:w-14 sm:h-14 rounded-full border-2 sm:border-4 flex flex-col items-center justify-center font-outfit shadow-sm bg-white">
+1038:                     <span id="detail-score-val" class="text-xs sm:text-base font-black leading-none"></span>
+1039:                     <span class="text-[5px] sm:text-[8px] text-slate-400 font-bold leading-none mt-0.5 sm:mt-1">SCORE</span>
+1040:                 </div>
+1041:             </div>
+1042:             
+1043:             <!-- 닫기 버튼: 모바일 absolute 고정 -->
+1044:             <button onclick="closeDetailDrawer()" class="absolute top-4 right-4 sm:static w-8 h-8 sm:w-10 sm:h-10 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-500 hover:text-slate-700 flex items-center justify-center transition-all select-none" title="닫기 (Esc)">
+1045:                 <i class="fa-solid fa-xmark text-base sm:text-lg"></i>
+1046:             </button>
+1047:         </div>
+1048: 
+1049:         
+1050:         <!-- 💎 상세 Drawer 4대 대분류 프리미엄 탭 메뉴 바 -->
+1051:         <div class="flex overflow-x-auto whitespace-nowrap bg-white p-2 gap-1.5 z-10 flex-shrink-0 custom-scrollbar border-b border-slate-200">
+1052:             <button id="detail-group-tab-1-btn" onclick="changeDetailGroupTab(1)" class="inline-block py-1.5 px-3.5 text-center text-[10.5px] sm:text-xs font-black rounded-xl border border-transparent transition-all select-none bg-royalBlue text-white shadow-sm">1. 종합 분석</button>
+1053:             <button id="detail-group-tab-2-btn" onclick="changeDetailGroupTab(2)" class="inline-block py-1.5 px-3.5 text-center text-[10.5px] sm:text-xs font-black rounded-xl border border-transparent transition-all select-none text-slate-500 hover:text-royalBlue hover:bg-slate-50 bg-slate-50/50">2. 권리 & 등기 분석</button>
+1054:             <button id="detail-group-tab-3-btn" onclick="changeDetailGroupTab(3)" class="inline-block py-1.5 px-3.5 text-center text-[10.5px] sm:text-xs font-black rounded-xl border border-transparent transition-all select-none text-slate-500 hover:text-royalBlue hover:bg-slate-50 bg-slate-50/50">3. 입찰 & 금융 분석</button>
+1055:             <button id="detail-group-tab-4-btn" onclick="changeDetailGroupTab(4)" class="inline-block py-1.5 px-3.5 text-center text-[10.5px] sm:text-xs font-black rounded-xl border border-transparent transition-all select-none text-slate-500 hover:text-royalBlue hover:bg-slate-50 bg-slate-50/50">4. 위치 & 시세 분석</button>
+1056:         </div>
+1057:         <div id="detail-group-panel-1" class="flex-1 overflow-y-auto p-4 sm:p-5 space-y-4 sm:space-y-5 custom-scrollbar bg-slate-50/50">
+1058:             <div id="group-content-1" class="space-y-4 sm:space-y-5 w-full">
+1059:                 <!-- 1. 대표 이미지와 부동산 기본 명세 반응형 분기 레이아웃 -->
+1060:                 <div id="detail-panel-summary" class="grid grid-cols-1 xl:grid-cols-2 gap-4 sm:gap-5 items-start">
+1061:                     <!-- 대표 이미지 영역 (실제 로드뷰 3D) -->
+1062:                     <div class="bg-white border border-slate-200 rounded-2xl p-4 shadow-sm w-full">
+1063:                         <h4 id="detail-roadview-title" class="text-xs sm:text-sm font-black text-slate-800 flex items-center gap-1.5 mb-2.5">
+1064:                             <i class="fa-solid fa-image text-royalBlue"></i> 🏢 부동산 대표 전경 (실제 로드뷰)
+1065:                         </h4>
+1066:                         <div class="w-full h-[220px] rounded-xl overflow-hidden border border-slate-200 bg-slate-100 relative">
+1067:                             <div id="detail-roadview" class="w-full h-full"></div>
+1068:                             <div id="detail-roadview-fallback" class="absolute inset-0 flex flex-col items-center justify-center bg-slate-100 p-4 text-center hidden">
+1069:                                 <img src="./apartment_elegant_facade.png" alt="부동산 전경 폴백" class="absolute inset-0 w-full h-full object-cover opacity-30">
+1070:                                 <div class="relative z-10 space-y-2">
+1071:                                     <p id="detail-roadview-fallback-text" class="text-xs font-black text-slate-700">해당 위치의 로드뷰를 불러올 수 없습니다.</p>
+1072:                                     <a id="btn-naver-roadview-fallback" href="#" target="_blank" class="inline-flex items-center gap-1 bg-royalBlue text-white text-[10px] font-black px-2.5 py-1.5 rounded-lg shadow-sm hover:bg-royalHover transition-all">
+1073:                                         <i class="fa-solid fa-map-location-dot"></i> 네이버 지도로 확인하기
+1074:                                     </a>
+1075:                                 </div>
+1076:                             </div>
+1077:                         </div>
+1078:                     </div>
+1079: 
+1080:                     <!-- 부동산 기본 명세 보드 -->
+1081:                     <div id="detail-spec-container" class="bg-white border border-slate-200 rounded-2xl p-4 space-y-2 shadow-sm w-full">
+1082:                         <h4 id="detail-spec-title" class="text-xs sm:text-sm font-black text-slate-800 flex items-center gap-1.5">
+1083:                             <i class="fa-solid fa-file-invoice text-royalBlue"></i> 📋 부동산 표시 및 기본 명세
+1084:                         </h4>
+1085:                         <div class="space-y-2.5 text-[11px] sm:text-xs font-bold text-slate-700">
+1086:                             <div class="bg-slate-50 border border-slate-100 p-2.5 rounded-xl flex justify-between items-center">
+1087:                                 <span class="text-slate-450 text-[10px] sm:text-xs font-bold">소재지 주소</span>
+1088:                                 <span id="detail-doc-address" class="font-extrabold text-slate-800 select-all text-right max-w-[70%] truncate"></span>
+1089:                             </div>
+1090:                             <div id="detail-spec-grid" class="grid grid-cols-2 gap-2 text-[11px] sm:text-xs text-slate-750">
+1091:                                 <div class="bg-slate-50 border border-slate-100 p-2 rounded-xl flex justify-between items-center">
+1092:                                     <span class="text-slate-450 font-semibold text-[10px] sm:text-xs">부동산 용도</span>
+1093:                                     <span id="detail-spec-ptype" class="font-extrabold text-slate-800"></span>
+1094:                                 </div>
+1095:                                 <div class="bg-slate-50 border border-slate-100 p-2 rounded-xl flex justify-between items-center">
+1096:                                     <span class="text-slate-450 font-semibold text-[10px] sm:text-xs">진행 회차</span>
+1097:                                     <span id="detail-spec-round" class="font-extrabold text-slate-800"></span>
+1098:                                 </div>
+1099:                                 <div class="bg-slate-50 border border-slate-100 p-2 rounded-xl flex justify-between items-center">
+1100:                                     <span class="text-slate-450 font-semibold text-[10px] sm:text-xs">소유자</span>
+1101:                                     <span id="detail-owner" class="font-extrabold text-slate-800"></span>
+1102:                                 </div>
+1103:                                 <div class="bg-slate-50 border border-slate-100 p-2 rounded-xl flex justify-between items-center">
+1104:                                     <span class="text-slate-450 font-semibold text-[10px] sm:text-xs">채무자</span>
+1105:                                     <span id="detail-debtor" class="font-extrabold text-slate-800"></span>
+1106:                                 </div>
+1107:                                 <div class="bg-slate-50 border border-slate-100 p-2 rounded-xl flex justify-between items-center">
+
+--- detail-group-panel-2 (Line 1410 ~ 1490) ---
+1410:                                     </td>
+1411:                                 </tr>
+1412:                                 <tr class="hover:bg-slate-50/40 transition-colors">
+1413:                                     <td class="p-3 pl-4 font-extrabold text-slate-850">
+1414:                                         <div class="flex flex-col space-y-0.5">
+1415:                                             <span class="text-slate-900 text-[12.5px]">⚖️ 사건내역</span>
+1416:                                             <span id="table-doc-history-summary" class="text-[10.5px] text-slate-450 font-bold">전체 경매 진행 사건 정보</span>
+1417:                                         </div>
+1418:                                     </td>
+1419:                                     <td class="p-3">
+1420:                                         <div class="space-y-1 text-[11.5px] sm:text-[12px] font-bold text-slate-600">
+1421:                                             <div class="flex justify-between max-w-[240px]"><span>경매 개시 결정</span><strong id="card-history-start" class="text-slate-900 font-extrabold">-</strong></div>
+1422:                                             <div class="flex justify-between max-w-[240px]"><span>배당요구 종기 기한</span><strong id="card-history-end" class="font-mono text-slate-700">-</strong></div>
+1423:                                             <div class="flex justify-between max-w-[240px]"><span>경매 진행 상태</span><strong id="card-history-status" class="text-slate-700">-</strong></div>
+1424:                                             <div class="flex justify-between max-w-[240px]"><span>최저 매각 비율</span><strong id="card-history-ratio" class="text-slate-700">-</strong></div>
+1425:                                         </div>
+1426:                                     </td>
+1427:                                     <td class="p-3 text-[11.5px] sm:text-[12px] text-slate-600 font-bold leading-normal" id="card-history-opinion">
+1428:                                         -
+1429:                                     </td>
+1430:                                     <td class="p-3 pr-4 text-right">
+1431:                                         <a id="btn-doc-history" href="#" target="_blank" class="inline-block bg-blue-50 hover:bg-royalBlue text-royalBlue hover:text-white px-2 py-1 rounded font-black text-[11px] transition-colors">이동</a>
+1432:                                     </td>
+1433:                                 </tr>
+1434:                             </tbody>
+1435:                         </table>
+1436:                     </div>
+1437:                 </div>
+1438:             </div>
+1439:         </div>
+1440:         <div id="detail-group-panel-2" class="flex-1 overflow-y-auto p-4 sm:p-5 space-y-4 sm:space-y-5 custom-scrollbar bg-slate-50/50 hidden relative">
+1441:             <div id="group-content-2" class="space-y-4 sm:space-y-5 w-full">
+1442:                 <!-- AI 7대 권리 리스크 및 공고문 반응형 분기 레이아웃 -->
+1443:                 <div id="detail-panel-analysis" class="grid grid-cols-1 xl:grid-cols-2 gap-4 sm:gap-5 items-start">
+1444:                     <!-- AI 7대 권리 리스크 정밀 하이브리드 리포트 -->
+1445:                     <div class="bg-white border border-slate-200 rounded-2xl p-4 shadow-sm w-full space-y-3">
+1446:                         <h4 class="text-xs sm:text-sm font-black text-slate-800 flex items-center gap-1.5 pb-2 border-b border-slate-100">
+1447:                             <i class="fa-solid fa-shield-halved text-royalBlue"></i> AI 7대 권리 리스크 정밀 하이브리드 리포트
+1448:                         </h4>
+1449:                         <div id="detail-risk-report" class="space-y-3">
+1450:                             <!-- 지능형 리스크 카드가 주입됨 -->
+1451:                         </div>
+1452:                     </div>
+1453: 
+1454:                     <!-- 공고문 원문 및 집행관 비고 요약 -->
+1455:                     <div class="bg-white border border-slate-200 rounded-2xl p-4 shadow-sm w-full space-y-3">
+1456:                         <h4 class="text-xs sm:text-sm font-black text-slate-800 flex items-center gap-1.5 pb-2 border-b border-slate-100">
+1457:                             <i class="fa-solid fa-align-left text-slate-500"></i> 공고문 원문 및 집행관 비고 요약
+1458:                         </h4>
+1459:                         <div id="detail-desc" class="text-xs sm:text-sm text-slate-655 leading-relaxed max-h-[160px] overflow-y-auto custom-scrollbar"></div>
+1460:                     </div>
+1461:                 </div>
+1462: 
+1463:                 <!-- 임차인 및 등기부 반응형 분기 레이아웃 -->
+1464:                 <div class="grid grid-cols-1 xl:grid-cols-2 gap-4 sm:gap-5 items-start">
+1465:                     <!-- 🚪 [6] 점유현황 탭 패널 (기본 숨김) -->
+1466:                     <div id="detail-panel-occupancy" class="bg-white border border-slate-200 rounded-2xl p-4 shadow-sm space-y-3 w-full">
+1467:                         <h4 class="text-xs sm:text-sm font-black text-slate-800 flex items-center gap-1.5 pb-2 border-b border-slate-100">
+1468:                             <i class="fa-solid fa-door-closed text-royalBlue"></i> 임차인 및 점유자 관계 명세
+1469:                         </h4>
+1470:                         <div class="overflow-x-auto border border-slate-200 rounded-xl overflow-hidden shadow-sm bg-white">
+1471:                             <table class="w-full text-left border-collapse text-[13px] document-view">
+1472:                                 <thead>
+1473:                                     <tr class="bg-slate-50 border-b border-slate-200 text-slate-800 font-extrabold text-[12px]">
+1474:                                         <th class="p-3 pl-4 border-b">점유자 구분</th>
+1475:                                         <th class="p-3 border-b">전입일자</th>
+1476:                                         <th class="p-3 border-b">확정일자</th>
+1477:                                         <th class="p-3 border-b text-right">보증금/차임</th>
+1478:                                         <th class="p-3 pr-4 border-b text-center">대항력</th>
+1479:                                     </tr>
+1480:                                 </thead>
+1481:                                 <tbody id="detail-occupancy-tbody" class="text-slate-700 font-medium">
+1482:                                     <!-- 동적 생성 -->
+1483:                                 </tbody>
+1484:                             </table>
+1485:                         </div>
+1486:                     </div>
+1487: 
+1488:                     <!-- 📝 [7] 등기현황 탭 패널 (기본 숨김) -->
+1489:                     <div id="detail-panel-registry" class="bg-white border border-slate-200 rounded-2xl p-4 shadow-sm space-y-3 w-full">
+1490:                         <h4 class="text-xs sm:text-sm font-black text-slate-800 flex items-center gap-1.5 pb-2 border-b border-slate-100">
+
+--- detail-group-panel-3 (Line 1515 ~ 1595) ---
+1515:                         <i class="fa-solid fa-triangle-exclamation text-rose-600"></i> 낙찰자 인수 리스크 분석
+1516:                     </h4>
+1517:                     <div class="overflow-x-auto border border-slate-200 rounded-xl overflow-hidden shadow-sm bg-white">
+1518:                         <table class="w-full text-left border-collapse text-[13px] document-view">
+1519:                             <thead>
+1520:                                 <tr class="bg-slate-50 border-b border-slate-200 text-slate-800 font-extrabold text-[12px]">
+1521:                                     <th class="p-3 pl-4 border-b">위험 항목</th>
+1522:                                     <th class="p-3 border-b">권리 내용</th>
+1523:                                     <th class="p-3 border-b text-right">예상 인수액</th>
+1524:                                     <th class="p-3 pr-4 border-b">진단 및 의견</th>
+1525:                                 </tr>
+1526:                             </thead>
+1527:                             <tbody id="detail-takeover-tbody" class="text-slate-700 font-medium">
+1528:                                 <!-- 동적 생성 -->
+1529:                             </tbody>
+1530:                         </table>
+1531:                     </div>
+1532:                 </div>
+1533:             </div>
+1534:             <!-- 📈 [8] 매각통계 탭 패널 (기본 숨김) -->
+1535:             </div>
+1536:             <div id="group-mask-2" class="absolute inset-0 bg-slate-900/60 backdrop-blur-sm z-30 flex flex-col items-center justify-center text-center p-6 hidden">
+1537:                 <div class="bg-white border border-slate-200 rounded-2xl p-6 max-w-sm shadow-2xl space-y-3">
+1538:                     <i class="fa-solid fa-lock text-rose-500 text-3xl"></i>
+1539:                     <h4 class="text-slate-800 text-sm font-black">🔒 권리 & 등기 분석 열람 제한</h4>
+1540:                     <p class="text-slate-500 text-[10.5px] leading-relaxed font-semibold">본 매물의 권리 & 등기 정보는 우수 회원 등급 전용 콘텐츠입니다. 등급을 상향하여 심층 AI 권리진단을 확인해 보세요.</p>
+1541:                     <button onclick="alert('등급 상향은 관리자 권한으로 즉시 조정 가능합니다.')" class="w-full bg-royalBlue text-white font-extrabold text-xs py-2 rounded-xl shadow-md hover:bg-royalHover transition-all">등급 상향 신청하기</button>
+1542:                 </div>
+1543:             </div>
+1544:         </div>
+1545:         <div id="detail-group-panel-3" class="flex-1 overflow-y-auto p-4 sm:p-5 space-y-4 sm:space-y-5 custom-scrollbar bg-slate-50/50 hidden relative">
+1546:             <div id="group-content-3" class="space-y-4 sm:space-y-5 w-full">
+1547:                 <div id="detail-panel-bid" class="space-y-4 sm:space-y-5">
+1548:             <!-- AI 낙찰 시뮬레이션 지표 분석 -->
+1549:             <div class="bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 rounded-2xl p-3.5 sm:p-4 space-y-2.5 shadow-sm mb-4">
+1550:                 <h4 class="text-xs sm:text-sm font-black text-royalBlue flex items-center gap-1.5">
+1551:                     <i class="fa-solid fa-chart-simple"></i> AI 낙찰 시뮬레이션 지표 분석
+1552:                 </h4>
+1553:                 <div class="grid grid-cols-2 gap-2.5 text-[11px] sm:text-xs font-bold text-slate-700">
+1554:                     <div class="bg-white/80 p-2.5 rounded-xl border border-blue-100 flex flex-col justify-between">
+1555:                         <span class="text-slate-455 text-[10px] sm:text-xs">예상 낙찰 확률</span>
+1556:                         <span id="detail-ai-bid-rate" class="text-xs sm:text-sm font-black text-royalBlue mt-0.5 font-outfit"></span>
+1557:                     </div>
+1558:                     <div class="bg-white/80 p-2.5 rounded-xl border border-blue-100 flex flex-col justify-between">
+1559:                         <span class="text-slate-455 text-[10px] sm:text-xs">예상 명도 기간</span>
+1560:                         <span id="detail-ai-evict-period" class="text-xs sm:text-sm font-black text-amber-600 mt-0.5"></span>
+1561:                     </div>
+1562:                     <div class="bg-white/80 p-2.5 rounded-xl border border-blue-100 flex flex-col justify-between col-span-2">
+1563:                         <span class="text-slate-455 text-[10px] sm:text-xs block mb-0.5">주변 시세 대조 분석 리포트</span>
+1564:                         <span id="detail-ai-market-compare" class="text-[11px] sm:text-xs font-black text-emeraldSuccess leading-relaxed"></span>
+1565:                     </div>
+1566:                 </div>
+1567:             </div>
+1568: 
+1569:             <!-- 🧮 세법 스마트 낙찰 계획서 계산기 -->
+1570:             <div class="bg-white border border-slate-200 rounded-2xl p-3.5 sm:p-4 shadow-sm space-y-3 max-w-[720px] mx-auto w-full">
+1571:                 <div class="flex items-center justify-between pb-2 border-b border-slate-100">
+1572:                     <h4 class="text-xs sm:text-sm font-black text-slate-800 flex items-center gap-1.5">
+1573:                         <i class="fa-solid fa-calculator text-royalBlue"></i> 스마트 정밀 소요자금 계획서
+1574:                     </h4>
+1575:                     <span id="tax-rate-badge" class="text-[9px] font-black px-2 py-0.5 rounded-full border"></span>
+1576:                 </div>
+1577: 
+1578:                 <div class="space-y-3">
+1579:                     <div>
+1580:                         <label class="block text-[9.5px] font-black text-slate-400 uppercase tracking-wider mb-1">내 예상 입찰 응찰가 입력 및 🧮 디지털 계산기 패드</label>
+1581:                         
+1582:                         <div class="bg-gradient-to-br from-slate-900 via-slate-950 to-slate-900 border border-slate-800 rounded-xl p-2.5 text-right text-emerald-400 font-mono font-black shadow-[inset_0_2px_4px_rgba(0,0,0,0.8),0_1px_1px_rgba(255,255,255,0.05)] flex items-center justify-between h-9 select-none mb-1.5">
+1583:                             <div class="flex items-center text-[8px] sm:text-[9.5px] text-slate-500 font-bold uppercase tracking-widest gap-1 select-none">
+1584:                                 <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+1585:                                 <span>Display</span>
+1586:                             </div>
+1587:                             <span id="calc-display-won" class="text-xs sm:text-sm font-black tracking-wider drop-shadow-[0_0_3px_rgba(52,211,153,0.5)]">0원</span>
+1588:                         </div>
+1589: 
+1590:                         <input type="number" id="calc-bid-input" oninput="runCalculator()"
+1591:                                class="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-1.5 text-base font-black focus:outline-none focus:border-royalBlue focus:bg-white transition-all text-royalBlue font-outfit mb-1.5">
+1592: 
+1593:                         <div class="grid grid-cols-4 gap-1 pt-1 calculator-keypad">
+1594:                             <button type="button" onclick="pressCalcKey('+1억')" class="bg-royalBlue/5 hover:bg-royalBlue/15 text-royalBlue text-[11px] font-black py-1.5 rounded-md transition-all select-none font-sans">+1억</button>
+1595:                             <button type="button" onclick="pressCalcKey('+1천')" class="bg-royalBlue/5 hover:bg-royalBlue/15 text-royalBlue text-[11px] font-black py-1.5 rounded-md transition-all select-none font-sans">+1천만</button>
+
+--- detail-group-panel-4 (Line 1779 ~ 1859) ---
+1779:                                 <th class="p-3 text-right">연 이자 (4.5%)</th>
+1780:                                 <th class="p-3 pr-4 text-right text-rose-600">예측 ROI</th>
+1781:                             </tr>
+1782:                         </thead>
+1783:                         <tbody id="detail-scenario-tbody" class="text-slate-700 font-medium">
+1784:                             <!-- 동적 주입 -->
+1785:                         </tbody>
+1786:                     </table>
+1787:                 </div>
+1788:             </div>
+1789: 
+1790:             <!-- 🧠 AI 실전 투자 분석 총평 -->
+1791:             <div class="bg-amber-50/30 border border-amber-200/60 rounded-2xl p-3.5 sm:p-4 space-y-2 shadow-sm">
+1792:                 <h4 class="text-xs sm:text-sm font-black text-slate-800 flex items-center gap-1.5">
+1793:                     <i class="fa-solid fa-brain text-amber-600"></i> 🧠 AI 실전 투자 분석 총평
+1794:                 </h4>
+1795:                 <div id="detail-ai-comment" class="text-xs sm:text-sm text-slate-700 leading-relaxed font-semibold">
+1796:                     <!-- 동적 코멘트 줄글 주입 -->
+1797:                 </div>
+1798:             </div>
+1799:             </div>
+1800:             <div id="group-mask-3" class="absolute inset-0 bg-slate-900/60 backdrop-blur-sm z-30 flex flex-col items-center justify-center text-center p-6 hidden">
+1801:                 <div class="bg-white border border-slate-200 rounded-2xl p-6 max-w-sm shadow-2xl space-y-3">
+1802:                     <i class="fa-solid fa-lock text-rose-500 text-3xl"></i>
+1803:                     <h4 class="text-slate-800 text-sm font-black">🔒 입찰 & 금융 분석 열람 제한</h4>
+1804:                     <p class="text-slate-500 text-[10.5px] leading-relaxed font-semibold">본 매물의 입찰 & 금융 상세 시뮬레이션은 프리미엄 회원 등급 전용 콘텐츠입니다. 등급을 상향하여 정밀 ROI 분석을 확인해 보세요.</p>
+1805:                     <button onclick="alert('등급 상향은 관리자 권한으로 즉시 조정 가능합니다.')" class="w-full bg-royalBlue text-white font-extrabold text-xs py-2 rounded-xl shadow-md hover:bg-royalHover transition-all">등급 상향 신청하기</button>
+1806:                 </div>
+1807:             </div>
+1808:         </div>
+1809:         <div id="detail-group-panel-4" class="flex-1 overflow-y-auto p-4 sm:p-5 space-y-4 sm:space-y-5 custom-scrollbar bg-slate-50/50 hidden relative">
+1810:             <div id="group-content-4" class="space-y-4 sm:space-y-5 w-full">
+1811:                 <!-- 위치 & 시세 분석 1열 스택 레이아웃 -->
+1812:                 <div class="space-y-4 sm:space-y-5">
+1813:                     <div id="detail-panel-map" class="space-y-4 sm:space-y-5">
+1814:             <!-- 📍 물건지 실시간 위치 지도 -->
+1815:             <div class="bg-white border border-slate-200 rounded-2xl p-3.5 sm:p-4 space-y-2.5 shadow-sm">
+1816:                 <h4 class="text-xs sm:text-sm font-black text-slate-800 flex items-center gap-1.5">
+1817:                     <i class="fa-solid fa-map-location-dot text-royalBlue"></i> 📍 물건지 실시간 위치 지도
+1818:                 </h4>
+1819:                 <div id="detail-map-container" class="w-full h-[220px] rounded-xl overflow-hidden border border-slate-200/60 bg-slate-50 relative group">
+1820:                     <!-- Javascript에서 iframe 동적 주입 -->
+1821:                 </div>
+1822:             </div>
+1823: 
+1824:             <!-- 🗺️ 네이버 전문 지도 및 정보망 연동 허브 -->
+1825:             <div class="bg-white border border-slate-200 rounded-2xl p-3.5 sm:p-4 space-y-3 shadow-sm">
+1826:                 <h4 class="text-xs sm:text-sm font-black text-slate-800 flex items-center gap-1.5">
+1827:                     <i class="fa-solid fa-map text-royalBlue"></i> 🗺️ 네이버 전문 지도 및 정보망 연동
+1828:                 </h4>
+1829:                 <p class="text-[9.5px] text-slate-500 leading-relaxed font-medium">다양한 지도 레이어를 네이버 지도로 열어 실경계를 분석하고 현장을 파악해 보십시오.</p>
+1830:                 <div class="grid grid-cols-2 gap-2 text-[11px] font-bold text-slate-700">
+1831:                     <!-- 지번도 (지적편집도) -->
+1832:                     <a id="btn-naver-map-edit" href="https://map.naver.com" target="_blank" class="bg-pink-50/40 border border-pink-200 hover:border-pink-500 rounded-xl p-2.5 flex items-center gap-2 transition-all shadow-sm group">
+1833:                         <div class="bg-pink-500 text-white w-7 h-7 rounded-lg flex items-center justify-center flex-shrink-0">
+1834:                             🗺️
+1835:                         </div>
+1836:                         <div class="truncate">
+1837:                             <span class="block text-[11px] font-black text-pink-600 truncate">지번도 보기</span>
+1838:                             <span class="text-[8.5px] text-slate-400 block font-normal">지적편집도 필지 경계조사</span>
+1839:                         </div>
+1840:                     </a>
+1841:                     <!-- 위성지도 -->
+1842:                     <a id="btn-naver-map-sat" href="https://map.naver.com" target="_blank" class="bg-slate-50 border border-slate-200 hover:border-slate-500 rounded-xl p-2.5 flex items-center gap-2 transition-all shadow-sm group">
+1843:                         <div class="bg-slate-600 text-white w-7 h-7 rounded-lg flex items-center justify-center flex-shrink-0">
+1844:                             🛰️
+1845:                         </div>
+1846:                         <div class="truncate">
+1847:                             <span class="block text-[11px] font-black text-slate-700 truncate">위성지도 보기</span>
+1848:                             <span class="text-[8.5px] text-slate-400 block font-normal">항공 위성 고해상도 촬영뷰</span>
+1849:                         </div>
+1850:                     </a>
+1851:                     <!-- 로드뷰 -->
+1852:                     <a id="btn-naver-map-road" href="https://map.naver.com" target="_blank" class="bg-emerald-50/40 border border-emerald-200 hover:border-emeraldSuccess rounded-xl p-2.5 flex items-center gap-2 transition-all shadow-sm group">
+1853:                         <div class="bg-emeraldSuccess text-white w-7 h-7 rounded-lg flex items-center justify-center flex-shrink-0">
+1854:                             📸
+1855:                         </div>
+1856:                         <div class="truncate">
+1857:                             <span class="block text-[11px] font-black text-emeraldSuccess truncate">로드뷰 보기</span>
+1858:                             <span class="text-[8.5px] text-slate-400 block font-normal">현장 파노라마 도로뷰 조회</span>
+1859:                         </div>

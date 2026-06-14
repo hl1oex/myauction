@@ -17,6 +17,7 @@ export interface Property {
   score: number;
   remaining_days: number;
   updated_at?: string;
+  court?: string;
   land_area?: number;
   building_area?: number;
   owner?: string;
@@ -99,7 +100,8 @@ export interface FilterState {
   sido: string[];
   sigungu: string;
   dateLimit: number; // 남은 기일 필터링 (D-Day 한도)
-  budgetLimit: number; // 가용 예산 한도
+  budgetMinLimit: number; // 가용 최소 예산
+  budgetMaxLimit: number; // 가용 최대 예산 한도
   hidePast: boolean; // 과거 마감 매물 제외 여부
   gradeFilter: 'all' | 'safe' | 'risk'; // AI 등급 분류 필터
   investmentType?: 'all' | 'investment' | 'residence'; // AI 자산 투자 성향 필터

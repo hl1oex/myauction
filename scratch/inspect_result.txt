@@ -1,0 +1,45 @@
+=== index.html 탭 관련 검색 결과 ===
+총 매칭 라인 수: 42
+
+Line 242: #detail-drawer {
+Line 1026: <aside id="detail-drawer" class="fixed inset-y-0 right-0 z-50 w-full sm:max-w-[700px] xl:max-w-[1050px] 2xl:max-w-[1280px] bg-white shadow-2xl border-l border-slate-200 flex flex-col h-full transform translate-x-full transition-transform duration-300 ease-out">
+Line 1052: <button id="detail-group-tab-1-btn" onclick="changeDetailGroupTab(1)" class="inline-block py-1.5 px-3.5 text-center text-[10.5px] sm:text-xs font-black rounded-xl border border-transparent transition-all select-none bg-royalBlue text-white shadow-sm">1. 종합 분석</button>
+Line 1053: <button id="detail-group-tab-2-btn" onclick="changeDetailGroupTab(2)" class="inline-block py-1.5 px-3.5 text-center text-[10.5px] sm:text-xs font-black rounded-xl border border-transparent transition-all select-none text-slate-500 hover:text-royalBlue hover:bg-slate-50 bg-slate-50/50">2. 권리 & 안전 분석</button>
+Line 1054: <button id="detail-group-tab-3-btn" onclick="changeDetailGroupTab(3)" class="inline-block py-1.5 px-3.5 text-center text-[10.5px] sm:text-xs font-black rounded-xl border border-transparent transition-all select-none text-slate-500 hover:text-royalBlue hover:bg-slate-50 bg-slate-50/50">3. 입지 & 위치 분석</button>
+Line 1055: <button id="detail-group-tab-4-btn" onclick="changeDetailGroupTab(4)" class="inline-block py-1.5 px-3.5 text-center text-[10.5px] sm:text-xs font-black rounded-xl border border-transparent transition-all select-none text-slate-500 hover:text-royalBlue hover:bg-slate-50 bg-slate-50/50">4. 입찰 & 금융 분석</button>
+Line 1057: <div id="detail-group-panel-1" class="flex-1 overflow-y-auto p-4 sm:p-5 space-y-4 sm:space-y-5 custom-scrollbar bg-slate-50/50">
+Line 1060: <div id="detail-panel-summary" class="grid grid-cols-1 xl:grid-cols-2 gap-4 sm:gap-5 items-start">
+Line 1193: <div id="detail-panel-complex" class="bg-white border border-slate-200 rounded-2xl p-4 shadow-sm space-y-3 w-full">
+Line 1207: <div id="detail-panel-floorplan" class="bg-white border border-slate-200 rounded-2xl p-4 shadow-sm space-y-4 w-full">
+Line 1442: <div class="flex justify-betw        <div id="detail-group-panel-3" class="flex-1 overflow-y-auto p-4 sm:p-5 space-y-4 sm:space-y-5 custom-scrollbar bg-slate-50/50 hidden relative">
+Line 1506: <div id="detail-panel-map" class="space-y-4 sm:space-y-5">
+Line 1591: <div id="detail-panel-market" class="space-y-4 sm:space-y-5">
+Line 1631: <div id="detail-group-panel-4" class="flex-1 overflow-y-auto p-4 sm:p-5 space-y-4 sm:space-y-5 custom-scrollbar bg-slate-50/50 hidden relative">
+Line 1633: <div id="detail-panel-bid" class="space-y-4 sm:space-y-5">
+Line 1843: <div id="detail-panel-dividend" class="space-y-4 sm:space-y-5">
+Line 1871: <div id="detail-panel-statistics" class="space-y-4 sm:space-y-5">
+Line 1921: <h4 class="text-slate-800 text-sm font-black">🔒 입찰 & 금융 분석 열람 제한</h4>
+Line 1922: <p class="text-slate-500 text-[10.5px] leading-relaxed font-semibold">본 매물의 입찰 & 금융 상세 시뮬레이션은 프리미엄 회원 등급 전용 콘텐츠입니다. 등급을 상향하여 정밀 ROI 분석을 확인해 보세요.</p>
+Line 2292: const drawer = document.getElementById("detail-drawer");
+Line 2513: const p2 = document.getElementById("detail-group-panel-2");
+Line 2514: const p3 = document.getElementById("detail-group-panel-3");
+Line 2515: const p4 = document.getElementById("detail-group-panel-4");
+Line 3285: const btn = document.getElementById(`detail-tab-${t}-btn`);
+Line 3286: const panel = document.getElementById(`detail-panel-${t}`);
+Line 3798: // 🎴 상세 창 열릴 때 첫 번째 그룹 탭(1.종합분석) 활성화 지정
+Line 3810: const drawer = document.getElementById("detail-drawer");
+Line 3830: const drawer = document.getElementById("detail-drawer");
+Line 4890: const tab2Btn = document.getElementById("detail-group-tab-2-btn");
+Line 4891: const tab3Btn = document.getElementById("detail-group-tab-3-btn");
+Line 4892: const tab4Btn = document.getElementById("detail-group-tab-4-btn");
+Line 4899: const p2 = document.getElementById("detail-group-panel-2");
+Line 4900: const p3 = document.getElementById("detail-group-panel-3");
+Line 4901: const p4 = document.getElementById("detail-group-panel-4");
+Line 5669: const fpPanel = document.getElementById("detail-panel-floorplan");
+Line 6277: const drawerPanel = document.getElementById("detail-group-panel-1");
+Line 7687: const btn = document.getElementById(`detail-group-tab-${i}-btn`);
+Line 7688: const panel = document.getElementById(`detail-group-panel-${i}`);
+Line 7713: const mapPanel = document.getElementById("detail-panel-map");
+Line 7714: const marketPanel = document.getElementById("detail-panel-market");
+Line 7753: const panel = document.getElementById(`detail-group-panel-${tabNum}`);
+Line 7957: const drawer = document.getElementById("detail-drawer");

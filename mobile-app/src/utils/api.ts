@@ -180,6 +180,21 @@ export function parseAreasFromText(
       estType = "exact";
     }
 
+    // 제목 내에 단일 호실 면적이 뚜렷하게 인접 배치된 패턴 검출 (예: "하나로아파트 제110동 13층1305호 ... 13층 599.52㎡"에서, 호실 면적은 전체 동/호수 매핑에서 튕겨나온 후보군 중 하나여야 함)
+    // 만약 ex가 정확히 검출되지 않았고, 후보군 중 상식적인 아파트 단일 호실 크기(30㎡~250㎡)가 있다면 이를 ex로 선정합니다.
+    if (ex === 0.0 && candidateExclusiveAreas.length > 0) {
+      // 아파트인 경우 상식적인 전용면적 기준 필터링
+      const isApartmentOrVilla = ["아파트", "오피스텔", "다세대", "빌라", "연립"].some(k => targetText.includes(k));
+      if (isApartmentOrVilla) {
+        const reasonableAptAreas = candidateExclusiveAreas.filter(a => a >= 25 && a <= 250);
+        if (reasonableAptAreas.length > 0) {
+          ex = reasonableAptAreas[0]; // 첫 번째 합리적인 면적 채택
+          estEx = false;
+          estType = "exact";
+        }
+      }
+    }
+
     if (ex === 0.0 && candidateExclusiveAreas.length > 0) {
       ex = candidateExclusiveAreas[candidateExclusiveAreas.length - 1];
       estEx = false;
@@ -294,6 +309,14 @@ export function parseAreasFromText(
           estType = "exact";
         }
       }
+    }
+
+    // 아파트/오피스텔/다세대의 전용면적이 300㎡를 초과하면 전체 층 면적이 전용면적으로 잘못 오인된 이상치로 판단하여 0으로 무력화하고 유추 루틴으로 넘김
+    const isApartmentOrVilla = ["아파트", "오피스텔", "다세대", "빌라", "연립"].some(k => targetText.includes(k));
+    if (isApartmentOrVilla && ex > 300) {
+      ex = 0.0;
+      estEx = true;
+      estType = "fake";
     }
 
     return { ex, ld, estEx, estLd, estType, totFloors, totArea, flAreas };
@@ -545,39 +568,148 @@ export function enrichPropertyDataMobile(item: any): Property {
     // 주거용 부동산 폴백 생성
     const isResidential = ["아파트", "오피스텔", "다세대", "빌라", "연립", "주택", "단독", "다가구"].some(k => ptype.includes(k));
     if (isResidential && (!item.complex_info || !item.complex_info.complex_name)) {
-      const schoolNames = ["대치초등학교", "송파초등학교", "반포초등학교", "청라초등학교", "정자초등학교", "범어초등학교", "해운대초등학교", "한빛초등학교"];
-      const addrParts = item.address ? item.address.split(" ") : [];
+      // 주소 파싱 및 유추 로직
+      const addr = item.address || "";
+      const title = item.title || "";
       
-      if (ptype.includes("아파트")) {
-        const builders = ["삼성물산(래미안)", "현대건설(힐스테이트)", "GS건설(자이)", "대우건설(푸르지오)", "DL이앤씨(e편한세상)", "포스코이앤씨(더샵)"];
-        const aptName = addrParts.length > 2 ? addrParts[addrParts.length - 2] + " 아파트" : "래미안 퍼스티지";
-        item.complex_info = {
-          complex_name: aptName,
-          total_households: 350 + (hash * 27) % 2500,
-          construction_company: builders[hash % builders.length],
-          built_year: 2005 + (hash * 3) % 18
-        };
-      } else if (ptype.includes("오피스텔")) {
-        const offBrands = ["마이빌 오피스텔", "현대 에띠앙", "두산위브센티움", "디아이빌", "푸르지오 시티", "효성해링턴"];
-        const offName = addrParts.length > 2 ? addrParts[addrParts.length - 2] + " 오피스텔" : "디아이빌 오피스텔";
-        item.complex_info = {
-          complex_name: offName,
-          total_households: 80 + (hash * 13) % 400,
-          construction_company: offBrands[hash % offBrands.length],
-          built_year: 2010 + (hash * 2) % 14
-        };
-      } else {
-        const villaBrands = ["청화빌라", "현대빌라", "대명하이츠", "대성빌라", "삼성하이츠", "청담타운"];
-        const villaName = addrParts.length > 2 ? addrParts[addrParts.length - 2] + " 빌라" : "청화하이츠";
-        item.complex_info = {
-          complex_name: villaName,
-          total_households: 10 + (hash * 7) % 35,
-          construction_company: villaBrands[hash % villaBrands.length],
-          built_year: 1995 + (hash * 4) % 28
-        };
+      // 1. 단지명 유추 (주소의 괄호 텍스트 우선 탐색, 예: "(월평동,하나로아파트)" -> "하나로아파트" 추출)
+      let inferredComplexName = "";
+      const parenMatch = addr.match(/\(([^)]+)\)/);
+      if (parenMatch) {
+        const contents = parenMatch[1].split(",");
+        // 동명이 아닌 단어 중 아파트/오피스텔/빌라를 포함하거나 가장 긴 단어를 단지명 후보로 선택
+        const candidates = contents.map(c => c.trim()).filter(c => !c.endsWith("동") && !c.endsWith("읍") && !c.endsWith("면") && !c.endsWith("리"));
+        if (candidates.length > 0) {
+          inferredComplexName = candidates[0];
+        }
       }
       
-      item.elementary_school = schoolNames[hash % schoolNames.length];
+      // 괄호가 없거나 추출 실패 시 제목 또는 주소 뒷부분에서 유추
+      if (!inferredComplexName) {
+        const titleClean = title.replace(/\[[^\]]+\]/g, "").trim();
+        const titleAptMatch = titleClean.match(/([가-힣a-zA-Z0-9\s]+(?:아파트|오피스텔|빌라|맨션|타운|하이츠|웰스리치|캐슬|자이|래미안|푸르지오|힐스테이트|아이파크|e편한세상|포레나|더샵))/);
+        if (titleAptMatch) {
+          inferredComplexName = titleAptMatch[1].trim();
+        }
+      }
+      
+      // 최종 폴백
+      if (!inferredComplexName) {
+        const addrParts = addr.split(" ");
+        if (addrParts.length > 2) {
+          const lastWord = addrParts[addrParts.length - 1];
+          const secondLastWord = addrParts[addrParts.length - 2];
+          if (lastWord.includes("동") || lastWord.includes("호") || lastWord.match(/\d/)) {
+            inferredComplexName = secondLastWord.match(/[가-힣]/) ? secondLastWord + " 단지" : "우량 주거시설";
+          } else {
+            inferredComplexName = lastWord;
+          }
+        } else {
+          inferredComplexName = ptype.includes("아파트") ? "경매 아파트 단지" : (ptype.includes("오피스텔") ? "경매 오피스텔 단지" : "경매 빌라 단지");
+        }
+      }
+
+      // 2. 건설사 브랜드 사전 자동 매칭 및 유추
+      let inferredBuilder = "자체 건설 (시공)";
+      const builderDict: Record<string, string> = {
+        "래미안": "삼성물산(래미안)",
+        "힐스테이트": "현대건설(힐스테이트)",
+        "디에이치": "현대건설(디에이치)",
+        "자이": "GS건설(자이)",
+        "푸르지오": "대우건설(푸르지오)",
+        "e편한세상": "DL이앤씨(e편한세상)",
+        "아크로": "DL이앤씨(아크로)",
+        "더샵": "포스코이앤씨(더샵)",
+        "아이파크": "HDC현대산업개발(아이파크)",
+        "롯데캐슬": "롯데건설(롯데캐슬)",
+        "SK뷰": "SK에코플랜트(SK뷰)",
+        "포레나": "한화건설(포레나)",
+        "데시앙": "태영건설(데시앙)",
+        "하늘채": "코오롱글로벌(하늘채)",
+        "센트레빌": "동부건설(센트레빌)",
+        "두산위브": "두산건설(두산위브)",
+        "벽산블루밍": "벽산건설(벽산블루밍)",
+        "코아루": "한국토지신탁(코아루)",
+        "골드클래스": "보광종합건설(골드클래스)",
+        "중흥S클래스": "중흥건설(중흥S클래스)",
+        "하나로": "동부건설/기타지역건설사"
+      };
+
+      const searchTarget = (inferredComplexName + " " + title).toLowerCase();
+      for (const [brand, company] of Object.entries(builderDict)) {
+        if (searchTarget.includes(brand.toLowerCase())) {
+          inferredBuilder = company;
+          break;
+        }
+      }
+      
+      if (inferredBuilder === "자체 건설 (시공)") {
+        const buildersList = ["삼성물산(래미안)", "현대건설(힐스테이트)", "GS건설(자이)", "대우건설(푸르지오)", "DL이앤씨(e편한세상)", "포스코이앤씨(더샵)", "HDC현대산업개발(아이파크)", "롯데건설(롯데캐슬)"];
+        inferredBuilder = buildersList[hash % buildersList.length];
+      }
+
+      // 3. 총 세대수 유추 (용도별 상식적 세대수 분기)
+      let inferredHouseholds = 100;
+      if (ptype.includes("아파트")) {
+        inferredHouseholds = 250 + (hash * 37) % 1800;
+      } else if (ptype.includes("오피스텔")) {
+        inferredHouseholds = 80 + (hash * 19) % 500;
+      } else {
+        inferredHouseholds = 8 + (hash * 7) % 45; // 빌라/다세대 등
+      }
+
+      // 4. 준공년도 유추 (사용승인일/보존등기일 정규식 파싱 우선 적용)
+      let inferredBuiltYear = 2005 + (hash * 3) % 18;
+      const yearMatch = textToSearch.match(/(?:사용승인|보존등기|준공|신축)\s*[:\s]*(\d{4})년/i);
+      if (yearMatch) {
+        inferredBuiltYear = parseInt(yearMatch[1]);
+      } else {
+        const yearMatchShort = textToSearch.match(/(?:사용승인일|보존등기일|준공일)\s*[:\s]*(\d{2})년/i);
+        if (yearMatchShort) {
+          const parsedYr = parseInt(yearMatchShort[1]);
+          inferredBuiltYear = parsedYr > 30 ? 1900 + parsedYr : 2000 + parsedYr;
+        }
+      }
+
+      // 5. 배정학교 유추 (주소의 법정동 또는 도로명 기반 동적 생성, 대치초등학교 일괄 배정 해결)
+      let inferredSchool = "근거리 초등학교 배정";
+      let foundDong = "";
+      
+      // 괄호 안의 법정동 정보 우선 탐색 (예: "(월평동,하나로아파트)" -> "월평동" 추출)
+      const schoolParenMatch = addr.match(/\(([^)]+)\)/);
+      if (schoolParenMatch) {
+        const contents = schoolParenMatch[1].split(",");
+        const dongCand = contents.map(c => c.trim()).find(c => c.endsWith("동") || c.endsWith("읍") || c.endsWith("면"));
+        if (dongCand) {
+          foundDong = dongCand;
+        }
+      }
+      
+      // 괄호에 동이 없거나 괄호 자체가 없으면 주소에서 숫자가 붙지 않은 순수 한글 동명 탐색
+      if (!foundDong) {
+        const dongMatch = addr.match(/(?:[^0-9가-힣]|^)([가-힣]+(?:동|읍|면))/);
+        if (dongMatch) {
+          foundDong = dongMatch[1];
+        }
+      }
+      
+      if (foundDong) {
+        inferredSchool = foundDong.replace(/\d+/g, "").replace(/(동|읍|면)$/, "") + "초등학교";
+      } else {
+        const roadMatch = addr.match(/(?:[^0-9가-힣]|^)([가-힣]+로)/);
+        if (roadMatch) {
+          inferredSchool = roadMatch[1].replace(/(로)$/, "") + "초등학교";
+        }
+      }
+
+      item.complex_info = {
+        complex_name: inferredComplexName,
+        total_households: inferredHouseholds,
+        construction_company: inferredBuilder,
+        built_year: inferredBuiltYear
+      };
+      
+      item.elementary_school = inferredSchool;
       const baseDeal = item.appraised_value || 1000000000;
       item.recent_deals = [
         {"deal_date": "2026-03", "deal_price": Math.round(baseDeal * 1.02), "floor": 12 + (hash % 8)},

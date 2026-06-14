@@ -80,6 +80,45 @@
             background-color: #eff6ff !important;
             box-shadow: 0 4px 12px rgba(30, 64, 175, 0.06) !important;
         }
+
+        /* 💸 듀얼 레인지 슬라이더를 위한 프리미엄 터치 무빙 스타일 */
+        .slider-range-input {
+            pointer-events: none;
+            -webkit-appearance: none;
+            appearance: none;
+            height: 0;
+            outline: none;
+        }
+        .slider-range-input::-webkit-slider-thumb {
+            pointer-events: auto;
+            -webkit-appearance: none;
+            appearance: none;
+            width: 14px;
+            height: 14px;
+            border-radius: 50%;
+            background: #1e40af;
+            cursor: pointer;
+            border: 2px solid #ffffff;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+            transition: transform 0.1s;
+        }
+        .slider-range-input::-webkit-slider-thumb:hover {
+            transform: scale(1.2);
+        }
+        .slider-range-input::-moz-range-thumb {
+            pointer-events: auto;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: #1e40af;
+            cursor: pointer;
+            border: 2px solid #ffffff;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+            transition: transform 0.1s;
+        }
+        .slider-range-input::-moz-range-thumb:hover {
+            transform: scale(1.2);
+        }
     
         /* 🚀 새로 생성되는 듯한 부드러운 카드 렌더링 애니메이션 */
         @keyframes fadeInUp {
@@ -119,7 +158,7 @@
                 border-radius: 8px !important;
             }
             #sidebar-panel.sidebar-compact .p-3,
-            #sidebar-panel.sidebar-compact .p-3.5 {
+            #sidebar-panel.sidebar-compact .p-3\.5 {
                 padding: 0.5rem !important;
                 border-radius: 10px !important;
             }
@@ -629,12 +668,18 @@
                         <span>💸 감정/최저 예산 한도</span>
                         <i id="accordion-budget-icon" class="fa-solid fa-chevron-down text-[8px] text-slate-400"></i>
                     </button>
-                    <div id="accordion-budget" class="hidden mt-1 space-y-1 pl-1">
+                    <div id="accordion-budget" class="hidden mt-1 space-y-2 pl-1 pb-1">
                         <div class="flex justify-between items-center mb-1">
                             <span id="budget-label" class="text-xs font-black text-royalBlue font-outfit">제한 없음</span>
                         </div>
-                        <input type="range" id="budget-slider" min="10000000" max="2000000000" step="10000000" value="2000000000" oninput="updateBudgetLabel(this.value)" 
-                               class="w-full accent-royalBlue cursor-pointer">
+                        <div id="budget-slider-container" class="relative w-full h-5 mt-2 select-none">
+                            <div class="absolute w-full h-1 bg-slate-200 rounded-full top-1/2 -translate-y-1/2 z-0"></div>
+                            <div id="slider-track" class="absolute h-1 bg-royalBlue rounded-full top-1/2 -translate-y-1/2 z-10" style="left: 0%; right: 0%;"></div>
+                            <input type="range" id="budget-min-slider" min="10000000" max="2000000000" step="10000000" value="10000000" 
+                                   oninput="onBudgetSliderInput('min')" class="absolute w-full top-1/2 -translate-y-1/2 pointer-events-none appearance-none bg-transparent z-20 slider-range-input">
+                            <input type="range" id="budget-max-slider" min="10000000" max="2000000000" step="10000000" value="2000000000" 
+                                   oninput="onBudgetSliderInput('max')" class="absolute w-full top-1/2 -translate-y-1/2 pointer-events-none appearance-none bg-transparent z-30 slider-range-input">
+                        </div>
                         <div class="flex justify-between text-[9px] text-slate-400 font-bold mt-1">
                             <span>1천만</span>
                             <span>10억</span>
@@ -1050,9 +1095,9 @@
         <!-- 💎 상세 Drawer 4대 대분류 프리미엄 탭 메뉴 바 -->
         <div class="flex overflow-x-auto whitespace-nowrap bg-white p-2 gap-1.5 z-10 flex-shrink-0 custom-scrollbar border-b border-slate-200">
             <button id="detail-group-tab-1-btn" onclick="changeDetailGroupTab(1)" class="inline-block py-1.5 px-3.5 text-center text-[10.5px] sm:text-xs font-black rounded-xl border border-transparent transition-all select-none bg-royalBlue text-white shadow-sm">1. 종합 분석</button>
-            <button id="detail-group-tab-2-btn" onclick="changeDetailGroupTab(2)" class="inline-block py-1.5 px-3.5 text-center text-[10.5px] sm:text-xs font-black rounded-xl border border-transparent transition-all select-none text-slate-500 hover:text-royalBlue hover:bg-slate-50 bg-slate-50/50">2. 권리 & 등기 분석</button>
-            <button id="detail-group-tab-3-btn" onclick="changeDetailGroupTab(3)" class="inline-block py-1.5 px-3.5 text-center text-[10.5px] sm:text-xs font-black rounded-xl border border-transparent transition-all select-none text-slate-500 hover:text-royalBlue hover:bg-slate-50 bg-slate-50/50">3. 입찰 & 금융 분석</button>
-            <button id="detail-group-tab-4-btn" onclick="changeDetailGroupTab(4)" class="inline-block py-1.5 px-3.5 text-center text-[10.5px] sm:text-xs font-black rounded-xl border border-transparent transition-all select-none text-slate-500 hover:text-royalBlue hover:bg-slate-50 bg-slate-50/50">4. 위치 & 시세 분석</button>
+            <button id="detail-group-tab-2-btn" onclick="changeDetailGroupTab(2)" class="inline-block py-1.5 px-3.5 text-center text-[10.5px] sm:text-xs font-black rounded-xl border border-transparent transition-all select-none text-slate-500 hover:text-royalBlue hover:bg-slate-50 bg-slate-50/50">2. 권리 & 안전 분석</button>
+            <button id="detail-group-tab-3-btn" onclick="changeDetailGroupTab(3)" class="inline-block py-1.5 px-3.5 text-center text-[10.5px] sm:text-xs font-black rounded-xl border border-transparent transition-all select-none text-slate-500 hover:text-royalBlue hover:bg-slate-50 bg-slate-50/50">3. 입지 & 시세 분석</button>
+            <button id="detail-group-tab-4-btn" onclick="changeDetailGroupTab(4)" class="inline-block py-1.5 px-3.5 text-center text-[10.5px] sm:text-xs font-black rounded-xl border border-transparent transition-all select-none text-slate-500 hover:text-royalBlue hover:bg-slate-50 bg-slate-50/50">4. 입찰 & 금융 시뮬레이션</button>
         </div>
         <div id="detail-group-panel-1" class="flex-1 overflow-y-auto p-4 sm:p-5 space-y-4 sm:space-y-5 custom-scrollbar bg-slate-50/50">
             <div id="group-content-1" class="space-y-4 sm:space-y-5 w-full">
@@ -1530,6 +1575,33 @@
                         </table>
                     </div>
                 </div>
+                <!-- 📊 예상배당표 탭 패널 (권리 & 안전 분석 탭으로 이동 배치) -->
+                <div id="detail-panel-dividend" class="space-y-4 sm:space-y-5">
+                    <div class="bg-white border border-slate-200 rounded-2xl p-3.5 sm:p-4 shadow-sm space-y-3">
+                        <h4 class="text-xs sm:text-sm font-black text-slate-800 flex items-center gap-1.5 pb-2 border-b border-slate-100">
+                            <i class="fa-solid fa-table-list text-royalBlue"></i> 예상 배당액 시뮬레이션 표
+                        </h4>
+                        <p class="text-[10px] text-slate-500 leading-relaxed font-bold">
+                            용도별 감정평가액 및 입찰가를 기준으로 배당 순위에 따라 자동 분배한 시뮬레이션입니다. 실제 채무 권리 조정에 따라 변동될 수 있습니다.
+                        </p>
+                        <div class="overflow-x-auto border border-slate-200 rounded-xl overflow-hidden shadow-sm bg-white">
+                            <table class="w-full text-left border-collapse text-[13px] document-view">
+                                <thead>
+                                    <tr class="bg-slate-50 border-b border-slate-200 text-slate-800 font-extrabold text-[12px]">
+                                        <th class="p-3 pl-4 border-b">순위</th>
+                                        <th class="p-3 border-b">채권자 (권리)</th>
+                                        <th class="p-3 border-b text-right">채권액/보증금</th>
+                                        <th class="p-3 border-b text-right">예상배당액</th>
+                                        <th class="p-3 pr-4 border-b text-center">소멸여부</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="detail-dividend-tbody" class="text-slate-700 font-medium">
+                                    <!-- 동적 생성 -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
             </div>
             <!-- 📈 [8] 매각통계 탭 패널 (기본 숨김) -->
             </div>
@@ -1544,6 +1616,145 @@
         </div>
         <div id="detail-group-panel-3" class="flex-1 overflow-y-auto p-4 sm:p-5 space-y-4 sm:space-y-5 custom-scrollbar bg-slate-50/50 hidden relative">
             <div id="group-content-3" class="space-y-4 sm:space-y-5 w-full">
+                <!-- 위치 & 시세 분석 1열 스택 레이아웃 -->
+                <div class="space-y-4 sm:space-y-5">
+                    <div id="detail-panel-map" class="space-y-4 sm:space-y-5">
+            <!-- 📍 물건지 실시간 위치 지도 -->
+            <div class="bg-white border border-slate-200 rounded-2xl p-3.5 sm:p-4 space-y-2.5 shadow-sm">
+                <h4 class="text-xs sm:text-sm font-black text-slate-800 flex items-center gap-1.5">
+                    <i class="fa-solid fa-map-location-dot text-royalBlue"></i> 📍 물건지 실시간 위치 지도
+                </h4>
+                <div id="detail-map-container" class="w-full h-[220px] rounded-xl overflow-hidden border border-slate-200/60 bg-slate-50 relative group">
+                    <!-- Javascript에서 iframe 동적 주입 -->
+                </div>
+            </div>
+
+            <!-- 🗺️ 네이버 전문 지도 및 정보망 연동 허브 -->
+            <div class="bg-white border border-slate-200 rounded-2xl p-3.5 sm:p-4 space-y-3 shadow-sm">
+                <h4 class="text-xs sm:text-sm font-black text-slate-800 flex items-center gap-1.5">
+                    <i class="fa-solid fa-map text-royalBlue"></i> 🗺️ 네이버 전문 지도 및 정보망 연동
+                </h4>
+                <p class="text-[9.5px] text-slate-500 leading-relaxed font-medium">다양한 지도 레이어를 네이버 지도로 열어 실경계를 분석하고 현장을 파악해 보십시오.</p>
+                <div class="grid grid-cols-2 gap-2 text-[11px] font-bold text-slate-700">
+                    <!-- 지번도 (지적편집도) -->
+                    <a id="btn-naver-map-edit" href="https://map.naver.com" target="_blank" class="bg-pink-50/40 border border-pink-200 hover:border-pink-500 rounded-xl p-2.5 flex items-center gap-2 transition-all shadow-sm group">
+                        <div class="bg-pink-500 text-white w-7 h-7 rounded-lg flex items-center justify-center flex-shrink-0">
+                            🗺️
+                        </div>
+                        <div class="truncate">
+                            <span class="block text-[11px] font-black text-pink-600 truncate">지번도 보기</span>
+                            <span class="text-[8.5px] text-slate-400 block font-normal">지적편집도 필지 경계조사</span>
+                        </div>
+                    </a>
+                    <!-- 위성지도 -->
+                    <a id="btn-naver-map-sat" href="https://map.naver.com" target="_blank" class="bg-slate-50 border border-slate-200 hover:border-slate-500 rounded-xl p-2.5 flex items-center gap-2 transition-all shadow-sm group">
+                        <div class="bg-slate-600 text-white w-7 h-7 rounded-lg flex items-center justify-center flex-shrink-0">
+                            🛰️
+                        </div>
+                        <div class="truncate">
+                            <span class="block text-[11px] font-black text-slate-700 truncate">위성지도 보기</span>
+                            <span class="text-[8.5px] text-slate-400 block font-normal">항공 위성 고해상도 촬영뷰</span>
+                        </div>
+                    </a>
+                    <!-- 로드뷰 -->
+                    <a id="btn-naver-map-road" href="https://map.naver.com" target="_blank" class="bg-emerald-50/40 border border-emerald-200 hover:border-emeraldSuccess rounded-xl p-2.5 flex items-center gap-2 transition-all shadow-sm group">
+                        <div class="bg-emeraldSuccess text-white w-7 h-7 rounded-lg flex items-center justify-center flex-shrink-0">
+                            📸
+                        </div>
+                        <div class="truncate">
+                            <span class="block text-[11px] font-black text-emeraldSuccess truncate">로드뷰 보기</span>
+                            <span class="text-[8.5px] text-slate-400 block font-normal">현장 파노라마 도로뷰 조회</span>
+                        </div>
+                    </a>
+                    <!-- 온나라 통합지도 및 시세 확인 -->
+                    <a href="#" onclick="event.preventDefault(); copyAddressToClipboardAndOpenSeeReal();" class="bg-amber-50/40 border border-amber-200 hover:border-amber-600 rounded-xl p-2.5 flex items-center gap-2 transition-all shadow-sm group">
+                        <div class="bg-amber-500 text-white w-7 h-7 rounded-lg flex items-center justify-center flex-shrink-0">
+                            🌐
+                        </div>
+                        <div class="truncate">
+                            <span class="block text-[11px] font-black text-amber-600 truncate">주변시세 확인 (씨리얼)</span>
+                            <span class="text-[8.5px] text-slate-400 block font-normal">주소 복사 후 씨:리얼 종합조회</span>
+                        </div>
+                    </a>
+                </div>
+            </div>
+
+            <!-- 🟢 토지이용계획 및 규제 진단 카드 -->
+            <div class="bg-white border border-slate-200 rounded-2xl p-3.5 sm:p-4 space-y-3 shadow-sm">
+                <h4 class="text-xs sm:text-sm font-black text-slate-800 flex items-center gap-1.5">
+                    <i class="fa-solid fa-leaf text-royalBlue"></i> 🌱 토지이용계획 및 규제 진단
+                </h4>
+                <div class="bg-slate-50 border border-slate-200 rounded-xl p-3.5 space-y-2">
+                    <div class="flex justify-between items-center text-xs">
+                        <span class="text-slate-455 font-bold">용도지역 구분</span>
+                        <span id="detail-land-use-plan" class="font-extrabold text-royalBlue text-sm"></span>
+                    </div>
+                    <p id="detail-land-use-plan-desc" class="text-[10px] text-slate-500 leading-relaxed font-bold border-t border-slate-200/60 pt-2 mt-2"></p>
+
+                    <div class="flex justify-between items-center text-xs border-t border-slate-200/60 pt-2 mt-2">
+                        <span class="text-slate-455 font-bold">예상 공시가격</span>
+                        <span id="detail-spec-official-price" class="font-extrabold text-royalBlue text-sm"></span>
+                    </div>
+                    <p id="detail-spec-official-price-desc" class="text-[10px] text-slate-500 leading-relaxed font-bold border-t border-slate-200/60 pt-2 mt-2"></p>
+                </div>
+                <a id="btn-official-eum" href="#" onclick="event.preventDefault(); copyAddressAndOpenEum();" class="w-full bg-emeraldSuccess text-white py-2 rounded-xl text-xs font-black hover:bg-emerald-700 transition-all flex items-center justify-center gap-1 select-none cursor-pointer text-center">
+                    국토부 토지이음(eum.go.kr) 공식 조회하기
+                </a>
+                        </div>
+                    </div>
+
+                    <div id="detail-panel-market" class="space-y-4 sm:space-y-5">
+                        <div class="bg-white border border-slate-200 rounded-2xl p-4 shadow-sm space-y-3">
+                <div class="flex items-center justify-between pb-2 border-b border-slate-100">
+                    <h4 class="text-xs sm:text-sm font-black text-slate-800 flex items-center gap-1.5">
+                        <i class="fa-solid fa-tags text-royalBlue"></i> 주변 아파트 실거래 시세 대조
+                    </h4>
+                    <button onclick="copyAddressToClipboardAndOpenSeeReal()" class="px-2 py-1 bg-amber-50 hover:bg-amber-100 border border-amber-200 text-amber-700 text-[10px] font-black rounded-lg transition-all flex items-center gap-1">
+                        <i class="fa-solid fa-copy"></i> 주소복사 & 시세확인 (씨리얼)
+                    </button>
+                </div>
+                                <div class="overflow-x-auto border border-slate-200 rounded-xl overflow-hidden mt-3 shadow-sm bg-white">
+                                    <table class="w-full text-left border-collapse text-[13px] document-view">
+                                        <thead>
+                                            <tr class="bg-slate-50 border-b border-slate-200 text-slate-800 font-extrabold text-[12px]">
+                                                <th class="p-3 pl-4">거래일자</th>
+                                                <th class="p-3">면적 (전용)</th>
+                                                <th class="p-3 text-center">층수</th>
+                                                <th class="p-3 text-right">거래금액</th>
+                                                <th class="p-3 pr-4 text-center">변동률</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="detail-market-tbody" class="text-slate-700 font-medium">
+                                            <!-- 동적 생성 -->
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- 📊 최근 1년 매각 통계 (입지 & 시세 분석 탭으로 이동 배치) -->
+                        <div id="detail-panel-statistics" class="space-y-4 sm:space-y-5">
+                            <div class="bg-white border border-slate-200 rounded-2xl p-3.5 sm:p-4 shadow-sm space-y-3">
+                                <h4 class="text-xs sm:text-sm font-black text-slate-800 flex items-center gap-1.5 pb-2 border-b border-slate-100">
+                                    <i class="fa-solid fa-chart-bar text-royalBlue"></i> 해당 법원/용도 최근 1년 매각 통계
+                                </h4>
+                                <div id="detail-statistics-box" class="space-y-3">
+                                    <!-- 동적 생성 -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+            </div>
+            <div id="group-mask-3" class="absolute inset-0 bg-slate-900/60 backdrop-blur-sm z-30 flex flex-col items-center justify-center text-center p-6 hidden">
+                <div class="bg-white border border-slate-200 rounded-2xl p-6 max-w-sm shadow-2xl space-y-3">
+                    <i class="fa-solid fa-lock text-rose-500 text-3xl"></i>
+                    <h4 class="text-slate-800 text-sm font-black">🔒 위치 & 시세 분석 열람 제한</h4>
+                    <p class="text-slate-500 text-[10.5px] leading-relaxed font-semibold">본 매물의 지도 및 인근 실거래 시세 추이는 프리미엄 회원 등급 전용 콘텐츠입니다. 등급을 상향하여 실시간 위치분석 정보를 확인해 보세요.</p>
+                    <button onclick="alert('등급 상향은 관리자 권한으로 즉시 조정 가능합니다.')" class="w-full bg-royalBlue text-white font-extrabold text-xs py-2 rounded-xl shadow-md hover:bg-royalHover transition-all">등급 상향 신청하기</button>
+                </div>
+            </div>
+        </div>
+        <div id="detail-group-panel-4" class="flex-1 overflow-y-auto p-4 sm:p-5 space-y-4 sm:space-y-5 custom-scrollbar bg-slate-50/50 hidden relative">
+            <div id="group-content-4" class="space-y-4 sm:space-y-5 w-full">
                 <div id="detail-panel-bid" class="space-y-4 sm:space-y-5">
             <!-- AI 낙찰 시뮬레이션 지표 분석 -->
             <div class="bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 rounded-2xl p-3.5 sm:p-4 space-y-2.5 shadow-sm mb-4">
@@ -1721,45 +1932,7 @@
                 </div>
             </div>
         </div>
-        <!-- 📊 [4] 예상배당표 탭 패널 (기본 숨김) -->
-                <div id="detail-panel-dividend" class="space-y-4 sm:space-y-5">
-            <div class="bg-white border border-slate-200 rounded-2xl p-3.5 sm:p-4 shadow-sm space-y-3">
-                <h4 class="text-xs sm:text-sm font-black text-slate-800 flex items-center gap-1.5 pb-2 border-b border-slate-100">
-                    <i class="fa-solid fa-table-list text-royalBlue"></i> 예상 배당액 시뮬레이션 표
-                </h4>
-                <p class="text-[10px] text-slate-500 leading-relaxed font-bold">
-                    낙찰금액을 감정평가액 기준으로 배당 순위에 따라 자동 분배한 시뮬레이션입니다. 실제 채무 권리 조정에 따라 변동될 수 있습니다.
-                </p>
-                <div class="overflow-x-auto border border-slate-200 rounded-xl overflow-hidden shadow-sm bg-white">
-                    <table class="w-full text-left border-collapse text-[13px] document-view">
-                        <thead>
-                            <tr class="bg-slate-50 border-b border-slate-200 text-slate-800 font-extrabold text-[12px]">
-                                <th class="p-3 pl-4 border-b">순위</th>
-                                <th class="p-3 border-b">채권자 (권리)</th>
-                                <th class="p-3 border-b text-right">채권액/보증금</th>
-                                <th class="p-3 border-b text-right">예상배당액</th>
-                                <th class="p-3 pr-4 border-b text-center">소멸여부</th>
-                            </tr>
-                        </thead>
-                        <tbody id="detail-dividend-tbody" class="text-slate-700 font-medium">
-                            <!-- 동적 생성 -->
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
-
-        <!-- 📑 [5] 인수분석 탭 패널 (기본 숨김) -->
-                <div id="detail-panel-statistics" class="space-y-4 sm:space-y-5">
-            <div class="bg-white border border-slate-200 rounded-2xl p-3.5 sm:p-4 shadow-sm space-y-3">
-                <h4 class="text-xs sm:text-sm font-black text-slate-800 flex items-center gap-1.5 pb-2 border-b border-slate-100">
-                    <i class="fa-solid fa-chart-bar text-royalBlue"></i> 해당 법원/용도 최근 1년 매각 통계
-                </h4>
-                <div id="detail-statistics-box" class="space-y-3">
-                    <!-- 동적 생성 -->
-                </div>
-            </div>
-        </div>
+        <!-- 예상배당표 및 매각통계 패널은 각각 2번 탭과 3번 탭으로 이동되었습니다. -->
 
         <!-- 💰 [9] 시세/실거래가 탭 패널 (기본 숨김) -->
                 
@@ -1797,139 +1970,11 @@
                 </div>
             </div>
             </div>
-            <div id="group-mask-3" class="absolute inset-0 bg-slate-900/60 backdrop-blur-sm z-30 flex flex-col items-center justify-center text-center p-6 hidden">
+            <div id="group-mask-4" class="absolute inset-0 bg-slate-900/60 backdrop-blur-sm z-30 flex flex-col items-center justify-center text-center p-6 hidden">
                 <div class="bg-white border border-slate-200 rounded-2xl p-6 max-w-sm shadow-2xl space-y-3">
                     <i class="fa-solid fa-lock text-rose-500 text-3xl"></i>
                     <h4 class="text-slate-800 text-sm font-black">🔒 입찰 & 금융 분석 열람 제한</h4>
                     <p class="text-slate-500 text-[10.5px] leading-relaxed font-semibold">본 매물의 입찰 & 금융 상세 시뮬레이션은 프리미엄 회원 등급 전용 콘텐츠입니다. 등급을 상향하여 정밀 ROI 분석을 확인해 보세요.</p>
-                    <button onclick="alert('등급 상향은 관리자 권한으로 즉시 조정 가능합니다.')" class="w-full bg-royalBlue text-white font-extrabold text-xs py-2 rounded-xl shadow-md hover:bg-royalHover transition-all">등급 상향 신청하기</button>
-                </div>
-            </div>
-        </div>
-        <div id="detail-group-panel-4" class="flex-1 overflow-y-auto p-4 sm:p-5 space-y-4 sm:space-y-5 custom-scrollbar bg-slate-50/50 hidden relative">
-            <div id="group-content-4" class="space-y-4 sm:space-y-5 w-full">
-                <!-- 위치 & 시세 분석 1열 스택 레이아웃 -->
-                <div class="space-y-4 sm:space-y-5">
-                    <div id="detail-panel-map" class="space-y-4 sm:space-y-5">
-            <!-- 📍 물건지 실시간 위치 지도 -->
-            <div class="bg-white border border-slate-200 rounded-2xl p-3.5 sm:p-4 space-y-2.5 shadow-sm">
-                <h4 class="text-xs sm:text-sm font-black text-slate-800 flex items-center gap-1.5">
-                    <i class="fa-solid fa-map-location-dot text-royalBlue"></i> 📍 물건지 실시간 위치 지도
-                </h4>
-                <div id="detail-map-container" class="w-full h-[220px] rounded-xl overflow-hidden border border-slate-200/60 bg-slate-50 relative group">
-                    <!-- Javascript에서 iframe 동적 주입 -->
-                </div>
-            </div>
-
-            <!-- 🗺️ 네이버 전문 지도 및 정보망 연동 허브 -->
-            <div class="bg-white border border-slate-200 rounded-2xl p-3.5 sm:p-4 space-y-3 shadow-sm">
-                <h4 class="text-xs sm:text-sm font-black text-slate-800 flex items-center gap-1.5">
-                    <i class="fa-solid fa-map text-royalBlue"></i> 🗺️ 네이버 전문 지도 및 정보망 연동
-                </h4>
-                <p class="text-[9.5px] text-slate-500 leading-relaxed font-medium">다양한 지도 레이어를 네이버 지도로 열어 실경계를 분석하고 현장을 파악해 보십시오.</p>
-                <div class="grid grid-cols-2 gap-2 text-[11px] font-bold text-slate-700">
-                    <!-- 지번도 (지적편집도) -->
-                    <a id="btn-naver-map-edit" href="https://map.naver.com" target="_blank" class="bg-pink-50/40 border border-pink-200 hover:border-pink-500 rounded-xl p-2.5 flex items-center gap-2 transition-all shadow-sm group">
-                        <div class="bg-pink-500 text-white w-7 h-7 rounded-lg flex items-center justify-center flex-shrink-0">
-                            🗺️
-                        </div>
-                        <div class="truncate">
-                            <span class="block text-[11px] font-black text-pink-600 truncate">지번도 보기</span>
-                            <span class="text-[8.5px] text-slate-400 block font-normal">지적편집도 필지 경계조사</span>
-                        </div>
-                    </a>
-                    <!-- 위성지도 -->
-                    <a id="btn-naver-map-sat" href="https://map.naver.com" target="_blank" class="bg-slate-50 border border-slate-200 hover:border-slate-500 rounded-xl p-2.5 flex items-center gap-2 transition-all shadow-sm group">
-                        <div class="bg-slate-600 text-white w-7 h-7 rounded-lg flex items-center justify-center flex-shrink-0">
-                            🛰️
-                        </div>
-                        <div class="truncate">
-                            <span class="block text-[11px] font-black text-slate-700 truncate">위성지도 보기</span>
-                            <span class="text-[8.5px] text-slate-400 block font-normal">항공 위성 고해상도 촬영뷰</span>
-                        </div>
-                    </a>
-                    <!-- 로드뷰 -->
-                    <a id="btn-naver-map-road" href="https://map.naver.com" target="_blank" class="bg-emerald-50/40 border border-emerald-200 hover:border-emeraldSuccess rounded-xl p-2.5 flex items-center gap-2 transition-all shadow-sm group">
-                        <div class="bg-emeraldSuccess text-white w-7 h-7 rounded-lg flex items-center justify-center flex-shrink-0">
-                            📸
-                        </div>
-                        <div class="truncate">
-                            <span class="block text-[11px] font-black text-emeraldSuccess truncate">로드뷰 보기</span>
-                            <span class="text-[8.5px] text-slate-400 block font-normal">현장 파노라마 도로뷰 조회</span>
-                        </div>
-                    </a>
-                    <!-- 온나라 통합지도 및 시세 확인 -->
-                    <a href="#" onclick="event.preventDefault(); copyAddressToClipboardAndOpenSeeReal();" class="bg-amber-50/40 border border-amber-200 hover:border-amber-600 rounded-xl p-2.5 flex items-center gap-2 transition-all shadow-sm group">
-                        <div class="bg-amber-500 text-white w-7 h-7 rounded-lg flex items-center justify-center flex-shrink-0">
-                            🌐
-                        </div>
-                        <div class="truncate">
-                            <span class="block text-[11px] font-black text-amber-600 truncate">주변시세 확인 (씨리얼)</span>
-                            <span class="text-[8.5px] text-slate-400 block font-normal">주소 복사 후 씨:리얼 종합조회</span>
-                        </div>
-                    </a>
-                </div>
-            </div>
-
-            <!-- 🟢 토지이용계획 및 규제 진단 카드 -->
-            <div class="bg-white border border-slate-200 rounded-2xl p-3.5 sm:p-4 space-y-3 shadow-sm">
-                <h4 class="text-xs sm:text-sm font-black text-slate-800 flex items-center gap-1.5">
-                    <i class="fa-solid fa-leaf text-royalBlue"></i> 🌱 토지이용계획 및 규제 진단
-                </h4>
-                <div class="bg-slate-50 border border-slate-200 rounded-xl p-3.5 space-y-2">
-                    <div class="flex justify-between items-center text-xs">
-                        <span class="text-slate-455 font-bold">용도지역 구분</span>
-                        <span id="detail-land-use-plan" class="font-extrabold text-royalBlue text-sm"></span>
-                    </div>
-                    <p id="detail-land-use-plan-desc" class="text-[10px] text-slate-500 leading-relaxed font-bold border-t border-slate-200/60 pt-2 mt-2"></p>
-
-                    <div class="flex justify-between items-center text-xs border-t border-slate-200/60 pt-2 mt-2">
-                        <span class="text-slate-455 font-bold">예상 공시가격</span>
-                        <span id="detail-spec-official-price" class="font-extrabold text-royalBlue text-sm"></span>
-                    </div>
-                    <p id="detail-spec-official-price-desc" class="text-[10px] text-slate-500 leading-relaxed font-bold border-t border-slate-200/60 pt-2 mt-2"></p>
-                </div>
-                <a id="btn-official-eum" href="#" onclick="event.preventDefault(); copyAddressAndOpenEum();" class="w-full bg-emeraldSuccess text-white py-2 rounded-xl text-xs font-black hover:bg-emerald-700 transition-all flex items-center justify-center gap-1 select-none cursor-pointer text-center">
-                    국토부 토지이음(eum.go.kr) 공식 조회하기
-                </a>
-                        </div>
-                    </div>
-
-                    <div id="detail-panel-market" class="space-y-4 sm:space-y-5">
-                        <div class="bg-white border border-slate-200 rounded-2xl p-4 shadow-sm space-y-3">
-                <div class="flex items-center justify-between pb-2 border-b border-slate-100">
-                    <h4 class="text-xs sm:text-sm font-black text-slate-800 flex items-center gap-1.5">
-                        <i class="fa-solid fa-tags text-royalBlue"></i> 주변 아파트 실거래 시세 대조
-                    </h4>
-                    <button onclick="copyAddressToClipboardAndOpenSeeReal()" class="px-2 py-1 bg-amber-50 hover:bg-amber-100 border border-amber-200 text-amber-700 text-[10px] font-black rounded-lg transition-all flex items-center gap-1">
-                        <i class="fa-solid fa-copy"></i> 주소복사 & 시세확인 (씨리얼)
-                    </button>
-                </div>
-                                <div class="overflow-x-auto border border-slate-200 rounded-xl overflow-hidden mt-3 shadow-sm bg-white">
-                                    <table class="w-full text-left border-collapse text-[13px] document-view">
-                                        <thead>
-                                            <tr class="bg-slate-50 border-b border-slate-200 text-slate-800 font-extrabold text-[12px]">
-                                                <th class="p-3 pl-4">거래일자</th>
-                                                <th class="p-3">면적 (전용)</th>
-                                                <th class="p-3 text-center">층수</th>
-                                                <th class="p-3 text-right">거래금액</th>
-                                                <th class="p-3 pr-4 text-center">변동률</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody id="detail-market-tbody" class="text-slate-700 font-medium">
-                                            <!-- 동적 생성 -->
-                                        </tbody>
-                                    </table>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-            </div>
-            <div id="group-mask-4" class="absolute inset-0 bg-slate-900/60 backdrop-blur-sm z-30 flex flex-col items-center justify-center text-center p-6 hidden">
-                <div class="bg-white border border-slate-200 rounded-2xl p-6 max-w-sm shadow-2xl space-y-3">
-                    <i class="fa-solid fa-lock text-rose-500 text-3xl"></i>
-                    <h4 class="text-slate-800 text-sm font-black">🔒 위치 & 시세 분석 열람 제한</h4>
-                    <p class="text-slate-500 text-[10.5px] leading-relaxed font-semibold">본 매물의 지도 및 인근 실거래 시세 추이는 프리미엄 회원 등급 전용 콘텐츠입니다. 등급을 상향하여 실시간 위치분석 정보를 확인해 보세요.</p>
                     <button onclick="alert('등급 상향은 관리자 권한으로 즉시 조정 가능합니다.')" class="w-full bg-royalBlue text-white font-extrabold text-xs py-2 rounded-xl shadow-md hover:bg-royalHover transition-all">등급 상향 신청하기</button>
                 </div>
             </div>
@@ -1970,7 +2015,8 @@
                 selectedPtypes: Array.from(document.querySelectorAll('input[name="ptype-check"]:checked')).map(cb => cb.value),
                 selectedSidos: Array.from(document.querySelectorAll('input[name="sido-check"]:checked')).map(cb => cb.value),
                 dateLimit: document.getElementById("date-filter").value,
-                budgetLimit: document.getElementById("budget-slider").value,
+                budgetMinLimit: document.getElementById("budget-min-slider").value,
+                budgetMaxLimit: document.getElementById("budget-max-slider").value,
                 hidePast: document.getElementById("hide-past-toggle").checked,
                 showFavorites: document.getElementById("show-favorites-toggle").checked,
                 gradeFilter: gradeVal,
@@ -2020,9 +2066,16 @@
                 
                 document.getElementById("date-filter").value = filters.dateLimit || "180";
                 
-                const budgetSlider = document.getElementById("budget-slider");
-                budgetSlider.value = filters.budgetLimit || "2000000000";
-                updateBudgetLabel(budgetSlider.value);
+                const cachedMin = filters.budgetMinLimit || "10000000";
+                const cachedMax = filters.budgetMaxLimit || filters.budgetLimit || "2000000000";
+                
+                const budgetMinSlider = document.getElementById("budget-min-slider");
+                const budgetMaxSlider = document.getElementById("budget-max-slider");
+                if (budgetMinSlider) budgetMinSlider.value = cachedMin;
+                if (budgetMaxSlider) budgetMaxSlider.value = cachedMax;
+                
+                updateBudgetLabel(parseInt(cachedMin), parseInt(cachedMax));
+                updateBudgetSliderTrack(parseInt(cachedMin), parseInt(cachedMax));
                 
                 document.getElementById("hide-past-toggle").checked = filters.hidePast !== false;
                 document.getElementById("show-favorites-toggle").checked = filters.showFavorites === true;
@@ -2528,6 +2581,7 @@
             if (p4) originalPanel4Html = p4.innerHTML;
 
             initResponsiveLayout();
+            initBudgetSliderZIndexController();
             restoreFiltersFromCache();
             initDataLoad();
         });
@@ -2535,14 +2589,122 @@
 
 
         // 2. 예산 설정 라벨 포맷터 (디바운스 연동)
-        function updateBudgetLabel(val) {
+        function updateBudgetLabel(minVal, maxVal) {
             const label = document.getElementById("budget-label");
-            if (val >= 2000000000) {
+            if (maxVal === undefined) {
+                maxVal = minVal;
+                minVal = 10000000;
+            }
+            const minV = parseInt(minVal);
+            const maxV = parseInt(maxVal);
+            
+            if (minV <= 10000000 && maxV >= 2000000000) {
                 label.innerText = "제한 없음";
             } else {
-                label.innerText = formatKRW(parseInt(val));
+                const minText = minV <= 10000000 ? "1천만" : formatKRW(minV);
+                const maxText = maxV >= 2000000000 ? "제한 없음" : formatKRW(maxV);
+                label.innerText = `${minText} ~ ${maxText}`;
             }
             debouncedApplyFilters(); // 슬라이드 드래그 시 과부하 렌더링 방지 (디바운싱 작동)
+        }
+
+        // 💸 듀얼 슬라이더 z-index 제어 (터치/마우스 포인터 기반 가까운 핸들 자동 활성화)
+        function initBudgetSliderZIndexController() {
+            const container = document.getElementById("budget-slider-container");
+            const minSlider = document.getElementById("budget-min-slider");
+            const maxSlider = document.getElementById("budget-max-slider");
+            if (!container || !minSlider || !maxSlider) return;
+
+            function updateZIndex(clientX) {
+                const rect = container.getBoundingClientRect();
+                const relativeX = clientX - rect.left;
+                const percent = (relativeX / rect.width) * 100;
+
+                const minLimit = parseInt(minSlider.min) || 10000000;
+                const maxLimit = parseInt(minSlider.max) || 2000000000;
+                const range = maxLimit - minLimit;
+
+                const minVal = parseInt(minSlider.value);
+                const maxVal = parseInt(maxSlider.value);
+
+                const minPercent = ((minVal - minLimit) / range) * 100;
+                const maxPercent = ((maxVal - minLimit) / range) * 100;
+
+                // 마우스 또는 터치 좌표가 minPercent에 더 가까우면 minSlider를 위로 올립니다.
+                if (Math.abs(percent - minPercent) < Math.abs(percent - maxPercent)) {
+                    minSlider.style.zIndex = "35";
+                    maxSlider.style.zIndex = "25";
+                } else {
+                    minSlider.style.zIndex = "25";
+                    maxSlider.style.zIndex = "35";
+                }
+            }
+
+            container.addEventListener("mousemove", function(e) {
+                updateZIndex(e.clientX);
+            });
+
+            container.addEventListener("touchstart", function(e) {
+                if (e.touches && e.touches.length > 0) {
+                    updateZIndex(e.touches[0].clientX);
+                }
+            }, { passive: true });
+
+            container.addEventListener("touchmove", function(e) {
+                if (e.touches && e.touches.length > 0) {
+                    updateZIndex(e.touches[0].clientX);
+                }
+            }, { passive: true });
+        }
+
+        // 💸 듀얼 슬라이더 상호 교차 제한 가드 및 트랙 갱신 처리
+        function onBudgetSliderInput(changedId) {
+            const minSlider = document.getElementById("budget-min-slider");
+            const maxSlider = document.getElementById("budget-max-slider");
+            if (!minSlider || !maxSlider) return;
+            
+            let minVal = parseInt(minSlider.value);
+            let maxVal = parseInt(maxSlider.value);
+            
+            if (minVal > maxVal) {
+                if (changedId === 'min') {
+                    minSlider.value = maxVal;
+                    minVal = maxVal;
+                } else {
+                    maxSlider.value = minVal;
+                    maxVal = minVal;
+                }
+            }
+
+            // 슬라이더 조작 시 활성화된 핸들이 위에 오도록 z-index를 보정합니다.
+            if (changedId === 'min') {
+                minSlider.style.zIndex = "35";
+                maxSlider.style.zIndex = "25";
+            } else {
+                minSlider.style.zIndex = "25";
+                maxSlider.style.zIndex = "35";
+            }
+            
+            updateBudgetLabel(minVal, maxVal);
+            updateBudgetSliderTrack(minVal, maxVal);
+        }
+
+        // 💸 듀얼 슬라이더 활성 구간 하이라이트 트랙 갱신
+        function updateBudgetSliderTrack(minVal, maxVal) {
+            const minSlider = document.getElementById("budget-min-slider");
+            if (!minSlider) return;
+            const minLimit = parseInt(minSlider.min) || 10000000;
+            const maxLimit = parseInt(minSlider.max) || 2000000000;
+            const range = maxLimit - minLimit;
+            
+            const leftPercent = ((minVal - minLimit) / range) * 100;
+            const rightPercent = 100 - (((maxVal - minLimit) / range) * 100);
+            
+            const track = document.getElementById("slider-track");
+            if (track) {
+                track.style.left = leftPercent + "%";
+                track.style.right = rightPercent + "%";
+            }
         }
 
         // [신규 기능 1] 다이내믹 시군구 소분류 체크박스 업데이트 (DOM 쓰기 최적화 완료)
@@ -2713,7 +2875,8 @@
             const selectedSidos = Array.from(sidoCheckBoxes).map(cb => cb.value);
 
             const dateLimit = parseInt(document.getElementById("date-filter").value);
-            const budgetLimit = parseInt(document.getElementById("budget-slider").value);
+            const budgetMinLimit = parseInt(document.getElementById("budget-min-slider").value);
+            const budgetMaxLimit = parseInt(document.getElementById("budget-max-slider").value);
             const hidePast = document.getElementById("hide-past-toggle").checked;
             
             const gradeFilterEl = document.querySelector('input[name="grade-filter"]:checked');
@@ -2742,7 +2905,8 @@
                     (item.notes_content && item.notes_content.toLowerCase().includes(searchQuery)) ||
                     (item.ptype && item.ptype.toLowerCase().includes(searchQuery));
                 
-                const matchesBudget = budgetLimit >= 2000000000 || item.minimum_bid <= budgetLimit;
+                const priceVal = item.minimum_bid || item.appraised_value || 0;
+                const matchesBudget = priceVal >= budgetMinLimit && (budgetMaxLimit >= 2000000000 || priceVal <= budgetMaxLimit);
                 
                 const matchesSource = selectedSources.length === 0 || 
                     selectedSources.includes(item.source) ||
@@ -2966,7 +3130,12 @@
             document.querySelectorAll('input[name="ptype-check"]').forEach(cb => cb.checked = true);
             document.querySelectorAll('input[name="sido-check"]').forEach(cb => cb.checked = false);
             document.getElementById("date-filter").value = "180";
-            document.getElementById("budget-slider").value = "2000000000";
+            
+            const minSlider = document.getElementById("budget-min-slider");
+            const maxSlider = document.getElementById("budget-max-slider");
+            if (minSlider) minSlider.value = "10000000";
+            if (maxSlider) maxSlider.value = "2000000000";
+            
             document.getElementById("hide-past-toggle").checked = true;
             document.getElementById("show-favorites-toggle").checked = false;
             showFavoritesOnly = false;
@@ -2978,7 +3147,8 @@
             document.getElementById("upload-status").classList.add("hidden");
             
             updateSigunguFilter(false);
-            updateBudgetLabel(2000000000);
+            updateBudgetSliderTrack(10000000, 2000000000);
+            updateBudgetLabel(10000000, 2000000000);
             applyFilters();
         }
 
@@ -5481,58 +5651,203 @@
 
             // ⚖️ 법정 서류 요약 테이블 및 상시 노출형 카드 데이터 동적 바인딩
             const dRemaining = calculateRemainingDays(item.bidding_date);
-            document.getElementById("table-doc-appraisal-summary").innerText = `감정가: ${formatKRW(item.appraised_value)} (대지권 포함)`;
-            document.getElementById("table-doc-survey-summary").innerText = `점유 실태: ${extra.daehangStatus}`;
-            document.getElementById("table-doc-spec-summary").innerText = `권리 소멸: ${extra.malsoStatus}`;
-            document.getElementById("table-doc-history-summary").innerText = `진행상태: ${dRemaining >= 0 ? 'D-' + dRemaining : '종결'} (${item.bidding_date || '미상'})`;
+            const isVehicle = item.non_building_meta && item.non_building_meta.asset_type === 'vehicle';
+            
+            if (isNonBuilding) {
+                if (isVehicle) {
+                    document.getElementById("table-doc-appraisal-summary").innerText = `차량 감정가: ${formatKRW(item.appraised_value)} (${item.non_building_meta.model_name || '차량'})`;
+                    document.getElementById("table-doc-survey-summary").innerText = `성능 점검: ${item.non_building_meta.mileage || '주행거리 미상'}`;
+                    document.getElementById("table-doc-spec-summary").innerText = `등록원부: ${item.non_building_meta.vehicle_no || '번호 미상'}`;
+                } else {
+                    document.getElementById("table-doc-appraisal-summary").innerText = `감정가: ${formatKRW(item.appraised_value)} (기타물품)`;
+                    document.getElementById("table-doc-survey-summary").innerText = `보관 상태: ${item.non_building_meta.storage_location || '보관지 미상'}`;
+                    document.getElementById("table-doc-spec-summary").innerText = `수량/규격: ${item.non_building_meta.quantity || item.non_building_meta.specification || '규격 미상'}`;
+                }
+                document.getElementById("table-doc-history-summary").innerText = `진행상태: ${dRemaining >= 0 ? 'D-' + dRemaining : '종결'} (${item.bidding_date || '미상'})`;
+            } else {
+                document.getElementById("table-doc-appraisal-summary").innerText = `감정가: ${formatKRW(item.appraised_value)} (대지권 포함)`;
+                document.getElementById("table-doc-survey-summary").innerText = `점유 실태: ${extra.daehangStatus}`;
+                document.getElementById("table-doc-spec-summary").innerText = `권리 소멸: ${extra.malsoStatus}`;
+                document.getElementById("table-doc-history-summary").innerText = `진행상태: ${dRemaining >= 0 ? 'D-' + dRemaining : '종결'} (${item.bidding_date || '미상'})`;
+            }
 
             // 1) 감정평가서 상세 카드 바인딩
-            document.getElementById("card-appraisal-total").innerText = formatKRW(item.appraised_value);
-            document.getElementById("card-appraisal-land").innerText = formatKRW(Math.floor(item.appraised_value * 0.4));
-            document.getElementById("card-appraisal-building").innerText = formatKRW(Math.floor(item.appraised_value * 0.6));
-            document.getElementById("card-appraisal-date").innerText = item.bidding_date || '2026-05-11';
-            document.getElementById("card-appraisal-opinion").innerHTML = `
-                <i class="fa-solid fa-lightbulb text-emeraldSuccess mr-1"></i>
-                <strong>[집행 법원 분석 의견]</strong> 인근 동종 아파트 및 유사 실거래 사례 분석에 기반하여 감정평가 가격 수준은 합리적으로 책정되었으며, 현재 부동산 거래 시세 변동율을 감안한 가격 보정치가 반영되어 안전한 투자 가격대로 분석됩니다.
-            `;
+            if (isNonBuilding) {
+                if (isVehicle) {
+                    document.querySelector("#table-doc-appraisal-summary").parentElement.firstElementChild.innerText = "🚗 차량 감정평가서";
+                    document.querySelector("#table-doc-appraisal-summary").innerText = "차량 가액 평가 보고서";
+                    document.getElementById("card-appraisal-total").innerText = formatKRW(item.appraised_value);
+                    document.getElementById("card-appraisal-land").previousElementSibling.innerText = "차량 모델명";
+                    document.getElementById("card-appraisal-land").innerText = item.non_building_meta.model_name || '-';
+                    document.getElementById("card-appraisal-building").previousElementSibling.innerText = "연식 정보";
+                    document.getElementById("card-appraisal-building").innerText = item.non_building_meta.model_year || '-';
+                    document.getElementById("card-appraisal-date").previousElementSibling.innerText = "주행 거리";
+                    document.getElementById("card-appraisal-date").innerText = item.non_building_meta.mileage || '-';
+                    document.getElementById("card-appraisal-opinion").innerHTML = `
+                        <i class="fa-solid fa-lightbulb text-emeraldSuccess mr-1"></i>
+                        <strong>[집행 법원 분석 의견]</strong> 차량의 내/외관 보존 상태, 연식 대비 주행거리 비율 및 사고/정비 이력을 감안하여 합리적인 감정가가 책정되었습니다.
+                    `;
+                } else {
+                    document.querySelector("#table-doc-appraisal-summary").parentElement.firstElementChild.innerText = "📋 물품 감정평가서";
+                    document.querySelector("#table-doc-appraisal-summary").innerText = "동산/물품 평가 보고서";
+                    document.getElementById("card-appraisal-total").innerText = formatKRW(item.appraised_value);
+                    document.getElementById("card-appraisal-land").previousElementSibling.innerText = "물품 규격";
+                    document.getElementById("card-appraisal-land").innerText = item.non_building_meta.specification || '-';
+                    document.getElementById("card-appraisal-building").previousElementSibling.innerText = "제조사/브랜드";
+                    document.getElementById("card-appraisal-building").innerText = item.non_building_meta.manufacturer || '-';
+                    document.getElementById("card-appraisal-date").previousElementSibling.innerText = "수량 정보";
+                    document.getElementById("card-appraisal-date").innerText = item.non_building_meta.quantity || '-';
+                    document.getElementById("card-appraisal-opinion").innerHTML = `
+                        <i class="fa-solid fa-lightbulb text-emeraldSuccess mr-1"></i>
+                        <strong>[집행 법원 분석 의견]</strong> 물품의 상태, 수량 및 유통 가치를 감안하여 합리적인 감정가가 책정되었습니다.
+                    `;
+                }
+            } else {
+                document.querySelector("#table-doc-appraisal-summary").parentElement.firstElementChild.innerText = "📋 감정평가서";
+                document.querySelector("#table-doc-appraisal-summary").innerText = "공식 자산 감정 보고서";
+                document.getElementById("card-appraisal-total").innerText = formatKRW(item.appraised_value);
+                document.getElementById("card-appraisal-land").previousElementSibling.innerText = "토지 평가 금액";
+                document.getElementById("card-appraisal-land").innerText = formatKRW(Math.floor(item.appraised_value * 0.4));
+                document.getElementById("card-appraisal-building").previousElementSibling.innerText = "건물 평가 금액";
+                document.getElementById("card-appraisal-building").innerText = formatKRW(Math.floor(item.appraised_value * 0.6));
+                document.getElementById("card-appraisal-date").previousElementSibling.innerText = "가격 조사 기일";
+                document.getElementById("card-appraisal-date").innerText = item.bidding_date || '2026-05-11';
+                document.getElementById("card-appraisal-opinion").innerHTML = `
+                    <i class="fa-solid fa-lightbulb text-emeraldSuccess mr-1"></i>
+                    <strong>[집행 법원 분석 의견]</strong> 인근 동종 아파트 및 유사 실거래 사례 분석에 기반하여 감정평가 가격 수준은 합리적으로 책정되었으며, 현재 부동산 거래 시세 변동율을 감안한 가격 보정치가 반영되어 안전한 투자 가격대로 분석됩니다.
+                `;
+            }
 
             // 2) 현황조사서 상세 카드 바인딩
-            const hasTenant = !extra.daehangStatus.includes("대항력 없음");
-            document.getElementById("card-survey-occupy").innerText = hasTenant ? "임차인 점유 중" : "임차인 없음 (소유자 점유)";
-            document.getElementById("card-survey-name").innerText = hasTenant ? "강ㅇㅇ (임차인)" : "소유자 세대";
-            document.getElementById("card-survey-date").innerText = hasTenant ? "2023-04-15 (대항력 있음)" : "해당사항 없음";
-            document.getElementById("card-survey-note").innerText = hasTenant ? "현장 방문 시 폐문 부재로 안내문을 부착함" : "주민등록 전입자 조사 시 소유자 세대 외 다른 세대 없음";
-            
-            let surveyOpinion = "";
-            if (extra.daehangStatus.includes("주의")) {
-                surveyOpinion = `<i class="fa-solid fa-circle-exclamation text-rose-500 mr-1"></i> <strong>[점유 리스크 진단]</strong> 선순위 전입 임차인이 존재하므로 미배당 보증금이 발생할 경우 낙찰자가 인수할 위험이 매우 높으니 각별한 주의가 필요합니다.`;
-            } else if (extra.daehangStatus.includes("미상")) {
-                surveyOpinion = `<i class="fa-solid fa-circle-question text-amber-500 mr-1"></i> <strong>[점유 리스크 진단]</strong> 임차 관계가 명확하지 않으므로 현장 조사 및 주민등록 전입세대 열람을 통한 사전 진단이 필요합니다.`;
+            if (isNonBuilding) {
+                if (isVehicle) {
+                    document.querySelector("#table-doc-survey-summary").parentElement.firstElementChild.innerText = "🔍 성능/사고점검서";
+                    document.querySelector("#table-doc-survey-summary").innerText = "차량 성능 및 사고 점검 기록";
+                    document.getElementById("card-survey-occupy").previousElementSibling.innerText = "원동기 형식";
+                    document.getElementById("card-survey-occupy").innerText = item.non_building_meta.engine_type || '-';
+                    document.getElementById("card-survey-name").previousElementSibling.innerText = "연료 구분";
+                    document.getElementById("card-survey-name").innerText = item.non_building_meta.fuel || '미상';
+                    document.getElementById("card-survey-date").previousElementSibling.innerText = "차대 번호";
+                    document.getElementById("card-survey-date").innerText = item.non_building_meta.vin || '-';
+                    document.getElementById("card-survey-note").previousElementSibling.innerText = "보관 장소";
+                    document.getElementById("card-survey-note").innerText = item.non_building_meta.storage_location || '-';
+                    document.getElementById("card-survey-opinion").innerHTML = `
+                        <i class="fa-solid fa-circle-check text-emeraldSuccess mr-1"></i>
+                        <strong>[차량 상태 진단]</strong> 시운전 및 조향 장치, 주요 전기 구동계통 이상 여부를 정밀 분석하였으며 현재 지정 보관소에서 정상 인도 대기 상태로 진단되었습니다.
+                    `;
+                } else {
+                    document.querySelector("#table-doc-survey-summary").parentElement.firstElementChild.innerText = "🔍 보관명세서";
+                    document.querySelector("#table-doc-survey-summary").innerText = "동산 보관 상태 및 보관처 명세";
+                    document.getElementById("card-survey-occupy").previousElementSibling.innerText = "보관 장소";
+                    document.getElementById("card-survey-occupy").innerText = item.non_building_meta.storage_location || '-';
+                    document.getElementById("card-survey-name").previousElementSibling.innerText = "인수 책임";
+                    document.getElementById("card-survey-name").innerText = "낙찰자 인수 없음";
+                    document.getElementById("card-survey-date").previousElementSibling.innerText = "점검 일자";
+                    document.getElementById("card-survey-date").innerText = item.bidding_date || '2026-05-11';
+                    document.getElementById("card-survey-note").previousElementSibling.innerText = "기타 보관고";
+                    document.getElementById("card-survey-note").innerText = item.non_building_meta.storage_location ? "지정 보관소 실물 확인됨" : "-";
+                    document.getElementById("card-survey-opinion").innerHTML = `
+                        <i class="fa-solid fa-circle-check text-emeraldSuccess mr-1"></i>
+                        <strong>[물품 리스크 진단]</strong> 지정 보관고 실물 대조 완료하였으며 도난, 유실 리스크가 없는 상태로 낙찰 즉시 인도가 가능합니다.
+                    `;
+                }
             } else {
-                surveyOpinion = `<i class="fa-solid fa-circle-check text-emeraldSuccess mr-1"></i> <strong>[점유 리스크 진단]</strong> 신고된 임차 내역이 없으며 소유주가 직접 점유 중인 물건으로 낙찰 시 인수할 명도 및 임차 리스크가 없는 안전한 물건입니다.`;
+                const hasTenant = !extra.daehangStatus.includes("대항력 없음");
+                document.querySelector("#table-doc-survey-summary").parentElement.firstElementChild.innerText = "🔍 현황조사서";
+                document.querySelector("#table-doc-survey-summary").innerText = "부동산 점유 실태 기록";
+                document.getElementById("card-survey-occupy").previousElementSibling.innerText = "부동산 점유 현황";
+                document.getElementById("card-survey-occupy").innerText = hasTenant ? "임차인 점유 중" : "임차인 없음 (소유자 점유)";
+                document.getElementById("card-survey-name").previousElementSibling.innerText = "점유자 성명";
+                document.getElementById("card-survey-name").innerText = hasTenant ? "강ㅇㅇ (임차인)" : "소유자 세대";
+                document.getElementById("card-survey-date").previousElementSibling.innerText = "전입 신고 일자";
+                document.getElementById("card-survey-date").innerText = hasTenant ? "2023-04-15 (대항력 있음)" : "해당사항 없음";
+                document.getElementById("card-survey-note").previousElementSibling.innerText = "기타 안내사항";
+                document.getElementById("card-survey-note").innerText = hasTenant ? "현장 방문 시 폐문 부재로 안내문을 부착함" : "주민등록 전입자 조사 시 소유자 세대 외 다른 세대 없음";
+                
+                let surveyOpinion = "";
+                if (extra.daehangStatus.includes("주의")) {
+                    surveyOpinion = `<i class="fa-solid fa-circle-exclamation text-rose-500 mr-1"></i> <strong>[점유 리스크 진단]</strong> 선순위 전입 임차인이 존재하므로 미배당 보증금이 발생할 경우 낙찰자가 인수할 위험이 매우 높으니 각별한 주의가 필요합니다.`;
+                } else if (extra.daehangStatus.includes("미상")) {
+                    surveyOpinion = `<i class="fa-solid fa-circle-question text-amber-500 mr-1"></i> <strong>[점유 리스크 진단]</strong> 임차 관계가 명확하지 않으므로 현장 조사 및 주민등록 전입세대 열람을 통한 사전 진단이 필요합니다.`;
+                } else {
+                    surveyOpinion = `<i class="fa-solid fa-circle-check text-emeraldSuccess mr-1"></i> <strong>[점유 리스크 진단]</strong> 신고된 임차 내역이 없으며 소유주가 직접 점유 중인 물건으로 낙찰 시 인수할 명도 및 임차 리스크가 없는 안전한 물건입니다.`;
+                }
+                document.getElementById("card-survey-opinion").innerHTML = surveyOpinion;
             }
-            document.getElementById("card-survey-opinion").innerHTML = surveyOpinion;
 
             // 3) 매각물건명세서 상세 카드 바인딩
-            document.getElementById("card-spec-malso").innerText = "2023-05-10 (말소기준권리)";
-            document.getElementById("card-spec-daehang").innerText = extra.daehangStatus;
-            document.getElementById("card-spec-daehang").className = extra.daehangStatus.includes("주의") ? "text-rose-600 font-black" : "text-emeraldSuccess font-black";
-            document.getElementById("card-spec-baedang").innerText = hasTenant ? "배당요구 신청 완료 (2026-03-10)" : "해당사항 없음";
-            document.getElementById("card-spec-special").innerText = "검출된 특수 매각 조건 및 법정 권리 없음";
-            document.getElementById("card-spec-opinion").innerHTML = `
-                <i class="fa-solid fa-circle-info text-royalBlue mr-1"></i>
-                <strong>[사법보좌관 최종 의견]</strong> 매각물건명세서상 인수할 수 있는 특수 권리(유치권, 법정지상권)는 없으며, 말소기준권리를 기점으로 후순위 제한 물권들은 낙찰 후 전량 소멸됩니다.
-            `;
+            if (isNonBuilding) {
+                if (isVehicle) {
+                    document.querySelector("#table-doc-spec-summary").parentElement.firstElementChild.innerText = "📝 자동차등록원부";
+                    document.querySelector("#table-doc-spec-summary").innerText = "공식 등록원부 및 근저당 분석 명세";
+                    document.getElementById("card-spec-malso").previousElementSibling.innerText = "차량 등록 번호";
+                    document.getElementById("card-spec-malso").innerText = item.non_building_meta.vehicle_no || '-';
+                    document.getElementById("card-spec-daehang").previousElementSibling.innerText = "제원 관리 번호";
+                    document.getElementById("card-spec-daehang").innerText = item.non_building_meta.spec_no || '-';
+                    document.getElementById("card-spec-daehang").className = "text-slate-800 font-extrabold";
+                    document.getElementById("card-spec-baedang").previousElementSibling.innerText = "사용 본거지";
+                    document.getElementById("card-spec-baedang").innerText = item.non_building_meta.base_location || '-';
+                    document.getElementById("card-spec-special").previousElementSibling.innerText = "원부 인수 제한";
+                    document.getElementById("card-spec-special").innerText = "압류/근저당 낙찰 후 말소 전량 소멸";
+                    document.getElementById("card-spec-opinion").innerHTML = `
+                        <i class="fa-solid fa-circle-info text-royalBlue mr-1"></i>
+                        <strong>[등록원부 최종 권리 진단]</strong> 차량등록원부(갑구/을구)상 체납 과태료 및 근저당 채무 제한은 낙찰 후 매각을 거쳐 말소 및 전량 소멸되어 안전합니다.
+                    `;
+                } else {
+                    document.querySelector("#table-doc-spec-summary").parentElement.firstElementChild.innerText = "📝 인수/인도명세서";
+                    document.querySelector("#table-doc-spec-summary").innerText = "동산 인도조건 및 인수 사항 명세";
+                    document.getElementById("card-spec-malso").previousElementSibling.innerText = "인수 조건";
+                    document.getElementById("card-spec-malso").innerText = "인도명령 대상 (인수 제한 없음)";
+                    document.getElementById("card-spec-daehang").previousElementSibling.innerText = "특이 사법 조건";
+                    document.getElementById("card-spec-daehang").innerText = "해당 없음";
+                    document.getElementById("card-spec-daehang").className = "text-slate-800 font-extrabold";
+                    document.getElementById("card-spec-baedang").previousElementSibling.innerText = "배송/인수 방식";
+                    document.getElementById("card-spec-baedang").innerText = "보관소 현장 직접 인수";
+                    document.getElementById("card-spec-special").previousElementSibling.innerText = "법적 소유 이전";
+                    document.getElementById("card-spec-special").innerText = "사법보좌관 매각결정문 즉시 등기 이전";
+                    document.getElementById("card-spec-opinion").innerHTML = `
+                        <i class="fa-solid fa-circle-info text-royalBlue mr-1"></i>
+                        <strong>[사법보좌관 최종 의견]</strong> 물품명세서상 인수할 수 있는 특수 법적 권리 및 채무는 없으며, 매각을 기점으로 전량 소멸 처리되어 깨끗하게 인수됩니다.
+                    `;
+                }
+            } else {
+                document.querySelector("#table-doc-spec-summary").parentElement.firstElementChild.innerText = "📝 물건명세서";
+                document.querySelector("#table-doc-spec-summary").innerText = "법원 공인 권리 분석서";
+                document.getElementById("card-spec-malso").previousElementSibling.innerText = "최초 설정 근저당";
+                document.getElementById("card-spec-malso").innerText = "2023-05-10 (말소기준권리)";
+                document.getElementById("card-spec-daehang").previousElementSibling.innerText = "임차인 대항력 여부";
+                document.getElementById("card-spec-daehang").innerText = extra.daehangStatus;
+                document.getElementById("card-spec-daehang").className = extra.daehangStatus.includes("주의") ? "text-rose-600 font-black" : "text-emeraldSuccess font-black";
+                document.getElementById("card-spec-baedang").previousElementSibling.innerText = "배당요구 신청 여부";
+                document.getElementById("card-spec-baedang").innerText = hasTenant ? "배당요구 신청 완료 (2026-03-10)" : "해당사항 없음";
+                document.getElementById("card-spec-special").previousElementSibling.innerText = "특별 매각 조건";
+                document.getElementById("card-spec-special").innerText = "검출된 특수 매각 조건 및 법정 권리 없음";
+                document.getElementById("card-spec-opinion").innerHTML = `
+                    <i class="fa-solid fa-circle-info text-royalBlue mr-1"></i>
+                    <strong>[사법보좌관 최종 의견]</strong> 매각물건명세서상 인수할 수 있는 특수 권리(유치권, 법정지상권)는 없으며, 말소기준권리를 기점으로 후순위 제한 물권들은 낙찰 후 전량 소멸됩니다.
+                `;
+            }
 
             // 4) 사건내역 상세 카드 바인딩
-            document.getElementById("card-history-start").innerText = "2025-11-20 (임의경매개시결정)";
-            document.getElementById("card-history-end").innerText = "2026-03-10";
-            document.getElementById("card-history-status").innerText = dRemaining >= 0 ? "매각 기일 대기 중" : "종결";
-            document.getElementById("card-history-ratio").innerText = `감정가 대비 ${item.minimum_bid === item.appraised_value ? '100%' : '70%'}`;
-            document.getElementById("card-history-opinion").innerHTML = `
-                <i class="fa-solid fa-clock text-slate-700 mr-1"></i>
-                <strong>[기일 관리 의견]</strong> 현재 연기나 정지 이력 없이 정상적으로 사법 절차가 집행되고 있으며 사건 진행 상태는 신건 매각 기일 대기 단계입니다.
-            `;
+            if (isNonBuilding) {
+                document.getElementById("card-history-start").innerText = "2025-11-20 (임의집행 결정)";
+                document.getElementById("card-history-end").innerText = "2026-03-10";
+                document.getElementById("card-history-status").innerText = dRemaining >= 0 ? "매각 기일 대기 중" : "종결";
+                document.getElementById("card-history-ratio").innerText = `감정가 대비 ${item.minimum_bid === item.appraised_value ? '100%' : '70%'}`;
+                document.getElementById("card-history-opinion").innerHTML = `
+                    <i class="fa-solid fa-clock text-slate-700 mr-1"></i>
+                    <strong>[기일 관리 의견]</strong> 현재 연기나 정지 이력 없이 정상적으로 사법 절차가 집행되고 있으며 사건 진행 상태는 신건 매각 기일 대기 단계입니다.
+                `;
+            } else {
+                document.getElementById("card-history-start").innerText = "2025-11-20 (임의경매개시결정)";
+                document.getElementById("card-history-end").innerText = "2026-03-10";
+                document.getElementById("card-history-status").innerText = dRemaining >= 0 ? "매각 기일 대기 중" : "종결";
+                document.getElementById("card-history-ratio").innerText = `감정가 대비 ${item.minimum_bid === item.appraised_value ? '100%' : '70%'}`;
+                document.getElementById("card-history-opinion").innerHTML = `
+                    <i class="fa-solid fa-clock text-slate-700 mr-1"></i>
+                    <strong>[기일 관리 의견]</strong> 현재 연기나 정지 이력 없이 정상적으로 사법 절차가 집행되고 있으며 사건 진행 상태는 신건 매각 기일 대기 단계입니다.
+                `;
+            }
 
             // 법정 주요 서류 바로가기 시 팝업을 띄우지 않고 원본 법원 페이지로 바로 이동하도록 수정
             const officialUrl = item.link_url || "https://www.courtauction.go.kr";
@@ -7411,12 +7726,14 @@
                 }
             }
 
-            // 📍 4. 위치 & 시세 분석 탭 선택 시 하위 패널들(지도 및 시세)의 hidden 클래스를 강제로 해제하여 화이트아웃 현상을 복구합니다. (부동산 한정)
-            if (!isNonBuilding && tabNum === 4) {
+            // 📍 3. 입지 & 시세 분석 탭 선택 시 하위 패널들(지도, 시세, 매각 통계)의 hidden 클래스를 강제로 해제하여 화이트아웃 현상을 복구합니다. (부동산 한정)
+            if (!isNonBuilding && tabNum === 3) {
                 const mapPanel = document.getElementById("detail-panel-map");
                 const marketPanel = document.getElementById("detail-panel-market");
+                const statsPanel = document.getElementById("detail-panel-statistics");
                 if (mapPanel) mapPanel.classList.remove("hidden");
                 if (marketPanel) marketPanel.classList.remove("hidden");
+                if (statsPanel) statsPanel.classList.remove("hidden");
             }
 
             const mask2 = document.getElementById("group-mask-2");

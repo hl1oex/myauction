@@ -436,12 +436,12 @@ export const FeedScreen: React.FC<FeedScreenProps> = ({ onSelectProperty, filter
     }
 
     // 3. 예산 한도 필터링
-    if (filters.budgetLimit < 2000000000) {
-      result = result.filter((item) => {
-        const price = item.minimum_bid || item.appraised_value || 0;
-        return price <= filters.budgetLimit;
-      });
-    }
+    result = result.filter((item) => {
+      const price = item.minimum_bid || item.appraised_value || 0;
+      const matchesMin = price >= filters.budgetMinLimit;
+      const matchesMax = filters.budgetMaxLimit >= 2000000000 || price <= filters.budgetMaxLimit;
+      return matchesMin && matchesMax;
+    });
 
     // 4. 기일 한도 필터 D-Day 필터링
     if (filters.dateLimit !== 999) {
@@ -537,7 +537,8 @@ export const FeedScreen: React.FC<FeedScreenProps> = ({ onSelectProperty, filter
       sido: [],
       sigungu: 'all',
       dateLimit: 999,
-      budgetLimit: 2000000000,
+      budgetMinLimit: 10000000,
+      budgetMaxLimit: 2000000000,
       hidePast: true,
       gradeFilter: 'all',
       investmentType: 'all',
@@ -561,13 +562,21 @@ export const FeedScreen: React.FC<FeedScreenProps> = ({ onSelectProperty, filter
   }, [filteredProperties]);
 
   // 예산 한도를 한글 단위 포맷으로 출력하는 헬퍼 함수입니다.
-  const getBudgetText = (limit: number) => {
-    if (limit >= 2000000000) return '제한 없음';
-    if (limit >= 100000000) {
-      const eok = limit / 100000000;
-      return `${eok}억 원 이하`;
-    }
-    return `${limit / 10000}만 원 이하`;
+  const getBudgetText = (min: number, max: number) => {
+    if (min <= 10000000 && max >= 2000000000) return '제한 없음';
+    
+    const formatValue = (val: number) => {
+      if (val >= 100000000) {
+        const eok = val / 100000000;
+        return `${eok}억`;
+      }
+      return `${val / 10000}만`;
+    };
+
+    const minStr = min <= 10000000 ? '1천만' : formatValue(min);
+    const maxStr = max >= 2000000000 ? '제한없음' : formatValue(max);
+    
+    return `${minStr} ~ ${maxStr}`;
   };
 
   // KPI 분석 통계치 계산입니다.
@@ -879,25 +888,80 @@ export const FeedScreen: React.FC<FeedScreenProps> = ({ onSelectProperty, filter
                 {/* 5. 가용 예산 */}
                 {activeFilterTab === 'budget' && (
                   <View style={styles.tabContent}>
-                    <Text style={styles.subFilterTitle}>💰 내 가용 예산 한도 설정 ({getBudgetText(filters.budgetLimit)})</Text>
-                    <View style={styles.checkboxList}>
+                    <Text style={styles.subFilterTitle}>💰 내 가용 예산 범위 설정</Text>
+                    <Text style={{ fontSize: 13, color: COLORS.royalBlue, fontWeight: 'bold', marginBottom: 12 }}>
+                      선택 범위: {getBudgetText(filters.budgetMinLimit, filters.budgetMaxLimit)}
+                    </Text>
+                    
+                    <Text style={{ fontWeight: 'bold', fontSize: 12, color: COLORS.slate600, marginTop: 4, marginBottom: 8 }}>📉 최소 예산 (이상)</Text>
+                    <View style={[styles.checkboxGrid, { marginBottom: 16 }]}>
                       {[
-                        { value: 50000000, label: '5천만 원 이하' },
-                        { value: 100000000, label: '1억 원 이하' },
-                        { value: 300000000, label: '3억 원 이하' },
-                        { value: 500000000, label: '5억 원 이하' },
-                        { value: 1000000000, label: '10억 원 이하' },
-                        { value: 2000000000, label: '금액 제한 없음' },
+                        { value: 10000000, label: '1천만 이상' },
+                        { value: 50000000, label: '5천만 이상' },
+                        { value: 100000000, label: '1억 이상' },
+                        { value: 300000000, label: '3억 이상' },
+                        { value: 500000000, label: '5억 이상' },
+                        { value: 1000000000, label: '10억 이상' },
                       ].map((item) => {
-                        const isSelected = filters.budgetLimit === item.value;
+                        const isSelected = filters.budgetMinLimit === item.value;
                         return (
                           <TouchableOpacity
-                            key={item.value}
-                            style={styles.checkboxItem}
-                            onPress={() => setFilters((prev) => ({ ...prev, budgetLimit: item.value }))}
+                            key={`min-${item.value}`}
+                            style={[
+                              styles.checkboxItem, 
+                              { 
+                                borderWidth: 1, 
+                                borderColor: isSelected ? COLORS.royalBlue : COLORS.slate200, 
+                                borderRadius: 8, 
+                                paddingHorizontal: 10, 
+                                paddingVertical: 6, 
+                                backgroundColor: isSelected ? '#eff6ff' : COLORS.white 
+                              }
+                            ]}
+                            onPress={() => setFilters((prev) => {
+                              const nextMin = item.value;
+                              const nextMax = prev.budgetMaxLimit < nextMin ? nextMin : prev.budgetMaxLimit;
+                              return { ...prev, budgetMinLimit: nextMin, budgetMaxLimit: nextMax };
+                            })}
                           >
-                            <Text style={[styles.checkboxIcon, isSelected && styles.checkboxIconActive]}>{isSelected ? '\u2611' : '\u2610'}</Text>
-                            <Text style={styles.checkboxLabel}>{item.label}</Text>
+                            <Text style={[styles.checkboxLabel, isSelected && { color: COLORS.royalBlue, fontWeight: 'bold' }]}>{item.label}</Text>
+                          </TouchableOpacity>
+                        );
+                      })}
+                    </View>
+
+                    <Text style={{ fontWeight: 'bold', fontSize: 12, color: COLORS.slate600, marginTop: 4, marginBottom: 8 }}>📈 최대 예산 (이하)</Text>
+                    <View style={styles.checkboxGrid}>
+                      {[
+                        { value: 50000000, label: '5천만 이하' },
+                        { value: 100000000, label: '1억 이하' },
+                        { value: 300000000, label: '3억 이하' },
+                        { value: 500000000, label: '5억 이하' },
+                        { value: 1000000000, label: '10억 이하' },
+                        { value: 2000000000, label: '금액 제한 없음' },
+                      ].map((item) => {
+                        const isSelected = filters.budgetMaxLimit === item.value;
+                        return (
+                          <TouchableOpacity
+                            key={`max-${item.value}`}
+                            style={[
+                              styles.checkboxItem, 
+                              { 
+                                borderWidth: 1, 
+                                borderColor: isSelected ? COLORS.royalBlue : COLORS.slate200, 
+                                borderRadius: 8, 
+                                paddingHorizontal: 10, 
+                                paddingVertical: 6, 
+                                backgroundColor: isSelected ? '#eff6ff' : COLORS.white 
+                              }
+                            ]}
+                            onPress={() => setFilters((prev) => {
+                              const nextMax = item.value;
+                              const nextMin = prev.budgetMinLimit > nextMax ? nextMax : prev.budgetMinLimit;
+                              return { ...prev, budgetMinLimit: nextMin, budgetMaxLimit: nextMax };
+                            })}
+                          >
+                            <Text style={[styles.checkboxLabel, isSelected && { color: COLORS.royalBlue, fontWeight: 'bold' }]}>{item.label}</Text>
                           </TouchableOpacity>
                         );
                       })}
