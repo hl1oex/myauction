@@ -2109,6 +2109,28 @@
             if (headerOnbid) headerOnbid.innerText = onbid.toLocaleString();
         }
 
+        // 로컬스토리지 저장 시 용량 한도 초과 방지를 위한 매물 데이터 경량화 함수입니다.
+        function minimizePropertyForCache(p) {
+            const minimized = { ...p };
+            if (minimized.desc_content && minimized.desc_content.length > 150) {
+                minimized.desc_content = minimized.desc_content.substring(0, 150) + "...";
+            }
+            if (minimized.notes_content) {
+                const metaIndex = minimized.notes_content.indexOf("__METADATA__");
+                if (metaIndex !== -1) {
+                    const textPart = minimized.notes_content.substring(0, metaIndex);
+                    const metaPart = minimized.notes_content.substring(metaIndex);
+                    const shortText = textPart.length > 200 ? textPart.substring(0, 200) + "..." : textPart;
+                    minimized.notes_content = shortText + "\n\n" + metaPart;
+                } else {
+                    if (minimized.notes_content.length > 200) {
+                        minimized.notes_content = minimized.notes_content.substring(0, 200) + "...";
+                    }
+                }
+            }
+            return minimized;
+        }
+
         // 1. [3중 방어막] 백엔드 데이터 비동기 연동 및 로딩 정지 방지 (전체 건수 모니터링 연동)
         async function fetchDataFromServer(forceLoad = false) {
             const sensor = document.getElementById("connection-sensor");
@@ -2178,15 +2200,23 @@
                             return { ...item, id: finalId, remaining_days: remDays };
                         });
 
-                        // 로컬스토리지에 최신 매물 목록 및 최신 타임스탬프 캐싱 (용량 한도 초과 예방을 위해 상위 3000건만 슬라이싱 저장)
+                        // 로컬스토리지에 최신 매물 목록 및 최신 타임스탬프 캐싱 (용량 한도 초과 예방을 위해 상위 10,000건 슬라이싱 및 경량화 저장)
                         try {
-                            const slicedForCache = originalProperties.slice(0, 3000);
+                            const slicedForCache = originalProperties.slice(0, 10000).map(minimizePropertyForCache);
                             localStorage.setItem('cached_properties', JSON.stringify(slicedForCache));
                             if (latestServerTimestamp) {
                                 localStorage.setItem('cached_properties_timestamp', latestServerTimestamp);
                             }
                         } catch (cacheErr) {
-                            console.warn('로컬 캐시 저장 실패', cacheErr);
+                            console.warn('로컬 캐시 1차 저장 실패 (1만 건) - 5천 건 축소 저장 시도합니다.', cacheErr);
+                            try {
+                                const slicedForCache = originalProperties.slice(0, 5000).map(minimizePropertyForCache);
+                                localStorage.setItem('cached_properties', JSON.stringify(slicedForCache));
+                            } catch (retryErr) {
+                                console.error('로컬 캐시 저장 최종 실패 - 캐시를 안전하게 삭제합니다.', retryErr);
+                                localStorage.removeItem('cached_properties');
+                                localStorage.removeItem('cached_properties_timestamp');
+                            }
                         }
 
                         // 헤더 통계 카운팅 동적 갱신

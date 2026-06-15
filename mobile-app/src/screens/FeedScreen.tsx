@@ -19,6 +19,27 @@ import { PropertyCard } from '../components/PropertyCard';
 import { subscribeProperties, fetchProperties, fetchSyncStatus } from '../utils/api';
 import { supabase } from '../utils/supabase';
 
+// 로컬스토리지 저장 시 용량 한도 초과 방지를 위한 매물 데이터 경량화 함수입니다.
+const minimizePropertyForCache = (p: Property): Property => {
+  const minimized = { ...p };
+  if (minimized.desc_content && minimized.desc_content.length > 150) {
+    minimized.desc_content = minimized.desc_content.substring(0, 150) + "...";
+  }
+  if (minimized.notes_content) {
+    const metaIndex = minimized.notes_content.indexOf("__METADATA__");
+    if (metaIndex !== -1) {
+      const textPart = minimized.notes_content.substring(0, metaIndex);
+      const metaPart = minimized.notes_content.substring(metaIndex);
+      const shortText = textPart.length > 200 ? textPart.substring(0, 200) + "..." : textPart;
+      minimized.notes_content = shortText + "\n\n" + metaPart;
+    } else {
+      if (minimized.notes_content.length > 200) {
+        minimized.notes_content = minimized.notes_content.substring(0, 200) + "...";
+      }
+    }
+  }
+  return minimized;
+};
 
 const estimateAuctionRounds = (appraisal: number, price: number, source: string) => {
   if (!appraisal || !price || appraisal <= 0 || price <= 0) {
@@ -158,6 +179,52 @@ export const FeedScreen: React.FC<FeedScreenProps> = ({ onSelectProperty, filter
   const [isOffline, setIsOffline] = useState<boolean>(false);
   const [adSettings, setAdSettings] = useState<any[]>([]);
   const [activeFilterTab, setActiveFilterTab] = useState<string>('court');
+
+  // 🏠 선택된 시도와 시군구에 해당하는 읍면동 목록을 파싱하여 정렬하는 함수
+  const getAvailableDongs = useCallback(() => {
+    if (!filters.sido || filters.sido.length !== 1 || filters.sigungu === 'all') return [];
+    const targetSido = filters.sido[0];
+    const targetSigungu = filters.sigungu;
+
+    const dongs = new Set<string>();
+    properties.forEach((item) => {
+      const addr = item.address || '';
+      
+      const sidoAliases = [targetSido];
+      if (targetSido === '서울') sidoAliases.push('서울특별시');
+      if (targetSido === '경기') sidoAliases.push('경기도');
+      if (targetSido === '제주') sidoAliases.push('제주특별자치도');
+      if (targetSido === '인천') sidoAliases.push('인천광역시');
+      if (targetSido === '부산') sidoAliases.push('부산광역시');
+
+      let sidoMatched = false;
+      sidoAliases.forEach(alias => {
+        if (addr.includes(alias)) sidoMatched = true;
+      });
+
+      if (sidoMatched && addr.includes(targetSigungu)) {
+        const parts = addr.split(/\s+/);
+        let sgIdx = -1;
+        for (let i = 0; i < parts.length; i++) {
+          if (parts[i].includes(targetSigungu)) {
+            sgIdx = i;
+            break;
+          }
+        }
+        if (sgIdx !== -1 && sgIdx + 1 < parts.length) {
+          const candidate = parts[sgIdx + 1];
+          if (/(동|읍|면|리|가)$/.test(candidate)) {
+            const cleanDong = candidate.replace(/[0-9]/g, '');
+            if (cleanDong && cleanDong.length > 1) {
+              dongs.add(cleanDong);
+            }
+          }
+        }
+      }
+    });
+
+    return Array.from(dongs).sort((a, b) => a.localeCompare(b, 'ko'));
+  }, [properties, filters.sido, filters.sigungu]);
   const [refreshing, setRefreshing] = useState<boolean>(false);
   const [updateNeeded, setUpdateNeeded] = useState<boolean>(false);
   const [expandedAccordion, setExpandedAccordion] = useState<Record<string, boolean>>({
@@ -201,10 +268,10 @@ export const FeedScreen: React.FC<FeedScreenProps> = ({ onSelectProperty, filter
       // 업데이트 완료 시 알림 해제
       setUpdateNeeded(false);
       
-      // 로컬 스토리지에 캐시와 타임스탬프 동시 저장 (용량 한도 초과 예방을 위해 상위 3000건만 슬라이싱 저장)
+      // 로컬 스토리지에 캐시와 타임스탬프 동시 저장 (용량 한도 초과 예방을 위해 상위 10,000건 슬라이싱 및 경량화 저장)
       try {
         if (typeof window !== 'undefined' && window.localStorage) {
-          const slicedForCache = data.slice(0, 3000);
+          const slicedForCache = data.slice(0, 10000).map(minimizePropertyForCache);
           localStorage.setItem('cached_properties', JSON.stringify(slicedForCache));
           
           const syncStatus = await fetchSyncStatus();
@@ -220,7 +287,19 @@ export const FeedScreen: React.FC<FeedScreenProps> = ({ onSelectProperty, filter
           }
         }
       } catch (cacheErr) {
-        console.warn('로컬 캐시 저장 실패', cacheErr);
+        console.warn('로컬 캐시 1차 저장 실패 (1만 건) - 5천 건 축소 저장 시도합니다.', cacheErr);
+        try {
+          if (typeof window !== 'undefined' && window.localStorage) {
+            const slicedForCache = data.slice(0, 5000).map(minimizePropertyForCache);
+            localStorage.setItem('cached_properties', JSON.stringify(slicedForCache));
+          }
+        } catch (retryErr) {
+          console.error('로컬 캐시 저장 최종 실패 - 캐시를 안전하게 삭제합니다.', retryErr);
+          if (typeof window !== 'undefined' && window.localStorage) {
+            localStorage.removeItem('cached_properties');
+            localStorage.removeItem('cached_properties_timestamp');
+          }
+        }
       }
     } catch (err) {
       console.warn('모바일 수동 새로고침 실패', err);
@@ -328,11 +407,22 @@ export const FeedScreen: React.FC<FeedScreenProps> = ({ onSelectProperty, filter
         setIsOffline(false);
         try {
           if (typeof window !== 'undefined' && window.localStorage) {
-            const slicedForCache = data.slice(0, 3000);
+            const slicedForCache = data.slice(0, 10000).map(minimizePropertyForCache);
             localStorage.setItem('cached_properties', JSON.stringify(slicedForCache));
           }
         } catch (cacheErr) {
-          console.warn('로컬 캐시 저장 실패', cacheErr);
+          console.warn('로컬 캐시 1차 저장 실패 (1만 건) - 5천 건 축소 저장 시도합니다.', cacheErr);
+          try {
+            if (typeof window !== 'undefined' && window.localStorage) {
+              const slicedForCache = data.slice(0, 5000).map(minimizePropertyForCache);
+              localStorage.setItem('cached_properties', JSON.stringify(slicedForCache));
+            }
+          } catch (retryErr) {
+            console.error('로컬 캐시 저장 최종 실패 - 캐시를 안전하게 삭제합니다.', retryErr);
+            if (typeof window !== 'undefined' && window.localStorage) {
+              localStorage.removeItem('cached_properties');
+            }
+          }
         }
         const { data: { session } } = await supabase.auth.getSession();
         if (session && session.user) {
@@ -432,6 +522,14 @@ export const FeedScreen: React.FC<FeedScreenProps> = ({ onSelectProperty, filter
           return address.includes(filters.sigungu);
         }
         return true;
+      });
+    }
+
+    // 2-1. 상세 읍면동 다중 필터링
+    if (filters.selectedDongs && filters.selectedDongs.length > 0) {
+      result = result.filter((item) => {
+        const address = item.address || '';
+        return filters.selectedDongs.some(dong => address.includes(dong));
       });
     }
 
@@ -820,11 +918,11 @@ export const FeedScreen: React.FC<FeedScreenProps> = ({ onSelectProperty, filter
                 {activeFilterTab === 'sido' && (
                   <View style={styles.tabContent}>
                     <View style={styles.selectionActions}>
-                      <TouchableOpacity onPress={() => setFilters(prev => ({ ...prev, sido: ['서울', '경기', '인천', '부산', '대구', '광주', '대전', '울산', '세종', '강원', '충북', '충남', '전북', '전남', '경북', '경남', '제주'] }))}>
+                      <TouchableOpacity onPress={() => setFilters(prev => ({ ...prev, sido: ['서울', '경기', '인천', '부산', '대구', '광주', '대전', '울산', '세종', '강원', '충북', '충남', '전북', '전남', '경북', '경남', '제주'], sigungu: 'all', selectedDongs: [] }))}>
                         <Text style={styles.actionText}>전체 선택</Text>
                       </TouchableOpacity>
                       <Text style={styles.actionDivider}>|</Text>
-                      <TouchableOpacity onPress={() => setFilters(prev => ({ ...prev, sido: [] }))}>
+                      <TouchableOpacity onPress={() => setFilters(prev => ({ ...prev, sido: [], sigungu: 'all', selectedDongs: [] }))}>
                         <Text style={styles.actionText}>전체 해제</Text>
                       </TouchableOpacity>
                     </View>
@@ -843,7 +941,7 @@ export const FeedScreen: React.FC<FeedScreenProps> = ({ onSelectProperty, filter
                                 const next = prev.sido.includes(sd)
                                   ? prev.sido.filter(s => s !== sd)
                                   : [...prev.sido, sd];
-                                return { ...prev, sido: next, sigungu: 'all' };
+                                return { ...prev, sido: next, sigungu: 'all', selectedDongs: [] };
                               });
                             }}
                           >
@@ -861,7 +959,7 @@ export const FeedScreen: React.FC<FeedScreenProps> = ({ onSelectProperty, filter
                         <View style={styles.checkboxGrid}>
                           <TouchableOpacity
                             style={styles.checkboxItem}
-                            onPress={() => setFilters((prev) => ({ ...prev, sigungu: 'all' }))}
+                            onPress={() => setFilters((prev) => ({ ...prev, sigungu: 'all', selectedDongs: [] }))}
                           >
                             <Text style={[styles.checkboxIcon, filters.sigungu === 'all' && styles.checkboxIconActive]}>{filters.sigungu === 'all' ? '\u2611' : '\u2610'}</Text>
                             <Text style={styles.checkboxLabel}>전체 구역</Text>
@@ -872,13 +970,46 @@ export const FeedScreen: React.FC<FeedScreenProps> = ({ onSelectProperty, filter
                               <TouchableOpacity
                                 key={sgg}
                                 style={styles.checkboxItem}
-                                onPress={() => setFilters((prev) => ({ ...prev, sigungu: sgg }))}
+                                onPress={() => setFilters((prev) => ({ ...prev, sigungu: sgg, selectedDongs: [] }))}
                               >
                                 <Text style={[styles.checkboxIcon, isSelected && styles.checkboxIconActive]}>{isSelected ? '\u2611' : '\u2610'}</Text>
                                 <Text style={styles.checkboxLabel}>{sgg}</Text>
                               </TouchableOpacity>
                             );
                           })}
+                        </View>
+                      </View>
+                    )}
+
+                    {/* 시군구까지 단 하나 선택된 경우 상세 읍면동 다중 선택 체크박스 추가 */}
+                    {filters.sido && filters.sido.length === 1 && filters.sigungu !== 'all' && (
+                      <View style={[styles.tabContent, { borderTopWidth: 1, borderTopColor: COLORS.slate200, marginTop: 12, paddingTop: 12 }]}>
+                        <Text style={styles.subFilterTitle}>🏠 상세 관할 구역 (읍/면/동)</Text>
+                        <View style={styles.checkboxGrid}>
+                          {getAvailableDongs().map((dong) => {
+                            const isSelected = filters.selectedDongs?.includes(dong);
+                            return (
+                              <TouchableOpacity
+                                key={dong}
+                                style={styles.checkboxItem}
+                                onPress={() => {
+                                  setFilters((prev) => {
+                                    const prevDongs = prev.selectedDongs || [];
+                                    const nextDongs = prevDongs.includes(dong)
+                                      ? prevDongs.filter(d => d !== dong)
+                                      : [...prevDongs, dong];
+                                    return { ...prev, selectedDongs: nextDongs };
+                                  });
+                                }}
+                              >
+                                <Text style={[styles.checkboxIcon, isSelected && styles.checkboxIconActive]}>{isSelected ? '\u2611' : '\u2610'}</Text>
+                                <Text style={styles.checkboxLabel}>{dong}</Text>
+                              </TouchableOpacity>
+                            );
+                          })}
+                          {getAvailableDongs().length === 0 && (
+                            <Text style={{ fontSize: 11, color: COLORS.slate400, fontStyle: 'italic', marginVertical: 8 }}>해당 구역 내 검색 가능한 읍/면/동 매물이 없습니다.</Text>
+                          )}
                         </View>
                       </View>
                     )}
