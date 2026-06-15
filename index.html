@@ -2207,6 +2207,7 @@
 
                 // 최초 데이터 조회
                 await loadData();
+                loadAdSettings(); // 📢 광고 정보 실시간 동기화
 
             } catch (error) {
                 console.warn("⚠️ Supabase 연결 실패 - 예비 시뮬레이션 데이터를 안전 탑재합니다.", error);
@@ -2223,6 +2224,7 @@
 
         // 🚀 첫 접속 시 캐시 유효성을 검증하여 필요한 경우에만 데이터를 가져오는 제어 함수
         async function initDataLoad() {
+            loadAdSettings(); // 📢 Supabase 광고 설정 로드
             const sensor = document.getElementById("connection-sensor");
             
             // 1. 먼저 sync_info를 조회하여 서버의 최신 타임스탬프를 가져옵니다. (3초 타임아웃 경쟁 방어 적용)
