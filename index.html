@@ -4054,6 +4054,108 @@
             return Math.abs(hash);
         }
 
+        function isValidComplexNameJS(name) {
+            if (!name) return false;
+            name = name.trim();
+            if (name.length <= 1) return false;
+            if (/^\d+$/.test(name) || /^[,\s]+$/.test(name)) return false;
+            if (["아파트", "오피스텔", "빌라", "다세대", "연립", "주택", "상가", "건물", "종합건설"].includes(name)) {
+                return false;
+            }
+            return true;
+        }
+
+        function extractComplexNameJS(address, ptype) {
+            if (!address) return "단지 정보 없음";
+            
+            // 1. 주소 내에 괄호가 있고 그 안에 아파트/빌라/맨션/오피스텔 등 건물명이 있는지 분석하여 우선 추출
+            const bracketRegex = /[\(\[\{](.*?)[\)\]\}]/g;
+            let bracketMatch;
+            const bracketMatches = [];
+            while ((bracketMatch = bracketRegex.exec(address)) !== null) {
+                bracketMatches.push(bracketMatch[1]);
+            }
+            
+            for (const content of bracketMatches) {
+                const parts = content.split(',').map(p => p.trim());
+                for (const p of parts) {
+                    const keywords = ["아파트", "빌라", "맨션", "오피스텔", "타운", "팰리스", "자이", "푸르지오", "더샵", "힐스테이트", "아이파크", "래미안", "e편한세상", "롯데캐슬", "하이츠", "캐슬", "클래스", "파크", "빌"];
+                    if (keywords.some(kw => p.includes(kw))) {
+                        const cleanName = p.replace(/^[가-힣\d\s]+(동|가|구|읍|면|리)\s+/, '').trim();
+                        if (isValidComplexNameJS(cleanName)) {
+                            return cleanName;
+                        }
+                    }
+                }
+            }
+            
+            // 2. 층수, 호수, 구조 지적 명세 꼬리표 소거
+            let addrClean = address.replace(/제?\s*\d+\s*층.*|제?\s*지하\s*\d+\s*층.*|제?\s*[가-힣\d\-]+\s*호.*|철근콘크리트.*|평스라브.*|옥탑.*|도시형생활.*|단층.*|블록.*|지상.*/g, '').trim();
+            addrClean = addrClean.replace(/\(.*?\)|\[.*?\]/g, '').trim();
+            addrClean = addrClean.replace(/\s*,\s*/g, ' ').trim();
+            
+            const parts = addrClean.split(/\s+/);
+            let jibunIdx = -1;
+            for (let i = 0; i < parts.length; i++) {
+                const part = parts[i];
+                if (/^\d+(?:-\d+)?$/.test(part) || /^\d+번지$/.test(part)) {
+                    jibunIdx = i;
+                    break;
+                }
+            }
+            
+            if (jibunIdx !== -1 && jibunIdx < parts.length - 1) {
+                let candidate = parts.slice(jibunIdx + 1).join(" ").trim();
+                candidate = candidate.replace(/\b\d+\s*(동|호|층)\b.*/, '').trim();
+                candidate = candidate.replace(/,/g, '').trim();
+                if (isValidComplexNameJS(candidate)) {
+                    return candidate;
+                }
+            }
+
+            if (parts.length >= 2) {
+                const lastWord = parts[parts.length - 1].replace(/,/g, '').trim();
+                if (isValidComplexNameJS(lastWord)) {
+                    return lastWord;
+                }
+            }
+            
+            // 3. 주소 내 동/읍/면 명칭 및 본번을 파싱하여 자연스러운 지번/도로명 기반 명칭을 동적으로 구성합니다.
+            const dongMatch = address.match(/([가-힣]+(?:동|읍|면|리))/);
+            const dongName = dongMatch ? dongMatch[1] : "";
+            
+            const buildingNoMatch = address.match(/(?:로|길)\s+(\d+(?:-\d+)?)\b/);
+            const jibunNoMatch = address.match(/(?:동|읍|면|리)\s+(\d+(?:-\d+)?)\b/);
+            
+            let noStr = "";
+            if (buildingNoMatch) {
+                const roadMatch = address.match(/([가-힣\d]+(?:로|길))\s+(\d+(?:-\d+)?)\b/);
+                if (roadMatch) {
+                    noStr = `${roadMatch[1]} ${roadMatch[2]}`;
+                }
+            } else if (jibunNoMatch) {
+                noStr = `${dongName} ${jibunNoMatch[1]}`;
+            }
+            
+            let typeSuffix = "건물";
+            const pt = ptype || "";
+            if (pt.includes("아파트")) {
+                typeSuffix = "아파트";
+            } else if (pt.includes("오피스텔")) {
+                typeSuffix = "오피스텔";
+            } else if (["빌라", "다세대", "연립", "주택"].some(kw => pt.includes(kw))) {
+                typeSuffix = "다세대";
+            }
+            
+            if (noStr) {
+                return `${noStr} ${typeSuffix}`;
+            } else if (dongName) {
+                return `${dongName} ${typeSuffix}`;
+            }
+            
+            return "경매 매물 단지";
+        }
+
         function getCleanedLandSearchQuery(address) {
             if (!address) return "";
             let clean = address.trim();
@@ -4061,6 +4163,7 @@
             clean = clean.replace(/\d+\s*동\s*\d+\s*호/g, "");
             clean = clean.replace(/\d+\s*동/g, "");
             clean = clean.replace(/\d+\s*호/g, "");
+            clean = clean.replace(/\s*,\s*/g, " ");
             
             const match = clean.match(/^([가-힣\s]+(?:시|도)\s+[가-힣\s]+(?:구|군|시)\s+[가-힣\s\d-]+(?:동|읍|면|리)?\s+\d+(?:-\d+)?\s*[가-힣a-zA-Z0-9\s]+(?:아파트|맨션|빌라|오피스텔|자이|푸르지오|더샵|힐스테이트|아이파크|래미안|e편한세상|롯데캐슬|두산위브|벽산|우성|한신|현대|주공|타운|하우스|팰리스|포레스트|스위트|캐슬|클래스|파크|빌|골드|스마트|시티|타워))/);
             if (match && match[1]) {
@@ -4952,6 +5055,8 @@
             item = enrichPropertyData(item);
             const est = estimateAuctionRounds(item.appraised_value, item.minimum_bid, item.source);
             const extra = analyzePropertyDetailExtra(item);
+            const nbMeta = item.non_building_meta || {};
+            const hasTenant = !extra.daehangStatus.includes("대항력 없음");
 
             // 비부동산 자산(onbid_etc)에 대한 상세 뷰 특화 처리
             const rvTitle = document.getElementById("detail-roadview-title");
@@ -5058,7 +5163,6 @@
                 if (specTitle) {
                     specTitle.innerHTML = `<i class="fa-solid fa-file-invoice text-royalBlue"></i> 📦 자산 표시 및 기본 명세`;
                 }
-                const nbMeta = item.non_building_meta || {};
                 let customGridHtml = "";
 
                 if (nbMeta.asset_type === 'vehicle') {
@@ -5494,30 +5598,36 @@
             const isComplexProperty = (item.ptype && (item.ptype.includes("아파트") || item.ptype.includes("오피스텔"))) || 
                                       (item.address && (item.address.includes("아파트") || item.address.includes("오피스텔") || item.address.includes("맨션")));
             const cleanedQuery = getCleanedLandSearchQuery(rawAddress);
-            document.getElementById("btn-naver-map").href = `https://map.naver.com/v5/search/${encodeURIComponent(cleanedNavAddress || rawAddress)}`;
-            document.getElementById("btn-official-site").href = item.link_url || "https://www.courtauction.go.kr";
+            const btnNaverMap = document.getElementById("btn-naver-map");
+            if (btnNaverMap) {
+                btnNaverMap.href = `https://map.naver.com/v5/search/${encodeURIComponent(cleanedNavAddress || rawAddress)}`;
+            }
+            const btnOfficialSite = document.getElementById("btn-official-site");
+            if (btnOfficialSite) {
+                btnOfficialSite.href = item.link_url || "https://www.courtauction.go.kr";
+            }
             
             const naverLandPriceBtn = document.getElementById("btn-naver-land-price");
             if (naverLandPriceBtn) {
                 if (isComplexProperty && !isNonBuilding) {
-                    naverLandPriceBtn.href = `https://new.land.naver.com/complexes?searchQuery=${encodeURIComponent(cleanedQuery)}`;
+                    naverLandPriceBtn.href = `https://fin.land.naver.com/map?searchQuery=${encodeURIComponent(cleanedQuery)}`;
                 } else {
-                    naverLandPriceBtn.href = `https://new.land.naver.com/search?searchQuery=${encodeURIComponent(rawAddress)}`;
+                    naverLandPriceBtn.href = `https://fin.land.naver.com/map?searchQuery=${encodeURIComponent(rawAddress)}`;
                 }
             }
             
             const floorplanLink = document.getElementById("btn-naver-floorplan-link");
             if (floorplanLink) {
                 if (item.auction_no === "2025타경502931" || (item.address && item.address.includes("한빛아파트"))) {
-                    floorplanLink.href = "https://new.land.naver.com/complexes?ms=36.360155,127.354157,16&a=APT:OPST:ABRD:OBYG&e=RETAIL";
+                    floorplanLink.href = "https://fin.land.naver.com/map?center=127.354157,36.360155&zoom=16";
                 } else if (isComplexProperty && !isNonBuilding) {
-                    floorplanLink.href = `https://new.land.naver.com/complexes?searchQuery=${encodeURIComponent(cleanedQuery)}`;
+                    floorplanLink.href = `https://fin.land.naver.com/map?searchQuery=${encodeURIComponent(cleanedQuery)}`;
                 } else {
-                    floorplanLink.href = `https://new.land.naver.com/search?searchQuery=${encodeURIComponent(rawAddress)}`;
+                    floorplanLink.href = `https://fin.land.naver.com/map?searchQuery=${encodeURIComponent(rawAddress)}`;
                 }
             }
 
-            // 📐 평면도 3사 로드뷰 링크 초기화
+            // 📐 평면도 3사 로드뷰 링크 초기화 (좌표 획득 전 텍스트 기반 폴백 링크)
             const fpNaverRoad = document.getElementById("btn-floorplan-naver-road");
             const fpKakaoRoad = document.getElementById("btn-floorplan-kakao-road");
             const fpGoogleRoad = document.getElementById("btn-floorplan-google-road");
@@ -5571,28 +5681,48 @@
                                     }
                                 });
 
+                                // 건물명 추출 및 실시간 단지명 덮어쓰기
+                                let kakaoBuildingName = "";
+                                if (result[0].road_address && result[0].road_address.building_name) {
+                                    kakaoBuildingName = result[0].road_address.building_name;
+                                } else if (result[0].address && result[0].address.building_name) {
+                                    kakaoBuildingName = result[0].address.building_name;
+                                }
+                                
+                                if (kakaoBuildingName) {
+                                    const complexField = document.getElementById("detail-complex-name-field");
+                                    if (complexField) {
+                                        complexField.innerText = kakaoBuildingName;
+                                    }
+                                    if (item.complex_info) {
+                                        item.complex_info.complex_name = kakaoBuildingName;
+                                    }
+                                }
+
                                 // 🟢 카카오 Geocoder로 획득한 위경도 좌표로 네이버 부동산 지도 링크 정밀 맵핑
                                 const activePriceBtn = document.getElementById("btn-naver-land-price");
+                                const finalQuery = kakaoBuildingName || cleanedQuery || rawAddress;
                                 if (isComplexProperty) {
                                     if (activePriceBtn) {
-                                        activePriceBtn.href = `https://new.land.naver.com/complexes?ms=${result[0].y},${result[0].x},16&a=APT:OPST:ABRD:OBYG&e=RETAIL`;
+                                        activePriceBtn.href = `https://fin.land.naver.com/map?center=${result[0].x},${result[0].y}&zoom=16&searchQuery=${encodeURIComponent(finalQuery)}`;
                                     }
                                     if (floorplanLink) {
                                         if (!(item.auction_no === "2025타경502931" || (item.address && item.address.includes("한빛아파트")))) {
-                                            floorplanLink.href = `https://new.land.naver.com/complexes?ms=${result[0].y},${result[0].x},16&a=APT:OPST:ABRD:OBYG&e=RETAIL`;
+                                            floorplanLink.href = `https://fin.land.naver.com/map?center=${result[0].x},${result[0].y}&zoom=16&searchQuery=${encodeURIComponent(finalQuery)}`;
                                         }
                                     }
                                 } else {
+                                    const nonComplexQuery = kakaoBuildingName ? `${cleanedNavAddress} ${kakaoBuildingName}` : rawAddress;
                                     if (activePriceBtn) {
-                                        activePriceBtn.href = `https://new.land.naver.com/articles?ms=${result[0].y},${result[0].x},16&a=VL:OR:JW:SG:HO:CO&e=RETAIL`;
+                                        activePriceBtn.href = `https://fin.land.naver.com/map?center=${result[0].x},${result[0].y}&zoom=16&searchQuery=${encodeURIComponent(nonComplexQuery)}`;
                                     }
                                     if (floorplanLink) {
-                                        floorplanLink.href = `https://new.land.naver.com/search?searchQuery=${encodeURIComponent(rawAddress)}`;
+                                        floorplanLink.href = `https://fin.land.naver.com/map?center=${result[0].x},${result[0].y}&zoom=16&searchQuery=${encodeURIComponent(nonComplexQuery)}`;
                                     }
                                 }
 
                                 // 🟢 좌표 획득 시 3사 로드뷰 링크도 좌표 기반 정밀 링크로 교체
-                                if (fpNaverRoad) fpNaverRoad.href = `https://map.naver.com/v5/?c=${result[0].x},${result[0].y},15,0,0,0,adh`;
+                                if (fpNaverRoad) fpNaverRoad.href = `https://map.naver.com/p/?c=${result[0].x},${result[0].y},17,0,0,0,rv`;
                                 if (fpKakaoRoad) fpKakaoRoad.href = `https://map.kakao.com/link/roadview/${result[0].y},${result[0].x}`;
                                 if (fpGoogleRoad) fpGoogleRoad.href = `https://www.google.com/maps/@?api=1&map_action=pano&viewpoint=${result[0].y},${result[0].x}`;
                             } else {
@@ -5675,17 +5805,17 @@
 
             // ⚖️ 법정 서류 요약 테이블 및 상시 노출형 카드 데이터 동적 바인딩
             const dRemaining = calculateRemainingDays(item.bidding_date);
-            const isVehicle = item.non_building_meta && item.non_building_meta.asset_type === 'vehicle';
+            const isVehicle = nbMeta && nbMeta.asset_type === 'vehicle';
             
             if (isNonBuilding) {
                 if (isVehicle) {
-                    document.getElementById("table-doc-appraisal-summary").innerText = `차량 감정가: ${formatKRW(item.appraised_value)} (${item.non_building_meta.model_name || '차량'})`;
-                    document.getElementById("table-doc-survey-summary").innerText = `성능 점검: ${item.non_building_meta.mileage || '주행거리 미상'}`;
-                    document.getElementById("table-doc-spec-summary").innerText = `등록원부: ${item.non_building_meta.vehicle_no || '번호 미상'}`;
+                    document.getElementById("table-doc-appraisal-summary").innerText = `차량 감정가: ${formatKRW(item.appraised_value)} (${nbMeta.model_name || '차량'})`;
+                    document.getElementById("table-doc-survey-summary").innerText = `성능 점검: ${nbMeta.mileage || '주행거리 미상'}`;
+                    document.getElementById("table-doc-spec-summary").innerText = `등록원부: ${nbMeta.vehicle_no || '번호 미상'}`;
                 } else {
                     document.getElementById("table-doc-appraisal-summary").innerText = `감정가: ${formatKRW(item.appraised_value)} (기타물품)`;
-                    document.getElementById("table-doc-survey-summary").innerText = `보관 상태: ${item.non_building_meta.storage_location || '보관지 미상'}`;
-                    document.getElementById("table-doc-spec-summary").innerText = `수량/규격: ${item.non_building_meta.quantity || item.non_building_meta.specification || '규격 미상'}`;
+                    document.getElementById("table-doc-survey-summary").innerText = `보관 상태: ${nbMeta.storage_location || '보관지 미상'}`;
+                    document.getElementById("table-doc-spec-summary").innerText = `수량/규격: ${nbMeta.quantity || nbMeta.specification || '규격 미상'}`;
                 }
                 document.getElementById("table-doc-history-summary").innerText = `진행상태: ${dRemaining >= 0 ? 'D-' + dRemaining : '종결'} (${item.bidding_date || '미상'})`;
             } else {
@@ -5702,11 +5832,11 @@
                     document.querySelector("#table-doc-appraisal-summary").innerText = "차량 가액 평가 보고서";
                     document.getElementById("card-appraisal-total").innerText = formatKRW(item.appraised_value);
                     document.getElementById("card-appraisal-land").previousElementSibling.innerText = "차량 모델명";
-                    document.getElementById("card-appraisal-land").innerText = item.non_building_meta.model_name || '-';
+                    document.getElementById("card-appraisal-land").innerText = nbMeta.model_name || '-';
                     document.getElementById("card-appraisal-building").previousElementSibling.innerText = "연식 정보";
-                    document.getElementById("card-appraisal-building").innerText = item.non_building_meta.model_year || '-';
+                    document.getElementById("card-appraisal-building").innerText = nbMeta.model_year || '-';
                     document.getElementById("card-appraisal-date").previousElementSibling.innerText = "주행 거리";
-                    document.getElementById("card-appraisal-date").innerText = item.non_building_meta.mileage || '-';
+                    document.getElementById("card-appraisal-date").innerText = nbMeta.mileage || '-';
                     document.getElementById("card-appraisal-opinion").innerHTML = `
                         <i class="fa-solid fa-lightbulb text-emeraldSuccess mr-1"></i>
                         <strong>[집행 법원 분석 의견]</strong> 차량의 내/외관 보존 상태, 연식 대비 주행거리 비율 및 사고/정비 이력을 감안하여 합리적인 감정가가 책정되었습니다.
@@ -5716,11 +5846,11 @@
                     document.querySelector("#table-doc-appraisal-summary").innerText = "동산/물품 평가 보고서";
                     document.getElementById("card-appraisal-total").innerText = formatKRW(item.appraised_value);
                     document.getElementById("card-appraisal-land").previousElementSibling.innerText = "물품 규격";
-                    document.getElementById("card-appraisal-land").innerText = item.non_building_meta.specification || '-';
+                    document.getElementById("card-appraisal-land").innerText = nbMeta.specification || '-';
                     document.getElementById("card-appraisal-building").previousElementSibling.innerText = "제조사/브랜드";
-                    document.getElementById("card-appraisal-building").innerText = item.non_building_meta.manufacturer || '-';
+                    document.getElementById("card-appraisal-building").innerText = nbMeta.manufacturer || '-';
                     document.getElementById("card-appraisal-date").previousElementSibling.innerText = "수량 정보";
-                    document.getElementById("card-appraisal-date").innerText = item.non_building_meta.quantity || '-';
+                    document.getElementById("card-appraisal-date").innerText = nbMeta.quantity || '-';
                     document.getElementById("card-appraisal-opinion").innerHTML = `
                         <i class="fa-solid fa-lightbulb text-emeraldSuccess mr-1"></i>
                         <strong>[집행 법원 분석 의견]</strong> 물품의 상태, 수량 및 유통 가치를 감안하여 합리적인 감정가가 책정되었습니다.
@@ -5748,13 +5878,13 @@
                     document.querySelector("#table-doc-survey-summary").parentElement.firstElementChild.innerText = "🔍 성능/사고점검서";
                     document.querySelector("#table-doc-survey-summary").innerText = "차량 성능 및 사고 점검 기록";
                     document.getElementById("card-survey-occupy").previousElementSibling.innerText = "원동기 형식";
-                    document.getElementById("card-survey-occupy").innerText = item.non_building_meta.engine_type || '-';
+                    document.getElementById("card-survey-occupy").innerText = nbMeta.engine_type || '-';
                     document.getElementById("card-survey-name").previousElementSibling.innerText = "연료 구분";
-                    document.getElementById("card-survey-name").innerText = item.non_building_meta.fuel || '미상';
+                    document.getElementById("card-survey-name").innerText = nbMeta.fuel || '미상';
                     document.getElementById("card-survey-date").previousElementSibling.innerText = "차대 번호";
-                    document.getElementById("card-survey-date").innerText = item.non_building_meta.vin || '-';
+                    document.getElementById("card-survey-date").innerText = nbMeta.vin || '-';
                     document.getElementById("card-survey-note").previousElementSibling.innerText = "보관 장소";
-                    document.getElementById("card-survey-note").innerText = item.non_building_meta.storage_location || '-';
+                    document.getElementById("card-survey-note").innerText = nbMeta.storage_location || '-';
                     document.getElementById("card-survey-opinion").innerHTML = `
                         <i class="fa-solid fa-circle-check text-emeraldSuccess mr-1"></i>
                         <strong>[차량 상태 진단]</strong> 시운전 및 조향 장치, 주요 전기 구동계통 이상 여부를 정밀 분석하였으며 현재 지정 보관소에서 정상 인도 대기 상태로 진단되었습니다.
@@ -5763,20 +5893,19 @@
                     document.querySelector("#table-doc-survey-summary").parentElement.firstElementChild.innerText = "🔍 보관명세서";
                     document.querySelector("#table-doc-survey-summary").innerText = "동산 보관 상태 및 보관처 명세";
                     document.getElementById("card-survey-occupy").previousElementSibling.innerText = "보관 장소";
-                    document.getElementById("card-survey-occupy").innerText = item.non_building_meta.storage_location || '-';
+                    document.getElementById("card-survey-occupy").innerText = nbMeta.storage_location || '-';
                     document.getElementById("card-survey-name").previousElementSibling.innerText = "인수 책임";
                     document.getElementById("card-survey-name").innerText = "낙찰자 인수 없음";
                     document.getElementById("card-survey-date").previousElementSibling.innerText = "점검 일자";
                     document.getElementById("card-survey-date").innerText = item.bidding_date || '2026-05-11';
                     document.getElementById("card-survey-note").previousElementSibling.innerText = "기타 보관고";
-                    document.getElementById("card-survey-note").innerText = item.non_building_meta.storage_location ? "지정 보관소 실물 확인됨" : "-";
+                    document.getElementById("card-survey-note").innerText = nbMeta.storage_location ? "지정 보관소 실물 확인됨" : "-";
                     document.getElementById("card-survey-opinion").innerHTML = `
                         <i class="fa-solid fa-circle-check text-emeraldSuccess mr-1"></i>
                         <strong>[물품 리스크 진단]</strong> 지정 보관고 실물 대조 완료하였으며 도난, 유실 리스크가 없는 상태로 낙찰 즉시 인도가 가능합니다.
                     `;
                 }
             } else {
-                const hasTenant = !extra.daehangStatus.includes("대항력 없음");
                 document.querySelector("#table-doc-survey-summary").parentElement.firstElementChild.innerText = "🔍 현황조사서";
                 document.querySelector("#table-doc-survey-summary").innerText = "부동산 점유 실태 기록";
                 document.getElementById("card-survey-occupy").previousElementSibling.innerText = "부동산 점유 현황";
@@ -5805,12 +5934,12 @@
                     document.querySelector("#table-doc-spec-summary").parentElement.firstElementChild.innerText = "📝 자동차등록원부";
                     document.querySelector("#table-doc-spec-summary").innerText = "공식 등록원부 및 근저당 분석 명세";
                     document.getElementById("card-spec-malso").previousElementSibling.innerText = "차량 등록 번호";
-                    document.getElementById("card-spec-malso").innerText = item.non_building_meta.vehicle_no || '-';
+                    document.getElementById("card-spec-malso").innerText = nbMeta.vehicle_no || '-';
                     document.getElementById("card-spec-daehang").previousElementSibling.innerText = "제원 관리 번호";
-                    document.getElementById("card-spec-daehang").innerText = item.non_building_meta.spec_no || '-';
+                    document.getElementById("card-spec-daehang").innerText = nbMeta.spec_no || '-';
                     document.getElementById("card-spec-daehang").className = "text-slate-800 font-extrabold";
                     document.getElementById("card-spec-baedang").previousElementSibling.innerText = "사용 본거지";
-                    document.getElementById("card-spec-baedang").innerText = item.non_building_meta.base_location || '-';
+                    document.getElementById("card-spec-baedang").innerText = nbMeta.base_location || '-';
                     document.getElementById("card-spec-special").previousElementSibling.innerText = "원부 인수 제한";
                     document.getElementById("card-spec-special").innerText = "압류/근저당 낙찰 후 말소 전량 소멸";
                     document.getElementById("card-spec-opinion").innerHTML = `
@@ -6281,7 +6410,7 @@
                     complexTbody.innerHTML = `
                         <tr class="border-b border-slate-100 text-xs">
                             <td class="p-2 bg-slate-50 font-extrabold text-slate-700 w-1/4">단지명</td>
-                            <td class="p-2 text-slate-800" colspan="3">${item.complex_info.complex_name}</td>
+                            <td class="p-2 text-slate-800" id="detail-complex-name-field" colspan="3">${item.complex_info.complex_name}</td>
                         </tr>
                         <tr class="border-b border-slate-100 text-xs">
                             <td class="p-2 bg-slate-50 font-extrabold text-slate-700 w-1/4">총 세대 수</td>
