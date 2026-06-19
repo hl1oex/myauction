@@ -106,5 +106,6 @@ export interface FilterState {
   gradeFilter: 'all' | 'safe' | 'risk'; // AI 등급 분류 필터
   investmentType?: 'all' | 'investment' | 'residence'; // AI 자산 투자 성향 필터
   selectedCourts?: string[]; // 관할 법원 다중 선택 필터
+  theme?: string | null; // AI 큐레이션 테마 필터
 }
 

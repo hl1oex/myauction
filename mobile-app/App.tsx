@@ -93,6 +93,7 @@ export default function App() {
     gradeFilter: 'all',
     investmentType: 'all',
     selectedCourts: [],
+    theme: null,
   });
 
   // 🔒 Supabase user_profiles 고객 등급 조회 함수
@@ -296,6 +297,7 @@ export default function App() {
               gradeFilter: 'all',
               investmentType: 'all',
               selectedCourts: [],
+              theme: null,
             });
           }}
         >

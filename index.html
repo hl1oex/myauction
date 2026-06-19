@@ -831,16 +831,30 @@
             <div id="dashboard-view" class="flex flex-col flex-1 overflow-hidden">
                 <!-- 📢 메인 상단 배너 광고 슬롯 -->
                 <div id="main-top-ad-slot" class="w-full bg-white px-3.5 pt-2 hidden"></div>
-                <!-- 🔍 추천 검색어 제안 칩 바 -->
+                <!-- 🔍 AI 추천 검색어 (초개인화 테마) 칩 바 -->
                 <div class="px-3.5 py-2 bg-slate-50 border-b border-slate-200/60 flex items-center gap-2 overflow-x-auto custom-scrollbar select-none">
-                    <span class="text-[10px] sm:text-xs font-black text-slate-500 flex-shrink-0">🔍 추천 검색어</span>
+                    <span class="bg-gradient-to-r from-amber-500 to-orange-500 text-white text-[9px] font-black px-2 py-0.5 rounded-full flex items-center gap-1 flex-shrink-0 animate-pulse">
+                        <i class="fa-solid fa-wand-magic-sparkles"></i> AI 추천
+                    </span>
                     <div class="flex gap-1.5">
-                        <button onclick="applySuggestedSearch('아파트')" class="bg-white border border-slate-200 text-slate-600 px-2 py-0.5 rounded-full text-[10px] font-bold hover:border-royalBlue hover:text-royalBlue transition-all">아파트</button>
-                        <button onclick="applySuggestedSearch('빌라')" class="bg-white border border-slate-200 text-slate-600 px-2 py-0.5 rounded-full text-[10px] font-bold hover:border-royalBlue hover:text-royalBlue transition-all">빌라/다세대</button>
-                        <button onclick="applySuggestedSearch('서울')" class="bg-white border border-slate-200 text-slate-600 px-2 py-0.5 rounded-full text-[10px] font-bold hover:border-royalBlue hover:text-royalBlue transition-all">서울</button>
-                        <button onclick="applySuggestedSearch('경기')" class="bg-white border border-slate-200 text-slate-600 px-2 py-0.5 rounded-full text-[10px] font-bold hover:border-royalBlue hover:text-royalBlue transition-all">경기</button>
-                        <button onclick="applySuggestedSearch('유찰')" class="bg-white border border-slate-200 text-slate-600 px-2 py-0.5 rounded-full text-[10px] font-bold hover:border-royalBlue hover:text-royalBlue transition-all">유찰</button>
-                        <button onclick="applySuggestedSearch('차량')" class="bg-white border border-slate-200 text-slate-600 px-2 py-0.5 rounded-full text-[10px] font-bold hover:border-royalBlue hover:text-royalBlue transition-all">차량</button>
+                        <button onclick="selectTheme(null)" id="btn-theme-all" class="bg-royalBlue text-white border-royalBlue px-2.5 py-0.5 rounded-full text-[10px] font-black border transition-all select-none flex items-center gap-1 shadow-sm">전체 피드</button>
+                        <button onclick="selectTheme('clean_rights')" id="btn-theme-clean" class="bg-white border border-slate-200 text-slate-600 px-2.5 py-0.5 rounded-full text-[10px] font-black hover:border-emerald-500 hover:text-emerald-500 transition-all select-none flex items-center gap-1"><i class="fa-solid fa-shield-halved text-emerald-500"></i> 권리클린</button>
+                        <button onclick="selectTheme('half_price')" id="btn-theme-half" class="bg-white border border-slate-200 text-slate-600 px-2.5 py-0.5 rounded-full text-[10px] font-black hover:border-rose-500 hover:text-rose-500 transition-all select-none flex items-center gap-1"><i class="fa-solid fa-percent text-rose-500"></i> 반값 격전지</button>
+                        <button onclick="selectTheme('hot_yongin')" id="btn-theme-yongin" class="bg-white border border-slate-200 text-slate-600 px-2.5 py-0.5 rounded-full text-[10px] font-black hover:border-indigo-500 hover:text-indigo-500 transition-all select-none flex items-center gap-1"><i class="fa-solid fa-fire text-indigo-500"></i> 반도체 HOT 용인</button>
+                        <button onclick="selectTheme('lifestyle_3eok')" id="btn-theme-lifestyle" class="bg-white border border-slate-200 text-slate-600 px-2.5 py-0.5 rounded-full text-[10px] font-black hover:border-amber-500 hover:text-amber-500 transition-all select-none flex items-center gap-1"><i class="fa-solid fa-campground text-amber-500"></i> 제주/서울 3억 이하</button>
+                        <button onclick="selectTheme('yield_top')" id="btn-theme-yield" class="bg-white border border-slate-200 text-slate-600 px-2.5 py-0.5 rounded-full text-[10px] font-black hover:border-blue-500 hover:text-blue-500 transition-all select-none flex items-center gap-1"><i class="fa-solid fa-coins text-blue-500"></i> 상가 수익률 TOP</button>
+                        <button onclick="selectTheme('redevelopment')" id="btn-theme-redevelopment" class="bg-white border border-slate-200 text-slate-600 px-2.5 py-0.5 rounded-full text-[10px] font-black hover:border-orange-500 hover:text-orange-500 transition-all select-none flex items-center gap-1"><i class="fa-solid fa-building text-orange-500"></i> 아파트 재건축</button>
+                        <button onclick="selectTheme('mini_land')" id="btn-theme-miniland" class="bg-white border border-slate-200 text-slate-600 px-2.5 py-0.5 rounded-full text-[10px] font-black hover:border-lime-600 hover:text-lime-600 transition-all select-none flex items-center gap-1"><i class="fa-solid fa-tree text-lime-600"></i> 초소액 토지</button>
+                        <button onclick="selectTheme('auto_machinery')" id="btn-theme-automachinery" class="bg-white border border-slate-200 text-slate-600 px-2.5 py-0.5 rounded-full text-[10px] font-black hover:border-purple-500 hover:text-purple-500 transition-all select-none flex items-center gap-1"><i class="fa-solid fa-car text-purple-500"></i> 실속 차량/동산</button>
+                        <button onclick="selectTheme('officetel_income')" id="btn-theme-officetel" class="bg-white border border-slate-200 text-slate-600 px-2.5 py-0.5 rounded-full text-[10px] font-black hover:border-cyan-500 hover:text-cyan-500 transition-all select-none flex items-center gap-1"><i class="fa-solid fa-city text-cyan-500"></i> 월세 오피스텔</button>
+                        <button onclick="selectTheme('subway_safe')" id="btn-theme-subwaysafe" class="bg-white border border-slate-200 text-slate-600 px-2.5 py-0.5 rounded-full text-[10px] font-black hover:border-teal-500 hover:text-teal-500 transition-all select-none flex items-center gap-1"><i class="fa-solid fa-train-subway text-teal-500"></i> 역세권 대항력 안전</button>
+                        <button onclick="selectTheme('small_building')" id="btn-theme-smallbuilding" class="bg-white border border-slate-200 text-slate-600 px-2.5 py-0.5 rounded-full text-[10px] font-black hover:border-amber-700 hover:text-amber-700 transition-all select-none flex items-center gap-1"><i class="fa-solid fa-building-user text-amber-700"></i> 꼬마빌딩 건물주</button>
+                        <button onclick="selectTheme('school_district')" id="btn-theme-schooldistrict" class="bg-white border border-slate-200 text-slate-600 px-2.5 py-0.5 rounded-full text-[10px] font-black hover:border-emerald-600 hover:text-emerald-600 transition-all select-none flex items-center gap-1"><i class="fa-solid fa-graduation-cap text-emerald-600"></i> 학세권 우수 교육</button>
+                        <button onclick="selectTheme('capital_single')" id="btn-theme-capitalsingle" class="bg-white border border-slate-200 text-slate-600 px-2.5 py-0.5 rounded-full text-[10px] font-black hover:border-violet-500 hover:text-violet-500 transition-all select-none flex items-center gap-1"><i class="fa-solid fa-house-laptop text-violet-500"></i> 수도권 1인 가구 갭</button>
+                        <button onclick="selectTheme('local_healing')" id="btn-theme-localhealing" class="bg-white border border-slate-200 text-slate-600 px-2.5 py-0.5 rounded-full text-[10px] font-black hover:border-green-600 hover:text-green-600 transition-all select-none flex items-center gap-1"><i class="fa-solid fa-house-chimney-window text-green-600"></i> 지방 힐링 세컨하우스</button>
+                        <button onclick="selectTheme('heavy_dropped')" id="btn-theme-heavydropped" class="bg-white border border-slate-200 text-slate-600 px-2.5 py-0.5 rounded-full text-[10px] font-black hover:border-red-600 hover:text-red-600 transition-all select-none flex items-center gap-1"><i class="fa-solid fa-down-long text-red-600"></i> 줍줍! 70% 폭락</button>
+                        <button onclick="selectTheme('factory_warehouse')" id="btn-theme-factorywarehouse" class="bg-white border border-slate-200 text-slate-600 px-2.5 py-0.5 rounded-full text-[10px] font-black hover:border-slate-600 hover:text-slate-600 transition-all select-none flex items-center gap-1"><i class="fa-solid fa-industry text-slate-600"></i> 창업/물류 공장창고</button>
+                        <button onclick="selectTheme('share_investment')" id="btn-theme-shareinvestment" class="bg-white border border-slate-200 text-slate-600 px-2.5 py-0.5 rounded-full text-[10px] font-black hover:border-rose-400 hover:text-rose-400 transition-all select-none flex items-center gap-1"><i class="fa-solid fa-scissors text-rose-400"></i> 소액 지분 틈새투자</button>
                     </div>
                 </div>
                 <!-- 정렬 및 리스트 필터 바 -->
@@ -3084,6 +3098,11 @@
                 return 0;
             });
             
+            // 🚀 AI 큐레이션 테마 필터링 추가 결합
+            if (activeTheme) {
+                filteredProperties = filterPropertiesByTheme(filteredProperties, activeTheme);
+            }
+            
             currentPage = 1;
             updateKPIDashboard();
             renderProperties();
@@ -3401,6 +3420,235 @@
                 }
                 debouncedApplyFilters();
             }
+        }
+
+        // 🔍 AI 추천 테마 선택 함수 및 필터링 모듈
+        let activeTheme = null;
+
+        function selectTheme(themeKey) {
+            activeTheme = themeKey;
+
+            // 칩 버튼 활성화/비활성화 클래스 갱신
+            const keys = [
+                { key: null, id: "btn-theme-all", activeClass: "bg-royalBlue text-white border-royalBlue shadow-sm" },
+                { key: "clean_rights", id: "btn-theme-clean", activeClass: "bg-emerald-500 text-white border-emerald-500 shadow-sm" },
+                { key: "half_price", id: "btn-theme-half", activeClass: "bg-rose-500 text-white border-rose-500 shadow-sm" },
+                { key: "hot_yongin", id: "btn-theme-yongin", activeClass: "bg-indigo-500 text-white border-indigo-500 shadow-sm" },
+                { key: "lifestyle_3eok", id: "btn-theme-lifestyle", activeClass: "bg-amber-500 text-white border-amber-500 shadow-sm" },
+                { key: "yield_top", id: "btn-theme-yield", activeClass: "bg-blue-500 text-white border-blue-500 shadow-sm" },
+                { key: "redevelopment", id: "btn-theme-redevelopment", activeClass: "bg-orange-500 text-white border-orange-500 shadow-sm" },
+                { key: "mini_land", id: "btn-theme-miniland", activeClass: "bg-lime-600 text-white border-lime-600 shadow-sm" },
+                { key: "auto_machinery", id: "btn-theme-automachinery", activeClass: "bg-purple-500 text-white border-purple-500 shadow-sm" },
+                { key: "officetel_income", id: "btn-theme-officetel", activeClass: "bg-cyan-500 text-white border-cyan-500 shadow-sm" },
+                { key: "subway_safe", id: "btn-theme-subwaysafe", activeClass: "bg-teal-500 text-white border-teal-500 shadow-sm" },
+                { key: "small_building", id: "btn-theme-smallbuilding", activeClass: "bg-amber-700 text-white border-amber-700 shadow-sm" },
+                { key: "school_district", id: "btn-theme-schooldistrict", activeClass: "bg-emerald-600 text-white border-emerald-600 shadow-sm" },
+                { key: "capital_single", id: "btn-theme-capitalsingle", activeClass: "bg-violet-500 text-white border-violet-500 shadow-sm" },
+                { key: "local_healing", id: "btn-theme-localhealing", activeClass: "bg-green-600 text-white border-green-600 shadow-sm" },
+                { key: "heavy_dropped", id: "btn-theme-heavydropped", activeClass: "bg-red-600 text-white border-red-600 shadow-sm" },
+                { key: "factory_warehouse", id: "btn-theme-factorywarehouse", activeClass: "bg-slate-600 text-white border-slate-600 shadow-sm" },
+                { key: "share_investment", id: "btn-theme-shareinvestment", activeClass: "bg-rose-400 text-white border-rose-400 shadow-sm" }
+            ];
+
+            keys.forEach(k => {
+                const btn = document.getElementById(k.id);
+                if (btn) {
+                    if (k.key === themeKey) {
+                        btn.className = `px-2.5 py-0.5 rounded-full text-[10px] font-black border transition-all select-none flex items-center gap-1 ${k.activeClass}`;
+                    } else {
+                        btn.className = "px-2.5 py-0.5 rounded-full text-[10px] font-black border border-slate-200 hover:bg-slate-50 transition-all select-none text-slate-600 flex items-center gap-1";
+                    }
+                }
+            });
+
+            debouncedApplyFilters();
+        }
+
+        // 🚀 AI 큐레이션 테마별 실시간 자체 알고리즘 필터 함수
+        function filterPropertiesByTheme(properties, targetTheme) {
+            if (!targetTheme) return properties;
+
+            return properties.filter(item => {
+                const address = item.address || "";
+                const ptype = item.ptype || "";
+                const notes = item.notes_content || "";
+                const appraisal = item.appraised_value || 0;
+                const minimum = item.minimum_bid || 0;
+                const margin = Math.max(0, appraisal - minimum);
+                
+                let expectedYield = 0.0;
+                if (appraisal > 0) {
+                    expectedYield = (margin / appraisal) * 100;
+                }
+                
+                const riskKeywords = ["유치권", "법정지상권", "주의", "인수", "대항력 있음", "분묘기지권"];
+                let isClean = true;
+                for (const key of riskKeywords) {
+                    if (notes.includes(key)) {
+                        isClean = false;
+                        break;
+                    }
+                }
+
+                if (targetTheme === "clean_rights") {
+                    return isClean && expectedYield >= 20.0;
+                }
+                
+                if (targetTheme === "half_price") {
+                    if (!isClean) return true;
+                    const ratio = minimum / appraisal;
+                    if (appraisal > 0 && ratio <= 0.4) return true;
+                    if ((item.round_info || "").includes("3회") || (item.round_info || "").includes("4회") || (item.round_info || "").includes("5회") || (item.round_info || "").includes("6회")) return true;
+                    return false;
+                }
+                
+                if (targetTheme === "hot_yongin") {
+                    return address.includes("용인");
+                }
+                
+                if (targetTheme === "lifestyle_3eok") {
+                    if (address.includes("제주") && minimum <= 300000000 && (ptype.includes("주택") || ptype.includes("단독"))) return true;
+                    if (address.includes("서울") && minimum <= 300000000 && (ptype.includes("다세대") || ptype.includes("빌라") || ptype.includes("연립"))) return true;
+                    if (minimum <= 50000000) return true;
+                    return false;
+                }
+                
+                if (targetTheme === "yield_top") {
+                    const isShopOrOffice = ptype.includes("상가") || ptype.includes("오피스텔") || ptype.includes("점포") || ptype.includes("근린") || ptype.includes("상업");
+                    return isShopOrOffice && expectedYield >= 30.0;
+                }
+
+                if (targetTheme === "redevelopment") {
+                    const isResident = ptype.includes("아파트") || ptype.includes("다세대") || ptype.includes("빌라") || ptype.includes("연립");
+                    let builtYear = 0;
+                    const metaMatch = notes.match(/__METADATA__:({.*})__/);
+                    if (metaMatch) {
+                        try {
+                            const meta = JSON.parse(metaMatch[1]);
+                            builtYear = meta.complex_info ? (meta.complex_info.built_year || 0) : 0;
+                        } catch (e) {}
+                    }
+                    const currentYear = new Date().getFullYear();
+                    return isResident && builtYear > 0 && (currentYear - builtYear) >= 30;
+                }
+                
+                if (targetTheme === "mini_land") {
+                    const isLand = ptype.includes("토지") || ptype.includes("대지") || ptype.includes("임야") || ptype.includes("잡종지") || ptype.includes("대") || ptype.includes("전") || ptype.includes("답");
+                    return isLand && minimum <= 20000000;
+                }
+                
+                if (targetTheme === "auto_machinery") {
+                    const type = ptype.toLowerCase();
+                    const isVehicle = type.includes("차량") || type.includes("운송") || type.includes("자동차") || type.includes("선박") || type.includes("항공기") || type.includes("중기") || type.includes("지게차") || type.includes("suv");
+                    const isSecurity = type.includes("유가증권") || type.includes("주식") || type.includes("채권") || type.includes("지분") || type.includes("증권");
+                    const isMachinery = type.includes("기계") || (type.includes("장비") && !type.includes("운송장비")) || type.includes("기구") || type.includes("설비") || type.includes("기기");
+                    const isGoods = type.includes("물품") || type.includes("기타물품") || type.includes("동산") || type.includes("기타동산") || item.source === 'onbid_etc' || item.source === 'court_etc';
+                    return isVehicle || isSecurity || isMachinery || isGoods;
+                }
+                
+                if (targetTheme === "officetel_income") {
+                    return ptype.includes("오피스텔") && expectedYield >= 15.0;
+                }
+                
+                if (targetTheme === "subway_safe") {
+                    const isSafe = !notes.includes("유치권") && !notes.includes("법정지상권") && !notes.includes("인수") && !notes.includes("주의") && !notes.includes("대항력 있음");
+                    
+                    let walkTime = 999;
+                    let subwayInfo = item.subway_info;
+                    
+                    const metaMatch = notes.match(/__METADATA__:({.*})__/);
+                    if (metaMatch) {
+                        try {
+                            const meta = JSON.parse(metaMatch[1]);
+                            if (meta.subway_info) subwayInfo = meta.subway_info;
+                        } catch (e) {}
+                    }
+                    
+                    if (subwayInfo) {
+                        walkTime = subwayInfo.walk_time || 999;
+                        if (walkTime === 999 && subwayInfo.distance) {
+                            walkTime = Math.round(subwayInfo.distance / 80);
+                        }
+                    }
+                    
+                    if (walkTime === 999) {
+                        const dongMatch = address.match(/([가-힇]+[동읍면리])\s/);
+                        if (dongMatch) {
+                            const dongName = dongMatch[1];
+                            const REGIONAL_INFRA_DB = {
+                                "화곡동": 320, "가락동": 280, "반포동": 210, "정자동": 350,
+                                "다산동": 410, "둔산동": 450, "범어동": 310, "우동": 240,
+                                "봉선동": 620, "옥동": 850, "청라동": 580, "삼전동": 180,
+                                "대치동": 190, "서초동": 250, "역삼동": 220, "상계동": 300,
+                                "중계동": 340, "신림동": 420, "구로동": 380, "등촌동": 290,
+                                "목동": 270, "신정동": 310, "성산동": 260, "망원동": 330
+                            };
+                            const dist = REGIONAL_INFRA_DB[dongName];
+                            if (dist !== undefined) {
+                                walkTime = Math.round(dist / 80);
+                            }
+                        }
+                    }
+                    
+                    return isSafe && walkTime <= 15;
+                }
+
+                if (targetTheme === "small_building") {
+                    const isCommercial = ptype.includes("상가") || ptype.includes("빌딩") || ptype.includes("근린") || ptype.includes("점포") || ptype.includes("상업") || ptype.includes("다가구") || ptype.includes("주택");
+                    return isCommercial && minimum >= 500000000 && minimum <= 3000000000;
+                }
+
+                if (targetTheme === "school_district") {
+                    const isResident = ptype.includes("아파트") || ptype.includes("다세대") || ptype.includes("빌라") || ptype.includes("연립");
+                    const hasSchool = notes.includes("학교") || notes.includes("초등") || notes.includes("학군") || notes.includes("중학교") || notes.includes("고등학교");
+                    return isClean && isResident && hasSchool;
+                }
+
+                if (targetTheme === "capital_single") {
+                    const isCapital = address.includes("서울") || address.includes("경기") || address.includes("인천");
+                    const isSingleType = ptype.includes("오피스텔") || ptype.includes("다세대") || ptype.includes("빌라") || ptype.includes("연립") || ptype.includes("도시형");
+
+                    let walkTime = 999;
+                    let subwayInfo = item.subway_info;
+                    const metaMatch = notes.match(/__METADATA__:({.*})__/);
+                    if (metaMatch) {
+                        try {
+                            const meta = JSON.parse(metaMatch[1]);
+                            if (meta.subway_info) subwayInfo = meta.subway_info;
+                        } catch (e) {}
+                    }
+                    if (subwayInfo) {
+                        walkTime = subwayInfo.walk_time || 999;
+                        if (walkTime === 999 && subwayInfo.distance) {
+                            walkTime = Math.round(subwayInfo.distance / 80);
+                        }
+                    }
+                    return isCapital && isSingleType && minimum <= 200000000 && walkTime <= 10;
+                }
+
+                if (targetTheme === "local_healing") {
+                    const isCapital = address.includes("서울") || address.includes("경기") || address.includes("인천") || address.includes("서울특별시") || address.includes("경기도") || address.includes("인천광역시");
+                    const isHealingHouse = ptype.includes("주택") || ptype.includes("단독") || ptype.includes("전원");
+                    return !isCapital && isHealingHouse && minimum <= 150000000;
+                }
+
+                if (targetTheme === "heavy_dropped") {
+                    const ratio = minimum / appraisal;
+                    return appraisal > 0 && ratio <= 0.3;
+                }
+
+                if (targetTheme === "factory_warehouse") {
+                    const isIndustry = ptype.includes("공장") || ptype.includes("창고") || ptype.includes("산업") || ptype.includes("아파트형공장");
+                    return isIndustry && minimum >= 300000000;
+                }
+
+                if (targetTheme === "share_investment") {
+                    const isShare = ptype.includes("지분") || notes.includes("지분") || (item.title || "").includes("지분");
+                    return isShare && minimum <= 50000000;
+                }
+                
+                return false;
+            });
         }
 
         // 🚀 입력 지연 디바운싱 필터 트리거 (성능 극대화)
@@ -5682,7 +5930,6 @@
             // 🗺️ 로드뷰 / 실사진 연동 로직 (비부동산 분기)
             const rvButtonsContainer = document.getElementById("detail-roadview-buttons-container");
             const rvImageContainer = document.getElementById("detail-roadview-image-container");
-            const rvTitle = document.getElementById("detail-roadview-title");
 
             const hubNaverRoad = document.getElementById("btn-naver-roadview-hub");
             const hubKakaoRoad = document.getElementById("btn-kakao-roadview-hub");

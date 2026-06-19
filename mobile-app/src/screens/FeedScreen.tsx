@@ -69,6 +69,213 @@ const estimateAuctionRounds = (appraisal: number, price: number, source: string)
   };
 };
 
+export const AI_THEMES = [
+  { key: null, label: '전체 피드', emoji: '🗂️' },
+  { key: 'clean_rights', label: '권리클린', emoji: '🛡️', color: '#10b981' },
+  { key: 'half_price', label: '반값 격전지', emoji: '🎯', color: '#f43f5e' },
+  { key: 'hot_yongin', label: '반도체 HOT 용인', emoji: '🔥', color: '#6366f1' },
+  { key: 'lifestyle_3eok', label: '제주/서울 3억 이하', emoji: '⛺', color: '#f59e0b' },
+  { key: 'yield_top', label: '상가 수익률 TOP', emoji: '💰', color: '#3b82f6' },
+  { key: 'redevelopment', label: '아파트 재건축', emoji: '🏢', color: '#f97316' },
+  { key: 'mini_land', label: '초소액 토지', emoji: '🌲', color: '#65a30d' },
+  { key: 'auto_machinery', label: '실속 차량/동산', emoji: '🚗', color: '#a855f7' },
+  { key: 'officetel_income', label: '월세 오피스텔', emoji: '🏙️', color: '#06b6d4' },
+  { key: 'subway_safe', label: '역세권 대항력 안전', emoji: '🚇', color: '#14b8a6' },
+  { key: 'small_building', label: '꼬마빌딩 건물주', emoji: '🏰', color: '#b45309' },
+  { key: 'school_district', label: '학세권 우수 교육', emoji: '🎓', color: '#059669' },
+  { key: 'capital_single', label: '수도권 1인 가구 갭', emoji: '💻', color: '#8b5cf6' },
+  { key: 'local_healing', label: '지방 힐링 세컨하우스', emoji: '🏡', color: '#16a34a' },
+  { key: 'heavy_dropped', label: '줍줍! 70% 폭락', emoji: '⬇️', color: '#dc2626' },
+  { key: 'factory_warehouse', label: '창업/물류 공장창고', emoji: '🏭', color: '#475569' },
+  { key: 'share_investment', label: '소액 지분 틈새투자', emoji: '✂️', color: '#fb7185' },
+];
+
+export const filterPropertiesByThemeMobile = (properties: Property[], targetTheme: string | null | undefined): Property[] => {
+  if (!targetTheme) return properties;
+
+  return properties.filter(item => {
+    const address = item.address || "";
+    const ptype = item.ptype || "";
+    const notes = item.notes_content || "";
+    const appraisal = item.appraised_value || 0;
+    const minimum = item.minimum_bid || 0;
+    const margin = Math.max(0, appraisal - minimum);
+    
+    let expectedYield = 0.0;
+    if (appraisal > 0) {
+      expectedYield = (margin / appraisal) * 100;
+    }
+    
+    const riskKeywords = ["유치권", "법정지상권", "주의", "인수", "대항력 있음", "분묘기지권"];
+    let isClean = true;
+    for (const key of riskKeywords) {
+      if (notes.includes(key)) {
+        isClean = false;
+        break;
+      }
+    }
+
+    if (targetTheme === "clean_rights") {
+      return isClean && expectedYield >= 20.0;
+    }
+    
+    if (targetTheme === "half_price") {
+      if (!isClean) return true;
+      const ratio = minimum / appraisal;
+      if (appraisal > 0 && ratio <= 0.4) return true;
+      if ((item.round_info || "").includes("3회") || (item.round_info || "").includes("4회") || (item.round_info || "").includes("5회") || (item.round_info || "").includes("6회")) return true;
+      return false;
+    }
+    
+    if (targetTheme === "hot_yongin") {
+      return address.includes("용인");
+    }
+    
+    if (targetTheme === "lifestyle_3eok") {
+      if (address.includes("제주") && minimum <= 300000000 && (ptype.includes("주택") || ptype.includes("단독"))) return true;
+      if (address.includes("서울") && minimum <= 300000000 && (ptype.includes("다세대") || ptype.includes("빌라") || ptype.includes("연립"))) return true;
+      if (minimum <= 50000000) return true;
+      return false;
+    }
+    
+    if (targetTheme === "yield_top") {
+      const isShopOrOffice = ptype.includes("상가") || ptype.includes("오피스텔") || ptype.includes("점포") || ptype.includes("근린") || ptype.includes("상업");
+      return isShopOrOffice && expectedYield >= 30.0;
+    }
+
+    if (targetTheme === "redevelopment") {
+      const isResident = ptype.includes("아파트") || ptype.includes("다세대") || ptype.includes("빌라") || ptype.includes("연립");
+      let builtYear = 0;
+      const metaMatch = notes.match(/__METADATA__:({.*})__/);
+      if (metaMatch) {
+        try {
+          const meta = JSON.parse(metaMatch[1]);
+          builtYear = meta.complex_info ? (meta.complex_info.built_year || 0) : 0;
+        } catch (e) {}
+      }
+      const currentYear = new Date().getFullYear();
+      return isResident && builtYear > 0 && (currentYear - builtYear) >= 30;
+    }
+    
+    if (targetTheme === "mini_land") {
+      const isLand = ptype.includes("토지") || ptype.includes("대지") || ptype.includes("임야") || ptype.includes("잡종지") || ptype.includes("대") || ptype.includes("전") || ptype.includes("답");
+      return isLand && minimum <= 20000000;
+    }
+    
+    if (targetTheme === "auto_machinery") {
+      const type = ptype.toLowerCase();
+      const isVehicle = type.includes("차량") || type.includes("운송") || type.includes("자동차") || type.includes("선박") || type.includes("항공기") || type.includes("중기") || type.includes("지게차") || type.includes("suv");
+      const isSecurity = type.includes("유가증권") || type.includes("주식") || type.includes("채권") || type.includes("지분") || type.includes("증권");
+      const isMachinery = type.includes("기계") || (type.includes("장비") && !type.includes("운송장비")) || type.includes("기구") || type.includes("설비") || type.includes("기기");
+      const isGoods = type.includes("물품") || type.includes("기타물품") || type.includes("동산") || type.includes("기타동산") || item.source === 'onbid_etc' || item.source === 'court_etc';
+      return isVehicle || isSecurity || isMachinery || isGoods;
+    }
+    
+    if (targetTheme === "officetel_income") {
+      return ptype.includes("오피스텔") && expectedYield >= 15.0;
+    }
+    
+    if (targetTheme === "subway_safe") {
+      const isSafe = !notes.includes("유치권") && !notes.includes("법정지상권") && !notes.includes("인수") && !notes.includes("주의") && !notes.includes("대항력 있음");
+      
+      let walkTime = 999;
+      let subwayInfo = item.subway_info;
+      
+      const metaMatch = notes.match(/__METADATA__:({.*})__/);
+      if (metaMatch) {
+        try {
+          const meta = JSON.parse(metaMatch[1]);
+          if (meta.subway_info) subwayInfo = meta.subway_info;
+        } catch (e) {}
+      }
+      
+      if (subwayInfo) {
+        walkTime = subwayInfo.walk_time || 999;
+        if (walkTime === 999 && subwayInfo.distance) {
+          walkTime = Math.round(subwayInfo.distance / 80);
+        }
+      }
+      
+      if (walkTime === 999) {
+        const dongMatch = address.match(/([가-힇]+[동읍면리])\s/);
+        if (dongMatch) {
+          const dongName = dongMatch[1];
+          const REGIONAL_INFRA_DB: Record<string, number> = {
+            "화곡동": 320, "가락동": 280, "반포동": 210, "정자동": 350,
+            "다산동": 410, "둔산동": 450, "범어동": 310, "우동": 240,
+            "봉선동": 620, "옥동": 850, "청라동": 580, "삼전동": 180,
+            "대치동": 190, "서초동": 250, "역삼동": 220, "상계동": 300,
+            "중계동": 340, "신림동": 420, "구로동": 380, "등촌동": 290,
+            "목동": 270, "신정동": 310, "성산동": 260, "망원동": 330
+          };
+          const dist = REGIONAL_INFRA_DB[dongName];
+          if (dist !== undefined) {
+            walkTime = Math.round(dist / 80);
+          }
+        }
+      }
+      
+      return isSafe && walkTime <= 15;
+    }
+
+    if (targetTheme === "small_building") {
+      const isCommercial = ptype.includes("상가") || ptype.includes("빌딩") || ptype.includes("근린") || ptype.includes("점포") || ptype.includes("상업") || ptype.includes("다가구") || ptype.includes("주택");
+      return isCommercial && minimum >= 500000000 && minimum <= 3000000000;
+    }
+
+    if (targetTheme === "school_district") {
+      const isResident = ptype.includes("아파트") || ptype.includes("다세대") || ptype.includes("빌라") || ptype.includes("연립");
+      const hasSchool = notes.includes("학교") || notes.includes("초등") || notes.includes("학군") || notes.includes("중학교") || notes.includes("고등학교");
+      return isClean && isResident && hasSchool;
+    }
+
+    if (targetTheme === "capital_single") {
+      const isCapital = address.includes("서울") || address.includes("경기") || address.includes("인천");
+      const isSingleType = ptype.includes("오피스텔") || ptype.includes("다세대") || ptype.includes("빌라") || ptype.includes("연립") || ptype.includes("도시형");
+
+      let walkTime = 999;
+      let subwayInfo = item.subway_info;
+      const metaMatch = notes.match(/__METADATA__:({.*})__/);
+      if (metaMatch) {
+        try {
+          const meta = JSON.parse(metaMatch[1]);
+          if (meta.subway_info) subwayInfo = meta.subway_info;
+        } catch (e) {}
+      }
+      if (subwayInfo) {
+        walkTime = subwayInfo.walk_time || 999;
+        if (walkTime === 999 && subwayInfo.distance) {
+          walkTime = Math.round(subwayInfo.distance / 80);
+        }
+      }
+      return isCapital && isSingleType && minimum <= 200000000 && walkTime <= 10;
+    }
+
+    if (targetTheme === "local_healing") {
+      const isCapital = address.includes("서울") || address.includes("경기") || address.includes("인천") || address.includes("서울특별시") || address.includes("경기도") || address.includes("인천광역시");
+      const isHealingHouse = ptype.includes("주택") || ptype.includes("단독") || ptype.includes("전원");
+      return !isCapital && isHealingHouse && minimum <= 150000000;
+    }
+
+    if (targetTheme === "heavy_dropped") {
+      const ratio = minimum / appraisal;
+      return appraisal > 0 && ratio <= 0.3;
+    }
+
+    if (targetTheme === "factory_warehouse") {
+      const isIndustry = ptype.includes("공장") || ptype.includes("창고") || ptype.includes("산업") || ptype.includes("아파트형공장");
+      return isIndustry && minimum >= 300000000;
+    }
+
+    if (targetTheme === "share_investment") {
+      const isShare = ptype.includes("지분") || notes.includes("지분") || (item.title || "").includes("지분");
+      return isShare && minimum <= 50000000;
+    }
+    
+    return false;
+  });
+};
+
 const FULL_REGIONS: Record<string, string[]> = {
   "서울": ["강남구", "강동구", "강북구", "강서구", "관악구", "광진구", "구로구", "금천구", "노원구", "도봉구", "동대문구", "동작구", "마포구", "서대문구", "서초구", "성동구", "성북구", "송파구", "양천구", "영등포구", "용산구", "은평구", "종로구", "중구", "중랑구"],
   "부산": ["강서구", "금정구", "기장군", "남구", "동구", "동래구", "부산진구", "북구", "사상구", "사하구", "서구", "수영구", "연제구", "영도구", "중구", "해운대구"],
@@ -623,6 +830,11 @@ export const FeedScreen: React.FC<FeedScreenProps> = ({ onSelectProperty, filter
       return (b.score || 0) - (a.score || 0);
     });
 
+    // 🚀 모바일 AI 큐레이션 테마 필터링 추가 결합
+    if (filters.theme) {
+      result = filterPropertiesByThemeMobile(result, filters.theme);
+    }
+
     setFilteredProperties(result);
   }, [properties, filters, sortKey, sortDir]);
 
@@ -641,6 +853,7 @@ export const FeedScreen: React.FC<FeedScreenProps> = ({ onSelectProperty, filter
       gradeFilter: 'all',
       investmentType: 'all',
       selectedCourts: [],
+      theme: null,
     });
   };
 
@@ -730,19 +943,35 @@ export const FeedScreen: React.FC<FeedScreenProps> = ({ onSelectProperty, filter
           </TouchableOpacity>
         </View>
 
-        {/* 추천 검색어 제안 칩 바 */}
+        {/* AI 추천 검색어 제안 칩 바 */}
         <View style={styles.suggestedSearchContainer}>
-          <Text style={styles.suggestedSearchTitle}>추천 검색어</Text>
+          <Text style={styles.suggestedSearchTitle}>✨ AI 추천</Text>
           <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.suggestedSearchScroll}>
-            {['아파트', '빌라', '서울', '경기', '유찰', '차량'].map((kw) => (
-              <TouchableOpacity
-                key={kw}
-                style={styles.suggestedSearchChip}
-                onPress={() => setFilters((prev) => ({ ...prev, search: kw }))}
-              >
-                <Text style={styles.suggestedSearchChipText}>{kw}</Text>
-              </TouchableOpacity>
-            ))}
+            {AI_THEMES.map((item) => {
+              const isActive = filters.theme === item.key;
+              return (
+                <TouchableOpacity
+                  key={item.label}
+                  style={[
+                    styles.suggestedSearchChip,
+                    isActive && {
+                      backgroundColor: item.color || COLORS.royalBlue,
+                      borderColor: item.color || COLORS.royalBlue,
+                    }
+                  ]}
+                  onPress={() => setFilters((prev) => ({ ...prev, theme: prev.theme === item.key ? null : item.key }))}
+                >
+                  <Text 
+                    style={[
+                      styles.suggestedSearchChipText,
+                      isActive && { color: COLORS.white, fontWeight: '900' }
+                    ]}
+                  >
+                    {item.emoji} {item.label}
+                  </Text>
+                </TouchableOpacity>
+              );
+            })}
           </ScrollView>
         </View>
 
