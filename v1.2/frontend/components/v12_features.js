@@ -270,16 +270,19 @@ const v12Features = (function() {
 
                 const input = document.getElementById("v12-mock-bid-input");
                 if (userBid && input) {
-                    input.value = userBid.bid_price;
+                    input.value = formatNumberWithCommas(userBid.bid_price);
+                    updateMockBidSpread(parseInt(userBid.bid_price) || 0);
                     if (msgEl) {
                         msgEl.innerHTML = `<span class="text-emeraldSuccess"><i class="fa-solid fa-circle-check"></i> 이미 모의입찰에 참여하셨습니다. (수정 가능)</span>`;
                         msgEl.classList.remove("hidden");
                     }
                 } else {
                     if (input) input.value = "";
+                    updateMockBidSpread(0);
                     if (msgEl) msgEl.classList.add("hidden");
                 }
             } else {
+                updateMockBidSpread(0);
                 if (msgEl) {
                     msgEl.innerHTML = `<span class="text-rose-500 font-bold"><i class="fa-solid fa-triangle-exclamation"></i> 로그인 시 모의입찰 참여가 가능합니다.</span>`;
                     msgEl.classList.remove("hidden");
@@ -288,6 +291,70 @@ const v12Features = (function() {
         } catch (err) {
             console.error("모의입찰 통계 조회 실패:", err);
         }
+    }
+
+    // 천단위 콤마 헬퍼 함수
+    function formatNumberWithCommas(val) {
+        const cleanVal = String(val).replace(/[^0-9]/g, '');
+        if (!cleanVal) return '';
+        return Number(cleanVal).toLocaleString();
+    }
+
+    // 모의입찰 입력 필드 입력 핸들러
+    function handleMockBidInput(input) {
+        const selectionStart = input.selectionStart;
+        const oldLength = input.value.length;
+        
+        const formatted = formatNumberWithCommas(input.value);
+        input.value = formatted;
+        
+        const newLength = formatted.length;
+        const diff = newLength - oldLength;
+        let newCursor = selectionStart + diff;
+        input.setSelectionRange(newCursor, newCursor);
+        
+        const bidPrice = parseInt(formatted.replace(/,/g, '')) || 0;
+        updateMockBidSpread(bidPrice);
+    }
+
+    // 모의입찰 필요 비용 실시간 스프레드 요약 연동
+    function updateMockBidSpread(bidPrice) {
+        const container = document.getElementById("v12-mock-bid-spread-container");
+        if (!container) return;
+        
+        if (bidPrice <= 0) {
+            container.classList.add("hidden");
+            return;
+        }
+        
+        container.classList.remove("hidden");
+        
+        // 취득세 요율 구별 (ptype에 따라 비주택 4.6%, 주택 1.5%)
+        let taxRate = 0.015;
+        if (window.selectedProperty) {
+            const ptype = (window.selectedProperty.ptype || "").toLowerCase();
+            if (ptype.includes("상가") || ptype.includes("점포") || ptype.includes("근린") || ptype.includes("토지") || ptype.includes("공장") || ptype.includes("빌딩") || ptype.includes("기타")) {
+                taxRate = 0.046;
+            }
+        }
+        
+        const acquisitionTax = Math.floor(bidPrice * taxRate);
+        const agencyFee = Math.floor(bidPrice * 0.005);
+        const totalBudget = bidPrice + acquisitionTax + agencyFee;
+        const loanAmount = Math.floor(bidPrice * 0.70);
+        const cashRequired = Math.max(0, totalBudget - loanAmount);
+        
+        const taxEl = document.getElementById("v12-mock-spread-tax");
+        const agencyEl = document.getElementById("v12-mock-spread-agency");
+        const loanEl = document.getElementById("v12-mock-spread-loan");
+        const totalEl = document.getElementById("v12-mock-spread-total");
+        const cashEl = document.getElementById("v12-mock-spread-cash");
+        
+        if (taxEl) taxEl.innerText = formatKRW(acquisitionTax);
+        if (agencyEl) agencyEl.innerText = "+ " + formatKRW(agencyFee);
+        if (loanEl) loanEl.innerText = formatKRW(loanAmount);
+        if (totalEl) totalEl.innerText = formatKRW(totalBudget);
+        if (cashEl) cashEl.innerText = formatKRW(cashRequired);
     }
 
     // 9. 모의입찰가 제출
@@ -300,7 +367,7 @@ const v12Features = (function() {
         const input = document.getElementById("v12-mock-bid-input");
         if (!input) return;
 
-        const bidPrice = parseInt(input.value.trim());
+        const bidPrice = parseInt(input.value.replace(/,/g, '').trim());
         if (isNaN(bidPrice) || bidPrice <= 0) {
             alert("유효한 가상 입찰가격을 입력해 주십시오.");
             return;
@@ -467,7 +534,9 @@ const v12Features = (function() {
         submitMockBid: submitMockBid,
         payPremiumAndUpgrade: payPremiumAndUpgrade,
         renderExperts: renderExperts,
-        requestExpertConsultation: requestExpertConsultation
+        requestExpertConsultation: requestExpertConsultation,
+        handleMockBidInput: handleMockBidInput,
+        updateMockBidSpread: updateMockBidSpread
     };
 })();
 

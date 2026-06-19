@@ -521,7 +521,7 @@ export const DetailScreen: React.FC<DetailScreenProps> = ({ property, onBack }) 
         if (myBidErr) throw myBidErr;
 
         if (myBid) {
-          setUserBidPrice(myBid.bid_price.toString());
+          setUserBidPrice(Number(myBid.bid_price).toLocaleString());
           setIsAlreadyBid(true);
         } else {
           setUserBidPrice('');
@@ -545,7 +545,7 @@ export const DetailScreen: React.FC<DetailScreenProps> = ({ property, onBack }) 
       return;
     }
 
-    const priceNum = parseInt(userBidPrice.trim());
+    const priceNum = parseInt(userBidPrice.replace(/,/g, '').trim());
     if (isNaN(priceNum) || priceNum <= 0) {
       Alert.alert('오류', '유효한 가상 입찰가격을 입력해주십시오.');
       return;
@@ -3083,7 +3083,7 @@ export const DetailScreen: React.FC<DetailScreenProps> = ({ property, onBack }) 
 
               <View style={{ backgroundColor: '#fffbeb', borderColor: '#fef3c7', borderWidth: 1, padding: 8, borderRadius: 8, marginBottom: 10 }}>
                 <Text style={{ fontSize: 10, color: '#b45309', fontWeight: 'bold', lineHeight: 14 }}>
-                  ⚠️ 본 예측 시세는 시나리오별 연 복리 상승률을 적용한 단순 추정치이며 실제 시장 변화와 다를 수 있으므로 참고용으로만 사용하시기 바랍니다.
+                  ⚠️ AI 분석 예측 모델 기준 (가상 시나리오 지표 - 허수). 본 예측 시세는 입지 모멘텀, AI 등급 가산, 유찰 조정률, 거시 인플레이션 상수가 복합 반영된 시뮬레이션 지표이며 실제 시장 변화와 다를 수 있으므로 참고용으로만 사용하시기 바랍니다.
                 </Text>
               </View>
 
@@ -3115,7 +3115,39 @@ export const DetailScreen: React.FC<DetailScreenProps> = ({ property, onBack }) 
 
               {(() => {
                 const basePrice = currentProperty.appraised_value || 0;
-                const r = futureGrowthRate / 100;
+                
+                // 입지 모멘텀 보정
+                const addr = currentProperty.address || "";
+                let locationMomentum = 0;
+                if (addr.includes("서울") || addr.includes("경기") || addr.includes("인천")) {
+                  locationMomentum = 0.8;
+                } else if (addr.includes("부산") || addr.includes("대구") || addr.includes("대전") || addr.includes("광주") || addr.includes("울산") || addr.includes("세종")) {
+                  locationMomentum = 0.3;
+                } else {
+                  locationMomentum = -0.2;
+                }
+
+                // AI 안전 등급 보정 (A등급: +0.5%, B등급: +0.1%, C등급: -0.5%)
+                let aiGradeBonus = 0;
+                const g = (currentProperty.ai_grade || "C").toUpperCase();
+                if (g === "A") {
+                  aiGradeBonus = 0.5;
+                } else if (g === "B") {
+                  aiGradeBonus = 0.1;
+                } else {
+                  aiGradeBonus = -0.5;
+                }
+
+                // 유찰 횟수 감가 조정 반영
+                const auctionInfo = estimateAuctionRounds(currentProperty.appraised_value, currentProperty.minimum_bid, currentProperty.source);
+                const failedCount = auctionInfo.failedCount;
+                const failedCorrection = failedCount * -0.15;
+
+                // 거시 인플레이션 보정 (+1.2%)
+                const macroInflation = 1.2;
+
+                const adjustedRate = futureGrowthRate + locationMomentum + aiGradeBonus + failedCorrection + macroInflation;
+                const r = adjustedRate / 100;
                 
                 const terms = [1, 3, 5, 10];
                 const rows = terms.map(t => {
@@ -3528,9 +3560,16 @@ export const DetailScreen: React.FC<DetailScreenProps> = ({ property, onBack }) 
                   <View style={{ flexDirection: 'row', gap: 8 }}>
                     <TextInput
                       style={styles.mockBidInput}
-                      placeholder="예: 250000000"
+                      placeholder="예: 250,000,000"
                       value={userBidPrice}
-                      onChangeText={setUserBidPrice}
+                      onChangeText={(txt) => {
+                        const clean = txt.replace(/[^0-9]/g, '');
+                        if (clean === '') {
+                          setUserBidPrice('');
+                        } else {
+                          setUserBidPrice(Number(clean).toLocaleString());
+                        }
+                      }}
                       keyboardType="numeric"
                     />
                     <TouchableOpacity onPress={submitMockBid} style={styles.mockBidSubmitBtn}>
@@ -3542,6 +3581,56 @@ export const DetailScreen: React.FC<DetailScreenProps> = ({ property, onBack }) 
                       ✓ 이미 모의입찰에 참여하셨습니다. (수정 가능)
                     </Text>
                   )}
+
+                  {/* 📊 실시간 세무/금융 자금계획 스프레드 영역 */}
+                  {(() => {
+                    const bidPrice = parseInt(userBidPrice.replace(/,/g, '')) || 0;
+                    if (bidPrice <= 0) return null;
+
+                    let taxRate = 0.015;
+                    const ptype = (currentProperty.ptype || "").toLowerCase();
+                    if (ptype.includes("상가") || ptype.includes("점포") || ptype.includes("근린") || ptype.includes("토지") || ptype.includes("공장") || ptype.includes("빌딩") || ptype.includes("기타")) {
+                      taxRate = 0.046;
+                    }
+                    const acquisitionTax = Math.floor(bidPrice * taxRate);
+                    const agencyFee = Math.floor(bidPrice * 0.005);
+                    const totalBudget = bidPrice + acquisitionTax + agencyFee;
+                    const loanAmount = Math.floor(bidPrice * 0.70);
+                    const cashRequired = Math.max(0, totalBudget - loanAmount);
+
+                    return (
+                      <View style={{ marginTop: 14, backgroundColor: '#f8fafc', borderColor: '#e2e8f0', borderWidth: 1, borderRadius: 12, padding: 10 }}>
+                        <Text style={{ fontSize: 10, fontWeight: 'bold', color: '#1e293b', borderBottomWidth: 1, borderBottomColor: '#cbd5e1', pb: 4, marginBottom: 8 }}>
+                          📋 실시간 자금 계획 스프레드 (시뮬레이션)
+                        </Text>
+                        <View style={{ gap: 4 }}>
+                          <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+                            <Text style={{ fontSize: 11, color: '#64748b' }}>취득세 예상액</Text>
+                            <Text style={{ fontSize: 11, fontWeight: 'bold', color: '#1e293b' }}>{formatCurrency(acquisitionTax)}</Text>
+                          </View>
+                          <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+                            <Text style={{ fontSize: 11, color: '#64748b' }}>법무 대행비 (0.5%)</Text>
+                            <Text style={{ fontSize: 11, fontWeight: 'bold', color: '#1e293b' }}>+ {formatCurrency(agencyFee)}</Text>
+                          </View>
+                          <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+                            <Text style={{ fontSize: 11, color: '#64748b' }}>LTV 가상 대출한도 (70%)</Text>
+                            <Text style={{ fontSize: 11, fontWeight: 'bold', color: '#1e293b' }}>{formatCurrency(loanAmount)}</Text>
+                          </View>
+                          <View style={{ flexDirection: 'row', justifyContent: 'space-between', backgroundColor: '#eff6ff', padding: 6, borderRadius: 6, marginTop: 4 }}>
+                            <Text style={{ fontSize: 11, color: COLORS.royalBlue, fontWeight: 'bold' }}>총 예상 소요자금</Text>
+                            <Text style={{ fontSize: 11, fontWeight: 'bold', color: COLORS.royalBlue }}>{formatCurrency(totalBudget)}</Text>
+                          </View>
+                          <View style={{ flexDirection: 'row', justifyContent: 'space-between', backgroundColor: '#ecfdf5', padding: 6, borderRadius: 6, marginTop: 2 }}>
+                            <Text style={{ fontSize: 11, color: COLORS.emeraldSuccess, fontWeight: 'bold' }}>필요 최소 자기자본</Text>
+                            <Text style={{ fontSize: 11, fontWeight: 'bold', color: COLORS.emeraldSuccess }}>{formatCurrency(cashRequired)}</Text>
+                          </View>
+                        </View>
+                        <Text style={{ fontSize: 8.5, color: '#94a3b8', marginTop: 6, textAlign: 'center' }}>
+                          ※ LTV 대출 규제 및 개인 신용도에 따라 실제 한도는 상이할 수 있습니다.
+                        </Text>
+                      </View>
+                    );
+                  })()}
                   {!userId && (
                     <Text style={{ fontSize: 10, color: COLORS.crimsonAlert, fontWeight: 'bold', marginTop: 4 }}>
                       ⚠ 로그인 시 모의입찰 참여가 가능합니다.
