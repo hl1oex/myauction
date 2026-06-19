@@ -1,0 +1,1080 @@
+﻿diff --git a/index.html b/index.html
+index a3b1bd6..f11a8e7 100644
+--- a/index.html
++++ b/index.html
+@@ -1316,13 +1316,18 @@
+                     </div>
+                 </div>
+ 
+-                <!-- 3. 寃쎈ℓ 湲곗씪 ?대젰怨??몃? ?뺣낫 ?곕룞/?좎궗 留ㅻЪ 諛섏쓳??遺꾧린 ?덉씠?꾩썐 -->
+-                <div class="grid grid-cols-1 xl:grid-cols-2 gap-4 sm:gap-5 items-start">
+-                    <!-- 寃쎈ℓ 吏꾪뻾 湲곗씪 ?대젰 -->
+-                    <div class="bg-white border border-slate-200 rounded-2xl p-4 space-y-2 shadow-sm w-full">
+-                        <h4 class="text-xs sm:text-sm font-black text-slate-800 flex items-center gap-1.5 mb-2.5">
+-                            <i class="fa-solid fa-calendar-days text-royalBlue"></i> ?뱟 寃쎈ℓ 吏꾪뻾 湲곗씪 ?대젰
+-                        </h4>
++                <!-- 3. ??붾㈃ xl ?댁긽?????2??諛섏쓳??洹몃━???덉씠?꾩썐 (鍮?怨듦컙 ?뚭굅 諛??뚯씠釉?媛濡??섏뼱吏?諛⑹?) -->
++                <div class="grid grid-cols-1 xl:grid-cols-2 gap-4 sm:gap-5 w-full items-start">
++                    <!-- ?쇱そ ?? 湲곗씪 ?대젰 諛??몃? ?곕룞 ?덈툕? ?좎궗 異붿쿇 留ㅻЪ -->
++                    <div class="space-y-4 sm:space-y-5 w-full">
++                        <!-- 寃쎈ℓ 吏꾪뻾 湲곗씪 ?대젰 -->
++                        <div class="bg-white border border-slate-200 rounded-2xl shadow-sm w-full overflow-hidden">
++                            <div class="bg-slate-50 px-4 py-2.5 border-b border-slate-200">
++                                <h4 class="text-xs sm:text-sm font-black text-slate-800 flex items-center gap-1.5">
++                                    <i class="fa-solid fa-calendar-days text-royalBlue"></i> ?뱟 寃쎈ℓ 吏꾪뻾 湲곗씪 ?대젰
++                                </h4>
++                            </div>
++                            <div class="p-3.5 space-y-3">
+                         <div class="overflow-x-auto border border-slate-200 rounded-xl overflow-hidden shadow-sm bg-white">
+                             <table class="w-full text-left border-collapse text-[13px] document-view">
+                                 <thead>
+@@ -1343,10 +1348,13 @@
+                     <!-- ?곗륫 臾띠쓬: ?몃? ?곕룞 ?덈툕 諛?異붿쿇 留ㅻЪ -->
+                     <div class="space-y-4 sm:space-y-5 w-full">
+                         <!-- ?먯뒪???몃? 怨듭떇 ?뺣낫留??곕룞 -->
+-                        <div class="bg-white border border-slate-200 rounded-2xl p-4 space-y-2.5 shadow-sm">
+-                            <h4 class="text-xs sm:text-sm font-black text-slate-800 flex items-center gap-1.5">
+-                                <i class="fa-solid fa-globe text-royalBlue"></i> ?뙋 ?먯뒪???몃? 怨듭떇 ?뺣낫留??곕룞
+-                            </h4>
++                        <div class="bg-white border border-slate-200 rounded-2xl shadow-sm w-full overflow-hidden">
++                            <div class="bg-slate-50 px-4 py-2.5 border-b border-slate-200">
++                                <h4 class="text-xs sm:text-sm font-black text-slate-800 flex items-center gap-1.5">
++                                    <i class="fa-solid fa-globe text-royalBlue"></i> ?뙋 ?먯뒪???몃? 怨듭떇 ?뺣낫留??곕룞
++                                </h4>
++                            </div>
++                            <div class="p-3.5 space-y-2.5">
+                             <p class="text-[9.5px] text-slate-500 leading-relaxed font-semibold">二쇱슂 ?몃? 怨듭떇 ?ы꽭 諛?吏?꾨줈 諛붾줈 ?대룞?⑸땲??</p>
+                             <div class="grid grid-cols-2 gap-2 text-xs">
+                                 <a id="btn-official-site" href="https://www.courtauction.go.kr" target="_blank" class="bg-slate-50 border border-slate-200 hover:border-royalBlue hover:shadow-md rounded-xl p-2.5 flex items-center gap-2.5 transition-all group">
+@@ -1389,23 +1397,29 @@
+                         </div>
+ 
+                         <!-- ?숈씪 ?⑸룄/吏??湲곕컲 ?좎궗 異붿쿇 留ㅻЪ -->
+-                        <div class="bg-white border border-slate-200 rounded-2xl p-4 space-y-3 shadow-sm">
+-                            <h4 class="text-xs sm:text-sm font-black text-slate-800 flex items-center gap-1.5 pb-2 border-b border-slate-100">
+-                                <i class="fa-solid fa-handshake text-royalBlue"></i> ?쩃 ?숈씪 ?⑸룄/吏??湲곕컲 ?좎궗 異붿쿇 留ㅻЪ
+-                            </h4>
++                        <div class="bg-white border border-slate-200 rounded-2xl shadow-sm w-full overflow-hidden">
++                            <div class="bg-slate-50 px-4 py-2.5 border-b border-slate-200">
++                                <h4 class="text-xs sm:text-sm font-black text-slate-800 flex items-center gap-1.5">
++                                    <i class="fa-solid fa-handshake text-royalBlue"></i> ?쩃 ?숈씪 ?⑸룄/吏??湲곕컲 ?좎궗 異붿쿇 留ㅻЪ
++                                </h4>
++                            </div>
++                            <div class="p-3.5 space-y-3">
+                             <div id="detail-similar-container" class="grid grid-cols-3 gap-2">
+                                 <!-- ?숈쟻 ?뚮뜑留?移대뱶 3媛?-->
+                             </div>
+                         </div>
+                     </div>
+-                </div>
++                </div> <!-- ?몚 ?쇱そ ??space-y-4 ?リ린 -->
+ 
+-                <!-- 4. 媛濡쒓? 湲?踰뺤젙 二쇱슂 ?쒕쪟 ?뚯씠釉?(?⑤룆 1??諛곗튂) -->
+-                <div class="bg-white border border-slate-200 rounded-2xl p-4 space-y-2.5 shadow-sm w-full">
+-                    <h4 class="text-xs sm:text-sm font-black text-slate-800 flex items-center gap-1.5">
+-                        <i class="fa-solid fa-scale-balanced text-royalBlue"></i> ?뽳툘 踰뺤젙 二쇱슂 ?쒕쪟 諛??ш굔 湲곕줉
+-                    </h4>
+-                    <p class="text-[9.5px] text-slate-500 leading-relaxed font-semibold">?踰뺤썝 寃쎈ℓ 諛?媛먯젙 踰뺤썝?먯꽌 怨듭떇 諛쒗뻾??踰뺤젙 二쇱슂 ?쒕쪟???뺣? 遺꾩꽍 紐낆꽭 ?뚯씠釉붿엯?덈떎.</p>
++                <!-- ?ㅻⅨ履??? 踰뺤젙 二쇱슂 ?쒕쪟 諛??ш굔 湲곕줉 (??붾㈃?먯꽌 媛濡쒗룺???섏뼱?섎뒗 臾몄젣 ?닿껐) -->
++                <div class="bg-white border border-slate-200 rounded-2xl shadow-sm w-full overflow-hidden">
++                    <div class="bg-slate-50 px-4 py-2.5 border-b border-slate-200">
++                        <h4 class="text-xs sm:text-sm font-black text-slate-800 flex items-center gap-1.5">
++                            <i class="fa-solid fa-scale-balanced text-royalBlue"></i> ?뽳툘 踰뺤젙 二쇱슂 ?쒕쪟 諛??ш굔 湲곕줉
++                        </h4>
++                    </div>
++                    <div class="p-3.5 space-y-2.5">
++                        <p class="text-[9.5px] text-slate-500 leading-relaxed font-semibold">?踰뺤썝 寃쎈ℓ 諛?媛먯젙 踰뺤썝?먯꽌 怨듭떇 諛쒗뻾??踰뺤젙 二쇱슂 ?쒕쪟???뺣? 遺꾩꽍 紐낆꽭 ?뚯씠釉붿엯?덈떎.</p>
+                     <div class="overflow-x-auto border border-slate-200 rounded-xl overflow-hidden shadow-sm bg-white">
+                         <table class="w-full text-left border-collapse text-[13px] document-view">
+                             <thead>
+@@ -1508,8 +1522,9 @@
+                             </tbody>
+                         </table>
+                     </div>
+-                </div>
+-            </div>
++                </div> <!-- ?몚 p-3.5 ?リ린 諛?移대뱶 ?リ린 -->
++                </div> <!-- ?몚 2??洹몃━???꾩껜 ?リ린 -->
++            </div> <!-- ?몚 group-content-1 ?リ린 -->
+         </div>
+         <div id="detail-group-panel-2" class="flex-1 overflow-y-auto p-4 sm:p-5 space-y-4 sm:space-y-5 custom-scrollbar bg-slate-50/50 hidden relative">
+             <div id="group-content-2" class="space-y-4 sm:space-y-5 w-full">
+@@ -1583,8 +1598,10 @@
+                     </div>
+                 </div>
+ 
+-                <!-- ?숈같???몄닔 由ъ뒪??遺꾩꽍 (?⑤룆 1??諛곗튂) -->
+-                <div id="detail-panel-takeover" class="bg-white border border-slate-200 rounded-2xl p-4 shadow-sm space-y-3 w-full">
++                <!-- ?숈같???몄닔 由ъ뒪??遺꾩꽍 諛??덉긽 諛곕떦??諛섏쓳??2???덉씠?꾩썐 -->
++                <div class="grid grid-cols-1 xl:grid-cols-2 gap-4 sm:gap-5 w-full items-start">
++                    <!-- ?숈같???몄닔 由ъ뒪??遺꾩꽍 (?⑤룆 1??諛곗튂 ?댁젣) -->
++                    <div id="detail-panel-takeover" class="bg-white border border-slate-200 rounded-2xl p-4 shadow-sm space-y-3 w-full">
+                     <h4 class="text-xs sm:text-sm font-black text-slate-800 flex items-center gap-1.5 pb-2 border-b border-slate-100">
+                         <i class="fa-solid fa-triangle-exclamation text-rose-600"></i> ?숈같???몄닔 由ъ뒪??遺꾩꽍
+                     </h4>
+@@ -1631,6 +1648,7 @@
+                         </div>
+                     </div>
+                 </div>
++                </div> <!-- ?몚 2??洹몃━???꾩껜 ?リ린 -->
+             </div>
+             <!-- ?뱢 [8] 留ㅺ컖?듦퀎 ???⑤꼸 (湲곕낯 ?④?) -->
+             </div>
+@@ -1645,9 +1663,11 @@
+         </div>
+         <div id="detail-group-panel-3" class="flex-1 overflow-y-auto p-4 sm:p-5 space-y-4 sm:space-y-5 custom-scrollbar bg-slate-50/50 hidden relative">
+             <div id="group-content-3" class="space-y-4 sm:space-y-5 w-full">
+-                <!-- ?꾩튂 & ?쒖꽭 遺꾩꽍 1???ㅽ깮 ?덉씠?꾩썐 -->
+-                <div class="space-y-4 sm:space-y-5">
+-                    <div id="detail-panel-map" class="space-y-4 sm:space-y-5">
++                <!-- ?꾩튂 & ?쒖꽭 遺꾩꽍 ??붾㈃ xl ???2??諛섏쓳??洹몃━???덉씠?꾩썐 -->
++                <div class="grid grid-cols-1 xl:grid-cols-2 gap-4 sm:gap-5 w-full items-start">
++                    <!-- ?쇱そ ?? 吏?? ?곕룞 ?덈툕, ?좎?洹쒖젣 吏꾨떒 -->
++                    <div class="space-y-4 sm:space-y-5 w-full">
++                        <div id="detail-panel-map" class="space-y-4 sm:space-y-5">
+             <!-- ?뱧 臾쇨굔吏 ?ㅼ떆媛??꾩튂 吏??-->
+             <div class="bg-white border border-slate-200 rounded-2xl p-3.5 sm:p-4 space-y-2.5 shadow-sm">
+                 <h4 class="text-xs sm:text-sm font-black text-slate-800 flex items-center gap-1.5">
+@@ -1656,7 +1676,7 @@
+                 <div id="detail-map-container" class="w-full h-[220px] rounded-xl overflow-hidden border border-slate-200/60 bg-slate-50 relative group">
+                     <!-- Javascript?먯꽌 iframe ?숈쟻 二쇱엯 -->
+                 </div>
+-            </div>
++            </div> <!-- ?몚 吏??移대뱶 ?リ린 -->
+ 
+             <!-- ?뿺截??ㅼ씠踰??꾨Ц 吏??諛??뺣낫留??곕룞 ?덈툕 -->
+             <div class="bg-white border border-slate-200 rounded-2xl p-3.5 sm:p-4 space-y-3 shadow-sm">
+@@ -1730,9 +1750,12 @@
+                     援?넗遺 ?좎??댁쓬(eum.go.kr) 怨듭떇 議고쉶?섍린
+                 </a>
+                         </div>
+-                    </div>
++                    </div> <!-- ?몚 ?좎??댁슜洹쒖젣 移대뱶 ?リ린 -->
++                    </div> <!-- ?몚 ?쇱そ ??space-y-4 ?リ린 -->
+ 
+-                    <div id="detail-panel-market" class="space-y-4 sm:space-y-5">
++                    <!-- ?ㅻⅨ履??? ?ㅺ굅???쒖꽭, 留ㅺ컖 ?듦퀎, [?뵰 AI 誘몃옒 ?덉긽 ?쒖꽭 ?쒕??덉씠?? -->
++                    <div class="space-y-4 sm:space-y-5 w-full">
++                        <div id="detail-panel-market" class="space-y-4 sm:space-y-5">
+                         <div class="bg-white border border-slate-200 rounded-2xl p-4 shadow-sm space-y-3">
+                 <div class="flex items-center justify-between pb-2 border-b border-slate-100">
+                     <h4 class="text-xs sm:text-sm font-black text-slate-800 flex items-center gap-1.5">
+@@ -1770,9 +1793,75 @@
+                                     <!-- ?숈쟻 ?앹꽦 -->
+                                 </div>
+                             </div>
+-                        </div>
+-                    </div>
+-            </div>
++                        </div> <!-- ?몚 留ㅺ컖 ?듦퀎 移대뱶 ?リ린 -->
++
++                        <!-- ?뵰 AI 誘몃옒 ?덉긽 ?쒖꽭 ?쒕??덉씠??(1??3??5??10?????덉긽?쒖꽭 ?덉륫) -->
++                        <div class="bg-white border border-slate-200 rounded-2xl shadow-sm w-full overflow-hidden">
++                            <div class="bg-slate-50 px-4 py-2.5 border-b border-slate-200 flex justify-between items-center">
++                                <h4 class="text-xs sm:text-sm font-black text-slate-800 flex items-center gap-1.5">
++                                    <i class="fa-solid fa-wand-magic-sparkles text-royalBlue"></i> ?뵰 AI 誘몃옒 ?덉긽 ?쒖꽭 ?쒕??덉씠??+                                </h4>
++                                <span class="bg-blue-50 border border-blue-200 text-royalBlue text-[9px] font-black px-2 py-0.5 rounded-full">?덉륫 ?붿쭊 v1.2</span>
++                            </div>
++                            <div class="p-3.5 space-y-3">
++                                <div class="bg-amber-50/50 border border-amber-200 rounded-xl p-2.5 text-[9.5px] text-amber-700 leading-normal font-semibold">
++                                    ?좑툘 蹂??덉륫 ?쒖꽭???쒕굹由ъ삤蹂???蹂듬━ ?곸듅瑜좎쓣 ?곸슜???⑥닚 異붿젙移섏씠硫??ㅼ젣 ?쒖옣 蹂?붿? ?ㅻ? ???덉쑝誘濡?李멸퀬?⑹쑝濡쒕쭔 ?ъ슜?섏떆湲?諛붾엻?덈떎.
++                                </div>
++                                <div class="flex items-center justify-between gap-2 bg-slate-50 border border-slate-200 rounded-xl p-2">
++                                    <span class="text-xs font-bold text-slate-500">?고룊洹?誘몃옒 ?깆옣瑜?/span>
++                                    <div class="flex gap-1.5">
++                                        <label class="cursor-pointer">
++                                            <input type="radio" name="future-rate-select" value="1.5" onchange="updateFuturePricePrediction()" class="sr-only peer">
++                                            <span class="block px-2 py-1 rounded-lg text-[10px] font-black bg-slate-200/60 text-slate-600 peer-checked:bg-royalBlue peer-checked:text-white transition-all select-none">蹂댁닔??(1.5%)</span>
++                                        </label>
++                                        <label class="cursor-pointer">
++                                            <input type="radio" name="future-rate-select" value="3.0" checked onchange="updateFuturePricePrediction()" class="sr-only peer">
++                                            <span class="block px-2 py-1 rounded-lg text-[10px] font-black bg-slate-200/60 text-slate-600 peer-checked:bg-royalBlue peer-checked:text-white transition-all select-none">?쒖? (3.0%)</span>
++                                        </label>
++                                        <label class="cursor-pointer">
++                                            <input type="radio" name="future-rate-select" value="5.0" onchange="updateFuturePricePrediction()" class="sr-only peer">
++                                            <span class="block px-2 py-1 rounded-lg text-[10px] font-black bg-slate-200/60 text-slate-600 peer-checked:bg-royalBlue peer-checked:text-white transition-all select-none">?곴레??(5.0%)</span>
++                                        </label>
++                                    </div>
++                                </div>
++                                <div class="overflow-x-auto border border-slate-200 rounded-xl overflow-hidden shadow-sm bg-white">
++                                    <table class="w-full text-left border-collapse text-[13px] document-view">
++                                        <thead>
++                                            <tr class="bg-slate-50 border-b border-slate-200 text-slate-800 font-extrabold text-[12px]">
++                                                <th class="p-3 pl-4">?덉긽 ?쒖젏</th>
++                                                <th class="p-3">?꾩쟻 ?곸듅瑜?/th>
++                                                <th class="p-3 text-right">?덉긽 異붿젙 媛寃?/th>
++                                            </tr>
++                                        </thead>
++                                        <tbody class="text-slate-700 font-medium">
++                                            <tr class="border-b border-slate-100 hover:bg-slate-50/40 transition-colors">
++                                                <td class="p-3 pl-4 font-bold">1????/td>
++                                                <td class="p-3 text-emeraldSuccess font-extrabold" id="future-rate-1y">+3.0%</td>
++                                                <td class="p-3 text-right font-black font-outfit" id="future-price-1y">-??/td>
++                                            </tr>
++                                            <tr class="border-b border-slate-100 hover:bg-slate-50/40 transition-colors">
++                                                <td class="p-3 pl-4 font-bold">3????/td>
++                                                <td class="p-3 text-emeraldSuccess font-extrabold" id="future-rate-3y">+9.27%</td>
++                                                <td class="p-3 text-right font-black font-outfit" id="future-price-3y">-??/td>
++                                            </tr>
++                                            <tr class="border-b border-slate-100 hover:bg-slate-50/40 transition-colors">
++                                                <td class="p-3 pl-4 font-bold">5????/td>
++                                                <td class="p-3 text-emeraldSuccess font-extrabold" id="future-rate-5y">+15.93%</td>
++                                                <td class="p-3 text-right font-black font-outfit" id="future-price-5y">-??/td>
++                                            </tr>
++                                            <tr class="hover:bg-slate-50/40 transition-colors">
++                                                <td class="p-3 pl-4 font-bold">10????/td>
++                                                <td class="p-3 text-emeraldSuccess font-extrabold" id="future-rate-10y">+34.39%</td>
++                                                <td class="p-3 text-right font-black font-outfit" id="future-price-10y">-??/td>
++                                            </tr>
++                                        </tbody>
++                                    </table>
++                                </div>
++                            </div>
++                        </div> <!-- ?몚 誘몃옒 ?덉긽 ?쒕??덉씠??移대뱶 ?リ린 -->
++                    </div> <!-- ?몚 ?ㅻⅨ履????リ린 -->
++                </div> <!-- ?몚 2??洹몃━???꾩껜 ?リ린 -->
++            </div> <!-- ?몚 group-content-3 ?꾩껜 ?リ린 -->
+             <div id="group-mask-3" class="absolute inset-0 bg-slate-900/60 backdrop-blur-sm z-30 flex flex-col items-center justify-center text-center p-6 hidden">
+                 <div class="bg-white border border-slate-200 rounded-2xl p-6 max-w-sm shadow-2xl space-y-3">
+                     <i class="fa-solid fa-lock text-rose-500 text-3xl"></i>
+@@ -6773,6 +6862,42 @@
+             }
+         }
+ 
++        // ?뵰 AI 誘몃옒 ?덉긽 ?쒖꽭 ?쒕??덉씠???곗궛 ?⑥닔 (1??3??5??10?????덉긽?쒖꽭 ?덉륫)
++        function updateFuturePricePrediction() {
++            const item = window.currentDetailItem;
++            if (!item) return;
++
++            const basePrice = item.appraised_value || 0;
++            const rateElements = document.getElementsByName("future-rate-select");
++            let rate = 3.0; // 湲곕낯 3% (?쒖?)
++            for (let r of rateElements) {
++                if (r.checked) {
++                    rate = parseFloat(r.value);
++                    break;
++                }
++            }
++
++            // 媛??덉긽 湲곌컙蹂?蹂듬━ ?곸듅瑜?諛?媛寃?怨꾩궛
++            const terms = [1, 3, 5, 10];
++            const termKeys = { 1: '1y', 3: '3y', 5: '5y', 10: '10y' };
++
++            terms.forEach(t => {
++                const key = termKeys[t];
++                const cumRate = (Math.pow(1 + rate / 100, t) - 1) * 100;
++                const estPrice = Math.round(basePrice * Math.pow(1 + rate / 100, t));
++
++                const rateEl = document.getElementById(`future-rate-${key}`);
++                const priceEl = document.getElementById(`future-price-${key}`);
++
++                if (rateEl) {
++                    rateEl.textContent = `+${cumRate.toFixed(2)}%`;
++                }
++                if (priceEl) {
++                    priceEl.textContent = formatKRW(estPrice);
++                }
++            });
++        }
++
+         // ?쭬 二쇰? ?좎궗 異붿쿇 留ㅻЪ 誘명꽣(m) ?⑥쐞 ?숈쟻 ?곗궛 ?뚮뜑??         function renderSimilarProperties(currentItem) {
+             const container = document.getElementById("detail-similar-container");
+diff --git a/scratch/diff_index.txt b/scratch/diff_index.txt
+index 7cde644..9ec174e 100644
+Binary files a/scratch/diff_index.txt and b/scratch/diff_index.txt differ
+diff --git a/scratch/refactor_drawer_grid_and_predict.py b/scratch/refactor_drawer_grid_and_predict.py
+index ca92efc..56ccce8 100644
+--- a/scratch/refactor_drawer_grid_and_predict.py
++++ b/scratch/refactor_drawer_grid_and_predict.py
+@@ -1,5 +1,5 @@
+ # -*- coding: utf-8 -*-
+-# index.html??3? ??쓣 諛섏쓳??2??洹몃━?쒕줈 ?꾨㈃ 媛쒗렪?섍퀬 誘몃옒 ?덉긽 ?쒖꽭 ?덉륫 ?쒕??덉씠?곕? ?쎌엯?섎뒗 ?⑥튂 ?ㅽ겕由쏀듃?낅땲??
++# index.html??3? ??쓣 諛섏쓳??2??洹몃━?쒕줈 ?뺢탳?섍쾶 媛쒗렪?섍퀬 愿묎퀬 ?곕룞 臾몄젣瑜?蹂듦뎄?섎뒗 ?⑥튂 ?ㅽ겕由쏀듃?낅땲??
+ import re
+ 
+ def main():
+@@ -11,112 +11,17 @@ def main():
+         print(f"Failed to read index.html: {e}")
+         return
+ 
+-    # 1. ??1 (醫낇빀 & 沅뚮━遺꾩꽍) 諛섏쓳??2??媛쒗렪 諛?移대뱶 ?ㅻ뜑 ?ㅽ????쇱껜??+    # 1. ??1 (醫낇빀 & 沅뚮━遺꾩꽍) 諛섏쓳??2??媛쒗렪
+     # 湲곗씪 ?대젰 移대뱶, ?몃? ?곕룞 ?덈툕, ?좎궗 異붿쿇 留ㅻЪ???쇱そ 1?대줈 臾띔퀬, 踰뺤젙 二쇱슂 ?쒕쪟瑜??ㅻⅨ履?2?대줈 臾띠뒿?덈떎.
+-    # 媛곴컖??移대뱶?ㅼ쓣 overflow-hidden 援ъ“? bg-slate-50 ?ㅻ뜑 ?곸뿭??媛吏?移대뱶 ?ㅽ??쇰줈 媛깆떊?⑸땲??
++    # replace ?⑥닔??count ?몄옄瑜?1濡??쒗븳?섏뿬 ????踰덈쭔 ?뺥솗??移섑솚?섎룄濡?諛⑹뼱?⑸땲??
+     
+-    # ??1??湲곗〈 '3. 寃쎈ℓ 湲곗씪 ?대젰怨??몃? ?뺣낫 ?곕룞...' 二쇱꽍 諛묒쓽 留덊겕???꾩껜瑜?2??洹몃━??援ъ“濡?媛쒗렪?⑸땲??
+-    old_tab1_markup = """                <!-- 3. 寃쎈ℓ 湲곗씪 ?대젰怨??몃? ?뺣낫 ?곕룞/?좎궗 留ㅻЪ 諛섏쓳??遺꾧린 ?덉씠?꾩썐 (?몃줈 1???뚮줈??諛곗튂濡?怨듬갚 ?쒓굅) -->
+-                <div class="space-y-4 sm:space-y-5 w-full">
++    old_tab1_markup = """                <!-- 3. 寃쎈ℓ 湲곗씪 ?대젰怨??몃? ?뺣낫 ?곕룞/?좎궗 留ㅻЪ 諛섏쓳??遺꾧린 ?덉씠?꾩썐 -->
++                <div class="grid grid-cols-1 xl:grid-cols-2 gap-4 sm:gap-5 items-start">
+                     <!-- 寃쎈ℓ 吏꾪뻾 湲곗씪 ?대젰 -->
+                     <div class="bg-white border border-slate-200 rounded-2xl p-4 space-y-2 shadow-sm w-full">
+                         <h4 class="text-xs sm:text-sm font-black text-slate-800 flex items-center gap-1.5 mb-2.5">
+                             <i class="fa-solid fa-calendar-days text-royalBlue"></i> ?뱟 寃쎈ℓ 吏꾪뻾 湲곗씪 ?대젰
+-                        </h4>
+-                        <div class="overflow-x-auto border border-slate-200 rounded-xl overflow-hidden shadow-sm bg-white">
+-                            <table class="w-full text-left border-collapse text-[13px] document-view">
+-                                <thead>
+-                                    <tr class="bg-slate-50 border-b border-slate-200 text-slate-800 font-extrabold text-[12px]">
+-                                        <th class="p-3 pl-4 w-1/4">?뚯감</th>
+-                                        <th class="p-3 w-1/3">?낆같 湲곗씪</th>
+-                                        <th class="p-3 text-right text-slate-800">理쒖? 留ㅺ컖 媛寃?/th>
+-                                        <th class="p-3 pr-4 text-center">寃곌낵</th>
+-                                    </tr>
+-                                </thead>
+-                                <tbody id="detail-giiil-tbody" class="text-slate-700 font-medium">
+-                                    <!-- ?숈쟻 二쇱엯 -->
+-                                </tbody>
+-                            </table>
+-                        </div>
+-                    </div>
+-
+-                    <!-- ?곗륫 臾띠쓬: ?몃? ?곕룞 ?덈툕 諛?異붿쿇 留ㅻЪ -->
+-                    <div class="space-y-4 sm:space-y-5 w-full">
+-                        <!-- ?먯뒪???몃? 怨듭떇 ?뺣낫留??곕룞 -->
+-                        <div class="bg-white border border-slate-200 rounded-2xl p-3 sm:p-3.5 space-y-2 shadow-sm">
+-                            <h4 class="text-xs sm:text-sm font-black text-slate-800 flex items-center gap-1.5">
+-                                <i class="fa-solid fa-globe text-royalBlue"></i> ?뙋 ?먯뒪???몃? 怨듭떇 ?뺣낫留??곕룞
+-                            </h4>
+-                            <p class="text-[9.5px] text-slate-500 leading-relaxed font-semibold">二쇱슂 ?몃? 怨듭떇 ?ы꽭 諛?吏?꾨줈 諛붾줈 ?대룞?⑸땲??</p>
+-                            <div class="grid grid-cols-2 gap-2 text-xs">
+-                                <a id="btn-official-site" href="https://www.courtauction.go.kr" target="_blank" class="bg-slate-50 border border-slate-200 hover:border-royalBlue hover:shadow-md rounded-xl p-2.5 flex items-center gap-2.5 transition-all group">
+-                                    <div class="bg-blue-50 text-royalBlue group-hover:bg-royalBlue group-hover:text-white w-7 h-7 rounded-lg flex items-center justify-center flex-shrink-0 transition-colors">
+-                                        <i class="fa-solid fa-arrow-up-right-from-square text-[10px]"></i>
+-                                    </div>
+-                                    <div class="truncate">
+-                                        <strong class="block text-[10.5px] sm:text-xs font-black text-slate-800 group-hover:text-royalBlue transition-colors truncate">怨듭떇 留ㅻЪ?곸꽭</strong>
+-                                        <span class="text-[9px] text-slate-400 font-bold block mt-0.5 truncate">踰뺤썝/?⑤퉬???먮낯 ?뺣낫</span>
+-                                    </div>
+-                                </a>
+-                                <a id="btn-naver-map" href="https://map.naver.com" target="_blank" class="bg-slate-50 border border-slate-200 hover:border-emeraldSuccess hover:shadow-md rounded-xl p-2.5 flex items-center gap-2.5 transition-all group">
+-                                    <div class="bg-emerald-50 text-emeraldSuccess group-hover:bg-emeraldSuccess group-hover:text-white w-7 h-7 rounded-lg flex items-center justify-center flex-shrink-0 transition-colors">
+-                                        <i class="fa-solid fa-map-location-dot text-[10px]"></i>
+-                                    </div>
+-                                    <div class="truncate">
+-                                        <strong class="block text-[10.5px] sm:text-xs font-black text-slate-800 group-hover:text-emeraldSuccess transition-colors truncate">?ㅼ씠踰꾩???蹂닿린</strong>
+-                                        <span class="text-[9px] text-slate-400 font-bold block mt-0.5 truncate">?꾩꽦酉?吏踰??뺤씤</span>
+-                                    </div>
+-                                </a>
+-                                <a id="btn-naver-land-price" href="https://land.naver.com" target="_blank" class="bg-slate-50 border border-slate-200 hover:border-royalBlue hover:shadow-md rounded-xl p-2.5 flex items-center gap-2.5 transition-all group">
+-                                    <div class="bg-blue-50 text-royalBlue group-hover:bg-royalBlue group-hover:text-white w-7 h-7 rounded-lg flex items-center justify-center flex-shrink-0 transition-colors">
+-                                        <i class="fa-solid fa-house-chimney text-[10px]"></i>
+-                                    </div>
+-                                    <div class="truncate">
+-                                        <strong class="block text-[10.5px] sm:text-xs font-black text-slate-800 group-hover:text-royalBlue transition-colors truncate">?ㅼ씠踰꾨??숈궛 ?쒖꽭</strong>
+-                                        <span class="text-[9px] text-slate-400 font-bold block mt-0.5 truncate">二쇰? ?⑥? 嫄곕옒 ?숉뼢</span>
+-                                    </div>
+-                                </a>
+-                                <a href="https://www.iros.go.kr" target="_blank" class="bg-slate-50 border border-slate-200 hover:border-royalBlue hover:shadow-md rounded-xl p-2.5 flex items-center gap-2.5 transition-all group">
+-                                    <div class="bg-blue-50 text-royalBlue group-hover:bg-royalBlue group-hover:text-white w-7 h-7 rounded-lg flex items-center justify-center flex-shrink-0 transition-colors">
+-                                        <i class="fa-solid fa-file-signature text-[10px]"></i>
+-                                    </div>
+-                                    <div class="truncate">
+-                                        <strong class="block text-[10.5px] sm:text-xs font-black text-slate-800 group-hover:text-royalBlue transition-colors truncate">?명꽣?룸벑湲곗냼</strong>
+-                                        <span class="text-[9px] text-slate-400 font-bold block mt-0.5 truncate">?깃린遺?깅낯 ?대엺</span>
+-                                    </div>
+-                                </a>
+-                            </div>
+-                        </div>
+-
+-                        <!-- ?숈씪 ?⑸룄/吏??湲곕컲 ?좎궗 異붿쿇 留ㅻЪ -->
+-                        <div class="bg-white border border-slate-200 rounded-2xl p-4 space-y-3 shadow-sm">
+-                            <h4 class="text-xs sm:text-sm font-black text-slate-800 flex items-center gap-1.5 pb-2 border-b border-slate-100">
+-                                <i class="fa-solid fa-handshake text-royalBlue"></i> ?쩃 ?숈씪 ?⑸룄/吏??湲곕컲 ?좎궗 異붿쿇 留ㅻЪ
+-                            </h4>
+-                            <div id="detail-similar-container" class="grid grid-cols-3 gap-2">
+-                                <!-- ?숈쟻 ?뚮뜑留?移대뱶 3媛?-->
+-                            </div>
+-                        </div>
+-                    </div>
+-                </div>
+-
+-                <!-- 4. 媛濡쒓? 湲?踰뺤젙 二쇱슂 ?쒕쪟 ?뚯씠釉?(?⑤룆 1??諛곗튂) -->
+-                <div class="bg-white border border-slate-200 rounded-2xl p-4 space-y-2.5 shadow-sm w-full">
+-                    <h4 class="text-xs sm:text-sm font-black text-slate-800 flex items-center gap-1.5">
+-                        <i class="fa-solid fa-scale-balanced text-royalBlue"></i> ?뽳툘 踰뺤젙 二쇱슂 ?쒕쪟 諛??ш굔 湲곕줉
+-                    </h4>
+-                    <p class="text-[9.5px] text-slate-500 leading-relaxed font-semibold">?踰뺤썝 寃쎈ℓ 諛?媛먯젙 踰뺤썝?먯꽌 怨듭떇 諛쒗뻾??踰뺤젙 二쇱슂 ?쒕쪟???뺣? 遺꾩꽍 紐낆꽭 ?뚯씠釉붿엯?덈떎.</p>
+-                    <div class="overflow-x-auto border border-slate-200 rounded-xl overflow-hidden shadow-sm bg-white">
+-                        <table class="w-full text-left border-collapse text-[13px] document-view">
+-                            <thead>
+-                                <tr class="bg-slate-50 border-b border-slate-200 text-slate-800 font-extrabold text-[12px]">
+-                                    <th class="p-3 pl-4 w-[20%] text-slate-900">?쒕쪟 援щ텇</th>
+-                                    <th class="p-3 w-[35%] text-slate-900">?몃? ??ぉ 遺꾩꽍 紐낆꽭</th>
+-                                    <th class="p-3 w-[35%] text-slate-900">吏묓뻾踰뺤썝 / ?섍껄 諛?沅뚮━ 吏꾨떒</th>
+-                                    <th class="p-3 pr-4 text-right w-[10%] text-slate-900">諛붾줈媛湲?/th>
+-                                </tr>
+-                            </thead>
+-                            <tbody class="text-slate-700 font-medium">"""
++                        </h4>"""
+ 
+     new_tab1_markup = """                <!-- 3. ??붾㈃ xl ?댁긽?????2??諛섏쓳??洹몃━???덉씠?꾩썐 (鍮?怨듦컙 ?뚭굅 諛??뚯씠釉?媛濡??섏뼱吏?諛⑹?) -->
+                 <div class="grid grid-cols-1 xl:grid-cols-2 gap-4 sm:gap-5 w-full items-start">
+@@ -129,464 +34,179 @@ def main():
+                                     <i class="fa-solid fa-calendar-days text-royalBlue"></i> ?뱟 寃쎈ℓ 吏꾪뻾 湲곗씪 ?대젰
+                                 </h4>
+                             </div>
+-                            <div class="p-3.5 space-y-3">
+-                                <div class="overflow-x-auto border border-slate-200 rounded-xl overflow-hidden shadow-sm bg-white">
+-                                    <table class="w-full text-left border-collapse text-[13px] document-view">
+-                                        <thead>
+-                                            <tr class="bg-slate-50 border-b border-slate-200 text-slate-800 font-extrabold text-[12px]">
+-                                                <th class="p-3 pl-4 w-1/4">?뚯감</th>
+-                                                <th class="p-3 w-1/3">?낆같 湲곗씪</th>
+-                                                <th class="p-3 text-right text-slate-800">理쒖? 留ㅺ컖 媛寃?/th>
+-                                                <th class="p-3 pr-4 text-center">寃곌낵</th>
+-                                            </tr>
+-                                        </thead>
+-                                        <tbody id="detail-giiil-tbody" class="text-slate-700 font-medium">
+-                                            <!-- ?숈쟻 二쇱엯 -->
+-                                        </tbody>
+-                                    </table>
+-                                </div>
+-                            </div>
+-                        </div>
++                            <div class="p-3.5 space-y-3">"""
++
++    content = content.replace(old_tab1_markup, new_tab1_markup, 1)
++
++    # ??1???몃? ?뺣낫留??곕룞 移대뱶 ?ㅻ뜑 ?ㅽ???媛쒗렪
++    old_tab1_hub = """                        <!-- ?먯뒪???몃? 怨듭떇 ?뺣낫留??곕룞 -->
++                        <div class="bg-white border border-slate-200 rounded-2xl p-4 space-y-2.5 shadow-sm">
++                            <h4 class="text-xs sm:text-sm font-black text-slate-800 flex items-center gap-1.5">
++                                <i class="fa-solid fa-globe text-royalBlue"></i> ?뙋 ?먯뒪???몃? 怨듭떇 ?뺣낫留??곕룞
++                            </h4>"""
+ 
+-                        <!-- ?먯뒪???몃? 怨듭떇 ?뺣낫留??곕룞 -->
++    new_tab1_hub = """                        <!-- ?먯뒪???몃? 怨듭떇 ?뺣낫留??곕룞 -->
+                         <div class="bg-white border border-slate-200 rounded-2xl shadow-sm w-full overflow-hidden">
+                             <div class="bg-slate-50 px-4 py-2.5 border-b border-slate-200">
+                                 <h4 class="text-xs sm:text-sm font-black text-slate-800 flex items-center gap-1.5">
+                                     <i class="fa-solid fa-globe text-royalBlue"></i> ?뙋 ?먯뒪???몃? 怨듭떇 ?뺣낫留??곕룞
+                                 </h4>
+                             </div>
+-                            <div class="p-3.5 space-y-2">
+-                                <p class="text-[9.5px] text-slate-500 leading-relaxed font-semibold">二쇱슂 ?몃? 怨듭떇 ?ы꽭 諛?吏?꾨줈 諛붾줈 ?대룞?⑸땲??</p>
+-                                <div class="grid grid-cols-2 gap-2 text-xs">
+-                                    <a id="btn-official-site" href="https://www.courtauction.go.kr" target="_blank" class="bg-slate-50 border border-slate-200 hover:border-royalBlue hover:shadow-md rounded-xl p-2.5 flex items-center gap-2.5 transition-all group">
+-                                        <div class="bg-blue-50 text-royalBlue group-hover:bg-royalBlue group-hover:text-white w-7 h-7 rounded-lg flex items-center justify-center flex-shrink-0 transition-colors">
+-                                            <i class="fa-solid fa-arrow-up-right-from-square text-[10px]"></i>
+-                                        </div>
+-                                        <div class="truncate">
+-                                            <strong class="block text-[10.5px] sm:text-xs font-black text-slate-800 group-hover:text-royalBlue transition-colors truncate">怨듭떇 留ㅻЪ?곸꽭</strong>
+-                                            <span class="text-[9px] text-slate-400 font-bold block mt-0.5 truncate">踰뺤썝/?⑤퉬???먮낯 ?뺣낫</span>
+-                                        </div>
+-                                    </a>
+-                                    <a id="btn-naver-map" href="https://map.naver.com" target="_blank" class="bg-slate-50 border border-slate-200 hover:border-emeraldSuccess hover:shadow-md rounded-xl p-2.5 flex items-center gap-2.5 transition-all group">
+-                                        <div class="bg-emerald-50 text-emeraldSuccess group-hover:bg-emeraldSuccess group-hover:text-white w-7 h-7 rounded-lg flex items-center justify-center flex-shrink-0 transition-colors">
+-                                            <i class="fa-solid fa-map-location-dot text-[10px]"></i>
+-                                        </div>
+-                                        <div class="truncate">
+-                                            <strong class="block text-[10.5px] sm:text-xs font-black text-slate-800 group-hover:text-emeraldSuccess transition-colors truncate">?ㅼ씠踰꾩???蹂닿린</strong>
+-                                            <span class="text-[9px] text-slate-400 font-bold block mt-0.5 truncate">?꾩꽦酉?吏踰??뺤씤</span>
+-                                        </div>
+-                                    </a>
+-                                    <a id="btn-naver-land-price" href="https://land.naver.com" target="_blank" class="bg-slate-50 border border-slate-200 hover:border-royalBlue hover:shadow-md rounded-xl p-2.5 flex items-center gap-2.5 transition-all group">
+-                                        <div class="bg-blue-50 text-royalBlue group-hover:bg-royalBlue group-hover:text-white w-7 h-7 rounded-lg flex items-center justify-center flex-shrink-0 transition-colors">
+-                                            <i class="fa-solid fa-house-chimney text-[10px]"></i>
+-                                        </div>
+-                                        <div class="truncate">
+-                                            <strong class="block text-[10.5px] sm:text-xs font-black text-slate-800 group-hover:text-royalBlue transition-colors truncate">?ㅼ씠踰꾨??숈궛 ?쒖꽭</strong>
+-                                            <span class="text-[9px] text-slate-400 font-bold block mt-0.5 truncate">二쇰? ?⑥? 嫄곕옒 ?숉뼢</span>
+-                                        </div>
+-                                    </a>
+-                                    <a href="https://www.iros.go.kr" target="_blank" class="bg-slate-50 border border-slate-200 hover:border-royalBlue hover:shadow-md rounded-xl p-2.5 flex items-center gap-2.5 transition-all group">
+-                                        <div class="bg-blue-50 text-royalBlue group-hover:bg-royalBlue group-hover:text-white w-7 h-7 rounded-lg flex items-center justify-center flex-shrink-0 transition-colors">
+-                                            <i class="fa-solid fa-file-signature text-[10px]"></i>
+-                                        </div>
+-                                        <div class="truncate">
+-                                            <strong class="block text-[10.5px] sm:text-xs font-black text-slate-800 group-hover:text-royalBlue transition-colors truncate">?명꽣?룸벑湲곗냼</strong>
+-                                            <span class="text-[9px] text-slate-400 font-bold block mt-0.5 truncate">?깃린遺?깅낯 ?대엺</span>
+-                                        </div>
+-                                    </a>
+-                                </div>
+-                            </div>
+-                        </div>
++                            <div class="p-3.5 space-y-2.5">"""
++
++    content = content.replace(old_tab1_hub, new_tab1_hub, 1)
++
++    # ??1???좎궗 異붿쿇 留ㅻЪ ?ㅻ뜑 ?ㅽ???媛쒗렪
++    old_tab1_similar = """                        <!-- ?숈씪 ?⑸룄/吏??湲곕컲 ?좎궗 異붿쿇 留ㅻЪ -->
++                        <div class="bg-white border border-slate-200 rounded-2xl p-4 space-y-3 shadow-sm">
++                            <h4 class="text-xs sm:text-sm font-black text-slate-800 flex items-center gap-1.5 pb-2 border-b border-slate-100">
++                                <i class="fa-solid fa-handshake text-royalBlue"></i> ?쩃 ?숈씪 ?⑸룄/吏??湲곕컲 ?좎궗 異붿쿇 留ㅻЪ
++                            </h4>"""
+ 
+-                        <!-- ?숈씪 ?⑸룄/吏??湲곕컲 ?좎궗 異붿쿇 留ㅻЪ -->
++    new_tab1_similar = """                        <!-- ?숈씪 ?⑸룄/吏??湲곕컲 ?좎궗 異붿쿇 留ㅻЪ -->
+                         <div class="bg-white border border-slate-200 rounded-2xl shadow-sm w-full overflow-hidden">
+                             <div class="bg-slate-50 px-4 py-2.5 border-b border-slate-200">
+                                 <h4 class="text-xs sm:text-sm font-black text-slate-800 flex items-center gap-1.5">
+                                     <i class="fa-solid fa-handshake text-royalBlue"></i> ?쩃 ?숈씪 ?⑸룄/吏??湲곕컲 ?좎궗 異붿쿇 留ㅻЪ
+                                 </h4>
+                             </div>
+-                            <div class="p-3.5 space-y-3">
+-                                <div id="detail-similar-container" class="grid grid-cols-3 gap-2">
+-                                    <!-- ?숈쟻 ?뚮뜑留?移대뱶 3媛?-->
+-                                </div>
+-                            </div>
+-                        </div>
+-                    </div>
+-
+-                    <!-- ?ㅻⅨ履??? 踰뺤젙 二쇱슂 ?쒕쪟 諛??ш굔 湲곕줉 (??붾㈃?먯꽌 媛濡쒗룺???섏뼱?섎뒗 臾몄젣 ?닿껐) -->
+-                    <div class="bg-white border border-slate-200 rounded-2xl shadow-sm w-full overflow-hidden">
+-                        <div class="bg-slate-50 px-4 py-2.5 border-b border-slate-200">
+-                            <h4 class="text-xs sm:text-sm font-black text-slate-800 flex items-center gap-1.5">
+-                                <i class="fa-solid fa-scale-balanced text-royalBlue"></i> ?뽳툘 踰뺤젙 二쇱슂 ?쒕쪟 諛??ш굔 湲곕줉
+-                            </h4>
+-                        </div>
+-                        <div class="p-3.5 space-y-2.5">
+-                            <p class="text-[9.5px] text-slate-500 leading-relaxed font-semibold">?踰뺤썝 寃쎈ℓ 諛?媛먯젙 踰뺤썝?먯꽌 怨듭떇 諛쒗뻾??踰뺤젙 二쇱슂 ?쒕쪟???뺣? 遺꾩꽍 紐낆꽭 ?뚯씠釉붿엯?덈떎.</p>
+-                            <div class="overflow-x-auto border border-slate-200 rounded-xl overflow-hidden shadow-sm bg-white">
+-                                <table class="w-full text-left border-collapse text-[13px] document-view">
+-                                    <thead>
+-                                        <tr class="bg-slate-50 border-b border-slate-200 text-slate-800 font-extrabold text-[12px]">
+-                                            <th class="p-3 pl-4 w-[20%] text-slate-900">?쒕쪟 援щ텇</th>
+-                                            <th class="p-3 w-[35%] text-slate-900">?몃? ??ぉ 遺꾩꽍 紐낆꽭</th>
+-                                            <th class="p-3 w-[35%] text-slate-900">?섍껄 諛?沅뚮━ 吏꾨떒</th>
+-                                            <th class="p-3 pr-4 text-right w-[10%] text-slate-900">諛붾줈媛湲?/th>
+-                                        </tr>
+-                                    </thead>
+-                                    <tbody class="text-slate-700 font-medium">"""
+-
+-    content = content.replace(old_tab1_markup, new_tab1_markup)
+-
+-    # ??1 洹몃━???レ븘二쇨린: </tbody> ?ロ엳???뚯씠釉??꾨옒?먯꽌 2??洹몃━???꾩껜???ル뒗 </div>瑜??쎌엯?⑸땲??
+-    # 湲곗〈 肄붾뱶?먯꽌 </tbody> ?꾨옒 ?뚯씠釉?諛??ル뒗 </div> 援ъ“瑜??뺤씤?대큶?덈떎.
+-    # index.html 1461?쇱씤 洹쇱쿂:
+-    old_tab1_close = """                                </tr>
+-                            </tbody>
+-                        </table>
+-                    </div>
+-                </div>"""
+-    
+-    new_tab1_close = """                                </tr>
+-                            </tbody>
+-                        </table>
+-                    </div>
+-                </div>
+-                </div> <!-- ?몚 2??洹몃━???꾩껜 ?リ린 -->"""
+-
+-    content = content.replace(old_tab1_close, new_tab1_close)
+-
+-
+-    # 2. ??2 (?낆같 & 湲덉쑖遺꾩꽍) 諛섏쓳??2??洹몃━??媛쒗렪
+-    # ?쇱そ: AI ?숈같 ?쒕??덉씠??吏??+ ?ㅻ쭏??怨꾩궛湲?+ ?쒕굹由ъ삤蹂?ROI 遺꾩꽍 ?뚯씠釉?-    # ?ㅻⅨ履? ?몄닔遺꾩꽍 紐낆꽭 + ?꾩감???꾪솴 + ?덉긽 諛곕떦??-    # 媛?移대뱶?ㅼ쓽 ?ㅻ뜑瑜?bg-slate-50怨??뚮몢由?移몄쑝濡?由ы뙥?좊쭅?⑸땲??
+-    
+-    old_tab2_markup = """        <div id="detail-group-panel-2" class="flex-1 overflow-y-auto p-3 sm:p-3.5 space-y-3 sm:space-y-3.5 custom-scrollbar bg-slate-50/50 hidden relative">
+-            <div id="group-content-2" class="space-y-3 sm:space-y-3.5 w-full">
+-                <div id="detail-panel-bid" class="space-y-3 sm:space-y-3.5">
+-            <!-- AI ?숈같 ?쒕??덉씠??吏??遺꾩꽍 -->
+-            <div class="bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 rounded-2xl p-3 sm:p-3.5 space-y-2 shadow-sm mb-3">
+-                <h4 class="text-xs sm:text-sm font-black text-slate-800 flex items-center gap-1.5">
+-                    <i class="fa-solid fa-chart-simple"></i> AI ?숈같 ?쒕??덉씠??吏??遺꾩꽍
+-                </h4>"""
+-
+-    new_tab2_markup = """        <div id="detail-group-panel-2" class="flex-1 overflow-y-auto p-3 sm:p-3.5 space-y-3 sm:space-y-3.5 custom-scrollbar bg-slate-50/50 hidden relative">
+-            <div id="group-content-2" class="space-y-3 sm:space-y-3.5 w-full">
+-                <!-- 2??洹몃━?쒕줈 履쇨컻??湲덉쑖/?낆같 ?뚯씠釉붾뱾??媛濡??섏뼱吏?諛⑹? -->
+-                <div class="grid grid-cols-1 xl:grid-cols-2 gap-4 sm:gap-5 w-full items-start">
+-                    <!-- ?쇱そ ?? ?쒕??덉씠??吏?? ?ㅻ쭏??怨꾩궛湲? ROI 遺꾩꽍 ?뚯씠釉?-->
+-                    <div class="space-y-4 sm:space-y-5 w-full">
+-                        <!-- AI ?숈같 ?쒕??덉씠??吏??遺꾩꽍 -->
+-                        <div class="bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 rounded-2xl p-3.5 space-y-2 shadow-sm">
+-                            <div class="flex items-center gap-1.5 pb-2 border-b border-blue-200/50 mb-1">
+-                                <h4 class="text-xs sm:text-sm font-black text-slate-800 flex items-center gap-1.5">
+-                                    <i class="fa-solid fa-chart-simple text-royalBlue"></i> AI ?숈같 ?쒕??덉씠??吏??遺꾩꽍
+-                                </h4>
+-                            </div>"""
+-
+-    content = content.replace(old_tab2_markup, new_tab2_markup)
++                            <div class="p-3.5 space-y-3">"""
+ 
+-    # ??2???ㅻ쭏??怨꾩궛湲?移대뱶 移대뱶 ?ㅻ뜑 ?ㅽ???媛쒗렪
+-    old_calc_markup = """            <!-- ?㎜ ?몃쾿 ?ㅻ쭏???숈같 怨꾪쉷??怨꾩궛湲?-->
+-            <div class="bg-white border border-slate-200 rounded-2xl p-3 sm:p-3.5 shadow-sm space-y-2.5 max-w-[720px] mx-auto w-full">
+-                <div class="flex items-center justify-between pb-2 border-b border-slate-100">
+-                    <h4 class="text-xs sm:text-sm font-black text-slate-800 flex items-center gap-1.5">
+-                        <i class="fa-solid fa-calculator text-royalBlue"></i> ?ㅻ쭏???뺣? ?뚯슂?먭툑 怨꾪쉷??-                    </h4>
+-                    <span id="tax-rate-badge" class="text-[9px] font-black px-2 py-0.5 rounded-full border"></span>
+-                </div>"""
+-
+-    new_calc_markup = """            <!-- ?㎜ ?몃쾿 ?ㅻ쭏???숈같 怨꾪쉷??怨꾩궛湲?-->
+-            <div class="bg-white border border-slate-200 rounded-2xl shadow-sm w-full overflow-hidden">
+-                <div class="bg-slate-50 px-4 py-2.5 border-b border-slate-200 flex justify-between items-center">
+-                    <h4 class="text-xs sm:text-sm font-black text-slate-800 flex items-center gap-1.5">
+-                        <i class="fa-solid fa-calculator text-royalBlue"></i> ?ㅻ쭏???뺣? ?뚯슂?먭툑 怨꾪쉷??-                    </h4>
+-                    <span id="tax-rate-badge" class="text-[9px] font-black px-2 py-0.5 rounded-full border border-slate-300 bg-white"></span>
+-                </div>
+-                <div class="p-3.5 space-y-2.5">"""
++    content = content.replace(old_tab1_similar, new_tab1_similar, 1)
+ 
+-    content = content.replace(old_calc_markup, new_calc_markup)
+-
+-    # 怨꾩궛湲??リ린 蹂댁젙: LTV ?異?諛?湲덈━ ?쒕??덉씠???꾨옒???ル뒗 div ?쒓렇??-    # 湲곗〈 肄붾뱶?먯꽌 ?뚮뜑留??섏튂 ??(?곸닔利? ?곸뿭 二쇰???2??洹몃━??遺꾧린???뚮쭪寃?由ы룷?낇빀?덈떎.
+-    # LTV 怨꾩궛湲??ル뒗 遺遺꾧낵 ?ъ옄 ?섏씡瑜?遺꾩꽍 ?뚯씠釉??쒖옉 遺遺?-    old_roi_markup = """                    <div class="loan-highlight-row bg-blue-50/50 border border-blue-100 rounded-lg p-2.5 flex justify-between items-center text-[10.5px]">
+-                        <span class="text-slate-500 font-extrabold flex items-center gap-1"><i class="fa-solid fa-coins text-royalBlue text-[10px]"></i> 寃쎈씫 ?異??덉긽 ?댁옄??/span>
+-                        <strong id="calc-loan-interest" class="text-slate-900 font-black font-outfit">0??(??</strong>
+-                    </div>
++    # ??1??異붿쿇 留ㅻЪ ?ル뒗 div 諛?踰뺤젙 ?쒕쪟 移대뱶 ?쒖옉??媛쒗렪
++    old_tab1_split = """                    </div>
+                 </div>
+-            </div>
+ 
+-            <!-- ?뱤 ?쒕굹由ъ삤蹂?珥??ъ옄?섏씡瑜?(ROI) 遺꾩꽍 ?뚯씠釉?-->
+-            <div class="bg-white border border-slate-200 rounded-2xl p-3 sm:p-3.5 shadow-sm space-y-2.5 max-w-[720px] mx-auto w-full">
+-                <h4 class="text-xs sm:text-sm font-black text-slate-800 flex items-center gap-1.5 pb-2 border-b border-slate-100">
+-                    <i class="fa-solid fa-percent text-royalBlue"></i> ?뱤 ?쒕굹由ъ삤蹂?珥??ъ옄?섏씡瑜?(ROI) 遺꾩꽍
+-                </h4>"""
+-
+-    new_roi_markup = """                    <div class="loan-highlight-row bg-blue-50/50 border border-blue-100 rounded-lg p-2.5 flex justify-between items-center text-[10.5px]">
+-                        <span class="text-slate-500 font-extrabold flex items-center gap-1"><i class="fa-solid fa-coins text-royalBlue text-[10px]"></i> 寃쎈씫 ?異??덉긽 ?댁옄??/span>
+-                        <strong id="calc-loan-interest" class="text-slate-900 font-black font-outfit">0??(??</strong>
+-                    </div>
+-                </div>
+-            </div>
+-            </div> <!-- ?몚 怨꾩궛湲?p-3.5 ?リ린 諛?overflow-hidden 移대뱶 ?リ린 -->
+-
+-            <!-- ?뱤 ?쒕굹由ъ삤蹂?珥??ъ옄?섏씡瑜?(ROI) 遺꾩꽍 ?뚯씠釉?-->
+-            <div class="bg-white border border-slate-200 rounded-2xl shadow-sm w-full overflow-hidden">
+-                <div class="bg-slate-50 px-4 py-2.5 border-b border-slate-200">
++                <!-- 4. 媛濡쒓? 湲?踰뺤젙 二쇱슂 ?쒕쪟 ?뚯씠釉?(?⑤룆 1??諛곗튂) -->
++                <div class="bg-white border border-slate-200 rounded-2xl p-4 space-y-2.5 shadow-sm w-full">
+                     <h4 class="text-xs sm:text-sm font-black text-slate-800 flex items-center gap-1.5">
+-                        <i class="fa-solid fa-percent text-royalBlue"></i> ?뱤 ?쒕굹由ъ삤蹂?珥??ъ옄?섏씡瑜?(ROI) 遺꾩꽍
++                        <i class="fa-solid fa-scale-balanced text-royalBlue"></i> ?뽳툘 踰뺤젙 二쇱슂 ?쒕쪟 諛??ш굔 湲곕줉
+                     </h4>
+-                </div>
+-                <div class="p-3.5 space-y-2.5">"""
++                    <p class="text-[9.5px] text-slate-500 leading-relaxed font-semibold">?踰뺤썝 寃쎈ℓ 諛?媛먯젙 踰뺤썝?먯꽌 怨듭떇 諛쒗뻾??踰뺤젙 二쇱슂 ?쒕쪟???뺣? 遺꾩꽍 紐낆꽭 ?뚯씠釉붿엯?덈떎.</p>"""
+ 
+-    content = content.replace(old_roi_markup, new_roi_markup)
+-
+-    # ROI ?ル뒗 ?쒓렇 蹂댁젙 諛?2???곗륫 ???쒖옉
+-    # 湲곗〈 肄붾뱶?먯꽌 </tbody> </table> </div> </div> (ROI ?ロ옒)
+-    # 洹?諛묒쓽 "?몄닔遺꾩꽍 紐낆꽭" ?쒖옉 遺遺꾩쓣 ?곗륫 ?대줈 留듯븨?⑸땲??
+-    old_tab2_col2_markup = """                        </tbody>
+-                    </table>
+-                </div>
+-            </div>
+-
+-            <!-- ?뮯 ?몄닔遺꾩꽍 紐낆꽭 ?뚯씠釉?-->
+-            <div class="bg-white border border-slate-200 rounded-2xl p-3 sm:p-3.5 shadow-sm space-y-2.5">
+-                <h4 class="text-xs sm:text-sm font-black text-slate-800 flex items-center gap-1.5 pb-2 border-b border-slate-100">
+-                    <i class="fa-solid fa-hand-holding-dollar text-royalBlue"></i> ?뮯 ?숈같???몄닔遺꾩꽍 紐낆꽭
+-                </h4>"""
+-
+-    new_tab2_col2_markup = """                        </tbody>
+-                    </table>
+-                </div>
+-            </div>
+-            </div> <!-- ?몚 ROI p-3.5 ?リ린 諛?移대뱶 ?リ린 -->
+-            </div> <!-- ?몚 2???쇱そ ???꾩껜 ?リ린 -->
++    new_tab1_split = """                    </div>
++                </div> <!-- ?몚 ?쇱そ ??space-y-4 ?リ린 -->
+ 
+-            <!-- ?ㅻⅨ履??? ?몄닔遺꾩꽍, ?먯쑀?꾪솴, ?덉긽 諛곕떦??-->
+-            <div class="space-y-4 sm:space-y-5 w-full">
+-                <!-- ?뮯 ?몄닔遺꾩꽍 紐낆꽭 ?뚯씠釉?-->
++                <!-- ?ㅻⅨ履??? 踰뺤젙 二쇱슂 ?쒕쪟 諛??ш굔 湲곕줉 (??붾㈃?먯꽌 媛濡쒗룺???섏뼱?섎뒗 臾몄젣 ?닿껐) -->
+                 <div class="bg-white border border-slate-200 rounded-2xl shadow-sm w-full overflow-hidden">
+                     <div class="bg-slate-50 px-4 py-2.5 border-b border-slate-200">
+                         <h4 class="text-xs sm:text-sm font-black text-slate-800 flex items-center gap-1.5">
+-                            <i class="fa-solid fa-hand-holding-dollar text-royalBlue"></i> ?뮯 ?숈같???몄닔遺꾩꽍 紐낆꽭
++                            <i class="fa-solid fa-scale-balanced text-royalBlue"></i> ?뽳툘 踰뺤젙 二쇱슂 ?쒕쪟 諛??ш굔 湲곕줉
+                         </h4>
+                     </div>
+-                    <div class="p-3.5 space-y-2.5">"""
+-
+-    content = content.replace(old_tab2_col2_markup, new_tab2_col2_markup)
+-
+-    # ??2???먯쑀?꾪솴 移대뱶 ?ㅻ뜑 媛쒗렪
+-    old_occupy_markup = """            <!-- ?뫁 ?먯쑀?꾪솴 諛??꾩감??遺꾩꽍 ?뚯씠釉?-->
+-            <div class="bg-white border border-slate-200 rounded-2xl p-3 sm:p-3.5 shadow-sm space-y-2.5">
+-                <h4 class="text-xs sm:text-sm font-black text-slate-800 flex items-center gap-1.5 pb-2 border-b border-slate-100">
+-                    <i class="fa-solid fa-users text-royalBlue"></i> ?뫁 遺?숈궛 ?먯쑀?꾪솴 諛??꾩감??遺꾩꽍
+-                </h4>"""
++                    <div class="p-3.5 space-y-2.5">
++                        <p class="text-[9.5px] text-slate-500 leading-relaxed font-semibold">?踰뺤썝 寃쎈ℓ 諛?媛먯젙 踰뺤썝?먯꽌 怨듭떇 諛쒗뻾??踰뺤젙 二쇱슂 ?쒕쪟???뺣? 遺꾩꽍 紐낆꽭 ?뚯씠釉붿엯?덈떎.</p>"""
+ 
+-    new_occupy_markup = """            </div> <!-- ?몚 ?몄닔遺꾩꽍 p-3.5 諛?移대뱶 ?リ린 -->
+-            </div> <!-- ?몚 ?몄닔遺꾩꽍 移대뱶 ?リ린 蹂댁젙 -->
++    content = content.replace(old_tab1_split, new_tab1_split, 1)
+ 
+-            <!-- ?뫁 ?먯쑀?꾪솴 諛??꾩감??遺꾩꽍 ?뚯씠釉?-->
+-            <div class="bg-white border border-slate-200 rounded-2xl shadow-sm w-full overflow-hidden">
+-                <div class="bg-slate-50 px-4 py-2.5 border-b border-slate-200">
+-                    <h4 class="text-xs sm:text-sm font-black text-slate-800 flex items-center gap-1.5">
+-                        <i class="fa-solid fa-users text-royalBlue"></i> ?뫁 遺?숈궛 ?먯쑀?꾪솴 諛??꾩감??遺꾩꽍
+-                    </h4>
++    # ??1 ?꾩껜 ?ル뒗 遺遺?媛쒗렪 (洹몃━???꾩껜 ?ル뒗 ?쒓렇 二쇱엯)
++    old_tab1_close = """                                </tr>
++                            </tbody>
++                        </table>
++                    </div>
+                 </div>
+-                <div class="p-3.5 space-y-2.5">"""
++            </div>
++        </div>
++        <div id="detail-group-panel-2" """
++
++    new_tab1_close = """                                </tr>
++                            </tbody>
++                        </table>
++                    </div>
++                </div> <!-- ?몚 p-3.5 ?リ린 諛?移대뱶 ?リ린 -->
++                </div> <!-- ?몚 2??洹몃━???꾩껜 ?リ린 -->
++            </div> <!-- ?몚 group-content-1 ?リ린 -->
++        </div>
++        <div id="detail-group-panel-2" """
+ 
+-    content = content.replace(old_occupy_markup, new_occupy_markup)
++    content = content.replace(old_tab1_close, new_tab1_close, 1)
+ 
+-    # ??2???덉긽 諛곕떦??移대뱶 ?ㅻ뜑 媛쒗렪
+-    old_dividend_markup = """            <!-- ?뮥 ?덉긽 諛곕떦???쒕??덉씠???뚯씠釉?-->
+-            <div class="bg-white border border-slate-200 rounded-2xl p-3 sm:p-3.5 shadow-sm space-y-2.5">
+-                <h4 class="text-xs sm:text-sm font-black text-slate-800 flex items-center gap-1.5 pb-2 border-b border-slate-100">
+-                    <i class="fa-solid fa-money-bill-transfer text-royalBlue"></i> ?뮥 ?덉긽 諛곕떦???쒕??덉씠??-                </h4>"""
+ 
+-    new_dividend_markup = """            </div> <!-- ?몚 ?먯쑀?꾪솴 p-3.5 諛?移대뱶 ?リ린 -->
+-            </div> <!-- ?몚 ?먯쑀?꾪솴 移대뱶 ?リ린 蹂댁젙 -->
++    # 2. ??2 (?낆같 & 湲덉쑖遺꾩꽍) 諛섏쓳??2??洹몃━??媛쒗렪
++    # ?몄닔 由ъ뒪??移대뱶? ?덉긽 諛곕떦??移대뱶瑜?2??洹몃━?쒕줈 臾띠뒿?덈떎.
++    
++    old_tab2_split = """                <!-- ?숈같???몄닔 由ъ뒪??遺꾩꽍 (?⑤룆 1??諛곗튂) -->
++                <div id="detail-panel-takeover" class="bg-white border border-slate-200 rounded-2xl p-4 shadow-sm space-y-3 w-full">"""
+ 
+-            <!-- ?뮥 ?덉긽 諛곕떦???쒕??덉씠???뚯씠釉?-->
+-            <div class="bg-white border border-slate-200 rounded-2xl shadow-sm w-full overflow-hidden">
+-                <div class="bg-slate-50 px-4 py-2.5 border-b border-slate-200">
+-                    <h4 class="text-xs sm:text-sm font-black text-slate-800 flex items-center gap-1.5">
+-                        <i class="fa-solid fa-money-bill-transfer text-royalBlue"></i> ?뮥 ?덉긽 諛곕떦???쒕??덉씠??-                    </h4>
+-                </div>
+-                <div class="p-3.5 space-y-2.5">"""
++    new_tab2_split = """                <!-- ?숈같???몄닔 由ъ뒪??遺꾩꽍 諛??덉긽 諛곕떦??諛섏쓳??2???덉씠?꾩썐 -->
++                <div class="grid grid-cols-1 xl:grid-cols-2 gap-4 sm:gap-5 w-full items-start">
++                    <!-- ?숈같???몄닔 由ъ뒪??遺꾩꽍 (?⑤룆 1??諛곗튂 ?댁젣) -->
++                    <div id="detail-panel-takeover" class="bg-white border border-slate-200 rounded-2xl p-4 shadow-sm space-y-3 w-full">"""
+ 
+-    content = content.replace(old_dividend_markup, new_dividend_markup)
++    content = content.replace(old_tab2_split, new_tab2_split, 1)
+ 
+-    # ??2???リ린 ?꾩껜 蹂댁젙: 諛곕떦??</tbody> </table> </div> </div> (諛곕떦???ロ옒) ?꾨옒?먯꽌
+-    # ?곗륫 2??諛??꾩껜 2??洹몃━?쒖쓽 ?ル뒗 div ?쒓렇瑜?二쇱엯?⑸땲??
++    # ??2??諛곕떦??移대뱶 ?リ린 諛?洹몃━???꾩껜 ?ル뒗 ?쒓렇 二쇱엯
+     old_tab2_close = """                                </tbody>
+                             </table>
+                         </div>
+                     </div>
+                 </div>
+             </div>
+-            </div>
+-            <div id="group-mask-2" """
++            <!-- ?뱢 [8] 留ㅺ컖?듦퀎 ???⑤꼸 (湲곕낯 ?④?) -->"""
+ 
+     new_tab2_close = """                                </tbody>
+                             </table>
+                         </div>
+                     </div>
+                 </div>
+-                </div> <!-- ?몚 諛곕떦??p-3.5 諛?移대뱶 ?リ린 -->
+-                </div> <!-- ?몚 2???ㅻⅨ履????꾩껜 ?リ린 -->
+                 </div> <!-- ?몚 2??洹몃━???꾩껜 ?リ린 -->
+-            </div> <!-- ?몚 group-content-2 ?リ린 -->
+-            </div> <!-- ?몚 detail-panel-bid ?リ린 蹂댁젙 -->
+-            <div id="group-mask-2" """
++            </div>
++            <!-- ?뱢 [8] 留ㅺ컖?듦퀎 ???⑤꼸 (湲곕낯 ?④?) -->"""
+ 
+-    content = content.replace(old_tab2_close, new_tab2_close)
++    content = content.replace(old_tab2_close, new_tab2_close, 1)
+ 
+ 
+     # 3. ??3 (?낆? & ?쒖꽭遺꾩꽍) 諛섏쓳??2??洹몃━??媛쒗렪 諛?AI 誘몃옒 ?덉긽 ?쒖꽭 ?덉륫 ?쒕??덉씠???묒옱
+-    # ?쇱そ: ?ㅼ떆媛??꾩튂 吏??+ ?ㅼ씠踰??곕룞 ?덈툕 + ?좎??댁슜怨꾪쉷 洹쒖젣 吏꾨떒
+-    # ?ㅻⅨ履? 二쇰? ?꾪뙆???ㅺ굅???쒖꽭 + 理쒓렐 1??留ㅺ컖 ?듦퀎 + [?뵰 AI 誘몃옒 ?덉긽 ?쒖꽭 ?쒕??덉씠??
+     
+-    old_tab3_markup = """        <div id="detail-group-panel-3" class="flex-1 overflow-y-auto p-3 sm:p-3.5 space-y-3 sm:space-y-3.5 custom-scrollbar bg-slate-50/50 hidden relative">
+-            <div id="group-content-3" class="space-y-3 sm:space-y-3.5 w-full">
+-                <!-- ?꾩튂 & ?쒖꽭 遺꾩꽍 1???ㅽ깮 ?덉씠?꾩썐 -->
++    old_tab3_markup = """                <!-- ?꾩튂 & ?쒖꽭 遺꾩꽍 1???ㅽ깮 ?덉씠?꾩썐 -->
+                 <div class="space-y-4 sm:space-y-5">
+-                    <div id="detail-panel-map" class="space-y-4 sm:space-y-5">
+-            <!-- ?뱧 臾쇨굔吏 ?ㅼ떆媛??꾩튂 吏??-->
+-            <div class="bg-white border border-slate-200 rounded-2xl p-3 sm:p-3.5 space-y-2 shadow-sm">
+-                <h4 class="text-xs sm:text-sm font-black text-slate-800 flex items-center gap-1.5">
+-                    <i class="fa-solid fa-map-location-dot text-royalBlue"></i> ?뱧 臾쇨굔吏 ?ㅼ떆媛??꾩튂 吏??-                </h4>"""
+-
+-    new_tab3_markup = """        <div id="detail-group-panel-3" class="flex-1 overflow-y-auto p-3 sm:p-3.5 space-y-3 sm:space-y-3.5 custom-scrollbar bg-slate-50/50 hidden relative">
+-            <div id="group-content-3" class="space-y-3 sm:space-y-3.5 w-full">
+-                <!-- 2??洹몃━?쒕줈 媛쒗렪?섏뿬 吏???쒖꽭 ?뚯씠釉붿쓽 媛濡??섏뼱吏?諛⑹? -->
++                    <div id="detail-panel-map" class="space-y-4 sm:space-y-5">"""
++
++    new_tab3_markup = """                <!-- ?꾩튂 & ?쒖꽭 遺꾩꽍 ??붾㈃ xl ???2??諛섏쓳??洹몃━???덉씠?꾩썐 -->
+                 <div class="grid grid-cols-1 xl:grid-cols-2 gap-4 sm:gap-5 w-full items-start">
+                     <!-- ?쇱そ ?? 吏?? ?곕룞 ?덈툕, ?좎?洹쒖젣 吏꾨떒 -->
+                     <div class="space-y-4 sm:space-y-5 w-full">
+-                        <div id="detail-panel-map" class="space-y-4 sm:space-y-5">
+-                            <!-- ?뱧 臾쇨굔吏 ?ㅼ떆媛??꾩튂 吏??-->
+-                            <div class="bg-white border border-slate-200 rounded-2xl shadow-sm w-full overflow-hidden">
+-                                <div class="bg-slate-50 px-4 py-2.5 border-b border-slate-200">
+-                                    <h4 class="text-xs sm:text-sm font-black text-slate-800 flex items-center gap-1.5">
+-                                        <i class="fa-solid fa-map-location-dot text-royalBlue"></i> ?뱧 臾쇨굔吏 ?ㅼ떆媛??꾩튂 吏??-                                    </h4>
+-                                </div>
+-                                <div class="p-3.5">"""
+-
+-    content = content.replace(old_tab3_markup, new_tab3_markup)
+-
+-    # ??3??吏??而⑦뀒?대꼫 ?ル뒗 遺遺꾧낵 ?곕룞 ?덈툕 ?쒖옉 遺遺?媛쒗렪
+-    old_hub_markup = """                </div>
+-            </div>
+-
+-            <!-- ?뿺截??ㅼ씠踰??꾨Ц 吏??諛??뺣낫留??곕룞 ?덈툕 -->
+-            <div class="bg-white border border-slate-200 rounded-2xl p-3 sm:p-3.5 space-y-2 shadow-sm">
+-                <h4 class="text-xs sm:text-sm font-black text-slate-800 flex items-center gap-1.5">
+-                    <i class="fa-solid fa-map text-royalBlue"></i> ?뿺截??ㅼ씠踰??꾨Ц 吏??諛??뺣낫留??곕룞
+-                </h4>"""
+-
+-    new_hub_markup = """                                </div>
+-                            </div>
+-                        </div> <!-- ?몚 吏??移대뱶 ?リ린 -->
+-
+-                        <!-- ?뿺截??ㅼ씠踰??꾨Ц 吏??諛??뺣낫留??곕룞 ?덈툕 -->
+-                        <div class="bg-white border border-slate-200 rounded-2xl shadow-sm w-full overflow-hidden">
+-                            <div class="bg-slate-50 px-4 py-2.5 border-b border-slate-200">
+-                                <h4 class="text-xs sm:text-sm font-black text-slate-800 flex items-center gap-1.5">
+-                                    <i class="fa-solid fa-map text-royalBlue"></i> ?뿺截??ㅼ씠踰??꾨Ц 吏??諛??뺣낫留??곕룞
+-                                </h4>
+-                            </div>
+-                            <div class="p-3.5 space-y-2">"""
+-
+-    content = content.replace(old_hub_markup, new_hub_markup)
++                        <div id="detail-panel-map" class="space-y-4 sm:space-y-5">"""
+ 
+-    # ??3???좎?洹쒖젣 移대뱶 ?쒖옉 遺遺?媛쒗렪
+-    old_regulation_markup = """            <!-- ?윟 ?좎??댁슜怨꾪쉷 諛?洹쒖젣 吏꾨떒 移대뱶 -->
+-            <div class="bg-white border border-slate-200 rounded-2xl p-3 sm:p-3.5 space-y-2 shadow-sm">
+-                <h4 class="text-xs sm:text-sm font-black text-slate-800 flex items-center gap-1.5">
+-                    <i class="fa-solid fa-leaf text-royalBlue"></i> ?뙮 ?좎??댁슜怨꾪쉷 諛?洹쒖젣 吏꾨떒
+-                </h4>"""
++    content = content.replace(old_tab3_markup, new_tab3_markup, 1)
+ 
+-    new_regulation_markup = """            </div> <!-- ?몚 ?곕룞 ?덈툕 p-3.5 諛?移대뱶 ?リ린 -->
+-            </div> <!-- ?몚 ?곕룞 ?덈툕 移대뱶 ?リ린 蹂댁젙 -->
++    # ??3??吏??而⑦뀒?대꼫 ?リ린 蹂댁젙
++    old_tab3_map_close = """                <div id="detail-map-container" class="w-full h-[220px] rounded-xl overflow-hidden border border-slate-200/60 bg-slate-50 relative group">
++                    <!-- Javascript?먯꽌 iframe ?숈쟻 二쇱엯 -->
++                </div>
++            </div>"""
+ 
+-            <!-- ?윟 ?좎??댁슜怨꾪쉷 諛?洹쒖젣 吏꾨떒 移대뱶 -->
+-            <div class="bg-white border border-slate-200 rounded-2xl shadow-sm w-full overflow-hidden">
+-                <div class="bg-slate-50 px-4 py-2.5 border-b border-slate-200">
+-                    <h4 class="text-xs sm:text-sm font-black text-slate-800 flex items-center gap-1.5">
+-                        <i class="fa-solid fa-leaf text-royalBlue"></i> ?뙮 ?좎??댁슜怨꾪쉷 諛?洹쒖젣 吏꾨떒
+-                    </h4>
++    new_tab3_map_close = """                <div id="detail-map-container" class="w-full h-[220px] rounded-xl overflow-hidden border border-slate-200/60 bg-slate-50 relative group">
++                    <!-- Javascript?먯꽌 iframe ?숈쟻 二쇱엯 -->
+                 </div>
+-                <div class="p-3.5 space-y-2.5">"""
++            </div> <!-- ?몚 吏??移대뱶 ?リ린 -->"""
+ 
+-    content = content.replace(old_regulation_markup, new_regulation_markup)
++    content = content.replace(old_tab3_map_close, new_tab3_map_close, 1)
+ 
+-    # ?좎?洹쒖젣 ??諛?2???곗륫 ???쒖옉
+-    # ?좎??댁쓬 ?꾩썐留곹겕 ?섎떒 </div> </div> (?좎?洹쒖젣 ?ロ옒) ?꾨옒?먯꽌
+-    # 2???곗륫 ?댁쓣 ?닿퀬 "二쇰? ?꾪뙆???ㅺ굅???쒖꽭 ?議? 移대뱶瑜?留ㅽ븨?⑸땲??
+-    old_tab3_col2_markup = """                <a id="btn-official-eum" href="#" onclick="event.preventDefault(); copyAddressAndOpenEum();" class="w-full bg-emeraldSuccess text-white py-2 rounded-xl text-xs font-black hover:bg-emerald-700 transition-all flex items-center justify-center gap-1 select-none cursor-pointer text-center">
++    # ??3???좎??댁슜怨꾪쉷 ?リ린 諛??ㅻⅨ履?2???ㅽ깮 ?닿린
++    old_tab3_split = """                <a id="btn-official-eum" href="#" onclick="event.preventDefault(); copyAddressAndOpenEum();" class="w-full bg-emeraldSuccess text-white py-2 rounded-xl text-xs font-black hover:bg-emerald-700 transition-all flex items-center justify-center gap-1 select-none cursor-pointer text-center">
+                     援?넗遺 ?좎??댁쓬(eum.go.kr) 怨듭떇 議고쉶?섍린
+                 </a>
+                         </div>
+                     </div>
+ 
+-                    <div id="detail-panel-market" class="space-y-4 sm:space-y-5">
+-                        <div class="bg-white border border-slate-200 rounded-2xl p-3 sm:p-3.5 shadow-sm space-y-2.5">
+-                <div class="flex items-center justify-between pb-2 border-b border-slate-100">
+-                    <h4 class="text-xs sm:text-sm font-black text-slate-800 flex items-center gap-1.5">
+-                        <i class="fa-solid fa-tags text-royalBlue"></i> 二쇰? ?꾪뙆???ㅺ굅???쒖꽭 ?議?-                    </h4>"""
++                    <div id="detail-panel-market" class="space-y-4 sm:space-y-5">"""
+ 
+-    new_tab3_col2_markup = """                <a id="btn-official-eum" href="#" onclick="event.preventDefault(); copyAddressAndOpenEum();" class="w-full bg-emeraldSuccess text-white py-2 rounded-xl text-xs font-black hover:bg-emerald-700 transition-all flex items-center justify-center gap-1 select-none cursor-pointer text-center">
++    new_tab3_split = """                <a id="btn-official-eum" href="#" onclick="event.preventDefault(); copyAddressAndOpenEum();" class="w-full bg-emeraldSuccess text-white py-2 rounded-xl text-xs font-black hover:bg-emerald-700 transition-all flex items-center justify-center gap-1 select-none cursor-pointer text-center">
+                     援?넗遺 ?좎??댁쓬(eum.go.kr) 怨듭떇 議고쉶?섍린
+                 </a>
+                         </div>
+-                    </div>
+-                    </div> <!-- ?몚 ?좎?洹쒖젣 p-3.5 諛?移대뱶 ?リ린 -->
+-                    </div> <!-- ?몚 2???쇱そ ???꾩껜 ?リ린 -->
++                    </div> <!-- ?몚 ?좎??댁슜洹쒖젣 移대뱶 ?リ린 -->
++                    </div> <!-- ?몚 ?쇱そ ??space-y-4 ?リ린 -->
+ 
+                     <!-- ?ㅻⅨ履??? ?ㅺ굅???쒖꽭, 留ㅺ컖 ?듦퀎, [?뵰 AI 誘몃옒 ?덉긽 ?쒖꽭 ?쒕??덉씠?? -->
+                     <div class="space-y-4 sm:space-y-5 w-full">
+-                        <!-- 二쇰? ?꾪뙆???ㅺ굅???쒖꽭 ?議?-->
+-                        <div class="bg-white border border-slate-200 rounded-2xl shadow-sm w-full overflow-hidden">
+-                            <div class="bg-slate-50 px-4 py-2.5 border-b border-slate-200 flex justify-between items-center">
+-                                <h4 class="text-xs sm:text-sm font-black text-slate-800 flex items-center gap-1.5">
+-                                    <i class="fa-solid fa-tags text-royalBlue"></i> 二쇰? ?꾪뙆???ㅺ굅???쒖꽭 ?議?-                                </h4>
+-                                <button onclick="copyAddressToClipboardAndOpenSeeReal()" class="px-2 py-1 bg-amber-50 hover:bg-amber-100 border border-amber-200 text-amber-700 text-[10px] font-black rounded-lg transition-all flex items-center gap-1 select-none cursor-pointer">
+-                                    <i class="fa-solid fa-copy"></i> 二쇱냼蹂듭궗 & ?쒖꽭?뺤씤 (?⑤━??
+-                                </button>
+-                            </div>
+-                            <div class="p-3.5 space-y-2.5">"""
+-
+-    content = content.replace(old_tab3_col2_markup, new_tab3_col2_markup)
+-
+-    # ??3??留ㅺ컖 ?듦퀎 移대뱶 ?ㅻ뜑 媛쒗렪
+-    old_stats_markup = """                        <!-- ?뱤 理쒓렐 1??留ㅺ컖 ?듦퀎 (?낆? & ?쒖꽭 遺꾩꽍 ??쑝濡??대룞 諛곗튂) -->
+-                        <div id="detail-panel-statistics" class="space-y-4 sm:space-y-5">
+-                            <div class="bg-white border border-slate-200 rounded-2xl p-3 sm:p-3.5 shadow-sm space-y-2 shadow-sm">
+-                                <h4 class="text-xs sm:text-sm font-black text-slate-800 flex items-center gap-1.5 pb-2 border-b border-slate-100">
+-                                    <i class="fa-solid fa-chart-bar text-royalBlue"></i> ?대떦 踰뺤썝/?⑸룄 理쒓렐 1??留ㅺ컖 ?듦퀎
+-                                </h4>"""
+-
+-    new_stats_markup = """                        </div> <!-- ?몚 ?ㅺ굅??p-3.5 諛?移대뱶 ?リ린 -->
+-                        </div> <!-- ?몚 ?ㅺ굅??移대뱶 ?リ린 蹂댁젙 -->
+-
+-                        <!-- ?뱤 理쒓렐 1??留ㅺ컖 ?듦퀎 (?낆? & ?쒖꽭 遺꾩꽍 ??쑝濡??대룞 諛곗튂) -->
+-                        <div class="bg-white border border-slate-200 rounded-2xl shadow-sm w-full overflow-hidden">
+-                            <div class="bg-slate-50 px-4 py-2.5 border-b border-slate-200">
+-                                <h4 class="text-xs sm:text-sm font-black text-slate-800 flex items-center gap-1.5">
+-                                    <i class="fa-solid fa-chart-bar text-royalBlue"></i> ?대떦 踰뺤썝/?⑸룄 理쒓렐 1??留ㅺ컖 ?듦퀎
+-                                </h4>
+-                            </div>
+-                            <div class="p-3.5 space-y-2.5">"""
++                        <div id="detail-panel-market" class="space-y-4 sm:space-y-5">"""
+ 
+-    content = content.replace(old_stats_markup, new_stats_markup)
++    content = content.replace(old_tab3_split, new_tab3_split, 1)
+ 
+-    # ??3??留ㅺ컖 ?듦퀎 ?リ린 諛?[?뵰 AI 誘몃옒 ?덉긽 ?쒖꽭 ?쒕??덉씠?? 移대뱶 ?좎꽕
+-    # 1746?쇱씤 洹쇱쿂???ル뒗 div 諛??⑤꼸 醫낅즺遺 ?꾨옒??誘몃옒 ?쒕??덉씠?곕? ?쎌엯?섍퀬 ?꾩껜 2??洹몃━?쒕? ?レ뒿?덈떎.
++    # ??3??留ㅺ컖 ?듦퀎 ?リ린 諛?AI ?쒕??덉씠??移대뱶 ?묒옱 諛?洹몃━???リ린
+     old_tab3_close = """                                </div>
+                             </div>
+                         </div>
+@@ -662,26 +282,111 @@ def main():
+                                 </div>
+                             </div>
+                         </div> <!-- ?몚 誘몃옒 ?덉긽 ?쒕??덉씠??移대뱶 ?リ린 -->
+-                    </div> <!-- ?몚 2???ㅻⅨ履????꾩껜 ?リ린 -->
++                    </div> <!-- ?몚 ?ㅻⅨ履????リ린 -->
+                 </div> <!-- ?몚 2??洹몃━???꾩껜 ?リ린 -->
+             </div> <!-- ?몚 group-content-3 ?꾩껜 ?リ린 -->
+-            </div> <!-- ?몚 detail-panel-market ?リ린 蹂댁젙 -->
+             <div id="group-mask-3" """
+ 
+-    content = content.replace(old_tab3_close, new_tab3_close)
++    content = content.replace(old_tab3_close, new_tab3_close, 1)
++
++
++    # 4. 愿묎퀬 ?ㅽ? ?섏젙 (鍮꾪솢?깊솕 遺꾧린 ??classList.remove ???add ?섎룄濡?泥섎━)
++    old_ad_top_bug = """                } else {
++                    detailTopAdSlot.classList.remove("hidden");
++                }"""
++
++    new_ad_top_bug = """                } else {
++                    detailTopAdSlot.classList.add("hidden");
++                }"""
++
++    content = content.replace(old_ad_top_bug, new_ad_top_bug, 1)
++
++    old_ad_bottom_bug = """                } else {
++                    detailBottomAdSlot.classList.remove("hidden");
++                }"""
++
++    new_ad_bottom_bug = """                } else {
++                    detailBottomAdSlot.classList.add("hidden");
++                }"""
++
++    content = content.replace(old_ad_bottom_bug, new_ad_bottom_bug, 1)
++
++
++    # 5. loadDetailView 留덉?留?遺遺꾩뿉 ?꾩뿭 蹂닿?, ?쒖꽭 ?덉륫 媛깆떊 諛?愿묎퀬 ?뚮뜑留??몄텧???ъ뼱 ?곌껐 蹂듦뎄
++    old_detail_load_end = """            // v1.2 紐⑥쓽?낆같 ?곗씠??諛??꾨Ц媛 由ъ뒪???ㅼ떆媛?濡쒕뱶 ?곕룞
++            if (typeof v12Features !== 'undefined') {
++                v12Features.loadMockBids(item.id, item.appraised_value);
++                v12Features.renderExperts(item.id);
++            }
++        }"""
++
++    new_detail_load_end = """            // v1.2 紐⑥쓽?낆같 ?곗씠??諛??꾨Ц媛 由ъ뒪???ㅼ떆媛?濡쒕뱶 ?곕룞
++            if (typeof v12Features !== 'undefined') {
++                v12Features.loadMockBids(item.id, item.appraised_value);
++                v12Features.renderExperts(item.id);
++            }
++
++            // 誘몃옒 ?덉긽 ?쒖꽭 ?곗텧???꾪빐 留ㅻЪ ?뺣낫瑜??꾩뿭??蹂닿??섍퀬 ?덉륫 ?쒕??덉씠?곕? ?낅뜲?댄듃?⑸땲??
++            window.currentDetailItem = item;
++            updateFuturePricePrediction();
++
++            // ?곸꽭?섏씠吏媛 ?대┫ ?뚮쭏??理쒖떊 愿묎퀬 ?뺣낫瑜?洹몃━?꾨줉 ?숆린?뷀빀?덈떎.
++            renderCustomAdSlots();
++        }"""
++
++    content = content.replace(old_detail_load_end, new_detail_load_end, 1)
++
++
++    # 6. 誘몃옒 ?덉긽 ?쒖꽭 ?곗궛 ?먮컮?ㅽ겕由쏀듃 ?⑥닔 異붽? (renderSimilarProperties ?쒖옉遺 諛붾줈 ?꾩뿉 ?뺤쓽)
++    old_similar_start = """        // ?쭬 二쇰? ?좎궗 異붿쿇 留ㅻЪ 誘명꽣(m) ?⑥쐞 ?숈쟻 ?곗궛 ?뚮뜑??+        function renderSimilarProperties(currentItem) {"""
++
++    new_similar_start = """        // ?뵰 AI 誘몃옒 ?덉긽 ?쒖꽭 ?쒕??덉씠???곗궛 ?⑥닔 (1??3??5??10?????덉긽?쒖꽭 ?덉륫)
++        function updateFuturePricePrediction() {
++            const item = window.currentDetailItem;
++            if (!item) return;
++
++            const basePrice = item.appraised_value || 0;
++            const rateElements = document.getElementsByName("future-rate-select");
++            let rate = 3.0; // 湲곕낯 3% (?쒖?)
++            for (let r of rateElements) {
++                if (r.checked) {
++                    rate = parseFloat(r.value);
++                    break;
++                }
++            }
++
++            // 媛??덉긽 湲곌컙蹂?蹂듬━ ?곸듅瑜?諛?媛寃?怨꾩궛
++            const terms = [1, 3, 5, 10];
++            const termKeys = { 1: '1y', 3: '3y', 5: '5y', 10: '10y' };
++
++            terms.forEach(t => {
++                const key = termKeys[t];
++                const cumRate = (Math.pow(1 + rate / 100, t) - 1) * 100;
++                const estPrice = Math.round(basePrice * Math.pow(1 + rate / 100, t));
++
++                const rateEl = document.getElementById(`future-rate-${key}`);
++                const priceEl = document.getElementById(`future-price-${key}`);
++
++                if (rateEl) {
++                    rateEl.textContent = `+${cumRate.toFixed(2)}%`;
++                }
++                if (priceEl) {
++                    priceEl.textContent = formatKRW(estPrice);
++                }
++            });
++        }
++
++        // ?쭬 二쇰? ?좎궗 異붿쿇 留ㅻЪ 誘명꽣(m) ?⑥쐞 ?숈쟻 ?곗궛 ?뚮뜑??+        function renderSimilarProperties(currentItem) {"""
++
++    content = content.replace(old_similar_start, new_similar_start, 1)
+ 
+ 
+-    # 4. 誘몃옒 ?덉긽 ?쒖꽭 ?곗궛 ?먮컮?ㅽ겕由쏀듃 ?⑥닔 異붽? 諛?loadDetailView 諛붿씤??-    # updateFuturePricePrediction() 援ы쁽遺 二쇱엯
+-    # loadDetailView(item) ?⑥닔 ?댁뿉 updateFuturePricePrediction() ?몄텧 二쇱엯
+-    # index.html ?먮컮?ㅽ겕由쏀듃???앹옄?쎌씠???곸젅??怨녹뿉 ?⑥닔瑜?異붽??⑸땲??
+-    # loadDetailView ?⑥닔 ?댁쓽 留덉?留??ル뒗 釉뚮젅?댁뒪 吏곸쟾???곕룞?섎룄濡?泥섎━?섍쿋?듬땲??
+-    # loadDetailView???앹쓣 grep_search濡?李얠븘遊낅땲?? (?꾨옒 ?쎌뒪 ?뚯씪?먯꽌 異붽? 吏꾪뻾)
+-    
+     try:
+         with open(filepath, "w", encoding="utf-8") as f:
+             f.write(content)
+-        print("Successfully refactored index.html layout to responsive 2-column grid and added AI future simulator mockup.")
++        print("Successfully applied precise responsive 2-column grid patches and restored ad syncing in index.html.")
+     except Exception as e:
+         print(f"Failed to write index.html: {e}")
+ 
