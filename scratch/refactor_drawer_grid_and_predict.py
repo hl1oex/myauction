@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# index.html의 3대 탭을 반응형 2열 그리드로 전면 개편하고 미래 예상 시세 예측 시뮬레이터를 삽입하는 패치 스크립트입니다.
+# index.html의 3대 탭을 반응형 2열 그리드로 정교하게 개편하고 광고 연동 문제를 복구하는 패치 스크립트입니다.
 import re
 
 def main():
@@ -11,112 +11,17 @@ def main():
         print(f"Failed to read index.html: {e}")
         return
 
-    # 1. 탭 1 (종합 & 권리분석) 반응형 2열 개편 및 카드 헤더 스타일 일체화
+    # 1. 탭 1 (종합 & 권리분석) 반응형 2열 개편
     # 기일 이력 카드, 외부 연동 허브, 유사 추천 매물을 왼쪽 1열로 묶고, 법정 주요 서류를 오른쪽 2열로 묶습니다.
-    # 각각의 카드들을 overflow-hidden 구조와 bg-slate-50 헤더 영역을 가진 카드 스타일로 갱신합니다.
+    # replace 함수의 count 인자를 1로 제한하여 단 한 번만 정확히 치환되도록 방어합니다.
     
-    # 탭 1의 기존 '3. 경매 기일 이력과 외부 정보 연동...' 주석 밑의 마크업 전체를 2열 그리드 구조로 개편합니다.
-    old_tab1_markup = """                <!-- 3. 경매 기일 이력과 외부 정보 연동/유사 매물 반응형 분기 레이아웃 (세로 1열 플로우 배치로 공백 제거) -->
-                <div class="space-y-4 sm:space-y-5 w-full">
+    old_tab1_markup = """                <!-- 3. 경매 기일 이력과 외부 정보 연동/유사 매물 반응형 분기 레이아웃 -->
+                <div class="grid grid-cols-1 xl:grid-cols-2 gap-4 sm:gap-5 items-start">
                     <!-- 경매 진행 기일 이력 -->
                     <div class="bg-white border border-slate-200 rounded-2xl p-4 space-y-2 shadow-sm w-full">
                         <h4 class="text-xs sm:text-sm font-black text-slate-800 flex items-center gap-1.5 mb-2.5">
                             <i class="fa-solid fa-calendar-days text-royalBlue"></i> 📅 경매 진행 기일 이력
-                        </h4>
-                        <div class="overflow-x-auto border border-slate-200 rounded-xl overflow-hidden shadow-sm bg-white">
-                            <table class="w-full text-left border-collapse text-[13px] document-view">
-                                <thead>
-                                    <tr class="bg-slate-50 border-b border-slate-200 text-slate-800 font-extrabold text-[12px]">
-                                        <th class="p-3 pl-4 w-1/4">회차</th>
-                                        <th class="p-3 w-1/3">입찰 기일</th>
-                                        <th class="p-3 text-right text-slate-800">최저 매각 가격</th>
-                                        <th class="p-3 pr-4 text-center">결과</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="detail-giiil-tbody" class="text-slate-700 font-medium">
-                                    <!-- 동적 주입 -->
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-
-                    <!-- 우측 묶음: 외부 연동 허브 및 추천 매물 -->
-                    <div class="space-y-4 sm:space-y-5 w-full">
-                        <!-- 원스톱 외부 공식 정보망 연동 -->
-                        <div class="bg-white border border-slate-200 rounded-2xl p-3 sm:p-3.5 space-y-2 shadow-sm">
-                            <h4 class="text-xs sm:text-sm font-black text-slate-800 flex items-center gap-1.5">
-                                <i class="fa-solid fa-globe text-royalBlue"></i> 🌐 원스톱 외부 공식 정보망 연동
-                            </h4>
-                            <p class="text-[9.5px] text-slate-500 leading-relaxed font-semibold">주요 외부 공식 포털 및 지도로 바로 이동합니다.</p>
-                            <div class="grid grid-cols-2 gap-2 text-xs">
-                                <a id="btn-official-site" href="https://www.courtauction.go.kr" target="_blank" class="bg-slate-50 border border-slate-200 hover:border-royalBlue hover:shadow-md rounded-xl p-2.5 flex items-center gap-2.5 transition-all group">
-                                    <div class="bg-blue-50 text-royalBlue group-hover:bg-royalBlue group-hover:text-white w-7 h-7 rounded-lg flex items-center justify-center flex-shrink-0 transition-colors">
-                                        <i class="fa-solid fa-arrow-up-right-from-square text-[10px]"></i>
-                                    </div>
-                                    <div class="truncate">
-                                        <strong class="block text-[10.5px] sm:text-xs font-black text-slate-800 group-hover:text-royalBlue transition-colors truncate">공식 매물상세</strong>
-                                        <span class="text-[9px] text-slate-400 font-bold block mt-0.5 truncate">법원/온비드 원본 정보</span>
-                                    </div>
-                                </a>
-                                <a id="btn-naver-map" href="https://map.naver.com" target="_blank" class="bg-slate-50 border border-slate-200 hover:border-emeraldSuccess hover:shadow-md rounded-xl p-2.5 flex items-center gap-2.5 transition-all group">
-                                    <div class="bg-emerald-50 text-emeraldSuccess group-hover:bg-emeraldSuccess group-hover:text-white w-7 h-7 rounded-lg flex items-center justify-center flex-shrink-0 transition-colors">
-                                        <i class="fa-solid fa-map-location-dot text-[10px]"></i>
-                                    </div>
-                                    <div class="truncate">
-                                        <strong class="block text-[10.5px] sm:text-xs font-black text-slate-800 group-hover:text-emeraldSuccess transition-colors truncate">네이버지도 보기</strong>
-                                        <span class="text-[9px] text-slate-400 font-bold block mt-0.5 truncate">위성뷰 지번 확인</span>
-                                    </div>
-                                </a>
-                                <a id="btn-naver-land-price" href="https://land.naver.com" target="_blank" class="bg-slate-50 border border-slate-200 hover:border-royalBlue hover:shadow-md rounded-xl p-2.5 flex items-center gap-2.5 transition-all group">
-                                    <div class="bg-blue-50 text-royalBlue group-hover:bg-royalBlue group-hover:text-white w-7 h-7 rounded-lg flex items-center justify-center flex-shrink-0 transition-colors">
-                                        <i class="fa-solid fa-house-chimney text-[10px]"></i>
-                                    </div>
-                                    <div class="truncate">
-                                        <strong class="block text-[10.5px] sm:text-xs font-black text-slate-800 group-hover:text-royalBlue transition-colors truncate">네이버부동산 시세</strong>
-                                        <span class="text-[9px] text-slate-400 font-bold block mt-0.5 truncate">주변 단지 거래 동향</span>
-                                    </div>
-                                </a>
-                                <a href="https://www.iros.go.kr" target="_blank" class="bg-slate-50 border border-slate-200 hover:border-royalBlue hover:shadow-md rounded-xl p-2.5 flex items-center gap-2.5 transition-all group">
-                                    <div class="bg-blue-50 text-royalBlue group-hover:bg-royalBlue group-hover:text-white w-7 h-7 rounded-lg flex items-center justify-center flex-shrink-0 transition-colors">
-                                        <i class="fa-solid fa-file-signature text-[10px]"></i>
-                                    </div>
-                                    <div class="truncate">
-                                        <strong class="block text-[10.5px] sm:text-xs font-black text-slate-800 group-hover:text-royalBlue transition-colors truncate">인터넷등기소</strong>
-                                        <span class="text-[9px] text-slate-400 font-bold block mt-0.5 truncate">등기부등본 열람</span>
-                                    </div>
-                                </a>
-                            </div>
-                        </div>
-
-                        <!-- 동일 용도/지역 기반 유사 추천 매물 -->
-                        <div class="bg-white border border-slate-200 rounded-2xl p-4 space-y-3 shadow-sm">
-                            <h4 class="text-xs sm:text-sm font-black text-slate-800 flex items-center gap-1.5 pb-2 border-b border-slate-100">
-                                <i class="fa-solid fa-handshake text-royalBlue"></i> 🤝 동일 용도/지역 기반 유사 추천 매물
-                            </h4>
-                            <div id="detail-similar-container" class="grid grid-cols-3 gap-2">
-                                <!-- 동적 렌더링 카드 3개 -->
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- 4. 가로가 긴 법정 주요 서류 테이블 (단독 1열 배치) -->
-                <div class="bg-white border border-slate-200 rounded-2xl p-4 space-y-2.5 shadow-sm w-full">
-                    <h4 class="text-xs sm:text-sm font-black text-slate-800 flex items-center gap-1.5">
-                        <i class="fa-solid fa-scale-balanced text-royalBlue"></i> ⚖️ 법정 주요 서류 및 사건 기록
-                    </h4>
-                    <p class="text-[9.5px] text-slate-500 leading-relaxed font-semibold">대법원 경매 및 감정 법원에서 공식 발행된 법정 주요 서류의 정밀 분석 명세 테이블입니다.</p>
-                    <div class="overflow-x-auto border border-slate-200 rounded-xl overflow-hidden shadow-sm bg-white">
-                        <table class="w-full text-left border-collapse text-[13px] document-view">
-                            <thead>
-                                <tr class="bg-slate-50 border-b border-slate-200 text-slate-800 font-extrabold text-[12px]">
-                                    <th class="p-3 pl-4 w-[20%] text-slate-900">서류 구분</th>
-                                    <th class="p-3 w-[35%] text-slate-900">세부 항목 분석 명세</th>
-                                    <th class="p-3 w-[35%] text-slate-900">집행법원 / 의견 및 권리 진단</th>
-                                    <th class="p-3 pr-4 text-right w-[10%] text-slate-900">바로가기</th>
-                                </tr>
-                            </thead>
-                            <tbody class="text-slate-700 font-medium">"""
+                        </h4>"""
 
     new_tab1_markup = """                <!-- 3. 대화면 xl 해상도 대응 2열 반응형 그리드 레이아웃 (빈 공간 소거 및 테이블 가로 늘어짐 방지) -->
                 <div class="grid grid-cols-1 xl:grid-cols-2 gap-4 sm:gap-5 w-full items-start">
@@ -129,464 +34,179 @@ def main():
                                     <i class="fa-solid fa-calendar-days text-royalBlue"></i> 📅 경매 진행 기일 이력
                                 </h4>
                             </div>
-                            <div class="p-3.5 space-y-3">
-                                <div class="overflow-x-auto border border-slate-200 rounded-xl overflow-hidden shadow-sm bg-white">
-                                    <table class="w-full text-left border-collapse text-[13px] document-view">
-                                        <thead>
-                                            <tr class="bg-slate-50 border-b border-slate-200 text-slate-800 font-extrabold text-[12px]">
-                                                <th class="p-3 pl-4 w-1/4">회차</th>
-                                                <th class="p-3 w-1/3">입찰 기일</th>
-                                                <th class="p-3 text-right text-slate-800">최저 매각 가격</th>
-                                                <th class="p-3 pr-4 text-center">결과</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody id="detail-giiil-tbody" class="text-slate-700 font-medium">
-                                            <!-- 동적 주입 -->
-                                        </tbody>
-                                    </table>
-                                </div>
-                            </div>
-                        </div>
+                            <div class="p-3.5 space-y-3">"""
 
-                        <!-- 원스톱 외부 공식 정보망 연동 -->
+    content = content.replace(old_tab1_markup, new_tab1_markup, 1)
+
+    # 탭 1의 외부 정보망 연동 카드 헤더 스타일 개편
+    old_tab1_hub = """                        <!-- 원스톱 외부 공식 정보망 연동 -->
+                        <div class="bg-white border border-slate-200 rounded-2xl p-4 space-y-2.5 shadow-sm">
+                            <h4 class="text-xs sm:text-sm font-black text-slate-800 flex items-center gap-1.5">
+                                <i class="fa-solid fa-globe text-royalBlue"></i> 🌐 원스톱 외부 공식 정보망 연동
+                            </h4>"""
+
+    new_tab1_hub = """                        <!-- 원스톱 외부 공식 정보망 연동 -->
                         <div class="bg-white border border-slate-200 rounded-2xl shadow-sm w-full overflow-hidden">
                             <div class="bg-slate-50 px-4 py-2.5 border-b border-slate-200">
                                 <h4 class="text-xs sm:text-sm font-black text-slate-800 flex items-center gap-1.5">
                                     <i class="fa-solid fa-globe text-royalBlue"></i> 🌐 원스톱 외부 공식 정보망 연동
                                 </h4>
                             </div>
-                            <div class="p-3.5 space-y-2">
-                                <p class="text-[9.5px] text-slate-500 leading-relaxed font-semibold">주요 외부 공식 포털 및 지도로 바로 이동합니다.</p>
-                                <div class="grid grid-cols-2 gap-2 text-xs">
-                                    <a id="btn-official-site" href="https://www.courtauction.go.kr" target="_blank" class="bg-slate-50 border border-slate-200 hover:border-royalBlue hover:shadow-md rounded-xl p-2.5 flex items-center gap-2.5 transition-all group">
-                                        <div class="bg-blue-50 text-royalBlue group-hover:bg-royalBlue group-hover:text-white w-7 h-7 rounded-lg flex items-center justify-center flex-shrink-0 transition-colors">
-                                            <i class="fa-solid fa-arrow-up-right-from-square text-[10px]"></i>
-                                        </div>
-                                        <div class="truncate">
-                                            <strong class="block text-[10.5px] sm:text-xs font-black text-slate-800 group-hover:text-royalBlue transition-colors truncate">공식 매물상세</strong>
-                                            <span class="text-[9px] text-slate-400 font-bold block mt-0.5 truncate">법원/온비드 원본 정보</span>
-                                        </div>
-                                    </a>
-                                    <a id="btn-naver-map" href="https://map.naver.com" target="_blank" class="bg-slate-50 border border-slate-200 hover:border-emeraldSuccess hover:shadow-md rounded-xl p-2.5 flex items-center gap-2.5 transition-all group">
-                                        <div class="bg-emerald-50 text-emeraldSuccess group-hover:bg-emeraldSuccess group-hover:text-white w-7 h-7 rounded-lg flex items-center justify-center flex-shrink-0 transition-colors">
-                                            <i class="fa-solid fa-map-location-dot text-[10px]"></i>
-                                        </div>
-                                        <div class="truncate">
-                                            <strong class="block text-[10.5px] sm:text-xs font-black text-slate-800 group-hover:text-emeraldSuccess transition-colors truncate">네이버지도 보기</strong>
-                                            <span class="text-[9px] text-slate-400 font-bold block mt-0.5 truncate">위성뷰 지번 확인</span>
-                                        </div>
-                                    </a>
-                                    <a id="btn-naver-land-price" href="https://land.naver.com" target="_blank" class="bg-slate-50 border border-slate-200 hover:border-royalBlue hover:shadow-md rounded-xl p-2.5 flex items-center gap-2.5 transition-all group">
-                                        <div class="bg-blue-50 text-royalBlue group-hover:bg-royalBlue group-hover:text-white w-7 h-7 rounded-lg flex items-center justify-center flex-shrink-0 transition-colors">
-                                            <i class="fa-solid fa-house-chimney text-[10px]"></i>
-                                        </div>
-                                        <div class="truncate">
-                                            <strong class="block text-[10.5px] sm:text-xs font-black text-slate-800 group-hover:text-royalBlue transition-colors truncate">네이버부동산 시세</strong>
-                                            <span class="text-[9px] text-slate-400 font-bold block mt-0.5 truncate">주변 단지 거래 동향</span>
-                                        </div>
-                                    </a>
-                                    <a href="https://www.iros.go.kr" target="_blank" class="bg-slate-50 border border-slate-200 hover:border-royalBlue hover:shadow-md rounded-xl p-2.5 flex items-center gap-2.5 transition-all group">
-                                        <div class="bg-blue-50 text-royalBlue group-hover:bg-royalBlue group-hover:text-white w-7 h-7 rounded-lg flex items-center justify-center flex-shrink-0 transition-colors">
-                                            <i class="fa-solid fa-file-signature text-[10px]"></i>
-                                        </div>
-                                        <div class="truncate">
-                                            <strong class="block text-[10.5px] sm:text-xs font-black text-slate-800 group-hover:text-royalBlue transition-colors truncate">인터넷등기소</strong>
-                                            <span class="text-[9px] text-slate-400 font-bold block mt-0.5 truncate">등기부등본 열람</span>
-                                        </div>
-                                    </a>
-                                </div>
-                            </div>
-                        </div>
+                            <div class="p-3.5 space-y-2.5">"""
 
-                        <!-- 동일 용도/지역 기반 유사 추천 매물 -->
+    content = content.replace(old_tab1_hub, new_tab1_hub, 1)
+
+    # 탭 1의 유사 추천 매물 헤더 스타일 개편
+    old_tab1_similar = """                        <!-- 동일 용도/지역 기반 유사 추천 매물 -->
+                        <div class="bg-white border border-slate-200 rounded-2xl p-4 space-y-3 shadow-sm">
+                            <h4 class="text-xs sm:text-sm font-black text-slate-800 flex items-center gap-1.5 pb-2 border-b border-slate-100">
+                                <i class="fa-solid fa-handshake text-royalBlue"></i> 🤝 동일 용도/지역 기반 유사 추천 매물
+                            </h4>"""
+
+    new_tab1_similar = """                        <!-- 동일 용도/지역 기반 유사 추천 매물 -->
                         <div class="bg-white border border-slate-200 rounded-2xl shadow-sm w-full overflow-hidden">
                             <div class="bg-slate-50 px-4 py-2.5 border-b border-slate-200">
                                 <h4 class="text-xs sm:text-sm font-black text-slate-800 flex items-center gap-1.5">
                                     <i class="fa-solid fa-handshake text-royalBlue"></i> 🤝 동일 용도/지역 기반 유사 추천 매물
                                 </h4>
                             </div>
-                            <div class="p-3.5 space-y-3">
-                                <div id="detail-similar-container" class="grid grid-cols-3 gap-2">
-                                    <!-- 동적 렌더링 카드 3개 -->
-                                </div>
-                            </div>
-                        </div>
+                            <div class="p-3.5 space-y-3">"""
+
+    content = content.replace(old_tab1_similar, new_tab1_similar, 1)
+
+    # 탭 1의 추천 매물 닫는 div 및 법정 서류 카드 시작점 개편
+    old_tab1_split = """                    </div>
+                </div>
+
+                <!-- 4. 가로가 긴 법정 주요 서류 테이블 (단독 1열 배치) -->
+                <div class="bg-white border border-slate-200 rounded-2xl p-4 space-y-2.5 shadow-sm w-full">
+                    <h4 class="text-xs sm:text-sm font-black text-slate-800 flex items-center gap-1.5">
+                        <i class="fa-solid fa-scale-balanced text-royalBlue"></i> ⚖️ 법정 주요 서류 및 사건 기록
+                    </h4>
+                    <p class="text-[9.5px] text-slate-500 leading-relaxed font-semibold">대법원 경매 및 감정 법원에서 공식 발행된 법정 주요 서류의 정밀 분석 명세 테이블입니다.</p>"""
+
+    new_tab1_split = """                    </div>
+                </div> <!-- 👈 왼쪽 열 space-y-4 닫기 -->
+
+                <!-- 오른쪽 열: 법정 주요 서류 및 사건 기록 (대화면에서 가로폭이 늘어나는 문제 해결) -->
+                <div class="bg-white border border-slate-200 rounded-2xl shadow-sm w-full overflow-hidden">
+                    <div class="bg-slate-50 px-4 py-2.5 border-b border-slate-200">
+                        <h4 class="text-xs sm:text-sm font-black text-slate-800 flex items-center gap-1.5">
+                            <i class="fa-solid fa-scale-balanced text-royalBlue"></i> ⚖️ 법정 주요 서류 및 사건 기록
+                        </h4>
                     </div>
+                    <div class="p-3.5 space-y-2.5">
+                        <p class="text-[9.5px] text-slate-500 leading-relaxed font-semibold">대법원 경매 및 감정 법원에서 공식 발행된 법정 주요 서류의 정밀 분석 명세 테이블입니다.</p>"""
 
-                    <!-- 오른쪽 열: 법정 주요 서류 및 사건 기록 (대화면에서 가로폭이 늘어나는 문제 해결) -->
-                    <div class="bg-white border border-slate-200 rounded-2xl shadow-sm w-full overflow-hidden">
-                        <div class="bg-slate-50 px-4 py-2.5 border-b border-slate-200">
-                            <h4 class="text-xs sm:text-sm font-black text-slate-800 flex items-center gap-1.5">
-                                <i class="fa-solid fa-scale-balanced text-royalBlue"></i> ⚖️ 법정 주요 서류 및 사건 기록
-                            </h4>
-                        </div>
-                        <div class="p-3.5 space-y-2.5">
-                            <p class="text-[9.5px] text-slate-500 leading-relaxed font-semibold">대법원 경매 및 감정 법원에서 공식 발행된 법정 주요 서류의 정밀 분석 명세 테이블입니다.</p>
-                            <div class="overflow-x-auto border border-slate-200 rounded-xl overflow-hidden shadow-sm bg-white">
-                                <table class="w-full text-left border-collapse text-[13px] document-view">
-                                    <thead>
-                                        <tr class="bg-slate-50 border-b border-slate-200 text-slate-800 font-extrabold text-[12px]">
-                                            <th class="p-3 pl-4 w-[20%] text-slate-900">서류 구분</th>
-                                            <th class="p-3 w-[35%] text-slate-900">세부 항목 분석 명세</th>
-                                            <th class="p-3 w-[35%] text-slate-900">의견 및 권리 진단</th>
-                                            <th class="p-3 pr-4 text-right w-[10%] text-slate-900">바로가기</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody class="text-slate-700 font-medium">"""
+    content = content.replace(old_tab1_split, new_tab1_split, 1)
 
-    content = content.replace(old_tab1_markup, new_tab1_markup)
-
-    # 탭 1 그리드 닫아주기: </tbody> 닫히는 테이블 아래에서 2열 그리드 전체의 닫는 </div>를 삽입합니다.
-    # 기존 코드에서 </tbody> 아래 테이블 및 닫는 </div> 구조를 확인해봅니다.
-    # index.html 1461라인 근처:
+    # 탭 1 전체 닫는 부분 개편 (그리드 전체 닫는 태그 주입)
     old_tab1_close = """                                </tr>
                             </tbody>
                         </table>
                     </div>
-                </div>"""
-    
+                </div>
+            </div>
+        </div>
+        <div id="detail-group-panel-2" """
+
     new_tab1_close = """                                </tr>
                             </tbody>
                         </table>
                     </div>
-                </div>
-                </div> <!-- 👈 2열 그리드 전체 닫기 -->"""
+                </div> <!-- 👈 p-3.5 닫기 및 카드 닫기 -->
+                </div> <!-- 👈 2열 그리드 전체 닫기 -->
+            </div> <!-- 👈 group-content-1 닫기 -->
+        </div>
+        <div id="detail-group-panel-2" """
 
-    content = content.replace(old_tab1_close, new_tab1_close)
+    content = content.replace(old_tab1_close, new_tab1_close, 1)
 
 
     # 2. 탭 2 (입찰 & 금융분석) 반응형 2열 그리드 개편
-    # 왼쪽: AI 낙찰 시뮬레이션 지표 + 스마트 계산기 + 시나리오별 ROI 분석 테이블
-    # 오른쪽: 인수분석 명세 + 임차인 현황 + 예상 배당표
-    # 각 카드들의 헤더를 bg-slate-50과 테두리 칸으로 리팩토링합니다.
+    # 인수 리스크 카드와 예상 배당표 카드를 2열 그리드로 묶습니다.
     
-    old_tab2_markup = """        <div id="detail-group-panel-2" class="flex-1 overflow-y-auto p-3 sm:p-3.5 space-y-3 sm:space-y-3.5 custom-scrollbar bg-slate-50/50 hidden relative">
-            <div id="group-content-2" class="space-y-3 sm:space-y-3.5 w-full">
-                <div id="detail-panel-bid" class="space-y-3 sm:space-y-3.5">
-            <!-- AI 낙찰 시뮬레이션 지표 분석 -->
-            <div class="bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 rounded-2xl p-3 sm:p-3.5 space-y-2 shadow-sm mb-3">
-                <h4 class="text-xs sm:text-sm font-black text-slate-800 flex items-center gap-1.5">
-                    <i class="fa-solid fa-chart-simple"></i> AI 낙찰 시뮬레이션 지표 분석
-                </h4>"""
+    old_tab2_split = """                <!-- 낙찰자 인수 리스크 분석 (단독 1열 배치) -->
+                <div id="detail-panel-takeover" class="bg-white border border-slate-200 rounded-2xl p-4 shadow-sm space-y-3 w-full">"""
 
-    new_tab2_markup = """        <div id="detail-group-panel-2" class="flex-1 overflow-y-auto p-3 sm:p-3.5 space-y-3 sm:space-y-3.5 custom-scrollbar bg-slate-50/50 hidden relative">
-            <div id="group-content-2" class="space-y-3 sm:space-y-3.5 w-full">
-                <!-- 2열 그리드로 쪼개어 금융/입찰 테이블들의 가로 늘어짐 방지 -->
+    new_tab2_split = """                <!-- 낙찰자 인수 리스크 분석 및 예상 배당표 반응형 2열 레이아웃 -->
                 <div class="grid grid-cols-1 xl:grid-cols-2 gap-4 sm:gap-5 w-full items-start">
-                    <!-- 왼쪽 열: 시뮬레이션 지표, 스마트 계산기, ROI 분석 테이블 -->
-                    <div class="space-y-4 sm:space-y-5 w-full">
-                        <!-- AI 낙찰 시뮬레이션 지표 분석 -->
-                        <div class="bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 rounded-2xl p-3.5 space-y-2 shadow-sm">
-                            <div class="flex items-center gap-1.5 pb-2 border-b border-blue-200/50 mb-1">
-                                <h4 class="text-xs sm:text-sm font-black text-slate-800 flex items-center gap-1.5">
-                                    <i class="fa-solid fa-chart-simple text-royalBlue"></i> AI 낙찰 시뮬레이션 지표 분석
-                                </h4>
-                            </div>"""
+                    <!-- 낙찰자 인수 리스크 분석 (단독 1열 배치 해제) -->
+                    <div id="detail-panel-takeover" class="bg-white border border-slate-200 rounded-2xl p-4 shadow-sm space-y-3 w-full">"""
 
-    content = content.replace(old_tab2_markup, new_tab2_markup)
+    content = content.replace(old_tab2_split, new_tab2_split, 1)
 
-    # 탭 2의 스마트 계산기 카드 카드 헤더 스타일 개편
-    old_calc_markup = """            <!-- 🧮 세법 스마트 낙찰 계획서 계산기 -->
-            <div class="bg-white border border-slate-200 rounded-2xl p-3 sm:p-3.5 shadow-sm space-y-2.5 max-w-[720px] mx-auto w-full">
-                <div class="flex items-center justify-between pb-2 border-b border-slate-100">
-                    <h4 class="text-xs sm:text-sm font-black text-slate-800 flex items-center gap-1.5">
-                        <i class="fa-solid fa-calculator text-royalBlue"></i> 스마트 정밀 소요자금 계획서
-                    </h4>
-                    <span id="tax-rate-badge" class="text-[9px] font-black px-2 py-0.5 rounded-full border"></span>
-                </div>"""
-
-    new_calc_markup = """            <!-- 🧮 세법 스마트 낙찰 계획서 계산기 -->
-            <div class="bg-white border border-slate-200 rounded-2xl shadow-sm w-full overflow-hidden">
-                <div class="bg-slate-50 px-4 py-2.5 border-b border-slate-200 flex justify-between items-center">
-                    <h4 class="text-xs sm:text-sm font-black text-slate-800 flex items-center gap-1.5">
-                        <i class="fa-solid fa-calculator text-royalBlue"></i> 스마트 정밀 소요자금 계획서
-                    </h4>
-                    <span id="tax-rate-badge" class="text-[9px] font-black px-2 py-0.5 rounded-full border border-slate-300 bg-white"></span>
-                </div>
-                <div class="p-3.5 space-y-2.5">"""
-
-    content = content.replace(old_calc_markup, new_calc_markup)
-
-    # 계산기 닫기 보정: LTV 대출 및 금리 시뮬레이터 아래의 닫는 div 태그들
-    # 기존 코드에서 렌더링 수치 행 (영수증) 영역 주변을 2열 그리드 분기에 알맞게 리포팅합니다.
-    # LTV 계산기 닫는 부분과 투자 수익률 분석 테이블 시작 부분
-    old_roi_markup = """                    <div class="loan-highlight-row bg-blue-50/50 border border-blue-100 rounded-lg p-2.5 flex justify-between items-center text-[10.5px]">
-                        <span class="text-slate-500 font-extrabold flex items-center gap-1"><i class="fa-solid fa-coins text-royalBlue text-[10px]"></i> 경락 대출 예상 이자액</span>
-                        <strong id="calc-loan-interest" class="text-slate-900 font-black font-outfit">0원 (월)</strong>
-                    </div>
-                </div>
-            </div>
-
-            <!-- 📊 시나리오별 총 투자수익률 (ROI) 분석 테이블 -->
-            <div class="bg-white border border-slate-200 rounded-2xl p-3 sm:p-3.5 shadow-sm space-y-2.5 max-w-[720px] mx-auto w-full">
-                <h4 class="text-xs sm:text-sm font-black text-slate-800 flex items-center gap-1.5 pb-2 border-b border-slate-100">
-                    <i class="fa-solid fa-percent text-royalBlue"></i> 📊 시나리오별 총 투자수익률 (ROI) 분석
-                </h4>"""
-
-    new_roi_markup = """                    <div class="loan-highlight-row bg-blue-50/50 border border-blue-100 rounded-lg p-2.5 flex justify-between items-center text-[10.5px]">
-                        <span class="text-slate-500 font-extrabold flex items-center gap-1"><i class="fa-solid fa-coins text-royalBlue text-[10px]"></i> 경락 대출 예상 이자액</span>
-                        <strong id="calc-loan-interest" class="text-slate-900 font-black font-outfit">0원 (월)</strong>
-                    </div>
-                </div>
-            </div>
-            </div> <!-- 👈 계산기 p-3.5 닫기 및 overflow-hidden 카드 닫기 -->
-
-            <!-- 📊 시나리오별 총 투자수익률 (ROI) 분석 테이블 -->
-            <div class="bg-white border border-slate-200 rounded-2xl shadow-sm w-full overflow-hidden">
-                <div class="bg-slate-50 px-4 py-2.5 border-b border-slate-200">
-                    <h4 class="text-xs sm:text-sm font-black text-slate-800 flex items-center gap-1.5">
-                        <i class="fa-solid fa-percent text-royalBlue"></i> 📊 시나리오별 총 투자수익률 (ROI) 분석
-                    </h4>
-                </div>
-                <div class="p-3.5 space-y-2.5">"""
-
-    content = content.replace(old_roi_markup, new_roi_markup)
-
-    # ROI 닫는 태그 보정 및 2열 우측 열 시작
-    # 기존 코드에서 </tbody> </table> </div> </div> (ROI 닫힘)
-    # 그 밑의 "인수분석 명세" 시작 부분을 우측 열로 맵핑합니다.
-    old_tab2_col2_markup = """                        </tbody>
-                    </table>
-                </div>
-            </div>
-
-            <!-- 💸 인수분석 명세 테이블 -->
-            <div class="bg-white border border-slate-200 rounded-2xl p-3 sm:p-3.5 shadow-sm space-y-2.5">
-                <h4 class="text-xs sm:text-sm font-black text-slate-800 flex items-center gap-1.5 pb-2 border-b border-slate-100">
-                    <i class="fa-solid fa-hand-holding-dollar text-royalBlue"></i> 💸 낙찰자 인수분석 명세
-                </h4>"""
-
-    new_tab2_col2_markup = """                        </tbody>
-                    </table>
-                </div>
-            </div>
-            </div> <!-- 👈 ROI p-3.5 닫기 및 카드 닫기 -->
-            </div> <!-- 👈 2열 왼쪽 열 전체 닫기 -->
-
-            <!-- 오른쪽 열: 인수분석, 점유현황, 예상 배당표 -->
-            <div class="space-y-4 sm:space-y-5 w-full">
-                <!-- 💸 인수분석 명세 테이블 -->
-                <div class="bg-white border border-slate-200 rounded-2xl shadow-sm w-full overflow-hidden">
-                    <div class="bg-slate-50 px-4 py-2.5 border-b border-slate-200">
-                        <h4 class="text-xs sm:text-sm font-black text-slate-800 flex items-center gap-1.5">
-                            <i class="fa-solid fa-hand-holding-dollar text-royalBlue"></i> 💸 낙찰자 인수분석 명세
-                        </h4>
-                    </div>
-                    <div class="p-3.5 space-y-2.5">"""
-
-    content = content.replace(old_tab2_col2_markup, new_tab2_col2_markup)
-
-    # 탭 2의 점유현황 카드 헤더 개편
-    old_occupy_markup = """            <!-- 👥 점유현황 및 임차인 분석 테이블 -->
-            <div class="bg-white border border-slate-200 rounded-2xl p-3 sm:p-3.5 shadow-sm space-y-2.5">
-                <h4 class="text-xs sm:text-sm font-black text-slate-800 flex items-center gap-1.5 pb-2 border-b border-slate-100">
-                    <i class="fa-solid fa-users text-royalBlue"></i> 👥 부동산 점유현황 및 임차인 분석
-                </h4>"""
-
-    new_occupy_markup = """            </div> <!-- 👈 인수분석 p-3.5 및 카드 닫기 -->
-            </div> <!-- 👈 인수분석 카드 닫기 보정 -->
-
-            <!-- 👥 점유현황 및 임차인 분석 테이블 -->
-            <div class="bg-white border border-slate-200 rounded-2xl shadow-sm w-full overflow-hidden">
-                <div class="bg-slate-50 px-4 py-2.5 border-b border-slate-200">
-                    <h4 class="text-xs sm:text-sm font-black text-slate-800 flex items-center gap-1.5">
-                        <i class="fa-solid fa-users text-royalBlue"></i> 👥 부동산 점유현황 및 임차인 분석
-                    </h4>
-                </div>
-                <div class="p-3.5 space-y-2.5">"""
-
-    content = content.replace(old_occupy_markup, new_occupy_markup)
-
-    # 탭 2의 예상 배당표 카드 헤더 개편
-    old_dividend_markup = """            <!-- 💰 예상 배당표 시뮬레이션 테이블 -->
-            <div class="bg-white border border-slate-200 rounded-2xl p-3 sm:p-3.5 shadow-sm space-y-2.5">
-                <h4 class="text-xs sm:text-sm font-black text-slate-800 flex items-center gap-1.5 pb-2 border-b border-slate-100">
-                    <i class="fa-solid fa-money-bill-transfer text-royalBlue"></i> 💰 예상 배당표 시뮬레이션
-                </h4>"""
-
-    new_dividend_markup = """            </div> <!-- 👈 점유현황 p-3.5 및 카드 닫기 -->
-            </div> <!-- 👈 점유현황 카드 닫기 보정 -->
-
-            <!-- 💰 예상 배당표 시뮬레이션 테이블 -->
-            <div class="bg-white border border-slate-200 rounded-2xl shadow-sm w-full overflow-hidden">
-                <div class="bg-slate-50 px-4 py-2.5 border-b border-slate-200">
-                    <h4 class="text-xs sm:text-sm font-black text-slate-800 flex items-center gap-1.5">
-                        <i class="fa-solid fa-money-bill-transfer text-royalBlue"></i> 💰 예상 배당표 시뮬레이션
-                    </h4>
-                </div>
-                <div class="p-3.5 space-y-2.5">"""
-
-    content = content.replace(old_dividend_markup, new_dividend_markup)
-
-    # 탭 2의 닫기 전체 보정: 배당표 </tbody> </table> </div> </div> (배당표 닫힘) 아래에서
-    # 우측 2열 및 전체 2열 그리드의 닫는 div 태그를 주입합니다.
+    # 탭 2의 배당표 카드 닫기 및 그리드 전체 닫는 태그 주입
     old_tab2_close = """                                </tbody>
                             </table>
                         </div>
                     </div>
                 </div>
             </div>
-            </div>
-            <div id="group-mask-2" """
+            <!-- 📈 [8] 매각통계 탭 패널 (기본 숨김) -->"""
 
     new_tab2_close = """                                </tbody>
                             </table>
                         </div>
                     </div>
                 </div>
-                </div> <!-- 👈 배당표 p-3.5 및 카드 닫기 -->
-                </div> <!-- 👈 2열 오른쪽 열 전체 닫기 -->
                 </div> <!-- 👈 2열 그리드 전체 닫기 -->
-            </div> <!-- 👈 group-content-2 닫기 -->
-            </div> <!-- 👈 detail-panel-bid 닫기 보정 -->
-            <div id="group-mask-2" """
+            </div>
+            <!-- 📈 [8] 매각통계 탭 패널 (기본 숨김) -->"""
 
-    content = content.replace(old_tab2_close, new_tab2_close)
+    content = content.replace(old_tab2_close, new_tab2_close, 1)
 
 
     # 3. 탭 3 (입지 & 시세분석) 반응형 2열 그리드 개편 및 AI 미래 예상 시세 예측 시뮬레이터 탑재
-    # 왼쪽: 실시간 위치 지도 + 네이버 연동 허브 + 토지이용계획 규제 진단
-    # 오른쪽: 주변 아파트 실거래 시세 + 최근 1년 매각 통계 + [🔮 AI 미래 예상 시세 시뮬레이터]
     
-    old_tab3_markup = """        <div id="detail-group-panel-3" class="flex-1 overflow-y-auto p-3 sm:p-3.5 space-y-3 sm:space-y-3.5 custom-scrollbar bg-slate-50/50 hidden relative">
-            <div id="group-content-3" class="space-y-3 sm:space-y-3.5 w-full">
-                <!-- 위치 & 시세 분석 1열 스택 레이아웃 -->
+    old_tab3_markup = """                <!-- 위치 & 시세 분석 1열 스택 레이아웃 -->
                 <div class="space-y-4 sm:space-y-5">
-                    <div id="detail-panel-map" class="space-y-4 sm:space-y-5">
-            <!-- 📍 물건지 실시간 위치 지도 -->
-            <div class="bg-white border border-slate-200 rounded-2xl p-3 sm:p-3.5 space-y-2 shadow-sm">
-                <h4 class="text-xs sm:text-sm font-black text-slate-800 flex items-center gap-1.5">
-                    <i class="fa-solid fa-map-location-dot text-royalBlue"></i> 📍 물건지 실시간 위치 지도
-                </h4>"""
+                    <div id="detail-panel-map" class="space-y-4 sm:space-y-5">"""
 
-    new_tab3_markup = """        <div id="detail-group-panel-3" class="flex-1 overflow-y-auto p-3 sm:p-3.5 space-y-3 sm:space-y-3.5 custom-scrollbar bg-slate-50/50 hidden relative">
-            <div id="group-content-3" class="space-y-3 sm:space-y-3.5 w-full">
-                <!-- 2열 그리드로 개편하여 지도/시세 테이블의 가로 늘어짐 방지 -->
+    new_tab3_markup = """                <!-- 위치 & 시세 분석 대화면 xl 대응 2열 반응형 그리드 레이아웃 -->
                 <div class="grid grid-cols-1 xl:grid-cols-2 gap-4 sm:gap-5 w-full items-start">
                     <!-- 왼쪽 열: 지도, 연동 허브, 토지규제 진단 -->
                     <div class="space-y-4 sm:space-y-5 w-full">
-                        <div id="detail-panel-map" class="space-y-4 sm:space-y-5">
-                            <!-- 📍 물건지 실시간 위치 지도 -->
-                            <div class="bg-white border border-slate-200 rounded-2xl shadow-sm w-full overflow-hidden">
-                                <div class="bg-slate-50 px-4 py-2.5 border-b border-slate-200">
-                                    <h4 class="text-xs sm:text-sm font-black text-slate-800 flex items-center gap-1.5">
-                                        <i class="fa-solid fa-map-location-dot text-royalBlue"></i> 📍 물건지 실시간 위치 지도
-                                    </h4>
-                                </div>
-                                <div class="p-3.5">"""
+                        <div id="detail-panel-map" class="space-y-4 sm:space-y-5">"""
 
-    content = content.replace(old_tab3_markup, new_tab3_markup)
+    content = content.replace(old_tab3_markup, new_tab3_markup, 1)
 
-    # 탭 3의 지도 컨테이너 닫는 부분과 연동 허브 시작 부분 개편
-    old_hub_markup = """                </div>
-            </div>
-
-            <!-- 🗺️ 네이버 전문 지도 및 정보망 연동 허브 -->
-            <div class="bg-white border border-slate-200 rounded-2xl p-3 sm:p-3.5 space-y-2 shadow-sm">
-                <h4 class="text-xs sm:text-sm font-black text-slate-800 flex items-center gap-1.5">
-                    <i class="fa-solid fa-map text-royalBlue"></i> 🗺️ 네이버 전문 지도 및 정보망 연동
-                </h4>"""
-
-    new_hub_markup = """                                </div>
-                            </div>
-                        </div> <!-- 👈 지도 카드 닫기 -->
-
-                        <!-- 🗺️ 네이버 전문 지도 및 정보망 연동 허브 -->
-                        <div class="bg-white border border-slate-200 rounded-2xl shadow-sm w-full overflow-hidden">
-                            <div class="bg-slate-50 px-4 py-2.5 border-b border-slate-200">
-                                <h4 class="text-xs sm:text-sm font-black text-slate-800 flex items-center gap-1.5">
-                                    <i class="fa-solid fa-map text-royalBlue"></i> 🗺️ 네이버 전문 지도 및 정보망 연동
-                                </h4>
-                            </div>
-                            <div class="p-3.5 space-y-2">"""
-
-    content = content.replace(old_hub_markup, new_hub_markup)
-
-    # 탭 3의 토지규제 카드 시작 부분 개편
-    old_regulation_markup = """            <!-- 🟢 토지이용계획 및 규제 진단 카드 -->
-            <div class="bg-white border border-slate-200 rounded-2xl p-3 sm:p-3.5 space-y-2 shadow-sm">
-                <h4 class="text-xs sm:text-sm font-black text-slate-800 flex items-center gap-1.5">
-                    <i class="fa-solid fa-leaf text-royalBlue"></i> 🌱 토지이용계획 및 규제 진단
-                </h4>"""
-
-    new_regulation_markup = """            </div> <!-- 👈 연동 허브 p-3.5 및 카드 닫기 -->
-            </div> <!-- 👈 연동 허브 카드 닫기 보정 -->
-
-            <!-- 🟢 토지이용계획 및 규제 진단 카드 -->
-            <div class="bg-white border border-slate-200 rounded-2xl shadow-sm w-full overflow-hidden">
-                <div class="bg-slate-50 px-4 py-2.5 border-b border-slate-200">
-                    <h4 class="text-xs sm:text-sm font-black text-slate-800 flex items-center gap-1.5">
-                        <i class="fa-solid fa-leaf text-royalBlue"></i> 🌱 토지이용계획 및 규제 진단
-                    </h4>
+    # 탭 3의 지도 컨테이너 닫기 보정
+    old_tab3_map_close = """                <div id="detail-map-container" class="w-full h-[220px] rounded-xl overflow-hidden border border-slate-200/60 bg-slate-50 relative group">
+                    <!-- Javascript에서 iframe 동적 주입 -->
                 </div>
-                <div class="p-3.5 space-y-2.5">"""
+            </div>"""
 
-    content = content.replace(old_regulation_markup, new_regulation_markup)
+    new_tab3_map_close = """                <div id="detail-map-container" class="w-full h-[220px] rounded-xl overflow-hidden border border-slate-200/60 bg-slate-50 relative group">
+                    <!-- Javascript에서 iframe 동적 주입 -->
+                </div>
+            </div> <!-- 👈 지도 카드 닫기 -->"""
 
-    # 토지규제 끝 및 2열 우측 열 시작
-    # 토지이음 아웃링크 하단 </div> </div> (토지규제 닫힘) 아래에서
-    # 2열 우측 열을 열고 "주변 아파트 실거래 시세 대조" 카드를 매핑합니다.
-    old_tab3_col2_markup = """                <a id="btn-official-eum" href="#" onclick="event.preventDefault(); copyAddressAndOpenEum();" class="w-full bg-emeraldSuccess text-white py-2 rounded-xl text-xs font-black hover:bg-emerald-700 transition-all flex items-center justify-center gap-1 select-none cursor-pointer text-center">
+    content = content.replace(old_tab3_map_close, new_tab3_map_close, 1)
+
+    # 탭 3의 토지이용계획 닫기 및 오른쪽 2열 스택 열기
+    old_tab3_split = """                <a id="btn-official-eum" href="#" onclick="event.preventDefault(); copyAddressAndOpenEum();" class="w-full bg-emeraldSuccess text-white py-2 rounded-xl text-xs font-black hover:bg-emerald-700 transition-all flex items-center justify-center gap-1 select-none cursor-pointer text-center">
                     국토부 토지이음(eum.go.kr) 공식 조회하기
                 </a>
                         </div>
                     </div>
 
-                    <div id="detail-panel-market" class="space-y-4 sm:space-y-5">
-                        <div class="bg-white border border-slate-200 rounded-2xl p-3 sm:p-3.5 shadow-sm space-y-2.5">
-                <div class="flex items-center justify-between pb-2 border-b border-slate-100">
-                    <h4 class="text-xs sm:text-sm font-black text-slate-800 flex items-center gap-1.5">
-                        <i class="fa-solid fa-tags text-royalBlue"></i> 주변 아파트 실거래 시세 대조
-                    </h4>"""
+                    <div id="detail-panel-market" class="space-y-4 sm:space-y-5">"""
 
-    new_tab3_col2_markup = """                <a id="btn-official-eum" href="#" onclick="event.preventDefault(); copyAddressAndOpenEum();" class="w-full bg-emeraldSuccess text-white py-2 rounded-xl text-xs font-black hover:bg-emerald-700 transition-all flex items-center justify-center gap-1 select-none cursor-pointer text-center">
+    new_tab3_split = """                <a id="btn-official-eum" href="#" onclick="event.preventDefault(); copyAddressAndOpenEum();" class="w-full bg-emeraldSuccess text-white py-2 rounded-xl text-xs font-black hover:bg-emerald-700 transition-all flex items-center justify-center gap-1 select-none cursor-pointer text-center">
                     국토부 토지이음(eum.go.kr) 공식 조회하기
                 </a>
                         </div>
-                    </div>
-                    </div> <!-- 👈 토지규제 p-3.5 및 카드 닫기 -->
-                    </div> <!-- 👈 2열 왼쪽 열 전체 닫기 -->
+                    </div> <!-- 👈 토지이용규제 카드 닫기 -->
+                    </div> <!-- 👈 왼쪽 열 space-y-4 닫기 -->
 
                     <!-- 오른쪽 열: 실거래 시세, 매각 통계, [🔮 AI 미래 예상 시세 시뮬레이터] -->
                     <div class="space-y-4 sm:space-y-5 w-full">
-                        <!-- 주변 아파트 실거래 시세 대조 -->
-                        <div class="bg-white border border-slate-200 rounded-2xl shadow-sm w-full overflow-hidden">
-                            <div class="bg-slate-50 px-4 py-2.5 border-b border-slate-200 flex justify-between items-center">
-                                <h4 class="text-xs sm:text-sm font-black text-slate-800 flex items-center gap-1.5">
-                                    <i class="fa-solid fa-tags text-royalBlue"></i> 주변 아파트 실거래 시세 대조
-                                </h4>
-                                <button onclick="copyAddressToClipboardAndOpenSeeReal()" class="px-2 py-1 bg-amber-50 hover:bg-amber-100 border border-amber-200 text-amber-700 text-[10px] font-black rounded-lg transition-all flex items-center gap-1 select-none cursor-pointer">
-                                    <i class="fa-solid fa-copy"></i> 주소복사 & 시세확인 (씨리얼)
-                                </button>
-                            </div>
-                            <div class="p-3.5 space-y-2.5">"""
+                        <div id="detail-panel-market" class="space-y-4 sm:space-y-5">"""
 
-    content = content.replace(old_tab3_col2_markup, new_tab3_col2_markup)
+    content = content.replace(old_tab3_split, new_tab3_split, 1)
 
-    # 탭 3의 매각 통계 카드 헤더 개편
-    old_stats_markup = """                        <!-- 📊 최근 1년 매각 통계 (입지 & 시세 분석 탭으로 이동 배치) -->
-                        <div id="detail-panel-statistics" class="space-y-4 sm:space-y-5">
-                            <div class="bg-white border border-slate-200 rounded-2xl p-3 sm:p-3.5 shadow-sm space-y-2 shadow-sm">
-                                <h4 class="text-xs sm:text-sm font-black text-slate-800 flex items-center gap-1.5 pb-2 border-b border-slate-100">
-                                    <i class="fa-solid fa-chart-bar text-royalBlue"></i> 해당 법원/용도 최근 1년 매각 통계
-                                </h4>"""
-
-    new_stats_markup = """                        </div> <!-- 👈 실거래 p-3.5 및 카드 닫기 -->
-                        </div> <!-- 👈 실거래 카드 닫기 보정 -->
-
-                        <!-- 📊 최근 1년 매각 통계 (입지 & 시세 분석 탭으로 이동 배치) -->
-                        <div class="bg-white border border-slate-200 rounded-2xl shadow-sm w-full overflow-hidden">
-                            <div class="bg-slate-50 px-4 py-2.5 border-b border-slate-200">
-                                <h4 class="text-xs sm:text-sm font-black text-slate-800 flex items-center gap-1.5">
-                                    <i class="fa-solid fa-chart-bar text-royalBlue"></i> 해당 법원/용도 최근 1년 매각 통계
-                                </h4>
-                            </div>
-                            <div class="p-3.5 space-y-2.5">"""
-
-    content = content.replace(old_stats_markup, new_stats_markup)
-
-    # 탭 3의 매각 통계 닫기 및 [🔮 AI 미래 예상 시세 시뮬레이터] 카드 신설
-    # 1746라인 근처의 닫는 div 및 패널 종료부 아래에 미래 시뮬레이터를 삽입하고 전체 2열 그리드를 닫습니다.
+    # 탭 3의 매각 통계 닫기 및 AI 시뮬레이터 카드 탑재 및 그리드 닫기
     old_tab3_close = """                                </div>
                             </div>
                         </div>
@@ -662,26 +282,111 @@ def main():
                                 </div>
                             </div>
                         </div> <!-- 👈 미래 예상 시뮬레이터 카드 닫기 -->
-                    </div> <!-- 👈 2열 오른쪽 열 전체 닫기 -->
+                    </div> <!-- 👈 오른쪽 열 닫기 -->
                 </div> <!-- 👈 2열 그리드 전체 닫기 -->
             </div> <!-- 👈 group-content-3 전체 닫기 -->
-            </div> <!-- 👈 detail-panel-market 닫기 보정 -->
             <div id="group-mask-3" """
 
-    content = content.replace(old_tab3_close, new_tab3_close)
+    content = content.replace(old_tab3_close, new_tab3_close, 1)
 
 
-    # 4. 미래 예상 시세 연산 자바스크립트 함수 추가 및 loadDetailView 바인딩
-    # updateFuturePricePrediction() 구현부 주입
-    # loadDetailView(item) 함수 내에 updateFuturePricePrediction() 호출 주입
-    # index.html 자바스크립트의 끝자락이나 적절한 곳에 함수를 추가합니다.
-    # loadDetailView 함수 내의 마지막 닫는 브레이스 직전에 연동하도록 처리하겠습니다.
-    # loadDetailView의 끝을 grep_search로 찾아봅니다. (아래 픽스 파일에서 추가 진행)
-    
+    # 4. 광고 오타 수정 (비활성화 분기 시 classList.remove 대신 add 하도록 처리)
+    old_ad_top_bug = """                } else {
+                    detailTopAdSlot.classList.remove("hidden");
+                }"""
+
+    new_ad_top_bug = """                } else {
+                    detailTopAdSlot.classList.add("hidden");
+                }"""
+
+    content = content.replace(old_ad_top_bug, new_ad_top_bug, 1)
+
+    old_ad_bottom_bug = """                } else {
+                    detailBottomAdSlot.classList.remove("hidden");
+                }"""
+
+    new_ad_bottom_bug = """                } else {
+                    detailBottomAdSlot.classList.add("hidden");
+                }"""
+
+    content = content.replace(old_ad_bottom_bug, new_ad_bottom_bug, 1)
+
+
+    # 5. loadDetailView 마지막 부분에 전역 보관, 시세 예측 갱신 및 광고 렌더링 호출을 심어 연결 복구
+    old_detail_load_end = """            // v1.2 모의입찰 데이터 및 전문가 리스트 실시간 로드 연동
+            if (typeof v12Features !== 'undefined') {
+                v12Features.loadMockBids(item.id, item.appraised_value);
+                v12Features.renderExperts(item.id);
+            }
+        }"""
+
+    new_detail_load_end = """            // v1.2 모의입찰 데이터 및 전문가 리스트 실시간 로드 연동
+            if (typeof v12Features !== 'undefined') {
+                v12Features.loadMockBids(item.id, item.appraised_value);
+                v12Features.renderExperts(item.id);
+            }
+
+            // 미래 예상 시세 산출을 위해 매물 정보를 전역에 보관하고 예측 시뮬레이터를 업데이트합니다.
+            window.currentDetailItem = item;
+            updateFuturePricePrediction();
+
+            // 상세페이지가 열릴 때마다 최신 광고 정보를 그리도록 동기화합니다.
+            renderCustomAdSlots();
+        }"""
+
+    content = content.replace(old_detail_load_end, new_detail_load_end, 1)
+
+
+    # 6. 미래 예상 시세 연산 자바스크립트 함수 추가 (renderSimilarProperties 시작부 바로 위에 정의)
+    old_similar_start = """        // 🧠 주변 유사 추천 매물 미터(m) 단위 동적 연산 렌더러
+        function renderSimilarProperties(currentItem) {"""
+
+    new_similar_start = """        // 🔮 AI 미래 예상 시세 시뮬레이터 연산 함수 (1년/3년/5년/10년 후 예상시세 예측)
+        function updateFuturePricePrediction() {
+            const item = window.currentDetailItem;
+            if (!item) return;
+
+            const basePrice = item.appraised_value || 0;
+            const rateElements = document.getElementsByName("future-rate-select");
+            let rate = 3.0; // 기본 3% (표준)
+            for (let r of rateElements) {
+                if (r.checked) {
+                    rate = parseFloat(r.value);
+                    break;
+                }
+            }
+
+            // 각 예상 기간별 복리 상승률 및 가격 계산
+            const terms = [1, 3, 5, 10];
+            const termKeys = { 1: '1y', 3: '3y', 5: '5y', 10: '10y' };
+
+            terms.forEach(t => {
+                const key = termKeys[t];
+                const cumRate = (Math.pow(1 + rate / 100, t) - 1) * 100;
+                const estPrice = Math.round(basePrice * Math.pow(1 + rate / 100, t));
+
+                const rateEl = document.getElementById(`future-rate-${key}`);
+                const priceEl = document.getElementById(`future-price-${key}`);
+
+                if (rateEl) {
+                    rateEl.textContent = `+${cumRate.toFixed(2)}%`;
+                }
+                if (priceEl) {
+                    priceEl.textContent = formatKRW(estPrice);
+                }
+            });
+        }
+
+        // 🧠 주변 유사 추천 매물 미터(m) 단위 동적 연산 렌더러
+        function renderSimilarProperties(currentItem) {"""
+
+    content = content.replace(old_similar_start, new_similar_start, 1)
+
+
     try:
         with open(filepath, "w", encoding="utf-8") as f:
             f.write(content)
-        print("Successfully refactored index.html layout to responsive 2-column grid and added AI future simulator mockup.")
+        print("Successfully applied precise responsive 2-column grid patches and restored ad syncing in index.html.")
     except Exception as e:
         print(f"Failed to write index.html: {e}")
 

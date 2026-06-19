@@ -379,6 +379,52 @@ export const DetailScreen: React.FC<DetailScreenProps> = ({ property, onBack }) 
     };
     fetchAds();
   }, []);
+
+  // 💼 우수 매수대리 전문가 연동
+  const fallbackExperts = [
+    {
+      id: 'fallback-1',
+      name: "정경우 전문 변호사",
+      office: "법무법인 한빛 경매 전담 센터",
+      license: "서울회 10452호",
+      success_rate: "98.5%",
+      phone: "02-588-4900",
+      intro: "특수 유치권, 법정지상권 복잡 소송 명도 소송 및 판례 분석 대행 20년 경력의 베테랑 법률 대리인입니다.",
+      img: "https://images.unsplash.com/photo-1560250097-0b93528c311a?w=100&auto=format&fit=crop&q=60"
+    },
+    {
+      id: 'fallback-2',
+      name: "이순신 등록 공인중개사",
+      office: "충무 경공매 매수대리 중개법인",
+      license: "경기 용인 581호 (매수대리인 정식 등록)",
+      success_rate: "96.2%",
+      phone: "031-289-4980",
+      intro: "용인 반도체 클러스터 및 경기 남부권 상가 수익률 TOP 빌딩 경매, 신속 명도 전문 매수신청대리인입니다.",
+      img: "https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?w=100&auto=format&fit=crop&q=60"
+    }
+  ];
+  const [experts, setExperts] = useState<any[]>([]);
+  useEffect(() => {
+    const fetchExperts = async () => {
+      try {
+        const { data, error } = await supabase
+          .from('experts')
+          .select('*')
+          .order('created_at', { ascending: false });
+        if (error) throw error;
+        if (data && data.length > 0) {
+          setExperts(data);
+        } else {
+          setExperts(fallbackExperts);
+        }
+      } catch (err) {
+        console.warn('전문가 DB 연동 실패로 로컬 폴백 전문가 리스트를 가동합니다.', err);
+        setExperts(fallbackExperts);
+      }
+    };
+    fetchExperts();
+  }, []);
+
   const [userGrade, setUserGrade] = useState<'A' | 'B' | 'C'>('C');
   const [similarProperties, setSimilarProperties] = useState<Property[]>([]);
   const [activeTab, setActiveTab] = useState<TabType>('general');
@@ -2304,7 +2350,7 @@ export const DetailScreen: React.FC<DetailScreenProps> = ({ property, onBack }) 
                     <Text style={{ fontSize: 10, fontWeight: 'bold', color: COLORS.slate500, marginBottom: 6 }}>🧭 현장 분석용 3대 포털 로드뷰 비교 바로가기</Text>
                     <View style={{ flexDirection: 'row', gap: 6 }}>
                       <TouchableOpacity
-                        onPress={() => Linking.openURL(`https://map.naver.com/v5/search/${encodeURIComponent(currentProperty.address)}`)}
+                        onPress={() => Linking.openURL(`https://m.map.naver.com/search.naver?query=${encodeURIComponent(currentProperty.address)}`)}
                         style={{ flex: 1, backgroundColor: COLORS.emeraldSuccess, paddingVertical: 8, borderRadius: 8, alignItems: 'center' }}
                       >
                         <Text style={{ color: '#ffffff', fontSize: 10, fontWeight: 'bold' }}>네이버 로드뷰</Text>
@@ -2809,7 +2855,7 @@ export const DetailScreen: React.FC<DetailScreenProps> = ({ property, onBack }) 
                       
                       <View style={{ flexDirection: 'row', gap: 8 }}>
                         <TouchableOpacity 
-                          onPress={() => Linking.openURL(`https://map.naver.com/v5/search/${encodeURIComponent(storageLoc)}`)}
+                          onPress={() => Linking.openURL(`https://m.map.naver.com/search.naver?query=${encodeURIComponent(storageLoc)}`)}
                           style={{ flex: 1, backgroundColor: '#f0fdf4', borderColor: '#bbf7d0', borderWidth: 1, padding: 10, borderRadius: 10, alignItems: 'center' }}
                         >
                           <Text style={{ fontSize: 11.5, fontWeight: 'bold', color: '#16a34a' }}>네이버 지도</Text>
@@ -2876,7 +2922,7 @@ export const DetailScreen: React.FC<DetailScreenProps> = ({ property, onBack }) 
                   {currentProperty.address && !isNonBuildingMobile && (
                     <TouchableOpacity 
                       style={styles.mapLinkOverlay}
-                      onPress={() => Linking.openURL(`https://map.naver.com/v5/search/${encodeURIComponent(cleanAddress(currentProperty.address))}/address?c=15,0,0,0,dh`)}
+                      onPress={() => Linking.openURL(`https://m.map.naver.com/search.naver?query=${encodeURIComponent(cleanAddress(currentProperty.address))}`)}
                     >
                       <Text style={styles.mapLinkOverlayText}>네이버 지도 ↗</Text>
                     </TouchableOpacity>
@@ -2886,7 +2932,7 @@ export const DetailScreen: React.FC<DetailScreenProps> = ({ property, onBack }) 
                 {/* 전문지도 & 시세 연동 버튼들 */}
                 <View style={[styles.networkGrid, { marginTop: 12 }]}>
                   <TouchableOpacity 
-                    onPress={() => Linking.openURL(`https://map.naver.com/v5/search/${encodeURIComponent(cleanAddress(currentProperty.address))}/address?c=15,0,0,0,dgh`)}
+                    onPress={() => Linking.openURL(`https://m.map.naver.com/search.naver?query=${encodeURIComponent(cleanAddress(currentProperty.address))}`)}
                     style={[styles.networkButton, { backgroundColor: '#fdf4ff', borderColor: '#fbcfe8' }]}
                   >
                     <View style={[styles.networkIconContainer, { backgroundColor: '#db2777' }]}>
@@ -2898,7 +2944,7 @@ export const DetailScreen: React.FC<DetailScreenProps> = ({ property, onBack }) 
                     </View>
                   </TouchableOpacity>
                   <TouchableOpacity 
-                    onPress={() => Linking.openURL(`https://map.naver.com/v5/search/${encodeURIComponent(cleanAddress(currentProperty.address))}/address?c=15,0,0,1,dh`)}
+                    onPress={() => Linking.openURL(`https://m.map.naver.com/search.naver?query=${encodeURIComponent(cleanAddress(currentProperty.address))}`)}
                     style={[styles.networkButton, { backgroundColor: '#f8fafc', borderColor: '#cbd5e1' }]}
                   >
                     <View style={[styles.networkIconContainer, { backgroundColor: '#475569' }]}>
@@ -3554,9 +3600,14 @@ export const DetailScreen: React.FC<DetailScreenProps> = ({ property, onBack }) 
                 </View>
                 
                 <View style={{ marginTop: 12 }}>
-                  <Text style={{ fontSize: 11, color: '#64748b', fontWeight: 'bold', marginBottom: 6 }}>
-                    나의 가상 입찰가 입력 (원 단위 입력)
-                  </Text>
+                  <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 6 }}>
+                    <Text style={{ fontSize: 11, color: '#64748b', fontWeight: 'bold' }}>
+                      나의 가상 입찰가 입력 (원 단위 입력)
+                    </Text>
+                    <Text style={{ fontSize: 10, color: '#64748b', fontWeight: 'bold' }}>
+                      감정가: <Text style={{ color: '#334155', fontWeight: '800' }}>{currentProperty.appraised_value ? Number(currentProperty.appraised_value).toLocaleString() + "원" : "0원"}</Text> | 최저가: <Text style={{ color: COLORS.royalBlue, fontWeight: '800' }}>{currentProperty.minimum_bid ? Number(currentProperty.minimum_bid).toLocaleString() + "원" : "0원"}</Text>
+                    </Text>
+                  </View>
                   <View style={{ flexDirection: 'row', gap: 8 }}>
                     <TextInput
                       style={styles.mockBidInput}
@@ -3600,7 +3651,7 @@ export const DetailScreen: React.FC<DetailScreenProps> = ({ property, onBack }) 
 
                     return (
                       <View style={{ marginTop: 14, backgroundColor: '#f8fafc', borderColor: '#e2e8f0', borderWidth: 1, borderRadius: 12, padding: 10 }}>
-                        <Text style={{ fontSize: 10, fontWeight: 'bold', color: '#1e293b', borderBottomWidth: 1, borderBottomColor: '#cbd5e1', pb: 4, marginBottom: 8 }}>
+                        <Text style={{ fontSize: 10, fontWeight: 'bold', color: '#1e293b', borderBottomWidth: 1, borderBottomColor: '#cbd5e1', paddingBottom: 4, marginBottom: 8 }}>
                           📋 실시간 자금 계획 스프레드 (시뮬레이션)
                         </Text>
                         <View style={{ gap: 4 }}>
@@ -3643,51 +3694,29 @@ export const DetailScreen: React.FC<DetailScreenProps> = ({ property, onBack }) 
               <View style={styles.sectionCard}>
                 <Text style={styles.sectionTitle}>💼 우수 매수대리 전문가 연계 광고 (v1.2)</Text>
                 
-                {/* 전문가 1 */}
-                <View style={styles.expertCard}>
-                  <Image source={{ uri: 'https://images.unsplash.com/photo-1560250097-0b93528c311a?w=100&auto=format&fit=crop&q=60' }} style={styles.expertImg} />
-                  <View style={{ flex: 1, marginLeft: 10 }}>
-                    <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
-                      <Text style={{ fontSize: 13, fontWeight: 'bold', color: COLORS.slate900 }}>정경우 전문 변호사</Text>
-                      <View style={styles.successBadge}><Text style={styles.successBadgeText}>낙찰률 98.5%</Text></View>
-                    </View>
-                    <Text style={styles.expertSub}>법무법인 한빛 경매 전담 센터 | 서울회 10452호</Text>
-                    <Text style={styles.expertIntro} numberOfLines={3}>
-                      특수 유치권, 법정지상권 복잡 소송 명도 소송 및 판례 분석 대행 20년 경력의 베테랑 법률 대리인입니다.
-                    </Text>
-                    <View style={styles.expertActions}>
-                      <TouchableOpacity onPress={() => Linking.openURL('tel:02-588-4900')} style={styles.expertBtnPhone}>
-                        <Text style={styles.expertBtnPhoneText}>📞 전화 연결</Text>
-                      </TouchableOpacity>
-                      <TouchableOpacity onPress={() => requestExpertConsultationMobile('정경우 전문 변호사')} style={styles.expertBtnMail}>
-                        <Text style={styles.expertBtnMailText}>✉ 온라인 상담</Text>
-                      </TouchableOpacity>
-                    </View>
-                  </View>
-                </View>
-
-                {/* 전문가 2 */}
-                <View style={styles.expertCard}>
-                  <Image source={{ uri: 'https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?w=100&auto=format&fit=crop&q=60' }} style={styles.expertImg} />
-                  <View style={{ flex: 1, marginLeft: 10 }}>
-                    <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
-                      <Text style={{ fontSize: 13, fontWeight: 'bold', color: COLORS.slate900 }}>이순신 등록 공인중개사</Text>
-                      <View style={styles.successBadge}><Text style={styles.successBadgeText}>낙찰률 96.2%</Text></View>
-                    </View>
-                    <Text style={styles.expertSub}>충무 경공매 매수대리 중개법인 | 경기 용인 581호</Text>
-                    <Text style={styles.expertIntro} numberOfLines={3}>
-                      용인 반도체 클러스터 및 경기 남부권 상가 수익률 TOP 빌딩 경매, 신속 명도 전문 매수신청대리인입니다.
-                    </Text>
-                    <View style={styles.expertActions}>
-                      <TouchableOpacity onPress={() => Linking.openURL('tel:031-289-4980')} style={styles.expertBtnPhone}>
-                        <Text style={styles.expertBtnPhoneText}>📞 전화 연결</Text>
-                      </TouchableOpacity>
-                      <TouchableOpacity onPress={() => requestExpertConsultationMobile('이순신 등록 공인중개사')} style={styles.expertBtnMail}>
-                        <Text style={styles.expertBtnMailText}>✉ 온라인 상담</Text>
-                      </TouchableOpacity>
+                {experts.map((exp) => (
+                  <View key={exp.id || exp.name} style={styles.expertCard}>
+                    <Image source={{ uri: exp.img }} style={styles.expertImg} />
+                    <View style={{ flex: 1, marginLeft: 10 }}>
+                      <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
+                        <Text style={{ fontSize: 13, fontWeight: 'bold', color: COLORS.slate900 }}>{exp.name}</Text>
+                        <View style={styles.successBadge}><Text style={styles.successBadgeText}>낙찰률 {exp.success_rate}</Text></View>
+                      </View>
+                      <Text style={styles.expertSub}>{exp.office} | {exp.license}</Text>
+                      <Text style={styles.expertIntro} numberOfLines={3}>
+                        {exp.intro}
+                      </Text>
+                      <View style={styles.expertActions}>
+                        <TouchableOpacity onPress={() => Linking.openURL(`tel:${exp.phone}`)} style={styles.expertBtnPhone}>
+                          <Text style={styles.expertBtnPhoneText}>📞 전화 연결</Text>
+                        </TouchableOpacity>
+                        <TouchableOpacity onPress={() => requestExpertConsultationMobile(exp.name)} style={styles.expertBtnMail}>
+                          <Text style={styles.expertBtnMailText}>✉ 온라인 상담</Text>
+                        </TouchableOpacity>
+                      </View>
                     </View>
                   </View>
-                </View>
+                ))}
               </View>
             </View>
 
@@ -3970,7 +3999,7 @@ export const DetailScreen: React.FC<DetailScreenProps> = ({ property, onBack }) 
                 const targetAddr = isNonBuildingMobile 
                   ? (currentProperty.non_building_meta?.storage_location || currentProperty.non_building_meta?.base_location || currentProperty.address || "") 
                   : currentProperty.address;
-                Linking.openURL(`https://map.naver.com/v5/search/${encodeURIComponent(cleanAddress(targetAddr))}`);
+                Linking.openURL(`https://m.map.naver.com/search.naver?query=${encodeURIComponent(cleanAddress(targetAddr))}`);
               }}
               style={styles.networkButton}
             >

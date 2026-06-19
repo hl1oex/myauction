@@ -106,7 +106,7 @@ export function AuthScreen({ onSuccess, onCancel }: AuthScreenProps) {
     setLoading(true);
     try {
       // 로컬 file:// 접속 환경을 고려하여 안전한 배포 호스팅 주소를 폴백 리다이렉트값으로 사용합니다.
-      let redirectTo = 'https://action-b8c75.web.app/mobile/';
+      let redirectTo = 'https://myauction.r-e.kr/mobile/';
       if (Platform.OS === 'web') {
         const origin = window.location.origin;
         if (origin && origin.startsWith('http') && !origin.includes('file:')) {

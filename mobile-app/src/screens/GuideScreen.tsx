@@ -159,7 +159,7 @@ export const GuideScreen: React.FC = () => {
           <View style={styles.guideStep}>
             <Text style={styles.stepTitle}>2. Site URL 및 Redirect URLs 수정</Text>
             <Text style={styles.stepText}>
-              Authentication - URL Configuration 메뉴로 이동하여 Site URL을 배포 주소(https://action-b8c75.web.app)로 변경하십시오. 추가로 Redirect URLs 목록에 https://action-b8c75.web.app/mobile/ 주소를 반드시 등록해야 로그인 완료 후 본래 앱으로 정상 복귀할 수 있습니다.
+              Authentication - URL Configuration 메뉴로 이동하여 Site URL을 배포 주소(https://myauction.r-e.kr)로 변경하십시오. 추가로 Redirect URLs 목록에 https://myauction.r-e.kr/mobile/ 주소를 반드시 등록해야 로그인 완료 후 본래 앱으로 정상 복귀할 수 있습니다.
             </Text>
           </View>
 

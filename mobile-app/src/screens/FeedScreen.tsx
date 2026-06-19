@@ -505,7 +505,17 @@ export const FeedScreen: React.FC<FeedScreenProps> = ({ onSelectProperty, filter
           .select('*')
           .eq('active', true);
         if (!error && data) {
-          setAdSettings(data);
+          const sanitizedData = data.map(ad => {
+            let sanitized = { ...ad };
+            if (sanitized.link_url && sanitized.link_url.indexOf('action-b8c75') !== -1) {
+              sanitized.link_url = sanitized.link_url.replace(/action-b8c75\.web\.app/g, 'myauction.r-e.kr');
+            }
+            if (sanitized.image_url && sanitized.image_url.indexOf('action-b8c75') !== -1) {
+              sanitized.image_url = sanitized.image_url.replace(/action-b8c75\.web\.app/g, 'myauction.r-e.kr');
+            }
+            return sanitized;
+          });
+          setAdSettings(sanitizedData);
         }
       } catch (err) {
         console.warn('모바일 광고 연동 실패', err);
@@ -786,7 +796,7 @@ export const FeedScreen: React.FC<FeedScreenProps> = ({ onSelectProperty, filter
     if (filters.selectedDongs && filters.selectedDongs.length > 0) {
       result = result.filter((item) => {
         const address = item.address || '';
-        return filters.selectedDongs.some(dong => address.includes(dong));
+        return filters.selectedDongs!.some((dong: string) => address.includes(dong));
       });
     }
 
@@ -1297,7 +1307,7 @@ export const FeedScreen: React.FC<FeedScreenProps> = ({ onSelectProperty, filter
                                   setFilters((prev) => {
                                     const prevDongs = prev.selectedDongs || [];
                                     const nextDongs = prevDongs.includes(dong)
-                                      ? prevDongs.filter(d => d !== dong)
+                                      ? prevDongs.filter((d: string) => d !== dong)
                                       : [...prevDongs, dong];
                                     return { ...prev, selectedDongs: nextDongs };
                                   });
@@ -1598,7 +1608,7 @@ export const FeedScreen: React.FC<FeedScreenProps> = ({ onSelectProperty, filter
                   title: "★ 프리미엄 경공매 투자 VIP 멤버십 모집",
                   desc: "오직 1%를 위한 NPL 부실채권 및 지분 경매 핵심 노하우 단독 공개. 지금 가입 시 30% 한정 할인 적용!",
                   image_url: "./apartment_elegant_facade.png",
-                  link_url: "https://action-b8c75.web.app",
+                  link_url: "https://myauction.r-e.kr",
                   type: "direct"
                 };
                 const currentAd = ad || defaultAd;

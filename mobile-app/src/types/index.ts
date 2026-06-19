@@ -91,6 +91,14 @@ export interface Property {
   building_total_floors?: number;
   building_total_area?: number;
   floor_areas?: Record<string, number>;
+  ai_grade?: string;
+  subway_info?: {
+    walk_time?: number;
+    distance?: number;
+    name?: string;
+    line?: string;
+  } | null;
+  title?: string;
 }
 
 export interface FilterState {
@@ -107,5 +115,7 @@ export interface FilterState {
   investmentType?: 'all' | 'investment' | 'residence'; // AI 자산 투자 성향 필터
   selectedCourts?: string[]; // 관할 법원 다중 선택 필터
   theme?: string | null; // AI 큐레이션 테마 필터
+  selectedDongs?: string[]; // 상세 읍면동 다중 선택 필터
 }
+
 

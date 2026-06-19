@@ -3,6 +3,7 @@ Write-Host "[*] 빌드 및 배포 자동화 프로세스를 시작합니다." -F
 
 # 1. 모바일 앱 빌드
 Write-Host "[*] 1/4. 모바일 React Native Expo 웹 빌드 중..." -ForegroundColor Yellow
+Copy-Item -Path "favicon.png" -Destination "mobile-app/assets/favicon.png" -Force
 cd mobile-app
 npx expo export
 if ($LASTEXITCODE -ne 0) {
@@ -24,7 +25,12 @@ if (-not (Test-Path "dist/mobile")) {
 Copy-Item -Path "mobile-app/dist/*" -Destination "dist/mobile/" -Recurse -Force
 Copy-Item -Path "index.html" -Destination "dist/" -Force
 Copy-Item -Path "admin.html" -Destination "dist/" -Force
+Copy-Item -Path "index.js" -Destination "dist/" -Force
+Copy-Item -Path "admin.js" -Destination "dist/" -Force
 Copy-Item -Path "favicon.png" -Destination "dist/" -Force
+Copy-Item -Path "favicon.ico" -Destination "dist/" -Force
+Copy-Item -Path "favicon.png" -Destination "dist/mobile/" -Force
+Copy-Item -Path "favicon.ico" -Destination "dist/mobile/" -Force
 Copy-Item -Path "apartment_elegant_facade.png" -Destination "dist/" -Force
 Copy-Item -Path "floorplan_modern_apartment.png" -Destination "dist/" -Force
 if (Test-Path "v1.2") {
