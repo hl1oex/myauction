@@ -832,29 +832,39 @@
                 <!-- 📢 메인 상단 배너 광고 슬롯 -->
                 <div id="main-top-ad-slot" class="w-full bg-white px-3.5 pt-2 hidden"></div>
                 <!-- 🔍 AI 추천 검색어 (초개인화 테마) 칩 바 -->
-                <div class="px-3.5 py-2 bg-slate-50 border-b border-slate-200/60 flex items-center gap-2 overflow-x-auto custom-scrollbar select-none">
+                <div class="px-3.5 py-2 bg-slate-50 border-b border-slate-200/60 flex items-center gap-2 overflow-x-auto custom-scrollbar select-none w-full whitespace-nowrap">
                     <span class="bg-gradient-to-r from-amber-500 to-orange-500 text-white text-[9px] font-black px-2 py-0.5 rounded-full flex items-center gap-1 flex-shrink-0 animate-pulse">
                         <i class="fa-solid fa-wand-magic-sparkles"></i> AI 추천
                     </span>
-                    <div class="flex gap-1.5">
-                        <button onclick="selectTheme(null)" id="btn-theme-all" class="bg-royalBlue text-white border-royalBlue px-2.5 py-0.5 rounded-full text-[10px] font-black border transition-all select-none flex items-center gap-1 shadow-sm">전체 피드</button>
-                        <button onclick="selectTheme('clean_rights')" id="btn-theme-clean" class="bg-white border border-slate-200 text-slate-600 px-2.5 py-0.5 rounded-full text-[10px] font-black hover:border-emerald-500 hover:text-emerald-500 transition-all select-none flex items-center gap-1"><i class="fa-solid fa-shield-halved text-emerald-500"></i> 권리클린</button>
-                        <button onclick="selectTheme('half_price')" id="btn-theme-half" class="bg-white border border-slate-200 text-slate-600 px-2.5 py-0.5 rounded-full text-[10px] font-black hover:border-rose-500 hover:text-rose-500 transition-all select-none flex items-center gap-1"><i class="fa-solid fa-percent text-rose-500"></i> 반값 격전지</button>
-                        <button onclick="selectTheme('hot_yongin')" id="btn-theme-yongin" class="bg-white border border-slate-200 text-slate-600 px-2.5 py-0.5 rounded-full text-[10px] font-black hover:border-indigo-500 hover:text-indigo-500 transition-all select-none flex items-center gap-1"><i class="fa-solid fa-fire text-indigo-500"></i> 반도체 HOT 용인</button>
-                        <button onclick="selectTheme('lifestyle_3eok')" id="btn-theme-lifestyle" class="bg-white border border-slate-200 text-slate-600 px-2.5 py-0.5 rounded-full text-[10px] font-black hover:border-amber-500 hover:text-amber-500 transition-all select-none flex items-center gap-1"><i class="fa-solid fa-campground text-amber-500"></i> 제주/서울 3억 이하</button>
-                        <button onclick="selectTheme('yield_top')" id="btn-theme-yield" class="bg-white border border-slate-200 text-slate-600 px-2.5 py-0.5 rounded-full text-[10px] font-black hover:border-blue-500 hover:text-blue-500 transition-all select-none flex items-center gap-1"><i class="fa-solid fa-coins text-blue-500"></i> 상가 수익률 TOP</button>
-                        <button onclick="selectTheme('redevelopment')" id="btn-theme-redevelopment" class="bg-white border border-slate-200 text-slate-600 px-2.5 py-0.5 rounded-full text-[10px] font-black hover:border-orange-500 hover:text-orange-500 transition-all select-none flex items-center gap-1"><i class="fa-solid fa-building text-orange-500"></i> 아파트 재건축</button>
-                        <button onclick="selectTheme('mini_land')" id="btn-theme-miniland" class="bg-white border border-slate-200 text-slate-600 px-2.5 py-0.5 rounded-full text-[10px] font-black hover:border-lime-600 hover:text-lime-600 transition-all select-none flex items-center gap-1"><i class="fa-solid fa-tree text-lime-600"></i> 초소액 토지</button>
-                        <button onclick="selectTheme('auto_machinery')" id="btn-theme-automachinery" class="bg-white border border-slate-200 text-slate-600 px-2.5 py-0.5 rounded-full text-[10px] font-black hover:border-purple-500 hover:text-purple-500 transition-all select-none flex items-center gap-1"><i class="fa-solid fa-car text-purple-500"></i> 실속 차량/동산</button>
-                        <button onclick="selectTheme('officetel_income')" id="btn-theme-officetel" class="bg-white border border-slate-200 text-slate-600 px-2.5 py-0.5 rounded-full text-[10px] font-black hover:border-cyan-500 hover:text-cyan-500 transition-all select-none flex items-center gap-1"><i class="fa-solid fa-city text-cyan-500"></i> 월세 오피스텔</button>
-                        <button onclick="selectTheme('subway_safe')" id="btn-theme-subwaysafe" class="bg-white border border-slate-200 text-slate-600 px-2.5 py-0.5 rounded-full text-[10px] font-black hover:border-teal-500 hover:text-teal-500 transition-all select-none flex items-center gap-1"><i class="fa-solid fa-train-subway text-teal-500"></i> 역세권 대항력 안전</button>
-                        <button onclick="selectTheme('small_building')" id="btn-theme-smallbuilding" class="bg-white border border-slate-200 text-slate-600 px-2.5 py-0.5 rounded-full text-[10px] font-black hover:border-amber-700 hover:text-amber-700 transition-all select-none flex items-center gap-1"><i class="fa-solid fa-building-user text-amber-700"></i> 꼬마빌딩 건물주</button>
-                        <button onclick="selectTheme('school_district')" id="btn-theme-schooldistrict" class="bg-white border border-slate-200 text-slate-600 px-2.5 py-0.5 rounded-full text-[10px] font-black hover:border-emerald-600 hover:text-emerald-600 transition-all select-none flex items-center gap-1"><i class="fa-solid fa-graduation-cap text-emerald-600"></i> 학세권 우수 교육</button>
-                        <button onclick="selectTheme('capital_single')" id="btn-theme-capitalsingle" class="bg-white border border-slate-200 text-slate-600 px-2.5 py-0.5 rounded-full text-[10px] font-black hover:border-violet-500 hover:text-violet-500 transition-all select-none flex items-center gap-1"><i class="fa-solid fa-house-laptop text-violet-500"></i> 수도권 1인 가구 갭</button>
-                        <button onclick="selectTheme('local_healing')" id="btn-theme-localhealing" class="bg-white border border-slate-200 text-slate-600 px-2.5 py-0.5 rounded-full text-[10px] font-black hover:border-green-600 hover:text-green-600 transition-all select-none flex items-center gap-1"><i class="fa-solid fa-house-chimney-window text-green-600"></i> 지방 힐링 세컨하우스</button>
-                        <button onclick="selectTheme('heavy_dropped')" id="btn-theme-heavydropped" class="bg-white border border-slate-200 text-slate-600 px-2.5 py-0.5 rounded-full text-[10px] font-black hover:border-red-600 hover:text-red-600 transition-all select-none flex items-center gap-1"><i class="fa-solid fa-down-long text-red-600"></i> 줍줍! 70% 폭락</button>
-                        <button onclick="selectTheme('factory_warehouse')" id="btn-theme-factorywarehouse" class="bg-white border border-slate-200 text-slate-600 px-2.5 py-0.5 rounded-full text-[10px] font-black hover:border-slate-600 hover:text-slate-600 transition-all select-none flex items-center gap-1"><i class="fa-solid fa-industry text-slate-600"></i> 창업/물류 공장창고</button>
-                        <button onclick="selectTheme('share_investment')" id="btn-theme-shareinvestment" class="bg-white border border-slate-200 text-slate-600 px-2.5 py-0.5 rounded-full text-[10px] font-black hover:border-rose-400 hover:text-rose-400 transition-all select-none flex items-center gap-1"><i class="fa-solid fa-scissors text-rose-400"></i> 소액 지분 틈새투자</button>
+                    <div class="flex gap-1.5 flex-nowrap flex-shrink-0">
+                        <button onclick="selectTheme(null)" id="btn-theme-all" class="bg-royalBlue text-white border-royalBlue px-2.5 py-0.5 rounded-full text-[10px] font-black border transition-all select-none flex items-center gap-1 shadow-sm whitespace-nowrap flex-shrink-0">전체 피드</button>
+                        <button onclick="selectTheme('clean_rights')" id="btn-theme-clean" class="bg-white border border-slate-200 text-slate-600 px-2.5 py-0.5 rounded-full text-[10px] font-black hover:border-emerald-500 hover:text-emerald-500 transition-all select-none flex items-center gap-1 whitespace-nowrap flex-shrink-0"><i class="fa-solid fa-shield-halved text-emerald-500"></i> 권리클린</button>
+                        <button onclick="selectTheme('half_price')" id="btn-theme-half" class="bg-white border border-slate-200 text-slate-600 px-2.5 py-0.5 rounded-full text-[10px] font-black hover:border-rose-500 hover:text-rose-500 transition-all select-none flex items-center gap-1 whitespace-nowrap flex-shrink-0"><i class="fa-solid fa-percent text-rose-500"></i> 반값 격전지</button>
+                        <button onclick="selectTheme('hot_yongin')" id="btn-theme-yongin" class="bg-white border border-slate-200 text-slate-600 px-2.5 py-0.5 rounded-full text-[10px] font-black hover:border-indigo-500 hover:text-indigo-500 transition-all select-none flex items-center gap-1 whitespace-nowrap flex-shrink-0"><i class="fa-solid fa-fire text-indigo-500"></i> 반도체 HOT 용인</button>
+                        <button onclick="selectTheme('lifestyle_3eok')" id="btn-theme-lifestyle" class="bg-white border border-slate-200 text-slate-600 px-2.5 py-0.5 rounded-full text-[10px] font-black hover:border-amber-500 hover:text-amber-500 transition-all select-none flex items-center gap-1 whitespace-nowrap flex-shrink-0"><i class="fa-solid fa-campground text-amber-500"></i> 제주/서울 3억 이하</button>
+                        <button onclick="selectTheme('yield_top')" id="btn-theme-yield" class="bg-white border border-slate-200 text-slate-600 px-2.5 py-0.5 rounded-full text-[10px] font-black hover:border-blue-500 hover:text-blue-500 transition-all select-none flex items-center gap-1 whitespace-nowrap flex-shrink-0"><i class="fa-solid fa-coins text-blue-500"></i> 상가 수익률 TOP</button>
+                        <button onclick="selectTheme('redevelopment')" id="btn-theme-redevelopment" class="bg-white border border-slate-200 text-slate-600 px-2.5 py-0.5 rounded-full text-[10px] font-black hover:border-orange-500 hover:text-orange-500 transition-all select-none flex items-center gap-1 whitespace-nowrap flex-shrink-0"><i class="fa-solid fa-building text-orange-500"></i> 아파트 재건축</button>
+                        <button onclick="selectTheme('mini_land')" id="btn-theme-miniland" class="bg-white border border-slate-200 text-slate-600 px-2.5 py-0.5 rounded-full text-[10px] font-black hover:border-lime-600 hover:text-lime-600 transition-all select-none flex items-center gap-1 whitespace-nowrap flex-shrink-0"><i class="fa-solid fa-tree text-lime-600"></i> 초소액 토지</button>
+                        <button onclick="selectTheme('auto_machinery')" id="btn-theme-automachinery" class="bg-white border border-slate-200 text-slate-600 px-2.5 py-0.5 rounded-full text-[10px] font-black hover:border-purple-500 hover:text-purple-500 transition-all select-none flex items-center gap-1 whitespace-nowrap flex-shrink-0"><i class="fa-solid fa-car text-purple-500"></i> 실속 차량/동산</button>
+                        <button onclick="selectTheme('officetel_income')" id="btn-theme-officetel" class="bg-white border border-slate-200 text-slate-600 px-2.5 py-0.5 rounded-full text-[10px] font-black hover:border-cyan-500 hover:text-cyan-500 transition-all select-none flex items-center gap-1 whitespace-nowrap flex-shrink-0"><i class="fa-solid fa-city text-cyan-500"></i> 월세 오피스텔</button>
+                        <button onclick="selectTheme('subway_safe')" id="btn-theme-subwaysafe" class="bg-white border border-slate-200 text-slate-600 px-2.5 py-0.5 rounded-full text-[10px] font-black hover:border-teal-500 hover:text-teal-500 transition-all select-none flex items-center gap-1 whitespace-nowrap flex-shrink-0"><i class="fa-solid fa-train-subway text-teal-500"></i> 역세권 대항력 안전</button>
+                        <button onclick="selectTheme('small_building')" id="btn-theme-smallbuilding" class="bg-white border border-slate-200 text-slate-600 px-2.5 py-0.5 rounded-full text-[10px] font-black hover:border-amber-700 hover:text-amber-700 transition-all select-none flex items-center gap-1 whitespace-nowrap flex-shrink-0"><i class="fa-solid fa-building-user text-amber-700"></i> 꼬마빌딩 건물주</button>
+                        <button onclick="selectTheme('school_district')" id="btn-theme-schooldistrict" class="bg-white border border-slate-200 text-slate-600 px-2.5 py-0.5 rounded-full text-[10px] font-black hover:border-emerald-600 hover:text-emerald-600 transition-all select-none flex items-center gap-1 whitespace-nowrap flex-shrink-0"><i class="fa-solid fa-graduation-cap text-emerald-600"></i> 학세권 우수 교육</button>
+                        <button onclick="selectTheme('capital_single')" id="btn-theme-capitalsingle" class="bg-white border border-slate-200 text-slate-600 px-2.5 py-0.5 rounded-full text-[10px] font-black hover:border-violet-500 hover:text-violet-500 transition-all select-none flex items-center gap-1 whitespace-nowrap flex-shrink-0"><i class="fa-solid fa-house-laptop text-violet-500"></i> 수도권 1인 가구 갭</button>
+                        <button onclick="selectTheme('local_healing')" id="btn-theme-localhealing" class="bg-white border border-slate-200 text-slate-600 px-2.5 py-0.5 rounded-full text-[10px] font-black hover:border-green-600 hover:text-green-600 transition-all select-none flex items-center gap-1 whitespace-nowrap flex-shrink-0"><i class="fa-solid fa-house-chimney-window text-green-600"></i> 지방 힐링 세컨하우스</button>
+                        <button onclick="selectTheme('heavy_dropped')" id="btn-theme-heavydropped" class="bg-white border border-slate-200 text-slate-600 px-2.5 py-0.5 rounded-full text-[10px] font-black hover:border-red-600 hover:text-red-600 transition-all select-none flex items-center gap-1 whitespace-nowrap flex-shrink-0"><i class="fa-solid fa-down-long text-red-600"></i> 줍줍! 70% 폭락</button>
+                        <button onclick="selectTheme('factory_warehouse')" id="btn-theme-factorywarehouse" class="bg-white border border-slate-200 text-slate-600 px-2.5 py-0.5 rounded-full text-[10px] font-black hover:border-slate-600 hover:text-slate-600 transition-all select-none flex items-center gap-1 whitespace-nowrap flex-shrink-0"><i class="fa-solid fa-industry text-slate-600"></i> 창업/물류 공장창고</button>
+                        <button onclick="selectTheme('share_investment')" id="btn-theme-shareinvestment" class="bg-white border border-slate-200 text-slate-600 px-2.5 py-0.5 rounded-full text-[10px] font-black hover:border-rose-400 hover:text-rose-400 transition-all select-none flex items-center gap-1 whitespace-nowrap flex-shrink-0"><i class="fa-solid fa-scissors text-rose-400"></i> 소액 지분 틈새투자</button>
+                        
+                        <!-- 🎁 신규 확장된 8대 AI 테마 칩 -->
+                        <button onclick="selectTheme('gangnam_class')" id="btn-theme-gangnam" class="bg-white border border-slate-200 text-slate-600 px-2.5 py-0.5 rounded-full text-[10px] font-black hover:border-amber-500 hover:text-amber-500 transition-all select-none flex items-center gap-1 whitespace-nowrap flex-shrink-0"><i class="fa-solid fa-gem text-amber-500"></i> 강남 3구 클래스</button>
+                        <button onclick="selectTheme('super_failed')" id="btn-theme-superfailed" class="bg-white border border-slate-200 text-slate-600 px-2.5 py-0.5 rounded-full text-[10px] font-black hover:border-rose-600 hover:text-rose-600 transition-all select-none flex items-center gap-1 whitespace-nowrap flex-shrink-0"><i class="fa-solid fa-circle-down text-rose-600"></i> 3회 유찰 대폭락</button>
+                        <button onclick="selectTheme('first_bid')" id="btn-theme-firstbid" class="bg-white border border-slate-200 text-slate-600 px-2.5 py-0.5 rounded-full text-[10px] font-black hover:border-yellow-500 hover:text-yellow-500 transition-all select-none flex items-center gap-1 whitespace-nowrap flex-shrink-0"><i class="fa-solid fa-star text-yellow-500"></i> 따끈따끈 신건</button>
+                        <button onclick="selectTheme('seoul_apartment')" id="btn-theme-seoulapt" class="bg-white border border-slate-200 text-slate-600 px-2.5 py-0.5 rounded-full text-[10px] font-black hover:border-blue-600 hover:text-blue-600 transition-all select-none flex items-center gap-1 whitespace-nowrap flex-shrink-0"><i class="fa-solid fa-building-flag text-blue-600"></i> 서울 아파트 실거주</button>
+                        <button onclick="selectTheme('gyeonggi_residence')" id="btn-theme-gyeonggires" class="bg-white border border-slate-200 text-slate-600 px-2.5 py-0.5 rounded-full text-[10px] font-black hover:border-green-500 hover:text-green-500 transition-all select-none flex items-center gap-1 whitespace-nowrap flex-shrink-0"><i class="fa-solid fa-tree-city text-green-500"></i> 경기 실거주 타운</button>
+                        <button onclick="selectTheme('safe_apartment')" id="btn-theme-safeapt" class="bg-white border border-slate-200 text-slate-600 px-2.5 py-0.5 rounded-full text-[10px] font-black hover:border-emerald-500 hover:text-emerald-500 transition-all select-none flex items-center gap-1 whitespace-nowrap flex-shrink-0"><i class="fa-solid fa-shield-heart text-emerald-500"></i> 안심 아파트 A급</button>
+                        <button onclick="selectTheme('monthly_rent_target')" id="btn-theme-monthlyrent" class="bg-white border border-slate-200 text-slate-600 px-2.5 py-0.5 rounded-full text-[10px] font-black hover:border-violet-500 hover:text-violet-500 transition-all select-none flex items-center gap-1 whitespace-nowrap flex-shrink-0"><i class="fa-solid fa-hand-holding-dollar text-violet-500"></i> 1억 이하 월세 타깃</button>
+                        <button onclick="selectTheme('non_residential_etc')" id="btn-theme-nonres" class="bg-white border border-slate-200 text-slate-600 px-2.5 py-0.5 rounded-full text-[10px] font-black hover:border-slate-500 hover:text-slate-500 transition-all select-none flex items-center gap-1 whitespace-nowrap flex-shrink-0"><i class="fa-solid fa-box-open text-slate-500"></i> 비주거 알짜 소액</button>
                     </div>
                 </div>
                 <!-- 정렬 및 리스트 필터 바 -->
@@ -3447,16 +3457,26 @@
                 { key: "local_healing", id: "btn-theme-localhealing", activeClass: "bg-green-600 text-white border-green-600 shadow-sm" },
                 { key: "heavy_dropped", id: "btn-theme-heavydropped", activeClass: "bg-red-600 text-white border-red-600 shadow-sm" },
                 { key: "factory_warehouse", id: "btn-theme-factorywarehouse", activeClass: "bg-slate-600 text-white border-slate-600 shadow-sm" },
-                { key: "share_investment", id: "btn-theme-shareinvestment", activeClass: "bg-rose-400 text-white border-rose-400 shadow-sm" }
+                { key: "share_investment", id: "btn-theme-shareinvestment", activeClass: "bg-rose-400 text-white border-rose-400 shadow-sm" },
+                
+                // 🎁 신규 8대 테마 키 등록
+                { key: "gangnam_class", id: "btn-theme-gangnam", activeClass: "bg-amber-500 text-white border-amber-500 shadow-sm" },
+                { key: "super_failed", id: "btn-theme-superfailed", activeClass: "bg-rose-500 text-white border-rose-500 shadow-sm" },
+                { key: "first_bid", id: "btn-theme-firstbid", activeClass: "bg-yellow-500 text-white border-yellow-500 shadow-sm" },
+                { key: "seoul_apartment", id: "btn-theme-seoulapt", activeClass: "bg-blue-500 text-white border-blue-500 shadow-sm" },
+                { key: "gyeonggi_residence", id: "btn-theme-gyeonggires", activeClass: "bg-green-500 text-white border-green-500 shadow-sm" },
+                { key: "safe_apartment", id: "btn-theme-safeapt", activeClass: "bg-emerald-500 text-white border-emerald-500 shadow-sm" },
+                { key: "monthly_rent_target", id: "btn-theme-monthlyrent", activeClass: "bg-violet-500 text-white border-violet-500 shadow-sm" },
+                { key: "non_residential_etc", id: "btn-theme-nonres", activeClass: "bg-slate-500 text-white border-slate-500 shadow-sm" }
             ];
 
             keys.forEach(k => {
                 const btn = document.getElementById(k.id);
                 if (btn) {
                     if (k.key === themeKey) {
-                        btn.className = `px-2.5 py-0.5 rounded-full text-[10px] font-black border transition-all select-none flex items-center gap-1 ${k.activeClass}`;
+                        btn.className = `px-2.5 py-0.5 rounded-full text-[10px] font-black border transition-all select-none flex items-center gap-1 whitespace-nowrap flex-shrink-0 ${k.activeClass}`;
                     } else {
-                        btn.className = "px-2.5 py-0.5 rounded-full text-[10px] font-black border border-slate-200 hover:bg-slate-50 transition-all select-none text-slate-600 flex items-center gap-1";
+                        btn.className = "px-2.5 py-0.5 rounded-full text-[10px] font-black border border-slate-200 hover:bg-slate-50 transition-all select-none text-slate-600 flex items-center gap-1 whitespace-nowrap flex-shrink-0";
                     }
                 }
             });
@@ -3639,12 +3659,52 @@
 
                 if (targetTheme === "factory_warehouse") {
                     const isIndustry = ptype.includes("공장") || ptype.includes("창고") || ptype.includes("산업") || ptype.includes("아파트형공장");
-                    return isIndustry && minimum >= 300000000;
+                    return isIndustry && minimum >= 100000000;
                 }
 
                 if (targetTheme === "share_investment") {
                     const isShare = ptype.includes("지분") || notes.includes("지분") || (item.title || "").includes("지분");
                     return isShare && minimum <= 50000000;
+                }
+
+                // 🎁 신규 8대 테마 조건식 추가
+                if (targetTheme === "gangnam_class") {
+                    return address.includes("강남구") || address.includes("서초구") || address.includes("송파구");
+                }
+
+                if (targetTheme === "super_failed") {
+                    const failedCount = estimateAuctionRounds(appraisal, minimum, item.source).failedCount;
+                    return failedCount >= 3;
+                }
+
+                if (targetTheme === "first_bid") {
+                    const failedCount = estimateAuctionRounds(appraisal, minimum, item.source).failedCount;
+                    return failedCount === 0;
+                }
+
+                if (targetTheme === "seoul_apartment") {
+                    return address.includes("서울") && ptype.includes("아파트");
+                }
+
+                if (targetTheme === "gyeonggi_residence") {
+                    const isResident = ptype.includes("아파트") || ptype.includes("다세대") || ptype.includes("빌라") || ptype.includes("연립") || ptype.includes("주택") || ptype.includes("단독") || ptype.includes("다가구") || ptype.includes("오피스텔");
+                    return address.includes("경기") && isResident;
+                }
+
+                if (targetTheme === "safe_apartment") {
+                    const isApt = ptype.includes("아파트");
+                    const isGoodGrade = item.grade === "A" || item.grade === "B";
+                    return isClean && isApt && isGoodGrade;
+                }
+
+                if (targetTheme === "monthly_rent_target") {
+                    const isRentTargetType = ptype.includes("오피스텔") || ptype.includes("다세대") || ptype.includes("빌라") || ptype.includes("연립") || ptype.includes("도시형") || ptype.includes("주택");
+                    return isRentTargetType && minimum <= 100000000;
+                }
+
+                if (targetTheme === "non_residential_etc") {
+                    const isResidential = ptype.includes("아파트") || ptype.includes("오피스텔") || ptype.includes("다세대") || ptype.includes("빌라") || ptype.includes("연립") || ptype.includes("주택") || ptype.includes("단독") || ptype.includes("다가구");
+                    return !isResidential && minimum <= 30000000;
                 }
                 
                 return false;

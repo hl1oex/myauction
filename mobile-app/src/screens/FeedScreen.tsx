@@ -88,6 +88,16 @@ export const AI_THEMES = [
   { key: 'heavy_dropped', label: '줍줍! 70% 폭락', emoji: '⬇️', color: '#dc2626' },
   { key: 'factory_warehouse', label: '창업/물류 공장창고', emoji: '🏭', color: '#475569' },
   { key: 'share_investment', label: '소액 지분 틈새투자', emoji: '✂️', color: '#fb7185' },
+  
+  // 🎁 신규 8대 테마 목록 등록
+  { key: 'gangnam_class', label: '강남 3구 클래스', emoji: '💎', color: '#f59e0b' },
+  { key: 'super_failed', label: '3회 유찰 대폭락', emoji: '🔄', color: '#e11d48' },
+  { key: 'first_bid', label: '따끈따끈 신건', emoji: '✨', color: '#eab308' },
+  { key: 'seoul_apartment', label: '서울 아파트 실거주', emoji: '🗼', color: '#2563eb' },
+  { key: 'gyeonggi_residence', label: '경기 실거주 타운', emoji: '🌲', color: '#22c55e' },
+  { key: 'safe_apartment', label: '안심 아파트 A급', emoji: '🛡️', color: '#10b981' },
+  { key: 'monthly_rent_target', label: '1억 이하 월세 타깃', emoji: '💵', color: '#8b5cf6' },
+  { key: 'non_residential_etc', label: '비주거 알짜 소액', emoji: '📦', color: '#64748b' },
 ];
 
 export const filterPropertiesByThemeMobile = (properties: Property[], targetTheme: string | null | undefined): Property[] => {
@@ -264,12 +274,52 @@ export const filterPropertiesByThemeMobile = (properties: Property[], targetThem
 
     if (targetTheme === "factory_warehouse") {
       const isIndustry = ptype.includes("공장") || ptype.includes("창고") || ptype.includes("산업") || ptype.includes("아파트형공장");
-      return isIndustry && minimum >= 300000000;
+      return isIndustry && minimum >= 100000000;
     }
 
     if (targetTheme === "share_investment") {
       const isShare = ptype.includes("지분") || notes.includes("지분") || (item.title || "").includes("지분");
       return isShare && minimum <= 50000000;
+    }
+
+    // 🎁 신규 8대 테마 조건식 추가
+    if (targetTheme === "gangnam_class") {
+      return address.includes("강남구") || address.includes("서초구") || address.includes("송파구");
+    }
+
+    if (targetTheme === "super_failed") {
+      const failedCount = estimateAuctionRounds(appraisal, minimum, item.source).failedCount;
+      return failedCount >= 3;
+    }
+
+    if (targetTheme === "first_bid") {
+      const failedCount = estimateAuctionRounds(appraisal, minimum, item.source).failedCount;
+      return failedCount === 0;
+    }
+
+    if (targetTheme === "seoul_apartment") {
+      return address.includes("서울") && ptype.includes("아파트");
+    }
+
+    if (targetTheme === "gyeonggi_residence") {
+      const isResident = ptype.includes("아파트") || ptype.includes("다세대") || ptype.includes("빌라") || ptype.includes("연립") || ptype.includes("주택") || ptype.includes("단독") || ptype.includes("다가구") || ptype.includes("오피스텔");
+      return address.includes("경기") && isResident;
+    }
+
+    if (targetTheme === "safe_apartment") {
+      const isApt = ptype.includes("아파트");
+      const isGoodGrade = item.grade === "A" || item.grade === "B";
+      return isClean && isApt && isGoodGrade;
+    }
+
+    if (targetTheme === "monthly_rent_target") {
+      const isRentTargetType = ptype.includes("오피스텔") || ptype.includes("다세대") || ptype.includes("빌라") || ptype.includes("연립") || ptype.includes("도시형") || ptype.includes("주택");
+      return isRentTargetType && minimum <= 100000000;
+    }
+
+    if (targetTheme === "non_residential_etc") {
+      const isResidential = ptype.includes("아파트") || ptype.includes("오피스텔") || ptype.includes("다세대") || ptype.includes("빌라") || ptype.includes("연립") || ptype.includes("주택") || ptype.includes("단독") || ptype.includes("다가구");
+      return !isResidential && minimum <= 30000000;
     }
     
     return false;
@@ -946,7 +996,12 @@ export const FeedScreen: React.FC<FeedScreenProps> = ({ onSelectProperty, filter
         {/* AI 추천 검색어 제안 칩 바 */}
         <View style={styles.suggestedSearchContainer}>
           <Text style={styles.suggestedSearchTitle}>✨ AI 추천</Text>
-          <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.suggestedSearchScroll}>
+          <ScrollView 
+            horizontal 
+            showsHorizontalScrollIndicator={false} 
+            style={{ flex: 1 }}
+            contentContainerStyle={styles.suggestedSearchScroll}
+          >
             {AI_THEMES.map((item) => {
               const isActive = filters.theme === item.key;
               return (
@@ -962,6 +1017,7 @@ export const FeedScreen: React.FC<FeedScreenProps> = ({ onSelectProperty, filter
                   onPress={() => setFilters((prev) => ({ ...prev, theme: prev.theme === item.key ? null : item.key }))}
                 >
                   <Text 
+                    numberOfLines={1}
                     style={[
                       styles.suggestedSearchChipText,
                       isActive && { color: COLORS.white, fontWeight: '900' }
@@ -2155,6 +2211,7 @@ const styles = StyleSheet.create({
   suggestedSearchScroll: {
     flexDirection: 'row',
     alignItems: 'center',
+    flexWrap: 'nowrap',
   },
   suggestedSearchChip: {
     backgroundColor: COLORS.white,
@@ -2164,6 +2221,10 @@ const styles = StyleSheet.create({
     paddingVertical: 4,
     borderRadius: 999,
     marginRight: 6,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    flexShrink: 0,
   },
   suggestedSearchChipText: {
     fontSize: 10.5,
