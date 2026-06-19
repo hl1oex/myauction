@@ -1,0 +1,15 @@
+Line 6: <title>AI 遺?숈궛 寃쎌떆/怨듬ℓ ?ㅼ떆媛??듯빀 異붿쿇 ?쒖뒪??v1.0</title>
+Line 207: AI 遺?숈궛 寃쎄났留?異붿쿇 ?쒖뒪??                    <span class="bg-blue-50 text-royalBlue text-[10px] px-2 py-0.5 rounded-full font-black border border-blue-200">v1.0</span>
+Line 359: <!-- AI ?먯궛 ?깃툒 ?꾪꽣 (?덉쟾 / ?꾪뿕 援щ텇 蹂닿린) -->
+Line 361: <label class="block text-[11px] sm:text-xs font-black text-slate-500 uppercase tracking-wider">?좑툘 AI 沅뚮━ ?깃툒 遺꾨쪟 ?꾪꽣</label>
+Line 477: <span class="flex items-center gap-1"><i class="fa-solid fa-circle-nodes text-royalBlue animate-pulse"></i> AI 寃쎌떆/怨듬ℓ ?듯빀 ?쒖뒪??v1.0</span>
+Line 736: <!-- ?썳截?3. AI 7? 沅뚮━ 由ъ뒪???뺣? ?섏씠釉뚮━??由ы룷??-->
+Line 739: <i class="fa-solid fa-shield-halved text-royalBlue"></i> AI 7? 沅뚮━ 由ъ뒪???뺣? ?섏씠釉뚮━??由ы룷??                </h4>
+Line 818: <span id="ltv-percentage-badge" class="text-[9px] font-black px-2 py-0.5 rounded-full border border-blue-200 bg-blue-50 text-royalBlue font-mono">鍮꾨?異?(0%)</span>
+Line 1442: // ??AI ?꾪뿕 ?깃툒(X?깃툒) 遺꾨쪟 留ㅼ묶
+Line 1784: <!-- AI Risk Summary Note -->
+Line 1816: // [?좉퇋 湲곕뒫 4] AI 7? 沅뚮━ ?섏옄 諛?由ъ뒪??吏?ν삎 ?먮룞 由ы룷??留ㅼ묶湲?        function generateLegalRiskReport(item) {
+Line 1989: previewPrice.innerHTML = `<i class="fa-solid fa-tags"></i> 理쒖?媛: ${formatKRW(item.minimum_bid)}`;
+Line 1990: previewGrade.innerHTML = `<i class="fa-solid fa-shield-halved"></i> AI: ${item.grade}?깃툒 (${item.score}??`;
+Line 2078: // AI 7? 由ъ뒪???뺣? 由ы룷???뚮뜑留?二쇱엯
+Line 2159: const ltvBadge = document.getElementById("ltv-percentage-badge");

@@ -1,0 +1,140 @@
+Commit: commit b1a6643ed079a619e90e59db9966021392b0336d | Date:   Thu Jun 11 09:03:38 2026 +0900
+Line 12055: +                container.innerHTML = `<div class="col-span-3 text-center text-[10px] text-slate-400 py-6">유사 추천 매물이 없습니다.</div>`;
+Context block:
+     12047: +
+     12048: +                const aSidoMatch = (a.address || "").startsWith(currentSido) ? 1 : 0;
+     12049: +                const bSidoMatch = (b.address || "").startsWith(currentSido) ? 1 : 0;
+     12050: +                return bSidoMatch - aSidoMatch;
+     12051: +            });
+     12052: +
+     12053: +            const targetList = similarList.slice(0, 3);
+     12054: +            if (targetList.length === 0) {
+  >> 12055: +                container.innerHTML = `<div class="col-span-3 text-center text-[10px] text-slate-400 py-6">유사 추천 매물이 없습니다.</div>`;
+     12056: +                return;
+     12057: +            }
+     12058: +
+     12059: +            container.innerHTML = targetList.map((item, index) => {
+     12060: +                // ID 기반으로 500m~2000m 이내 고유 가상 거리 연산
+     12061: +                const distance = 400 + ((item.id * 17) % 1500);
+     12062: +                const distanceText = `${distance}m 이내`;
+============================================================
+Commit: commit b1a6643ed079a619e90e59db9966021392b0336d | Date:   Thu Jun 11 09:03:38 2026 +0900
+Line 12371: +                document.title = "부동산경공매 검색시스템 - 실시간 추천";
+Context block:
+     12363: +                    1: "종합분석",
+     12364: +                    2: "권리분석",
+     12365: +                    3: "수익분석",
+     12366: +                    4: "위치분석"
+     12367: +                };
+     12368: +                const tabLabel = tabNames[currentDetailGroupTab] || "상세";
+     12369: +                document.title = `부동산경공매 검색시스템 - ${cleanNo} [${tabLabel}]`;
+     12370: +            } else {
+  >> 12371: +                document.title = "부동산경공매 검색시스템 - 실시간 추천";
+     12372: +            }
+     12373: +        }
+     12374: +
+     12375:          // Supabase로부터 로그인 유저의 관심 목록 로드 함수
+     12376:          async function loadFavoritesFromServer() {
+     12377:              if (!currentUser) return;
+     12378: 
+============================================================
+Commit: commit 5ef68496f3175fc6f5b309412a1ba8a8854a370a | Date:   Wed Jun 10 23:43:52 2026 +0900
+Line 12471: -                    AI 부동산 경공매 추천 시스템
+Context block:
+     12463:      <!-- 💎 1. 프리미엄 디자인 타이포그래피를 위한 Google Fonts 연동 -->
+     12464:      <link rel="preconnect" href="https://fonts.googleapis.com">
+     12465:      <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+     12466: @@ -252,8 +252,8 @@
+     12467:                  <i class="fa-solid fa-hotel text-xs"></i>
+     12468:              </div>
+     12469:              <div class="truncate">
+     12470: -                <h1 class="text-[10px] min-[360px]:text-xs sm:text-sm font-extrabold tracking-tight text-slate-900 flex items-center gap-1 min-[360px]:gap-1.5 whitespace-nowrap">
+  >> 12471: -                    AI 부동산 경공매 추천 시스템
+     12472: +                <h1 onclick="goToHome()" class="cursor-pointer text-[10px] min-[360px]:text-xs sm:text-sm font-extrabold tracking-tight text-slate-900 flex items-center gap-1 min-[360px]:gap-1.5 whitespace-nowrap hover:text-royalBlue transition-all">
+     12473: +                    부동산경공매 검색시스템
+     12474:                      <span class="bg-blue-50 text-royalBlue text-[8px] min-[360px]:text-[9px] px-1 min-[360px]:px-1.5 py-0.2 rounded-full font-black border border-blue-200">v1.1</span>
+     12475:                  </h1>
+     12476:                  <p class="text-[8px] text-slate-400 font-bold uppercase tracking-wider leading-none">Premium Elegant Pearl White</p>
+     12477: @@ -330,6 +330,85 @@
+     12478:                      </select>
+============================================================
+Commit: commit a8c353b3eb3d65fd512543bd0dff88fa73b04248 | Date:   Sat Jun 6 02:47:36 2026 +0900
+Line 16302: -    <title>AI 부동산 경시/공매 실시간 통합 추천 시스템 v1.0</title>
+Context block:
+     16294: diff --git a/index.html b/index.html
+     16295: index 2446094..42fe3bc 100644
+     16296: --- a/index.html
+     16297: +++ b/index.html
+     16298: @@ -3,7 +3,7 @@
+     16299:  <head>
+     16300:      <meta charset="UTF-8">
+     16301:      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  >> 16302: -    <title>AI 부동산 경시/공매 실시간 통합 추천 시스템 v1.0</title>
+     16303: +    <title>AI 부동산 경시/공매 실시간 통합 추천 시스템 v1.1</title>
+     16304:      <!-- 💎 1. 프리미엄 디자인 타이포그래피를 위한 Google Fonts 연동 -->
+     16305:      <link rel="preconnect" href="https://fonts.googleapis.com">
+     16306:      <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+     16307: @@ -35,6 +35,10 @@
+     16308:          }
+     16309:      </script>
+============================================================
+Commit: commit a8c353b3eb3d65fd512543bd0dff88fa73b04248 | Date:   Sat Jun 6 02:47:36 2026 +0900
+Line 16303: +    <title>AI 부동산 경시/공매 실시간 통합 추천 시스템 v1.1</title>
+Context block:
+     16295: index 2446094..42fe3bc 100644
+     16296: --- a/index.html
+     16297: +++ b/index.html
+     16298: @@ -3,7 +3,7 @@
+     16299:  <head>
+     16300:      <meta charset="UTF-8">
+     16301:      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+     16302: -    <title>AI 부동산 경시/공매 실시간 통합 추천 시스템 v1.0</title>
+  >> 16303: +    <title>AI 부동산 경시/공매 실시간 통합 추천 시스템 v1.1</title>
+     16304:      <!-- 💎 1. 프리미엄 디자인 타이포그래피를 위한 Google Fonts 연동 -->
+     16305:      <link rel="preconnect" href="https://fonts.googleapis.com">
+     16306:      <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+     16307: @@ -35,6 +35,10 @@
+     16308:          }
+     16309:      </script>
+     16310:      <style>
+============================================================
+Commit: commit d43660ab60a5e264ef2f7763ea79251cacbc0ed4 | Date:   Wed Jun 3 13:12:23 2026 +0900
+Line 18353: +    <title>AI 부동산 경시/공매 실시간 통합 추천 시스템 v1.0</title>
+Context block:
+     18345: --- /dev/null
+     18346: +++ b/index.html
+     18347: @@ -0,0 +1,2125 @@
+     18348: +<!DOCTYPE html>
+     18349: +<html lang="ko">
+     18350: +<head>
+     18351: +    <meta charset="UTF-8">
+     18352: +    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  >> 18353: +    <title>AI 부동산 경시/공매 실시간 통합 추천 시스템 v1.0</title>
+     18354: +    <!-- 💎 1. 프리미엄 디자인 타이포그래피를 위한 Google Fonts 연동 -->
+     18355: +    <link rel="preconnect" href="https://fonts.googleapis.com">
+     18356: +    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+     18357: +    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Outfit:wght@400;500;600;700;800&family=Noto+Sans+KR:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+     18358: +    <!-- 💎 2. 시안 2 (Elegant Pearl White) 구현을 위한 Tailwind CSS CDN 연동 -->
+     18359: +    <script src="https://cdn.tailwindcss.com"></script>
+     18360: +    <!-- 💎 3. 비동기 HTTP 호출을 위한 Axios CDN 연동 -->
+============================================================
+Commit: commit d43660ab60a5e264ef2f7763ea79251cacbc0ed4 | Date:   Wed Jun 3 13:12:23 2026 +0900
+Line 18421: +                    AI 부동산 경공매 추천 시스템
+Context block:
+     18413: +            <button onclick="toggleSidebar()" class="lg:hidden p-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 flex items-center justify-center transition-all select-none mr-1 flex-shrink-0" title="필터 열기">
+     18414: +                <i class="fa-solid fa-sliders text-xs"></i>
+     18415: +            </button>
+     18416: +            <div class="bg-royalBlue text-white w-9 h-9 rounded-xl flex items-center justify-center shadow-md shadow-blue-500/10 flex-shrink-0">
+     18417: +                <i class="fa-solid fa-hotel text-sm"></i>
+     18418: +            </div>
+     18419: +            <div class="truncate">
+     18420: +                <h1 class="text-xs sm:text-base font-extrabold tracking-tight text-slate-900 flex items-center gap-2 whitespace-nowrap">
+  >> 18421: +                    AI 부동산 경공매 추천 시스템
+     18422: +                    <span class="bg-blue-50 text-royalBlue text-[10px] px-2 py-0.5 rounded-full font-black border border-blue-200">v1.0</span>
+     18423: +                </h1>
+     18424: +                <p class="text-[9px] sm:text-[10px] text-slate-400 font-bold uppercase tracking-wider">Premium Elegant Pearl White</p>
+     18425: +            </div>
+     18426: +        </div>
+     18427: +        
+     18428: +        <!-- [중앙 영역] 실시간 자산 현황판 및 연결 센서 (태블릿 이상 노출) -->
+============================================================

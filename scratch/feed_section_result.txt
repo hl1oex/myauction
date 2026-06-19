@@ -1,0 +1,152 @@
+Line 347: <div id="main-grid-container" class="flex flex-1 overflow-hidden h-full relative">
+Context:
+     339:                 <button onclick="openLoginModal()" class="px-1.5 min-[360px]:px-2.5 py-0.5 min-[360px]:py-1 rounded-full border border-royalBlue text-royalBlue bg-white text-[8.5px] min-[360px]:text-[9.5px] font-black shadow-sm transition-all duration-300 cursor-pointer hover:bg-blue-50 active:scale-95 whitespace-nowrap">
+     340:                     <i class="fa-solid fa-user-lock mr-0.5"></i> 로그인 / 회원가입
+     341:                 </button>
+     342:             </div>
+     343:         </div>
+     344:     </header>
+     345:  
+     346:     <!-- 🎛️ 2. 메인 3단 전문가 대시보드 그리드 영역 -->
+  >> 347:     <div id="main-grid-container" class="flex flex-1 overflow-hidden h-full relative">
+     348: 
+     349:         <!-- 🖤 Mobile Sidebar Backdrop Overlay -->
+     350:         <div id="sidebar-backdrop" class="fixed inset-0 bg-slate-900/40 z-40 hidden lg:hidden transition-opacity duration-300" onclick="toggleSidebar()"></div>
+     351: 
+     352:         <!-- 📂 [COLUMN 1] 좌측 고정 사이드바: 통합 필터 및 사설 파일 Mix 업로더 (모바일 반응형 서랍화 적용) -->
+     353:         <aside id="sidebar-panel" class="fixed inset-y-0 left-0 z-40 w-[280px] sm:w-[320px] bg-white border-r border-slate-200 flex flex-col h-full transform -translate-x-full transition-transform duration-300 ease-out lg:static lg:w-[22%] lg:min-w-[290px] lg:max-w-[350px] lg:translate-x-0">
+     354:             <!-- 필터 메인 헤더 -->
+--------------------------------------------------
+Line 769: <section id="center-feed-section" class="flex-1 bg-slate-50 border-r border-slate-200 flex flex-col h-full overflow-hidden">
+Context:
+     761:                         <span>🏢 온비드공매 (Plan B)</span>
+     762:                         <span id="sync-onbid-time" class="text-slate-900 font-outfit">연동 전</span>
+     763:                     </div>
+     764:                 </div>
+     765:             </div>
+     766:         </aside>
+     767: 
+     768:         <!-- 📊 [COLUMN 2] 중앙 메인 피드: 통계 KPI & 추천 매물 카드 피드 (Width: 50%) -->
+  >> 769:         <section id="center-feed-section" class="flex-1 bg-slate-50 border-r border-slate-200 flex flex-col h-full overflow-hidden">
+     770:             <!-- 중앙 상단 통계 KPI 바 (반응형: 모바일 한 줄 통합 vs PC 3단 그리드) -->
+     771:             <div class="bg-white border-b border-slate-200 p-2 z-10 shadow-sm">
+     772:                 <!-- 📱 모바일 전용: 3열 구조의 미니 그리드 카드로 개편하여 가독성 밸런스 극대화 (1024px 미만 lg:hidden) -->
+     773:                 <div class="lg:hidden bg-white z-10">
+     774:                     <div class="grid grid-cols-3 gap-1 text-center">
+     775:                         <div class="bg-blue-50/40 border border-blue-100/60 rounded-lg py-0.5 px-1">
+     776:                             <p class="text-[6.5px] min-[360px]:text-[7.5px] font-black text-royalBlue mb-0.2 whitespace-nowrap">추천 적합 매물</p>
+--------------------------------------------------
+Line 853: <div class="flex-1 overflow-auto custom-scrollbar bg-white" id="properties-container">
+Context:
+     845:                     </div>
+     846:                     <!-- 🌟 내 관심 목록 바로가기 버튼 (프리미엄 골드/앰버 테마) -->
+     847:                     <button id="fav-filter-btn" onclick="toggleFavoritesFilterBtn()" class="px-2.5 py-1 rounded text-[10px] font-black shadow-sm transition-all duration-300 flex items-center gap-1 cursor-pointer bg-white border border-slate-200 text-slate-400 hover:bg-slate-50 active:scale-95 opacity-60">
+     848:                         <i class="fa-solid fa-star"></i> <span id="fav-filter-btn-text">내 관심 매물</span>
+     849:                     </button>
+     850:                 </div>
+     851: 
+     852:                 <!-- 매물 목록 스크롤 피드 영역 (성능 극대화 데이터 테이블 뷰 탑재) -->
+  >> 853:                 <div class="flex-1 overflow-auto custom-scrollbar bg-white" id="properties-container">
+     854:                     <!-- 로딩 애니메이션 (서버 데이터 바인딩 시 로딩 표시) -->
+     855:                     <div class="text-center py-20 bg-white">
+     856:                         <div class="inline-block w-8 h-8 border-4 border-royalBlue border-t-transparent rounded-full animate-spin mb-3"></div>
+     857:                         <p class="text-xs font-bold text-slate-500">실시간 스케줄 서버로부터 자산을 연동하는 중입니다...</p>
+     858:                     </div>
+     859:                 </div>
+     860: 
+--------------------------------------------------
+Line 2686: const mainGridContainer = document.getElementById("main-grid-container");
+Context:
+     2678:             if (target.scrollTop + target.clientHeight >= target.scrollHeight - 100) {
+     2679:                 loadMoreProperties();
+     2680:             }
+     2681:         }
+     2682: 
+     2683:         function initResponsiveLayout() {
+     2684:             const sidebar = document.getElementById("sidebar-panel");
+     2685:             const dashboardView = document.getElementById("dashboard-view");
+  >> 2686:             const mainGridContainer = document.getElementById("main-grid-container");
+     2687:             const centerSection = document.getElementById("center-feed-section");
+     2688:             const headerToggleBtn = document.getElementById("header-sidebar-toggle-btn");
+     2689:             const closeBtn = document.getElementById("sidebar-close-btn");
+     2690:             const propertiesContainer = document.getElementById("properties-container");
+     2691: 
+     2692:             if (!sidebar || !dashboardView || !mainGridContainer || !centerSection || !propertiesContainer) return;
+     2693: 
+--------------------------------------------------
+Line 2687: const centerSection = document.getElementById("center-feed-section");
+Context:
+     2679:                 loadMoreProperties();
+     2680:             }
+     2681:         }
+     2682: 
+     2683:         function initResponsiveLayout() {
+     2684:             const sidebar = document.getElementById("sidebar-panel");
+     2685:             const dashboardView = document.getElementById("dashboard-view");
+     2686:             const mainGridContainer = document.getElementById("main-grid-container");
+  >> 2687:             const centerSection = document.getElementById("center-feed-section");
+     2688:             const headerToggleBtn = document.getElementById("header-sidebar-toggle-btn");
+     2689:             const closeBtn = document.getElementById("sidebar-close-btn");
+     2690:             const propertiesContainer = document.getElementById("properties-container");
+     2691: 
+     2692:             if (!sidebar || !dashboardView || !mainGridContainer || !centerSection || !propertiesContainer) return;
+     2693: 
+     2694:             // 스크롤 이벤트 해제 후 알맞은 컨테이너에 재바인딩
+--------------------------------------------------
+Line 2690: const propertiesContainer = document.getElementById("properties-container");
+Context:
+     2682: 
+     2683:         function initResponsiveLayout() {
+     2684:             const sidebar = document.getElementById("sidebar-panel");
+     2685:             const dashboardView = document.getElementById("dashboard-view");
+     2686:             const mainGridContainer = document.getElementById("main-grid-container");
+     2687:             const centerSection = document.getElementById("center-feed-section");
+     2688:             const headerToggleBtn = document.getElementById("header-sidebar-toggle-btn");
+     2689:             const closeBtn = document.getElementById("sidebar-close-btn");
+  >> 2690:             const propertiesContainer = document.getElementById("properties-container");
+     2691: 
+     2692:             if (!sidebar || !dashboardView || !mainGridContainer || !centerSection || !propertiesContainer) return;
+     2693: 
+     2694:             // 스크롤 이벤트 해제 후 알맞은 컨테이너에 재바인딩
+     2695:             dashboardView.removeEventListener("scroll", handleFeedScroll);
+     2696:             propertiesContainer.removeEventListener("scroll", handleFeedScroll);
+     2697: 
+--------------------------------------------------
+Line 2720: // 데스크톱 스크롤: properties-container만 스크롤
+Context:
+     2712:                 
+     2713:                 // 모바일 스크롤 바인딩
+     2714:                 dashboardView.addEventListener("scroll", handleFeedScroll);
+     2715:             } else {
+     2716:                 // 데스크톱 레이아웃: 필터 패널을 왼쪽 열로 이동
+     2717:                 if (sidebar.parentNode !== mainGridContainer) {
+     2718:                     mainGridContainer.insertBefore(sidebar, centerSection);
+     2719:                 }
+  >> 2720:                 // 데스크톱 스크롤: properties-container만 스크롤
+     2721:                 dashboardView.className = "flex flex-col flex-1 overflow-hidden";
+     2722:                 propertiesContainer.className = "flex-1 overflow-auto custom-scrollbar bg-white";
+     2723:                 
+     2724:                 sidebar.className = "bg-white border-r border-slate-200 flex flex-col h-full lg:w-[22%] lg:min-w-[290px] lg:max-w-[350px] block";
+     2725:                 if (headerToggleBtn) headerToggleBtn.classList.add("hidden"); // 항상 숨김 유지
+     2726:                 if (closeBtn) closeBtn.classList.remove("hidden");
+     2727:                 
+--------------------------------------------------
+Line 3375: const container = document.getElementById("properties-container");
+Context:
+     3367:                 round: failedCount + 1,
+     3368:                 failedCount: failedCount,
+     3369:                 discount: discount < 0 ? 0 : discount
+     3370:             };
+     3371:         }
+     3372: 
+     3373:         // 8. 매물 스크롤 리스트 동적 렌더러 (모던 포털 카드형 반응형 그리드 뷰 탑재)
+     3374:         function renderProperties() {
+  >> 3375:             const container = document.getElementById("properties-container");
+     3376:             
+     3377:             if (currentPage === 1) {
+     3378:                 container.innerHTML = "";
+     3379:             }
+     3380:             
+     3381:             if (filteredProperties.length === 0) {
+     3382:                 container.innerHTML = `
+--------------------------------------------------

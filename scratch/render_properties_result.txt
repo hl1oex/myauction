@@ -1,0 +1,150 @@
+Line 3374:         function renderProperties() {
+Line 3375:             const container = document.getElementById("properties-container");
+Line 3376:             
+Line 3377:             if (currentPage === 1) {
+Line 3378:                 container.innerHTML = "";
+Line 3379:             }
+Line 3380:             
+Line 3381:             if (filteredProperties.length === 0) {
+Line 3382:                 container.innerHTML = `
+Line 3383:                     <div class="text-center py-20 bg-white border border-slate-200 rounded-2xl p-8 shadow-sm m-5">
+Line 3384:                         <i class="fa-solid fa-folder-open text-slate-300 text-4xl mb-3"></i>
+Line 3385:                         <h4 class="font-extrabold text-slate-700 text-xs mb-1">매칭 자산 없음</h4>
+Line 3386:                         <p class="text-[10px] text-slate-400">설정한 필터나 가용 예산 한도 내에 부합하는 추천 매물이 없습니다.</p>
+Line 3387:                     </div>
+Line 3388:                 `;
+Line 3389:                 return;
+Line 3390:             }
+Line 3391:             
+Line 3392:             // 처음 1페이지 로드 시에는 그리드 컨테이너 생성
+Line 3393:             if (currentPage === 1) {
+Line 3394:                 container.innerHTML = `
+Line 3395:                     <div id="properties-grid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-2.5 p-3 pb-12 lg:pb-3">
+Line 3396:                         <!-- 동적 카드들이 마운팅됨 -->
+Line 3397:                     </div>
+Line 3398:                 `;
+Line 3399:             }
+Line 3400:             
+Line 3401:             const grid = document.getElementById("properties-grid");
+Line 3402:             if (!grid) return;
+Line 3403:             
+Line 3404:             // 페이지 범위 연산
+Line 3405:             const startIndex = (currentPage - 1) * itemsPerPage;
+Line 3406:             const endIndex = Math.min(currentPage * itemsPerPage, filteredProperties.length);
+Line 3407:             
+Line 3408:             if (startIndex >= filteredProperties.length) return;
+Line 3409:             
+Line 3410:             const pageItems = filteredProperties.slice(startIndex, endIndex);
+Line 3411:             let htmlBuffer = [];
+Line 3412:             
+Line 3413:             if (currentPage === 1) {
+Line 3414:                 renderedCount = 0;
+Line 3415:             }
+Line 3416:             
+Line 3417:             pageItems.forEach((item, idx) => {
+Line 3418:                 // 매 4번째 위치에 광고 카드 동적 주입
+Line 3419:                 if (renderedCount > 0 && renderedCount % 4 === 3) {
+Line 3420:                     const adHtml = renderAdCard(renderedCount);
+Line 3421:                     htmlBuffer.push(adHtml);
+Line 3422:                     renderedCount++;
+Line 3423:                 }
+Line 3424:                 renderedCount++;
+Line 3425:                 let sourceBadge = "";
+Line 3426:                 
+Line 3427:                 // 부동산 vs 동산(비부동산) 판별
+Line 3428:                 const nonBuildingKeywords = ['차량', '자동차', '중기', '선박', '항공기', '운송', '지게차', '장비', '기계', '기구', '설비', '유가증권', '증권', '주식', '채권', '기타물품', '물품', '동산'];
+Line 3429:                 const isNonBuilding = item.source.endsWith('_etc') || nonBuildingKeywords.some(k => (item.ptype || "").includes(k));
+Line 3430:                 const assetTypeBadge = isNonBuilding 
+Line 3431:                     ? `<span class="bg-purple-50 text-purple-700 border border-purple-200 text-[11px] font-black px-1.5 py-0.5 rounded-md flex-shrink-0">📦 동산</span>`
+Line 3432:                     : `<span class="bg-amber-50 text-amber-700 border border-amber-200 text-[11px] font-black px-1.5 py-0.5 rounded-md flex-shrink-0">🏠 부동산</span>`;
+Line 3433: 
+Line 3434:                 if (item.source === 'court' || item.source === 'court_etc') {
+Line 3435:                     sourceBadge = `<span class="bg-blue-50 text-royalBlue border border-blue-100 text-[11.5px] font-black px-1.5 py-0.5 rounded-md flex-shrink-0">⚖️ 경매</span>`;
+Line 3436:                 } else if (item.source === 'onbid' || item.source === 'onbid_etc') {
+Line 3437:                     sourceBadge = `<span class="bg-emerald-50 text-emeraldSuccess border border-emerald-100 text-[11.5px] font-black px-1.5 py-0.5 rounded-md flex-shrink-0">🏢 공매</span>`;
+Line 3438:                 } else {
+Line 3439:                     sourceBadge = `<span class="bg-slate-100 text-slate-600 border border-slate-200 text-[11.5px] font-black px-1.5 py-0.5 rounded-md flex-shrink-0">📁 사설</span>`;
+Line 3440:                 }
+Line 3441:                 
+Line 3442:                 let gradeClass = "bg-slate-500 text-white shadow-sm";
+Line 3443:                 let cardBg = "bg-white border-slate-200";
+Line 3444:                 let hoverBorder = "hover:border-royalBlue/30 hover:shadow-lg hover:shadow-blue-500/5";
+Line 3445:                 let warningBadge = "";
+Line 3446:                 let riskTitleClass = "text-slate-900";
+Line 3447:                 
+Line 3448:                 if (item.grade === 'A') {
+Line 3449:                     gradeClass = "bg-[#10b981] text-white";
+Line 3450:                 } else if (item.grade === 'B') {
+Line 3451:                     gradeClass = "bg-royalBlue text-white";
+Line 3452:                 } else if (item.grade === 'X') {
+Line 3453:                     gradeClass = "bg-rose-500 text-white animate-pulse shadow-sm";
+Line 3454:                     cardBg = "bg-rose-50/15 border-rose-200";
+Line 3455:                     hoverBorder = "hover:border-rose-300 hover:shadow-lg hover:shadow-rose-500/5";
+Line 3456:                     warningBadge = `<span class="bg-rose-100 text-rose-700 text-[11px] px-1.5 py-0.5 rounded-md font-black border border-rose-200 animate-bounce inline-flex items-center gap-0.5"><i class="fa-solid fa-triangle-exclamation text-[10px]"></i>위험</span>`;
+Line 3457:                     riskTitleClass = "text-rose-950";
+Line 3458:                 }
+Line 3459:  
+Line 3460:                 const isSelected = selectedProperty && selectedProperty.id === item.id;
+Line 3461:                 const activeBorderClass = isSelected ? "border-royalBlue ring-2 ring-royalBlue/10 shadow-md bg-blue-50/10" : "";
+Line 3462:                 
+Line 3463:                 // 디데이 라벨
+Line 3464:                 let ddayText = `D-${item.remaining_days}`;
+Line 3465:                 let ddayClass = "bg-rose-50 text-rose-700 border border-rose-200";
+Line 3466:                 if (item.remaining_days < 0) {
+Line 3467:                     ddayText = "기일 마감";
+Line 3468:                     ddayClass = "bg-slate-100 text-slate-400 border border-slate-200";
+Line 3469:                 } else if (item.remaining_days === 0) {
+Line 3470:                     ddayText = "★ 금일 입찰";
+Line 3471:                     ddayClass = "bg-amber-100 text-amber-700 border border-amber-200 animate-pulse font-black";
+Line 3472:                 }
+Line 3473:  
+Line 3474:                 // 유찰 및 저감율 연산 호출
+Line 3475:                 const est = estimateAuctionRounds(item.appraised_value, item.minimum_bid, item.source);
+Line 3476:  
+Line 3477:                 const delay = (idx % 10) * 40;
+Line 3478:                 const cardHtml = `
+Line 3479:                     <div onclick="selectProperty(${item.id})" onmouseover="handleRowHover(${item.id})" id="card-${item.id}"
+Line 3480:                          class="${cardBg} ${hoverBorder} ${activeBorderClass} fade-in-up border rounded-2xl p-3 flex flex-col justify-between cursor-pointer transition-all duration-300 transform hover:-translate-y-1 select-none"
+Line 3481:                          style="animation-delay: ${delay}ms;">
+Line 3482:                         
+Line 3483:                         <!-- Top Badges Row -->
+Line 3484:                         <div class="flex justify-between items-center flex-wrap gap-y-1.5 mb-2">
+Line 3485:                             <div class="flex flex-wrap gap-1.5 items-center">
+Line 3486:                                 <!-- 관심 등록 별표 버튼 -->
+Line 3487:                                 <button id="star-btn-${item.id}" onclick="toggleFavoriteProperty(${item.id}, event)" class="p-1 hover:scale-110 active:scale-95 transition-all select-none mr-0.5" title="관심 등록 토글">
+Line 3488:                                     ${favoritePropertyIds.has(item.id) 
+Line 3489:                                         ? `<i class="fa-solid fa-star text-amber-400 text-[13px]"></i>` 
+Line 3490:                                         : `<i class="fa-regular fa-star text-slate-400 text-[13px]"></i>`}
+Line 3491:                                 </button>
+Line 3492:                                 ${sourceBadge}
+Line 3493:                                 ${assetTypeBadge}
+Line 3494:                                 <span class="${ddayClass} text-[10px] sm:text-[11.5px] font-black px-1 py-0.5 sm:px-1.5 rounded-md">${ddayText}</span>
+Line 3495:                             </div>
+Line 3496:                             <div class="flex gap-1 items-center">
+Line 3497:                                 ${item.grade === 'X' ? warningBadge : ''}
+Line 3498:                                 <span class="${gradeClass} text-[10px] sm:text-[11.5px] font-black px-1 py-0.5 sm:px-1.5 rounded-md shadow-sm min-w-[30px] sm:min-w-[34px] text-center">${item.grade}등급</span>
+Line 3499:                             </div>
+Line 3500:                         </div>
+Line 3501: 
+Line 3502:                         <!-- Mid Content: Address & Info -->
+Line 3503:                         <div class="space-y-1 flex-1 flex flex-col justify-between">
+Line 3504:                             <div>
+Line 3505:                                 <h4 class="${riskTitleClass} font-extrabold text-sm leading-normal line-clamp-2 min-h-[32px] tracking-tight hover:text-royalBlue transition-colors" title="${item.address}">
+Line 3506:                                     ${item.address}
+Line 3507:                                 </h4>
+Line 3508:                                 <div class="text-[12px] text-slate-400 font-bold mt-1 flex justify-between items-center">
+Line 3509:                                     <span class="truncate max-w-[120px] text-slate-400">${item.ptype}</span>
+Line 3510:                                     <span class="font-mono text-slate-500 font-bold bg-slate-100 border border-slate-200 px-1 py-0.2 rounded text-[11px]">${item.auction_no}</span>
+Line 3511:                                 </div>
+Line 3512:                             </div>
+Line 3513: 
+Line 3514:                             <!-- Financial Details -->
+Line 3515:                             <div class="mt-2.5 pt-2.5 border-t border-slate-100 space-y-1">
+Line 3516:                                 <div class="flex items-center justify-between">
+Line 3517:                                     <span class="text-[11.5px] text-slate-400 font-bold">최저 매각가</span>
+Line 3518:                                     <span class="text-rose-600 font-black text-sm font-outfit tracking-wide">${formatKRW(item.minimum_bid)}</span>
+Line 3519:                                 </div>
+Line 3520:                                 <div class="flex justify-between text-[11.5px] text-slate-400 font-medium">
+Line 3521:                                     <span>감정가</span>
+Line 3522:                                     <span class="font-mono font-semibold text-slate-600">${formatKRW(item.appraised_value)}</span>
+Line 3523:                                 </div>

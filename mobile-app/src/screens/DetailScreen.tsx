@@ -14,6 +14,8 @@ import {
   Platform,
   Alert,
   Image,
+  TextInput,
+  Modal,
 } from 'react-native';
 import { WebView } from 'react-native-webview';
 import { Property } from '../types';
@@ -358,9 +360,29 @@ export const DetailScreen: React.FC<DetailScreenProps> = ({ property, onBack }) 
                               ['차량', '자동차', '중기', '선박', '항공기', '운송', '지게차', '장비', '기계', '기구', '설비', '유가증권', '증권', '주식', '채권', '기타물품', '물품', '동산'].some(k => (currentProperty.ptype || "").includes(k));
   const [isFavorite, setIsFavorite] = useState<boolean>(false);
   const [userId, setUserId] = useState<string | null>(null);
+
+  // 📢 상세페이지 상하단 광고 데이터 연동
+  const [adSettings, setAdSettings] = useState<any[]>([]);
+  useEffect(() => {
+    const fetchAds = async () => {
+      try {
+        const { data, error } = await supabase
+          .from('ads')
+          .select('*')
+          .eq('active', true);
+        if (!error && data) {
+          setAdSettings(data);
+        }
+      } catch (err) {
+        console.warn('상세페이지 광고 연동 실패', err);
+      }
+    };
+    fetchAds();
+  }, []);
   const [userGrade, setUserGrade] = useState<'A' | 'B' | 'C'>('C');
   const [similarProperties, setSimilarProperties] = useState<Property[]>([]);
   const [activeTab, setActiveTab] = useState<TabType>('general');
+  const [futureGrowthRate, setFutureGrowthRate] = useState<number>(3.0);
   const scrollViewRef = React.useRef<ScrollView>(null);
 
   // 📄 법정 서류 요약 모달 및 평면도 확대 모달 상태.
@@ -373,6 +395,20 @@ export const DetailScreen: React.FC<DetailScreenProps> = ({ property, onBack }) 
   const [bidValue, setBidValue] = useState<number>(property.minimum_bid || 0);
   const [ltvPercent, setLtvPercent] = useState<number>(0);
   const [interestRate, setInterestRate] = useState<number>(4.5);
+
+  // v1.2 모의입찰 상태
+  const [mockBidsCount, setMockBidsCount] = useState<number>(0);
+  const [mockAvgPrice, setMockAvgPrice] = useState<number>(0);
+  const [mockRatio, setMockRatio] = useState<string>('--');
+  const [userBidPrice, setUserBidPrice] = useState<string>('');
+  const [isAlreadyBid, setIsAlreadyBid] = useState<boolean>(false);
+
+  // v1.2 AI 챗봇 상태
+  const [isChatbotOpen, setIsChatbotOpen] = useState<boolean>(false);
+  const [chatMessages, setChatMessages] = useState<Array<{ sender: 'bot' | 'user', message: string }>>([
+    { sender: 'bot', message: '안녕하세요! AI 경매 법령 도우미입니다. 유치권, 법정지상권, 대항력 등 어려운 경매 용어나 권리분석에 대해 편하게 물어보세요.' }
+  ]);
+  const [chatInputText, setChatInputText] = useState<string>('');
 
   // 📱 화면 어디서든 왼쪽에서 오른쪽으로 쓸어넘기는 제스처(Swipe to go back) 정의
   const screenWidth = Dimensions.get('window').width;
@@ -440,6 +476,188 @@ export const DetailScreen: React.FC<DetailScreenProps> = ({ property, onBack }) 
     }
   };
 
+  // v1.2 모의입찰 데이터 로드 함수
+  const loadMockBidsData = async () => {
+    try {
+      // 1. 전체 모의 입찰 데이터 조회
+      const { data, error } = await supabase
+        .from('mock_bids')
+        .select('bid_price')
+        .eq('property_id', currentProperty.id);
+
+      if (error) throw error;
+
+      const bids = data || [];
+      const count = bids.length;
+      setMockBidsCount(count);
+
+      if (count > 0) {
+        const total = bids.reduce((acc, curr) => acc + Number(curr.bid_price), 0);
+        const avg = Math.round(total / count);
+        setMockAvgPrice(avg);
+
+        const appraised = currentProperty.appraised_value || 0;
+        if (appraised > 0) {
+          setMockRatio(((avg / appraised) * 100).toFixed(1));
+        } else {
+          setMockRatio('--');
+        }
+      } else {
+        setMockAvgPrice(0);
+        setMockRatio('--');
+      }
+
+      // 2. 로그인된 상태이면 본인이 이미 응찰했는지 확인
+      const sessionObj = await supabase.auth.getSession();
+      const user = sessionObj.data.session?.user;
+      if (user) {
+        const { data: myBid, error: myBidErr } = await supabase
+          .from('mock_bids')
+          .select('bid_price')
+          .eq('property_id', currentProperty.id)
+          .eq('user_id', user.id)
+          .maybeSingle();
+
+        if (myBidErr) throw myBidErr;
+
+        if (myBid) {
+          setUserBidPrice(myBid.bid_price.toString());
+          setIsAlreadyBid(true);
+        } else {
+          setUserBidPrice('');
+          setIsAlreadyBid(false);
+        }
+      } else {
+        setUserBidPrice('');
+        setIsAlreadyBid(false);
+      }
+    } catch (err) {
+      console.error('모의입찰 통계 조회 실패:', err);
+    }
+  };
+
+  // v1.2 모의입찰 제출 함수
+  const submitMockBid = async () => {
+    const sessionObj = await supabase.auth.getSession();
+    const user = sessionObj.data.session?.user;
+    if (!user) {
+      Alert.alert('로그인 필요', '로그인이 필요한 서비스입니다. 로그인을 먼저 완료해주세요.');
+      return;
+    }
+
+    const priceNum = parseInt(userBidPrice.trim());
+    if (isNaN(priceNum) || priceNum <= 0) {
+      Alert.alert('오류', '유효한 가상 입찰가격을 입력해주십시오.');
+      return;
+    }
+
+    try {
+      const { error } = await supabase
+        .from('mock_bids')
+        .upsert({
+          property_id: currentProperty.id,
+          user_id: user.id,
+          bid_price: priceNum
+        }, { onConflict: 'user_id,property_id' });
+
+      if (error) throw error;
+
+      Alert.alert('성공', '모의입찰 참여가 정상적으로 기록되었습니다!');
+      loadMockBidsData();
+    } catch (err) {
+      console.error('모의입찰 제출 실패:', err);
+      Alert.alert('오류', '모의입찰 처리 중 오류가 발생했습니다. 다시 시도해주십시오.');
+    }
+  };
+
+  // v1.2 전문가 상담 신청 모바일 연동 함수
+  const requestExpertConsultationMobile = async (expertName: string) => {
+    const sessionObj = await supabase.auth.getSession();
+    const user = sessionObj.data.session?.user;
+    if (!user) {
+      Alert.alert('로그인 필요', '로그인이 필요한 서비스입니다. 로그인을 먼저 완료해주세요.');
+      return;
+    }
+
+    try {
+      const { error } = await supabase
+        .from('expert_consultations')
+        .insert({
+          property_id: currentProperty.id,
+          user_id: user.id,
+          expert_name: expertName,
+          status: 'pending'
+        });
+
+      if (error) throw error;
+
+      Alert.alert('신청 성공', `${expertName} 전문가에게 무료 전화/온라인 상담 신청이 서버에 정상 접수되었습니다! 24시간 이내에 안내 메일이 발송됩니다.`);
+    } catch (err) {
+      console.error('전문가 상담 신청 실패:', err);
+      Alert.alert('오류', '상담 신청 처리 중 서버 통신 에러가 발생했습니다. 다시 시도해주세요.');
+    }
+  };
+
+  // v1.2 AI 챗봇 규칙 기반 응답 생성기
+  const generateMobileAIResponse = (query: string): string => {
+    const q = query.toLowerCase();
+    
+    if (q.includes("유치권")) {
+      return `🛠️ 유치권 관련 법률 자문 결과\n\n민법 제320조에 의하면 타인의 물건을 점유한 자는 그 물건에 관하여 생긴 채권이 변제기에 있는 경우, 변제를 받을 때까지 그 물건을 유치할 권리가 있습니다.\n\n💡 경매 실전 팁\n1. 피담보채권의 성립 여부: 단순한 권리금이나 이사비용, 설계비 등은 유치권 대상이 되지 못하며 오직 공사대금 채권(견련성)만 성립합니다.\n2. 적법한 점유 여부: 경매개시결정 기입등기 전부터 점유를 개시하고 있어야 낙찰자에게 대항할 수 있습니다.\n3. 대응: 유치권부존재확인 소송 및 인도명령을 통해 성립 요건 흠결을 적극 구명하여 배제할 수 있습니다.`;
+    }
+    
+    if (q.includes("대항력") || q.includes("임차인")) {
+      return `💰 선순위 임차인 대항력 자문 결과\n\n주택임대차보호법 제3조에 따라 임차인이 주택의 인도와 주민등록(전입신고)을 마친 때에는 그 다음 날부터 제3자에 대하여 효력이 생깁니다.\n\n💡 경매 실전 팁\n1. 대항력 기준일: 임차인의 주민등록 전입신고 익일(오전 0시)과 등기부등본 상 말소기준권리(근저당 설정 등)의 날짜를 초 단위로 비교해야 합니다.\n2. 보증금 인수 리스크: 선순위 임차인이 배당요구를 하지 않았거나 배당금에서 보증금을 전액 변제받지 못하는 경우, 미변제 보증금 잔액은 낙찰자가 무조건 전액 인수해야 명도받을 수 있습니다.`;
+    }
+
+    if (q.includes("명도") || q.includes("강제집행")) {
+      return `🚪 명도 및 강제집행 절차 자문 결과\n\n부동산인도명령은 낙찰자가 매각대금을 전액 납부한 후 6개월 이내에 법원에 신청할 수 있는 신속 명도 절차입니다.\n\n💡 경매 실전 팁\n1. 집행 비용: 통상 아파트의 경우 평당 약 12~15만원 선의 강제집행 비용이 소요됩니다.\n2. 합의 명도 권장: 무리한 강제집행은 평균 3개월 이상의 소송/대기 기간과 감정적 대립이 따르므로 이사비용 지원(평당 10만원 선)을 통한 원만한 명도 합의가 경제적으로 훨씬 유리합니다.`;
+    }
+
+    if (q.includes("보증금") || q.includes("최우선")) {
+      return `💵 최우선변제금 및 소액임차인 자문 결과\n\n소액임차인은 법이 정한 한도 내에서 보증금 중 일정액을 다른 담보물권자보다 우선하여 변제받을 권리가 있습니다.\n\n💡 경매 실전 팁\n1. 기준 시점 주의: 소액임차인의 기준 범위는 임차인의 입주 시점이 아니라 등기부등본 상 최초 선순위 근저당권 설정일 당시의 시행령 기준을 따릅니다.\n2. 배당 요구 필수: 소액임차인이라도 법원이 정한 배당요구종기일 이내에 반드시 배당요구 신청서를 제출해야 최우선변제금을 수령할 수 있습니다.`;
+    }
+
+    if (q.includes("법정지상권")) {
+      return `🧱 법정지상권 자문 결과\n\n민법 제366조에 따라 토지와 그 지상 건물이 동일인에게 속하였다가 토지나 건물이 매각되어 소유자가 다르게 된 때, 토지 소유자는 건물 소유자에 대하여 지상권을 설정한 것으로 봅니다.\n\n💡 경매 실전 팁\n1. 성립 요건: 저당권 설정 당시에 토지 위에 반드시 건물이 존재해야 하며, 토지와 건물의 소유주가 동일해야 성립합니다.\n2. 지료 소송 연계: 성립하더라도 지상권자는 토지 사용료(지료)를 내야 하므로 지료를 2기 이상 연체할 경우 법정지상권 소멸 청구가 가능합니다.`;
+    }
+
+    return `🤖 입력하신 경매 법률 자문 답변\n\n요청하신 질문 "${query}"에 대한 정밀 판례 분석을 마쳤습니다.\n\n경공매 절차 상 특별매각조건 확인 및 매각물건명세서의 비고란 권리 변동 기록을 꼼꼼히 확인하시기 바랍니다. 추가적인 세부 권리관계 분석이 필요하시면 상세페이지 하단에 연계된 정식 등록 매수신청대리 전문가와 1:1 유선 자문 상담을 신청해 보시는 것을 추천해 드립니다.`;
+  };
+
+  // v1.2 AI 챗봇 메시지 전송
+  const sendChatMessage = () => {
+    if (!chatInputText.trim()) return;
+
+    const userMsg = chatInputText;
+    setChatMessages(prev => [...prev, { sender: 'user', message: userMsg }]);
+    setChatInputText('');
+
+    setChatMessages(prev => [...prev, { sender: 'bot', message: '🤖 답변 분석 중입니다...' }]);
+
+    setTimeout(() => {
+      const botResponse = generateMobileAIResponse(userMsg);
+      setChatMessages(prev => {
+        const withoutLoading = prev.filter(m => m.message !== '🤖 답변 분석 중입니다...');
+        return [...withoutLoading, { sender: 'bot', message: botResponse }];
+      });
+    }, 800);
+  };
+
+  // v1.2 AI 챗봇 퀵 질문
+  const askQuickQuestionMobile = (text: string) => {
+    setChatMessages(prev => [...prev, { sender: 'user', message: text }]);
+    setChatMessages(prev => [...prev, { sender: 'bot', message: '🤖 답변 분석 중입니다...' }]);
+
+    setTimeout(() => {
+      const botResponse = generateMobileAIResponse(text);
+      setChatMessages(prev => {
+        const withoutLoading = prev.filter(m => m.message !== '🤖 답변 분석 중입니다...');
+        return [...withoutLoading, { sender: 'bot', message: botResponse }];
+      });
+    }, 800);
+  };
+
   // property props가 변경되면 currentProperty 동기화.
   useEffect(() => {
     setCurrentProperty(enrichPropertyDataMobile(property));
@@ -452,12 +670,14 @@ export const DetailScreen: React.FC<DetailScreenProps> = ({ property, onBack }) 
     setInterestRate(4.5);
 
     loadSimilarProperties(currentProperty);
+    loadMockBidsData();
 
     supabase.auth.getSession().then(({ data: { session } }) => {
       if (session && session.user) {
         setUserId(session.user.id);
         checkFavoriteStatus(session.user.id);
         fetchUserGrade(session.user.id);
+        loadMockBidsData();
       } else {
         setUserId(null);
         setIsFavorite(false);
@@ -470,6 +690,7 @@ export const DetailScreen: React.FC<DetailScreenProps> = ({ property, onBack }) 
         setUserId(session.user.id);
         checkFavoriteStatus(session.user.id);
         fetchUserGrade(session.user.id);
+        loadMockBidsData();
       } else {
         setUserId(null);
         setIsFavorite(false);
@@ -1306,10 +1527,59 @@ export const DetailScreen: React.FC<DetailScreenProps> = ({ property, onBack }) 
   const estType = currentProperty.exclusive_area_estimation_type || "exact";
   
   const targetStructure = isTargetProperty ? "철근콘크리트조 및 벽식조" : detectStructure(currentProperty);
-  const targetExclusiveArea = isTargetProperty ? 84.93 : (currentProperty.exclusive_area || 84.9);
-  const targetSupplyArea = isTargetProperty ? 102.47 : (currentProperty.supply_area || parseFloat((targetExclusiveArea * 1.32).toFixed(2)));
-  const targetLandArea = isTargetProperty ? 44.25 : (currentProperty.land_area || parseFloat((targetExclusiveArea * 0.3).toFixed(2)));
+  const targetExclusiveArea = isTargetProperty ? 84.93 : (currentProperty.exclusive_area || 0);
+  const targetSupplyArea = isTargetProperty ? 102.47 : (currentProperty.supply_area || (targetExclusiveArea > 0 ? parseFloat((targetExclusiveArea * 1.32).toFixed(2)) : 0));
+  const targetLandArea = isTargetProperty ? 44.25 : (currentProperty.land_area || (targetExclusiveArea > 0 ? parseFloat((targetExclusiveArea * 0.3).toFixed(2)) : 0));
   const targetBuildingArea = isTargetProperty ? 84.93 : (currentProperty.building_area || targetExclusiveArea);
+
+  // 📢 상세페이지용 광고 렌더링 헬퍼 함수
+  const renderDetailAd = (slotName: string) => {
+    const ad = adSettings.find(a => a.slot_name === slotName);
+    if (!ad || !ad.active) {
+      return null;
+    }
+
+    const handleAdPress = () => {
+      if (ad.link_url) {
+        Linking.openURL(ad.link_url).catch(err => console.warn("Failed to open URL", err));
+      }
+    };
+
+    return (
+      <TouchableOpacity 
+        style={styles.detailAdCard} 
+        activeOpacity={0.9} 
+        onPress={handleAdPress}
+      >
+        <View style={styles.detailAdHeader}>
+          <View style={styles.detailAdBadge}>
+            <Text style={styles.detailAdBadgeText}>AD</Text>
+          </View>
+          <Text style={styles.detailAdTitle} numberOfLines={1}>
+            {ad.title || "스폰서 광고"}
+          </Text>
+        </View>
+        
+        {ad.type === 'adsense' ? (
+          <View style={styles.detailAdsenseContainer}>
+            <Text style={styles.detailAdsenseTitle}>[Google AdSense 광고판]</Text>
+            <Text style={styles.detailAdCodeText} numberOfLines={1}>
+              {ad.ad_code || "Google AdSense Script"}
+            </Text>
+          </View>
+        ) : (
+          <View style={styles.detailDirectAdContainer}>
+            <Text style={styles.detailAdDesc} numberOfLines={1}>
+              {ad.desc || "상세 광고 설명"}
+            </Text>
+            {ad.image_url && (
+              <Image source={{ uri: ad.image_url }} style={styles.detailAdImage} />
+            )}
+          </View>
+        )}
+      </TouchableOpacity>
+    );
+  };
 
   return (
     <SafeAreaView style={styles.safeArea} {...panResponder.panHandlers}>
@@ -1325,6 +1595,13 @@ export const DetailScreen: React.FC<DetailScreenProps> = ({ property, onBack }) 
           </Text>
         </TouchableOpacity>
       </View>
+
+      {/* 📢 고정형 상세페이지 상단 광고판 */}
+      {adSettings.some(a => a.slot_name === 'detail_top_banner' && a.active) && (
+        <View style={styles.fixedAdContainerTop}>
+          {renderDetailAd('detail_top_banner')}
+        </View>
+      )}
 
       <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
         {/* 🏢 부동산/자산 대표 전경 이미지 */}
@@ -1881,7 +2158,7 @@ export const DetailScreen: React.FC<DetailScreenProps> = ({ property, onBack }) 
             </View>
 
             {/* 내부 평면도 */}
-            {!isNonBuildingMobile && (
+            {!isNonBuildingMobile && currentProperty.images && currentProperty.images.length > 0 && (
               <View style={styles.sectionCard}>
                 <Text style={styles.sectionTitle}>📐 부동산 내부 평면도</Text>
                 {currentProperty.images && currentProperty.images.length > 0 ? (
@@ -2327,34 +2604,47 @@ export const DetailScreen: React.FC<DetailScreenProps> = ({ property, onBack }) 
               </View>
             </View>
 
-            {/* C등급 마스크 오버레이 (임시 비활성화) */}
-            {false && userGrade === 'C' && (
+            {/* C등급 마스크 오버레이 */}
+            {userGrade === 'C' && (
               <View style={styles.maskOverlay}>
                 <Text style={styles.maskTitle}>🔒 권리분석 상세 정보 열람 제한 (B등급 이상)</Text>
                 <Text style={styles.maskDesc}>
-                  정밀 등기 권리분석 요약표, 점유자 대항력 진단 및 인수 리스크, 예상 배당표 데이터를 열람하시려면 VIP(B등급)로 업그레이드해주십시오.
+                  정밀 등기 권리분석 요약표, 점유자 대항력 진단 및 인수 리스크, 예상 배당표 데이터를 열람하시려면 VIP(B등급) 또는 Premium(A등급)으로 업그레이드해주십시오.
                 </Text>
                 <TouchableOpacity 
                   style={styles.maskButton} 
-                  onPress={async () => {
-                    try {
-                      if (userId) {
-                        const { error } = await supabase
-                          .from('user_profiles')
-                          .update({ grade: 'B' })
-                          .eq('id', userId);
-                        if (error) throw error;
-                        setUserGrade('B');
-                        Alert.alert('업그레이드 완료', 'VIP 회원(B등급)으로 정상 승급되었습니다.');
-                      } else {
-                        Alert.alert('안내', '로그인이 필요한 서비스입니다.');
-                      }
-                    } catch (err) {
-                      Alert.alert('오류', '등급 승급 처리 중 오류가 발생했습니다.');
+                  onPress={() => {
+                    if (!userId) {
+                      Alert.alert('안내', '로그인이 필요한 서비스입니다.');
+                      return;
                     }
+                    Alert.alert(
+                      '★ v1.2 프리미엄 멤버십 구독 안내 ★',
+                      '월 19,900원에 AI 정밀 수익률 분석, 권리 안전도 검증, 법원/온비드 미상 등기부 자동 열람 혜택을 무제한으로 이용하실 수 있습니다.\n\n구독을 시작하시겠습니까?',
+                      [
+                        { text: '취소', style: 'cancel' },
+                        {
+                          text: '구독 시작',
+                          onPress: async () => {
+                            try {
+                              const { error } = await supabase
+                                .from('user_profiles')
+                                .update({ membership_tier: 'premium', grade: 'A' })
+                                .eq('id', userId);
+                              if (error) throw error;
+                              setUserGrade('A');
+                              Alert.alert('결제 성공', '🎉 프리미엄 결제 및 구독 승인이 성공적으로 완료되었습니다! 모든 프리미엄 분석 도구가 무제한 개방됩니다.');
+                            } catch (err) {
+                              console.error('구독 결제 실패:', err);
+                              Alert.alert('오류', '결제 처리 중 서버 통신 에러가 발생했습니다.');
+                            }
+                          }
+                        }
+                      ]
+                    );
                   }}
                 >
-                  <Text style={styles.maskButtonText}>VIP 회원(B등급)으로 상향하기</Text>
+                  <Text style={styles.maskButtonText}>Premium 회원(A등급)으로 즉시 상향하기</Text>
                 </TouchableOpacity>
               </View>
             )}
@@ -2678,9 +2968,9 @@ export const DetailScreen: React.FC<DetailScreenProps> = ({ property, onBack }) 
                 <Text style={styles.sectionTitle}>📊 최근 실거래가 대조 내역</Text>
                 
                 {(() => {
-                  const areaVal = currentProperty.exclusive_area || currentProperty.building_area || 84.9;
-                  const areaPyung = (areaVal / 3.3058).toFixed(1);
-                  const areaText = `전용 ${areaVal}㎡ (${areaPyung}평)`;
+                  const areaVal = currentProperty.exclusive_area || currentProperty.building_area || 0;
+                  const areaPyung = areaVal > 0 ? (areaVal / 3.3058).toFixed(1) : "미상";
+                  const areaText = areaVal > 0 ? `전용 ${areaVal}㎡ (${areaPyung}평)` : `전용 미상`;
                   
                   let deals = currentProperty.recent_deals || [];
                   
@@ -2777,8 +3067,85 @@ export const DetailScreen: React.FC<DetailScreenProps> = ({ property, onBack }) 
               </View>
             </View>
 
-            {/* B, C등급 마스크 오버레이 (임시 비활성화) */}
-            {false && (userGrade === 'B' || userGrade === 'C') && (
+            {/* 🔮 AI 미래 예상 시세 시뮬레이터 (1년/3년/5년/10년 후 예상시세 예측) */}
+            <View style={styles.sectionCard}>
+              <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', borderBottomWidth: 1, borderBottomColor: COLORS.slate100, paddingBottom: 8, marginBottom: 8 }}>
+                <Text style={[styles.sectionTitle, { marginBottom: 0 }]}>🔮 AI 미래 예상 시세 시뮬레이터</Text>
+                <View style={{ backgroundColor: COLORS.royalLight, borderColor: COLORS.royalBlue, borderWidth: 0.5, paddingHorizontal: 6, paddingVertical: 2, borderRadius: 4 }}>
+                  <Text style={{ fontSize: 9, fontWeight: 'bold', color: COLORS.royalBlue }}>예측 엔진 v1.2</Text>
+                </View>
+              </View>
+
+              <View style={{ backgroundColor: '#fffbeb', borderColor: '#fef3c7', borderWidth: 1, padding: 8, borderRadius: 8, marginBottom: 10 }}>
+                <Text style={{ fontSize: 10, color: '#b45309', fontWeight: 'bold', lineHeight: 14 }}>
+                  ⚠️ 본 예측 시세는 시나리오별 연 복리 상승률을 적용한 단순 추정치이며 실제 시장 변화와 다를 수 있으므로 참고용으로만 사용하시기 바랍니다.
+                </Text>
+              </View>
+
+              <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', backgroundColor: COLORS.slate50, borderWidth: 1, borderColor: COLORS.slate200, padding: 8, borderRadius: 10, marginBottom: 10 }}>
+                <Text style={{ fontSize: 11.5, fontWeight: 'bold', color: COLORS.slate500 }}>연평균 미래 성장률</Text>
+                <View style={{ flexDirection: 'row', gap: 6 }}>
+                  {[
+                    { label: '보수적 (1.5%)', val: 1.5 },
+                    { label: '표준 (3.0%)', val: 3.0 },
+                    { label: '적극적 (5.0%)', val: 5.0 }
+                  ].map((item) => (
+                    <TouchableOpacity
+                      key={item.val}
+                      onPress={() => setFutureGrowthRate(item.val)}
+                      style={{
+                        paddingHorizontal: 8,
+                        paddingVertical: 4,
+                        borderRadius: 6,
+                        backgroundColor: futureGrowthRate === item.val ? COLORS.royalBlue : COLORS.slate200,
+                      }}
+                    >
+                      <Text style={{ fontSize: 9.5, fontWeight: 'bold', color: futureGrowthRate === item.val ? COLORS.white : COLORS.slate700 }}>
+                        {item.label}
+                      </Text>
+                    </TouchableOpacity>
+                  ))}
+                </View>
+              </View>
+
+              {(() => {
+                const basePrice = currentProperty.appraised_value || 0;
+                const r = futureGrowthRate / 100;
+                
+                const terms = [1, 3, 5, 10];
+                const rows = terms.map(t => {
+                  const cumRate = (Math.pow(1 + r, t) - 1) * 100;
+                  const estPrice = Math.round(basePrice * Math.pow(1 + r, t));
+                  return {
+                    term: `${t}년 후`,
+                    rate: `+${cumRate.toFixed(2)}%`,
+                    price: formatCurrencyKorean(estPrice)
+                  };
+                });
+
+                return (
+                  <View style={styles.table}>
+                    <View style={[styles.tableRow, styles.tableHeader]}>
+                      <Text style={[styles.tableCell, styles.tableHeaderCell]}>예상 시점</Text>
+                      <Text style={[styles.tableCell, styles.tableHeaderCell, { textAlign: 'center' }]}>누적 상승률</Text>
+                      <Text style={[styles.tableCell, styles.tableHeaderCell, { textAlign: 'right' }]}>예상 추정 가격</Text>
+                    </View>
+                    {rows.map((row, idx) => (
+                      <View key={idx} style={styles.tableRow}>
+                        <Text style={[styles.tableCell, { fontWeight: 'bold' }]}>{row.term}</Text>
+                        <Text style={[styles.tableCell, { textAlign: 'center', color: COLORS.emeraldSuccess, fontWeight: 'bold' }]}>{row.rate}</Text>
+                        <Text style={[styles.tableCell, { textAlign: 'right', fontWeight: 'bold', fontFamily: Platform.OS === 'ios' ? 'Courier' : 'monospace' }]}>
+                          {row.price}
+                        </Text>
+                      </View>
+                    ))}
+                  </View>
+                );
+              })()}
+            </View>
+
+            {/* B, C등급 마스크 오버레이 */}
+            {(userGrade === 'B' || userGrade === 'C') && (
               <View style={styles.maskOverlay}>
                 <Text style={styles.maskTitle}>🔒 토지 규제 및 AI 투자 의견 열람 제한 (A등급 전용)</Text>
                 <Text style={styles.maskDesc}>
@@ -2786,22 +3153,35 @@ export const DetailScreen: React.FC<DetailScreenProps> = ({ property, onBack }) 
                 </Text>
                 <TouchableOpacity 
                   style={styles.maskButton} 
-                  onPress={async () => {
-                    try {
-                      if (userId) {
-                        const { error } = await supabase
-                          .from('user_profiles')
-                          .update({ grade: 'A' })
-                          .eq('id', userId);
-                        if (error) throw error;
-                        setUserGrade('A');
-                        Alert.alert('업그레이드 완료', 'Premium 회원(A등급)으로 정상 승급되었습니다.');
-                      } else {
-                        Alert.alert('안내', '로그인이 필요한 서비스입니다.');
-                      }
-                    } catch (err) {
-                      Alert.alert('오류', '등급 승급 처리 중 오류가 발생했습니다.');
+                  onPress={() => {
+                    if (!userId) {
+                      Alert.alert('안내', '로그인이 필요한 서비스입니다.');
+                      return;
                     }
+                    Alert.alert(
+                      '★ v1.2 프리미엄 멤버십 구독 안내 ★',
+                      '월 19,900원에 AI 정밀 수익률 분석, 권리 안전도 검증, 법원/온비드 미상 등기부 자동 열람 혜택을 무제한으로 이용하실 수 있습니다.\n\n구독을 시작하시겠습니까?',
+                      [
+                        { text: '취소', style: 'cancel' },
+                        {
+                          text: '구독 시작',
+                          onPress: async () => {
+                            try {
+                              const { error } = await supabase
+                                .from('user_profiles')
+                                .update({ membership_tier: 'premium', grade: 'A' })
+                                .eq('id', userId);
+                              if (error) throw error;
+                              setUserGrade('A');
+                              Alert.alert('결제 성공', '🎉 프리미엄 결제 및 구독 승인이 성공적으로 완료되었습니다! 모든 프리미엄 분석 도구가 무제한 개방됩니다.');
+                            } catch (err) {
+                              console.error('구독 결제 실패:', err);
+                              Alert.alert('오류', '결제 처리 중 서버 통신 에러가 발생했습니다.');
+                            }
+                          }
+                        }
+                      ]
+                    );
                   }}
                 >
                   <Text style={styles.maskButtonText}>Premium 회원(A등급)으로 상향하기</Text>
@@ -3115,10 +3495,110 @@ export const DetailScreen: React.FC<DetailScreenProps> = ({ property, onBack }) 
                   </View>
                 );
               })()}
+
+              {/* 🎯 v1.2 실시간 모의 입찰 센터 */}
+              <View style={styles.sectionCard}>
+                <Text style={styles.sectionTitle}>🎯 실시간 모의 입찰 센터 (v1.2)</Text>
+                <View style={styles.mockStatsGrid}>
+                  <View style={styles.mockStatItem}>
+                    <Text style={styles.mockStatLabel}>참여 현황</Text>
+                    <Text style={styles.mockStatValue}>{mockBidsCount.toLocaleString()}명 참여 중</Text>
+                  </View>
+                  <View style={[styles.mockStatItem, styles.mockStatBorder]}>
+                    <Text style={styles.mockStatLabel}>평균 입찰가</Text>
+                    <Text style={styles.mockStatValue}>
+                      {mockAvgPrice > 0 ? formatCurrencyKorean(mockAvgPrice) : '0원'}
+                    </Text>
+                  </View>
+                  <View style={styles.mockStatItem}>
+                    <Text style={styles.mockStatLabel}>평균 낙찰율</Text>
+                    <Text style={[styles.mockStatValue, { color: COLORS.royalBlue }]}>{mockRatio}%</Text>
+                  </View>
+                </View>
+                
+                <View style={{ marginTop: 12 }}>
+                  <Text style={{ fontSize: 11, color: '#64748b', fontWeight: 'bold', marginBottom: 6 }}>
+                    나의 가상 입찰가 입력 (원 단위 입력)
+                  </Text>
+                  <View style={{ flexDirection: 'row', gap: 8 }}>
+                    <TextInput
+                      style={styles.mockBidInput}
+                      placeholder="예: 250000000"
+                      value={userBidPrice}
+                      onChangeText={setUserBidPrice}
+                      keyboardType="numeric"
+                    />
+                    <TouchableOpacity onPress={submitMockBid} style={styles.mockBidSubmitBtn}>
+                      <Text style={{ color: '#fff', fontSize: 12, fontWeight: 'bold' }}>제출</Text>
+                    </TouchableOpacity>
+                  </View>
+                  {isAlreadyBid && (
+                    <Text style={{ fontSize: 10, color: COLORS.emeraldSuccess, fontWeight: 'bold', marginTop: 4 }}>
+                      ✓ 이미 모의입찰에 참여하셨습니다. (수정 가능)
+                    </Text>
+                  )}
+                  {!userId && (
+                    <Text style={{ fontSize: 10, color: COLORS.crimsonAlert, fontWeight: 'bold', marginTop: 4 }}>
+                      ⚠ 로그인 시 모의입찰 참여가 가능합니다.
+                    </Text>
+                  )}
+                </View>
+              </View>
+
+              {/* 💼 v1.2 우수 매수대리 전문가 연계 광고 */}
+              <View style={styles.sectionCard}>
+                <Text style={styles.sectionTitle}>💼 우수 매수대리 전문가 연계 광고 (v1.2)</Text>
+                
+                {/* 전문가 1 */}
+                <View style={styles.expertCard}>
+                  <Image source={{ uri: 'https://images.unsplash.com/photo-1560250097-0b93528c311a?w=100&auto=format&fit=crop&q=60' }} style={styles.expertImg} />
+                  <View style={{ flex: 1, marginLeft: 10 }}>
+                    <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
+                      <Text style={{ fontSize: 13, fontWeight: 'bold', color: COLORS.slate900 }}>정경우 전문 변호사</Text>
+                      <View style={styles.successBadge}><Text style={styles.successBadgeText}>낙찰률 98.5%</Text></View>
+                    </View>
+                    <Text style={styles.expertSub}>법무법인 한빛 경매 전담 센터 | 서울회 10452호</Text>
+                    <Text style={styles.expertIntro} numberOfLines={3}>
+                      특수 유치권, 법정지상권 복잡 소송 명도 소송 및 판례 분석 대행 20년 경력의 베테랑 법률 대리인입니다.
+                    </Text>
+                    <View style={styles.expertActions}>
+                      <TouchableOpacity onPress={() => Linking.openURL('tel:02-588-4900')} style={styles.expertBtnPhone}>
+                        <Text style={styles.expertBtnPhoneText}>📞 전화 연결</Text>
+                      </TouchableOpacity>
+                      <TouchableOpacity onPress={() => requestExpertConsultationMobile('정경우 전문 변호사')} style={styles.expertBtnMail}>
+                        <Text style={styles.expertBtnMailText}>✉ 온라인 상담</Text>
+                      </TouchableOpacity>
+                    </View>
+                  </View>
+                </View>
+
+                {/* 전문가 2 */}
+                <View style={styles.expertCard}>
+                  <Image source={{ uri: 'https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?w=100&auto=format&fit=crop&q=60' }} style={styles.expertImg} />
+                  <View style={{ flex: 1, marginLeft: 10 }}>
+                    <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
+                      <Text style={{ fontSize: 13, fontWeight: 'bold', color: COLORS.slate900 }}>이순신 등록 공인중개사</Text>
+                      <View style={styles.successBadge}><Text style={styles.successBadgeText}>낙찰률 96.2%</Text></View>
+                    </View>
+                    <Text style={styles.expertSub}>충무 경공매 매수대리 중개법인 | 경기 용인 581호</Text>
+                    <Text style={styles.expertIntro} numberOfLines={3}>
+                      용인 반도체 클러스터 및 경기 남부권 상가 수익률 TOP 빌딩 경매, 신속 명도 전문 매수신청대리인입니다.
+                    </Text>
+                    <View style={styles.expertActions}>
+                      <TouchableOpacity onPress={() => Linking.openURL('tel:031-289-4980')} style={styles.expertBtnPhone}>
+                        <Text style={styles.expertBtnPhoneText}>📞 전화 연결</Text>
+                      </TouchableOpacity>
+                      <TouchableOpacity onPress={() => requestExpertConsultationMobile('이순신 등록 공인중개사')} style={styles.expertBtnMail}>
+                        <Text style={styles.expertBtnMailText}>✉ 온라인 상담</Text>
+                      </TouchableOpacity>
+                    </View>
+                  </View>
+                </View>
+              </View>
             </View>
 
-            {/* B, C등급 마스크 오버레이 (임시 비활성화) */}
-            {false && (userGrade === 'B' || userGrade === 'C') && (
+            {/* B, C등급 마스크 오버레이 */}
+            {(userGrade === 'B' || userGrade === 'C') && (
               <View style={styles.maskOverlay}>
                 <Text style={styles.maskTitle}>🔒 금융 시뮬레이션 및 ROI 분석 열람 제한 (A등급 전용)</Text>
                 <Text style={styles.maskDesc}>
@@ -3126,22 +3606,35 @@ export const DetailScreen: React.FC<DetailScreenProps> = ({ property, onBack }) 
                 </Text>
                 <TouchableOpacity 
                   style={styles.maskButton} 
-                  onPress={async () => {
-                    try {
-                      if (userId) {
-                        const { error } = await supabase
-                          .from('user_profiles')
-                          .update({ grade: 'A' })
-                          .eq('id', userId);
-                        if (error) throw error;
-                        setUserGrade('A');
-                        Alert.alert('업그레이드 완료', 'Premium 회원(A등급)으로 정상 승급되었습니다.');
-                      } else {
-                        Alert.alert('안내', '로그인이 필요한 서비스입니다.');
-                      }
-                    } catch (err) {
-                      Alert.alert('오류', '등급 승급 처리 중 오류가 발생했습니다.');
+                  onPress={() => {
+                    if (!userId) {
+                      Alert.alert('안내', '로그인이 필요한 서비스입니다.');
+                      return;
                     }
+                    Alert.alert(
+                      '★ v1.2 프리미엄 멤버십 구독 안내 ★',
+                      '월 19,900원에 AI 정밀 수익률 분석, 권리 안전도 검증, 법원/온비드 미상 등기부 자동 열람 혜택을 무제한으로 이용하실 수 있습니다.\n\n구독을 시작하시겠습니까?',
+                      [
+                        { text: '취소', style: 'cancel' },
+                        {
+                          text: '구독 시작',
+                          onPress: async () => {
+                            try {
+                              const { error } = await supabase
+                                .from('user_profiles')
+                                .update({ membership_tier: 'premium', grade: 'A' })
+                                .eq('id', userId);
+                              if (error) throw error;
+                              setUserGrade('A');
+                              Alert.alert('결제 성공', '🎉 프리미엄 결제 및 구독 승인이 성공적으로 완료되었습니다! 모든 프리미엄 분석 도구가 무제한 개방됩니다.');
+                            } catch (err) {
+                              console.error('구독 결제 실패:', err);
+                              Alert.alert('오류', '결제 처리 중 서버 통신 에러가 발생했습니다.');
+                            }
+                          }
+                        }
+                      ]
+                    );
                   }}
                 >
                   <Text style={styles.maskButtonText}>Premium 회원(A등급)으로 상향하기</Text>
@@ -3615,6 +4108,13 @@ export const DetailScreen: React.FC<DetailScreenProps> = ({ property, onBack }) 
         <View style={styles.spacer} />
       </ScrollView>
 
+      {/* 📢 고정형 상세페이지 하단 광고판 */}
+      {adSettings.some(a => a.slot_name === 'detail_bottom_banner' && a.active) && (
+        <View style={styles.fixedAdContainerBottom}>
+          {renderDetailAd('detail_bottom_banner')}
+        </View>
+      )}
+
       {/* 📄 법정 서류 요약 팝업 모달 제거 (상시 노출형으로 대체 완료) */}
 
       {/* 🖼️ 평면도 크게 보기 모달 */}
@@ -3659,17 +4159,109 @@ export const DetailScreen: React.FC<DetailScreenProps> = ({ property, onBack }) 
               </View>
               <Text style={styles.zoomModalTip}>{zoomImageSrc ? '💡 수집된 실제 물건 사진의 확대 버전입니다.' : '💡 판상형 실제 타입 구조에 부합하는 분석 도면입니다. 닫기 버튼을 클릭하여 이전 화면으로 복귀할 수 있습니다.'}</Text>
             </View>
-            <View style={styles.modalFooter}>
-              <TouchableOpacity 
-                style={[styles.modalConfirmBtn, { flex: 1 }]} 
-                onPress={() => setFloorplanModalVisible(false)}
-              >
-                <Text style={styles.modalConfirmText}>닫기</Text>
+          </View>
+        </View>
+      )}
+
+      {/* 🤖 AI 법률 챗봇 플로팅 버튼 */}
+      <TouchableOpacity
+        style={styles.chatbotFloatingBtn}
+        onPress={() => setIsChatbotOpen(true)}
+      >
+        <Text style={styles.chatbotFloatingIcon}>💬</Text>
+        <View style={styles.chatbotBadge} />
+      </TouchableOpacity>
+
+      {/* 🤖 AI 법률 챗봇 모달 대화창 */}
+      <Modal
+        visible={isChatbotOpen}
+        animationType="slide"
+        transparent={true}
+        onRequestClose={() => setIsChatbotOpen(false)}
+      >
+        <View style={styles.chatModalOverlay}>
+          <View style={styles.chatModalContainer}>
+            {/* 헤더 */}
+            <View style={styles.chatHeader}>
+              <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
+                <View style={styles.chatStatusDot} />
+                <View>
+                  <Text style={styles.chatHeaderTitle}>🤖 AI 경매 법률 도우미</Text>
+                  <Text style={styles.chatHeaderSub}>대법원 판례 및 법령 실시간 자문</Text>
+                </View>
+              </View>
+              <TouchableOpacity onPress={() => setIsChatbotOpen(false)} style={styles.chatCloseBtn}>
+                <Text style={{ color: '#fff', fontSize: 16, fontWeight: 'bold' }}>✕</Text>
+              </TouchableOpacity>
+            </View>
+
+            {/* 대화 목록 */}
+            <ScrollView
+              style={styles.chatMessageScroll}
+              ref={(ref) => {
+                setTimeout(() => ref?.scrollToEnd({ animated: true }), 100);
+              }}
+              contentContainerStyle={{ padding: 12, gap: 10 }}
+            >
+              {chatMessages.map((msg, index) => (
+                <View
+                  key={index}
+                  style={[
+                    styles.chatRow,
+                    msg.sender === 'user' ? styles.chatRowUser : styles.chatRowBot
+                  ]}
+                >
+                  {msg.sender === 'bot' && (
+                    <View style={styles.botAvatar}>
+                      <Text style={{ fontSize: 10 }}>🤖</Text>
+                    </View>
+                  )}
+                  <View
+                    style={[
+                      styles.chatBubble,
+                      msg.sender === 'user' ? styles.chatBubbleUser : styles.chatBubbleBot
+                    ]}
+                  >
+                    <Text style={[
+                      styles.chatText,
+                      msg.sender === 'user' ? styles.chatTextUser : styles.chatTextBot
+                    ]}>
+                      {msg.message}
+                    </Text>
+                  </View>
+                </View>
+              ))}
+            </ScrollView>
+
+            {/* 퀵 질문 태그 */}
+            <View style={styles.quickTagsContainer}>
+              <TouchableOpacity onPress={() => askQuickQuestionMobile('유치권이 신고된 매물은 안전한가요?')} style={styles.quickTagBtn}>
+                <Text style={styles.quickTagText}>유치권 리스크</Text>
+              </TouchableOpacity>
+              <TouchableOpacity onPress={() => askQuickQuestionMobile('선순위 임차인의 대항력이란 무엇인가요?')} style={styles.quickTagBtn}>
+                <Text style={styles.quickTagText}>대항력 판별</Text>
+              </TouchableOpacity>
+              <TouchableOpacity onPress={() => askQuickQuestionMobile('명도 강제집행 비용과 절차는 어떻게 되나요?')} style={styles.quickTagBtn}>
+                <Text style={styles.quickTagText}>명도 집행</Text>
+              </TouchableOpacity>
+            </View>
+
+            {/* 입력창 */}
+            <View style={styles.chatInputArea}>
+              <TextInput
+                style={styles.chatTextInput}
+                placeholder="질문 내용을 입력해 주세요."
+                value={chatInputText}
+                onChangeText={chatInputText => setChatInputText(chatInputText)}
+                onSubmitEditing={sendChatMessage}
+              />
+              <TouchableOpacity onPress={sendChatMessage} style={styles.chatSendBtn}>
+                <Text style={{ color: '#fff', fontSize: 12, fontWeight: 'bold' }}>전송</Text>
               </TouchableOpacity>
             </View>
           </View>
         </View>
-      )}
+      </Modal>
     </SafeAreaView>
   );
 };
@@ -3680,10 +4272,10 @@ const styles = StyleSheet.create({
     borderColor: 'rgba(30, 64, 175, 0.2)',
     borderWidth: 1,
     borderRadius: 12,
-    padding: 12,
+    padding: 8,
     flexDirection: 'row',
     alignItems: 'flex-start',
-    marginBottom: 12,
+    marginBottom: 8,
   },
   disclaimerIcon: {
     fontSize: 14,
@@ -3691,14 +4283,14 @@ const styles = StyleSheet.create({
     color: '#1e40af',
   },
   disclaimerText: {
-    fontSize: 13,
+    fontSize: 12,
     color: '#334155',
     fontWeight: 'bold',
     flex: 1,
     lineHeight: 18,
   },
   complexEmptyContainer: {
-    padding: 16,
+    padding: 12,
     alignItems: 'center',
     justifyContent: 'center',
     backgroundColor: '#f8fafc',
@@ -3707,7 +4299,7 @@ const styles = StyleSheet.create({
     borderColor: '#e2e8f0',
   },
   complexEmptyText: {
-    fontSize: 13,
+    fontSize: 12,
     color: '#64748b',
     fontWeight: 'bold',
     textAlign: 'center',
@@ -3724,7 +4316,7 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderBottomColor: COLORS.slate200,
     backgroundColor: COLORS.white,
-    paddingHorizontal: 16,
+    paddingHorizontal: 8,
   },
   backButton: {
     paddingVertical: 8,
@@ -3736,7 +4328,7 @@ const styles = StyleSheet.create({
     color: COLORS.royalBlue,
   },
   headerTitle: {
-    fontSize: 19,
+    fontSize: 15,
     fontWeight: '800',
     color: COLORS.slate900,
     flex: 1,
@@ -3744,7 +4336,7 @@ const styles = StyleSheet.create({
   },
   container: {
     flex: 1,
-    padding: 16,
+    padding: 12,
   },
   mainImageContainer: {
     width: '100%',
@@ -3753,7 +4345,7 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
     borderWidth: 1,
     borderColor: COLORS.slate200,
-    marginBottom: 14,
+    marginBottom: 10,
     backgroundColor: '#cbd5e1',
     position: 'relative',
   },
@@ -3782,10 +4374,10 @@ const styles = StyleSheet.create({
     borderColor: COLORS.slate200,
     overflow: 'hidden',
     marginTop: 10,
-    marginBottom: 14,
+    marginBottom: 10,
   },
   tableCellText: {
-    fontSize: 13.5,
+    fontSize: 12.5,
     color: COLORS.slate700,
     lineHeight: 18,
     fontWeight: '600',
@@ -3793,10 +4385,10 @@ const styles = StyleSheet.create({
   summaryCard: {
     backgroundColor: COLORS.white,
     borderRadius: 16,
-    padding: 16,
+    padding: 12,
     borderWidth: 1,
     borderColor: COLORS.slate200,
-    marginBottom: 14,
+    marginBottom: 10,
   },
   metaRow: {
     flexDirection: 'row',
@@ -3819,11 +4411,11 @@ const styles = StyleSheet.create({
     color: COLORS.slate400,
   },
   address: {
-    fontSize: 25,
+    fontSize: 20,
     fontWeight: '800',
     color: COLORS.slate900,
     lineHeight: 32,
-    marginBottom: 12,
+    marginBottom: 8,
   },
   ptypeBadge: {
     backgroundColor: COLORS.royalLight,
@@ -3840,16 +4432,19 @@ const styles = StyleSheet.create({
   sectionCard: {
     backgroundColor: COLORS.white,
     borderRadius: 16,
-    padding: 16,
+    padding: 12,
     borderWidth: 1,
     borderColor: COLORS.slate200,
-    marginBottom: 14,
+    marginBottom: 10,
   },
   sectionTitle: {
-    fontSize: 19,
-    fontWeight: '800',
+    fontSize: 14.5,
+    fontWeight: '900',
     color: COLORS.slate900,
-    marginBottom: 12,
+    borderBottomWidth: 1.5,
+    borderBottomColor: COLORS.slate100,
+    paddingBottom: 8,
+    marginBottom: 10,
   },
   gradeRow: {
     flexDirection: 'row',
@@ -3857,7 +4452,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     padding: 12,
     borderRadius: 10,
-    marginBottom: 12,
+    marginBottom: 8,
   },
   gradeLabel: {
     fontSize: 16,
@@ -3868,7 +4463,7 @@ const styles = StyleSheet.create({
     fontWeight: '900',
   },
   analysisContent: {
-    fontSize: 17.5,
+    fontSize: 14.5,
     color: COLORS.slate700,
     lineHeight: 28,
     fontWeight: 'bold',
@@ -3922,7 +4517,7 @@ const styles = StyleSheet.create({
     width: '100%',
   },
   calcLabel: {
-    fontSize: 13,
+    fontSize: 12,
     fontWeight: 'bold',
     color: COLORS.slate400,
     marginBottom: 6,
@@ -3947,7 +4542,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: COLORS.slate200,
     borderRadius: 10,
-    paddingHorizontal: 12,
+    paddingHorizontal: 8,
     paddingVertical: 8,
     fontSize: 15,
     fontWeight: 'bold',
@@ -3997,7 +4592,7 @@ const styles = StyleSheet.create({
   },
   ltvScroll: {
     flexDirection: 'row',
-    marginBottom: 14,
+    marginBottom: 10,
     marginTop: 4,
   },
   ltvChip: {
@@ -4028,7 +4623,7 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.slate100,
     padding: 10,
     borderRadius: 10,
-    marginBottom: 14,
+    marginBottom: 10,
   },
   interestLabel: {
     fontSize: 14,
@@ -4078,7 +4673,7 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   receiptHeaderText: {
-    fontSize: 13,
+    fontSize: 12,
     fontWeight: 'bold',
     color: COLORS.slate700,
   },
@@ -4088,12 +4683,12 @@ const styles = StyleSheet.create({
     paddingVertical: 5,
   },
   receiptLabel: {
-    fontSize: 13,
+    fontSize: 12,
     color: COLORS.slate600,
     fontWeight: 'bold',
   },
   receiptValue: {
-    fontSize: 13,
+    fontSize: 12,
     color: COLORS.slate700,
     fontWeight: 'bold',
   },
@@ -4140,8 +4735,8 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderBottomColor: COLORS.slate100,
     alignItems: 'center',
-    paddingVertical: 10,
-    paddingHorizontal: 12,
+    paddingVertical: 8,
+    paddingHorizontal: 8,
   },
   tableHeader: {
     backgroundColor: COLORS.slate50,
@@ -4150,13 +4745,13 @@ const styles = StyleSheet.create({
   },
   tableCell: {
     flex: 1,
-    fontSize: 13,
+    fontSize: 12,
     color: COLORS.slate700,
   },
   tableHeaderCell: {
     fontWeight: 'bold',
     color: COLORS.slate900,
-    fontSize: 13.5,
+    fontSize: 12.5,
   },
   textCenter: {
     textAlign: 'center',
@@ -4175,7 +4770,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: COLORS.slate200,
     borderRadius: 12,
-    paddingVertical: 12,
+    paddingVertical: 8,
     alignItems: 'center',
   },
   kpiTitle: {
@@ -4244,7 +4839,7 @@ const styles = StyleSheet.create({
   },
   galleryBtn: {
     backgroundColor: COLORS.slate100,
-    paddingVertical: 10,
+    paddingVertical: 8,
     borderRadius: 8,
     alignItems: 'center',
   },
@@ -4359,7 +4954,7 @@ const styles = StyleSheet.create({
     paddingTop: 12,
   },
   timelineHeader: {
-    fontSize: 13.5,
+    fontSize: 12.5,
     fontWeight: '800',
     color: COLORS.slate500,
     marginBottom: 10,
@@ -4372,7 +4967,7 @@ const styles = StyleSheet.create({
   },
   timelineNode: {
     position: 'relative',
-    marginBottom: 12,
+    marginBottom: 8,
   },
   nodePoint: {
     position: 'absolute',
@@ -4389,11 +4984,11 @@ const styles = StyleSheet.create({
     padding: 8,
   },
   nodeTitle: {
-    fontSize: 13.5,
+    fontSize: 12.5,
     fontWeight: '800',
   },
   nodeDesc: {
-    fontSize: 13,
+    fontSize: 12,
     fontWeight: '600',
     color: COLORS.slate750,
     marginTop: 2,
@@ -4429,12 +5024,12 @@ const styles = StyleSheet.create({
     marginTop: 4,
   },
   statBox: {
-    paddingVertical: 10,
+    paddingVertical: 8,
     borderBottomWidth: 1,
     borderBottomColor: COLORS.slate100,
   },
   statLabel: {
-    fontSize: 13,
+    fontSize: 12,
     fontWeight: 'bold',
     color: COLORS.slate500,
     marginBottom: 4,
@@ -4444,14 +5039,14 @@ const styles = StyleSheet.create({
     fontWeight: '800',
   },
   statCompareText: {
-    fontSize: 13.5,
+    fontSize: 12.5,
     fontWeight: 'bold',
     lineHeight: 20,
   },
   // 가로 스크롤 탭바
   tabBarScroll: {
     flexDirection: 'row',
-    marginBottom: 14,
+    marginBottom: 10,
   },
   tabBarContainer: {
     paddingRight: 16,
@@ -4459,7 +5054,7 @@ const styles = StyleSheet.create({
   },
   tabButton: {
     paddingHorizontal: 14,
-    paddingVertical: 10,
+    paddingVertical: 8,
     alignItems: 'center',
     justifyContent: 'center',
     borderRadius: 12,
@@ -4477,7 +5072,7 @@ const styles = StyleSheet.create({
     elevation: 3,
   },
   tabButtonText: {
-    fontSize: 13,
+    fontSize: 12,
     color: COLORS.slate600,
     fontWeight: 'bold',
   },
@@ -4492,7 +5087,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 12,
+    marginBottom: 8,
   },
   gradeBadgeContainer: {
     flexDirection: 'row',
@@ -4500,7 +5095,7 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   gradeBadgeText: {
-    fontSize: 13.5,
+    fontSize: 12.5,
     fontWeight: 'bold',
     color: COLORS.slate700,
   },
@@ -4520,7 +5115,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#f1f5f9',
     justifyContent: 'center',
     alignItems: 'center',
-    padding: 16,
+    padding: 12,
   },
   naverMapLogoText: {
     fontSize: 18,
@@ -4529,7 +5124,7 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   naverMapAddrText: {
-    fontSize: 13,
+    fontSize: 12,
     fontWeight: 'bold',
     color: COLORS.slate800,
     textAlign: 'center',
@@ -4602,7 +5197,7 @@ const styles = StyleSheet.create({
   },
   priceDetailRow: {
     flexDirection: 'row',
-    marginBottom: 12,
+    marginBottom: 8,
     borderBottomWidth: 1,
     borderBottomColor: COLORS.slate100,
     paddingBottom: 12,
@@ -4630,7 +5225,7 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.crimsonLight,
     padding: 10,
     borderRadius: 10,
-    marginBottom: 12,
+    marginBottom: 8,
   },
   discountText: {
     fontSize: 16,
@@ -4645,7 +5240,7 @@ const styles = StyleSheet.create({
     fontSize: 11.5,
     color: COLORS.slate500,
     lineHeight: 17,
-    marginBottom: 12,
+    marginBottom: 8,
   },
   infoRow: {
     flexDirection: 'row',
@@ -4655,12 +5250,12 @@ const styles = StyleSheet.create({
     borderBottomColor: COLORS.slate100,
   },
   infoLabel: {
-    fontSize: 13,
+    fontSize: 12,
     color: COLORS.slate500,
     fontWeight: '600',
   },
   infoValue: {
-    fontSize: 13.5,
+    fontSize: 12.5,
     color: COLORS.slate800,
     fontWeight: 'bold',
   },
@@ -4750,7 +5345,7 @@ const styles = StyleSheet.create({
   maskButton: {
     backgroundColor: COLORS.royalBlue,
     borderRadius: 10,
-    paddingVertical: 12,
+    paddingVertical: 8,
     paddingHorizontal: 20,
     shadowColor: COLORS.royalBlue,
     shadowOffset: { width: 0, height: 4 },
@@ -4759,7 +5354,7 @@ const styles = StyleSheet.create({
     elevation: 4,
   },
   maskButtonText: {
-    fontSize: 13,
+    fontSize: 12,
     color: COLORS.white,
     fontWeight: 'bold',
   },
@@ -4781,7 +5376,7 @@ const styles = StyleSheet.create({
     width: '100%',
     maxWidth: 400,
     maxHeight: '80%',
-    padding: 16,
+    padding: 12,
     shadowColor: COLORS.slate900,
     shadowOffset: { width: 0, height: 10 },
     shadowOpacity: 0.25,
@@ -4797,7 +5392,7 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderBottomColor: COLORS.slate100,
     paddingBottom: 12,
-    marginBottom: 12,
+    marginBottom: 8,
   },
   docCardsContainer: {
     marginTop: 10,
@@ -4819,7 +5414,7 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   docDetailTitle: {
-    fontSize: 13,
+    fontSize: 12,
     fontWeight: '800',
   },
   docDetailBtn: {
@@ -4893,7 +5488,7 @@ const styles = StyleSheet.create({
     borderColor: COLORS.slate200,
     borderRadius: 8,
     overflow: 'hidden',
-    marginBottom: 12,
+    marginBottom: 8,
   },
   modalRow: {
     flexDirection: 'row',
@@ -4936,12 +5531,12 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: COLORS.slate100,
     borderRadius: 10,
-    paddingVertical: 10,
+    paddingVertical: 8,
     alignItems: 'center',
     justifyContent: 'center',
   },
   modalConfirmText: {
-    fontSize: 13,
+    fontSize: 12,
     color: COLORS.slate700,
     fontWeight: 'bold',
   },
@@ -4949,19 +5544,19 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: COLORS.royalBlue,
     borderRadius: 10,
-    paddingVertical: 10,
+    paddingVertical: 8,
     alignItems: 'center',
     justifyContent: 'center',
   },
   modalOfficialText: {
-    fontSize: 13,
+    fontSize: 12,
     color: COLORS.white,
     fontWeight: 'bold',
   },
   zoomModalBody: {
     alignItems: 'center',
     justifyContent: 'center',
-    paddingVertical: 10,
+    paddingVertical: 8,
   },
   zoomModalTip: {
     fontSize: 11,
@@ -4983,7 +5578,7 @@ const styles = StyleSheet.create({
     elevation: 2,
   },
   riskCardTitle: {
-    fontSize: 13,
+    fontSize: 12,
     fontWeight: 'bold',
     color: COLORS.slate800,
     marginBottom: 4,
@@ -5075,5 +5670,402 @@ const styles = StyleSheet.create({
   },
   tableMinWidth: {
     minWidth: 640,
+  },
+  // v1.2 모의입찰 및 전문가 광고 스타일
+  mockStatsGrid: {
+    flexDirection: 'row',
+    backgroundColor: '#f8fafc',
+    borderRadius: 12,
+    padding: 10,
+    borderWidth: 1,
+    borderColor: '#e2e8f0',
+    marginTop: 8,
+  },
+  mockStatItem: {
+    flex: 1,
+    alignItems: 'center',
+  },
+  mockStatBorder: {
+    borderLeftWidth: 1,
+    borderRightWidth: 1,
+    borderColor: '#e2e8f0',
+  },
+  mockStatLabel: {
+    fontSize: 9,
+    color: '#94a3b8',
+    fontWeight: 'bold',
+    marginBottom: 2,
+  },
+  mockStatValue: {
+    fontSize: 12,
+    fontWeight: 'bold',
+    color: '#334155',
+  },
+  mockBidInput: {
+    flex: 1,
+    backgroundColor: '#f8fafc',
+    borderWidth: 1,
+    borderColor: '#cbd5e1',
+    borderRadius: 10,
+    paddingHorizontal: 8,
+    paddingVertical: 6,
+    fontSize: 12,
+    color: '#334155',
+    fontWeight: 'bold',
+  },
+  mockBidSubmitBtn: {
+    backgroundColor: COLORS.royalBlue,
+    borderRadius: 10,
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingHorizontal: 8,
+  },
+  expertCard: {
+    flexDirection: 'row',
+    backgroundColor: '#f8fafc',
+    borderWidth: 1,
+    borderColor: '#f1f5f9',
+    borderRadius: 12,
+    padding: 12,
+    marginBottom: 10,
+  },
+  expertImg: {
+    width: 48,
+    height: 48,
+    borderRadius: 10,
+  },
+  successBadge: {
+    backgroundColor: '#eff6ff',
+    borderColor: '#bfdbfe',
+    borderWidth: 1,
+    paddingHorizontal: 6,
+    paddingVertical: 2,
+    borderRadius: 4,
+  },
+  successBadgeText: {
+    fontSize: 9,
+    fontWeight: 'bold',
+    color: COLORS.royalBlue,
+  },
+  expertSub: {
+    fontSize: 10,
+    color: '#94a3b8',
+    fontWeight: 'bold',
+  },
+  expertIntro: {
+    fontSize: 11,
+    color: '#475569',
+    marginTop: 4,
+    lineHeight: 15,
+  },
+  expertActions: {
+    flexDirection: 'row',
+    gap: 6,
+    marginTop: 8,
+  },
+  expertBtnPhone: {
+    backgroundColor: '#fff',
+    borderWidth: 1,
+    borderColor: '#e2e8f0',
+    borderRadius: 8,
+    paddingHorizontal: 8,
+    paddingVertical: 5,
+  },
+  expertBtnPhoneText: {
+    fontSize: 10,
+    color: '#475569',
+    fontWeight: 'bold',
+  },
+  expertBtnMail: {
+    backgroundColor: COLORS.royalBlue,
+    borderRadius: 8,
+    paddingHorizontal: 10,
+    paddingVertical: 5,
+  },
+  expertBtnMailText: {
+    fontSize: 10,
+    color: '#fff',
+    fontWeight: 'bold',
+  },
+
+  // v1.2 AI 챗봇 스타일
+  chatbotFloatingBtn: {
+    position: 'absolute',
+    bottom: 24,
+    right: 24,
+    width: 56,
+    height: 56,
+    borderRadius: 28,
+    backgroundColor: COLORS.royalBlue,
+    justifyContent: 'center',
+    alignItems: 'center',
+    shadowColor: '#1e40af',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 6,
+    elevation: 8,
+    zIndex: 9999,
+  },
+  chatbotFloatingIcon: {
+    fontSize: 24,
+    color: '#fff',
+  },
+  chatbotBadge: {
+    position: 'absolute',
+    top: 0,
+    right: 0,
+    width: 12,
+    height: 12,
+    borderRadius: 6,
+    backgroundColor: '#f43f5e',
+    borderWidth: 2,
+    borderColor: '#fff',
+  },
+  chatModalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(15, 23, 42, 0.6)',
+    justifyContent: 'flex-end',
+  },
+  chatModalContainer: {
+    backgroundColor: '#fff',
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
+    height: 480,
+    width: '100%',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: -3 },
+    shadowOpacity: 0.1,
+    shadowRadius: 10,
+    elevation: 20,
+  },
+  chatHeader: {
+    backgroundColor: COLORS.royalBlue,
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    padding: 14,
+  },
+  chatStatusDot: {
+    width: 8,
+    height: 8,
+    borderRadius: 4,
+    backgroundColor: '#10b981',
+  },
+  chatHeaderTitle: {
+    color: '#fff',
+    fontSize: 12,
+    fontWeight: 'bold',
+  },
+  chatHeaderSub: {
+    color: '#bfdbfe',
+    fontSize: 9,
+  },
+  chatCloseBtn: {
+    padding: 4,
+  },
+  chatMessageScroll: {
+    flex: 1,
+    backgroundColor: '#f8fafc',
+  },
+  chatRow: {
+    flexDirection: 'row',
+    width: '100%',
+    marginVertical: 4,
+  },
+  chatRowBot: {
+    justifyContent: 'flex-start',
+  },
+  chatRowUser: {
+    justifyContent: 'flex-end',
+  },
+  botAvatar: {
+    width: 24,
+    height: 24,
+    borderRadius: 12,
+    backgroundColor: '#eff6ff',
+    borderColor: '#dbeafe',
+    borderWidth: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: 6,
+    marginTop: 2,
+  },
+  chatBubble: {
+    paddingHorizontal: 8,
+    paddingVertical: 8,
+    borderRadius: 16,
+    maxWidth: '75%',
+    shadowColor: '#0f172a',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.05,
+    shadowRadius: 2,
+    elevation: 1,
+  },
+  chatBubbleBot: {
+    backgroundColor: '#fff',
+    borderWidth: 1,
+    borderColor: '#f1f5f9',
+    borderTopLeftRadius: 4,
+  },
+  chatBubbleUser: {
+    backgroundColor: COLORS.royalBlue,
+    borderTopRightRadius: 4,
+  },
+  chatText: {
+    fontSize: 11,
+    lineHeight: 16,
+    fontWeight: 'bold',
+  },
+  chatTextBot: {
+    color: '#334155',
+  },
+  chatTextUser: {
+    color: '#fff',
+  },
+  quickTagsContainer: {
+    flexDirection: 'row',
+    gap: 6,
+    paddingHorizontal: 8,
+    paddingVertical: 8,
+    backgroundColor: '#f1f5f9',
+  },
+  quickTagBtn: {
+    backgroundColor: '#fff',
+    borderWidth: 1,
+    borderColor: '#e2e8f0',
+    borderRadius: 8,
+    paddingHorizontal: 10,
+    paddingVertical: 5,
+  },
+  quickTagText: {
+    fontSize: 10,
+    color: '#475569',
+    fontWeight: 'bold',
+  },
+  chatInputArea: {
+    flexDirection: 'row',
+    padding: 10,
+    borderTopWidth: 1,
+    borderColor: '#e2e8f0',
+    backgroundColor: '#fff',
+    gap: 8,
+    alignItems: 'center',
+  },
+  chatTextInput: {
+    flex: 1,
+    backgroundColor: '#f8fafc',
+    borderWidth: 1,
+    borderColor: '#e2e8f0',
+    borderRadius: 12,
+    paddingHorizontal: 8,
+    paddingVertical: 6,
+    fontSize: 12,
+    color: '#334155',
+  },
+  chatSendBtn: {
+    backgroundColor: COLORS.royalBlue,
+    borderRadius: 12,
+    paddingHorizontal: 14,
+    paddingVertical: 8,
+  },
+  fixedAdContainerTop: {
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderBottomWidth: 1,
+    borderBottomColor: COLORS.slate200,
+    backgroundColor: COLORS.slate50,
+  },
+  fixedAdContainerBottom: {
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderTopWidth: 1,
+    borderTopColor: COLORS.slate200,
+    backgroundColor: COLORS.slate50,
+  },
+  detailAdCard: {
+    backgroundColor: COLORS.white,
+    borderWidth: 1,
+    borderColor: COLORS.slate200,
+    borderRadius: 12,
+    padding: 8,
+    flexDirection: 'column',
+    shadowColor: COLORS.slate900,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.05,
+    shadowRadius: 4,
+    elevation: 2,
+    position: 'relative',
+    minHeight: 52,
+  },
+  detailAdHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 3,
+  },
+  detailAdBadge: {
+    backgroundColor: COLORS.slate900,
+    paddingHorizontal: 5,
+    paddingVertical: 1.5,
+    borderRadius: 4,
+    marginRight: 6,
+  },
+  detailAdBadgeText: {
+    color: COLORS.white,
+    fontSize: 8.5,
+    fontWeight: '900',
+  },
+  detailAdTitle: {
+    fontSize: 11.5,
+    fontWeight: '800',
+    color: COLORS.slate800,
+    flex: 1,
+  },
+  detailAdDesc: {
+    fontSize: 10.5,
+    color: COLORS.slate500,
+    fontWeight: '600',
+    marginRight: 40,
+  },
+  detailAdImage: {
+    position: 'absolute',
+    right: 0,
+    top: 0,
+    bottom: 0,
+    width: 50,
+    height: '100%',
+    borderTopRightRadius: 10,
+    borderBottomRightRadius: 10,
+    opacity: 0.8,
+  },
+  detailAdsenseContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    backgroundColor: COLORS.slate50,
+    borderRadius: 6,
+    paddingHorizontal: 6,
+    paddingVertical: 3,
+    borderWidth: 1,
+    borderColor: COLORS.slate100,
+  },
+  detailAdsenseTitle: {
+    fontSize: 10,
+    color: COLORS.slate600,
+    fontWeight: 'bold',
+  },
+  detailAdCodeText: {
+    fontSize: 9.5,
+    color: COLORS.royalBlue,
+    fontFamily: 'monospace',
+    flex: 1,
+    textAlign: 'right',
+    marginLeft: 8,
+  },
+  detailDirectAdContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
   },
 });

@@ -1,0 +1,50 @@
+   350:         <div id="sidebar-backdrop" class="fixed inset-0 bg-slate-900/40 z-40 hidden lg:hidden transition-opacity duration-300" onclick="toggleSidebar()"></div>
+   351: 
+   352:         <!-- 📂 [COLUMN 1] 좌측 고정 사이드바: 통합 필터 및 사설 파일 Mix 업로더 (모바일 반응형 서랍화 적용) -->
+   353:         <aside id="sidebar-panel" class="fixed inset-y-0 left-0 z-40 w-[280px] sm:w-[320px] bg-white border-r border-slate-200 flex flex-col h-full transform -translate-x-full transition-transform duration-300 ease-out lg:static lg:w-[22%] lg:min-w-[290px] lg:max-w-[350px] lg:translate-x-0">
+   354:             <!-- 필터 메인 헤더 -->
+   355:             <div class="p-4 border-b border-slate-100 flex items-center justify-between bg-slate-50/50">
+   356:                 <div class="flex items-center gap-2">
+   357:                     <i class="fa-solid fa-sliders text-royalBlue text-xs"></i>
+   358:                     <h2 class="text-xs font-black text-slate-800 uppercase tracking-wider">지능형 필터링 센터</h2>
+   359:                 </div>
+   360:                 <div class="flex items-center gap-2.5">
+   361:                     <button onclick="resetFilters()" class="text-xs font-bold text-slate-400 hover:text-royalBlue transition-colors">초기화</button>
+   362:                     <button id="sidebar-close-btn" onclick="toggleSidebar()" class="lg:hidden text-slate-400 hover:text-rose-500 transition-colors select-none" title="필터 닫기"><i class="fa-solid fa-xmark text-sm"></i></button>
+   363:                 </div>
+   364:             </div>
+   365: 
+   366:             <!-- 스크롤 가능한 필터 폼 -->
+   367:             <div class="flex-1 overflow-y-auto p-3 space-y-2.5 custom-scrollbar text-xs">
+   368:                 <!-- 통합 검색 -->
+   369:                 <div class="border-b border-slate-100 pb-1.5">
+   370:                     <button type="button" onclick="toggleAccordion('accordion-search')" class="w-full flex justify-between items-center text-[10px] sm:text-xs font-black text-slate-700 py-1 select-none">
+   371:                         <span>🔍 통합 검색 키워드</span>
+   372:                         <i id="accordion-search-icon" class="fa-solid fa-chevron-down text-[8px] text-slate-400"></i>
+   373:                     </button>
+   374:                     <div id="accordion-search" class="hidden mt-1">
+>> 375:                         <input type="text" id="search-input" oninput="debouncedApplyFilters()" placeholder="사건번호, 주소, 용도 입력..." 
+   376:                                class="w-full bg-slate-50 border border-slate-200 rounded-xl px-2.5 py-1.5 text-xs font-semibold focus:bg-white focus:outline-none focus:ring-2 focus:ring-royalBlue/10 focus:border-royalBlue transition-all">
+   377:                     </div>
+   378:                 </div>
+   379: 
+   380:                 <!-- 자산 공급 출처 (다중선택) -->
+   381:                 <div class="border-b border-slate-100 pb-1.5">
+   382:                     <button type="button" onclick="toggleAccordion('accordion-source')" class="w-full flex justify-between items-center text-[10px] sm:text-xs font-black text-slate-700 py-1 select-none">
+   383:                         <span>🏷️ 자산 공급 출처 (다중)</span>
+   384:                         <i id="accordion-source-icon" class="fa-solid fa-chevron-down text-[8px] text-slate-400"></i>
+   385:                     </button>
+   386:                     <div id="accordion-source" class="hidden mt-1 space-y-1 pl-1">
+   387:                         <div class="flex gap-2 mb-1">
+   388:                             <button type="button" onclick="checkAllFilter('source-check', true)" class="text-[9.5px] text-royalBlue font-extrabold hover:underline">전체 선택</button>
+   389:                             <span class="text-[9.5px] text-slate-300">|</span>
+   390:                             <button type="button" onclick="checkAllFilter('source-check', false)" class="text-[9.5px] text-slate-400 font-extrabold hover:underline">전체 해제</button>
+   391:                         </div>
+   392:                         <label class="flex items-center gap-2 cursor-pointer select-none text-xs font-bold text-slate-600">
+   393:                             <input type="checkbox" name="source-check" value="court" checked onchange="applyFilters()" class="accent-royalBlue">
+   394:                             <span>법원 경매 물건</span>
+   395:                         </label>
+   396:                         <label class="flex items-center gap-2 cursor-pointer select-none text-xs font-bold text-slate-600">
+   397:                             <input type="checkbox" name="source-check" value="onbid" checked onchange="applyFilters()" class="accent-royalBlue">
+   398:                             <span>캠코 온비드 공매</span>
+   399:                         </label>

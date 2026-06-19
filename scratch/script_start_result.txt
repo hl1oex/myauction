@@ -1,0 +1,98 @@
+Line 7: <script>
+Context:
+     2: <html lang="ko">
+     3: <head>
+     4:     <meta charset="UTF-8">
+     5:     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+     6:     <!-- ⚠️ 콘솔 경고 필터 (Tailwind CDN 프로덕션 경고 메시지 콘솔 출력 차단) -->
+  >> 7:     <script>
+     8:         (function() {
+     9:             const originalWarn = console.warn;
+     10:             console.warn = function(...args) {
+     11:                 if (args[0] && typeof args[0] === 'string' && (args[0].includes('cdn.tailwindcss.com') || args[0].includes('tailwindcss.com/docs'))) {
+     12:                     return;
+--------------------------------------------------
+Line 35: <script>
+Context:
+     30:     <!-- 💎 5. Supabase Web SDK CDN 연동 -->
+     31:     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+     32:     <!-- 🗺️ 카카오 지도/로드뷰 SDK 로딩 (무료 API 키 기반 동적 지도 시각화 실사진화 목적) -->
+     33:     <script type="text/javascript" src="https://dapi.kakao.com/v2/maps/sdk.js?appkey=ec7b35c73770fbe949e52bf3ff940346&libraries=services"></script>
+     34:     
+  >> 35:     <script>
+     36:         const supabaseUrl = "https://ubaxyfxcsxsvrryowswb.supabase.co";
+     37:         const supabaseAnonKey = "sb_publishable_JrM_2rrvppC105lHndMLkg_x2x0sLUE";
+     38:         const supabaseClient = supabase.createClient(supabaseUrl, supabaseAnonKey);
+     39: 
+     40:         tailwind.config = {
+--------------------------------------------------
+Line 2141: <script>
+Context:
+     2136: 
+     2137:         <!-- 상세 최하단 고정 광고 구좌 -->
+     2138:         <div id="detail-footer-ad-slot" class="px-4 py-2 bg-slate-50 border-t border-slate-200 flex-shrink-0 hidden"></div>
+     2139:     </aside>
+     2140: 
+  >> 2141:     <script>
+     2142:         // 📱 모바일 필터 사이드바 슬라이드 토글 제어
+     2143:         function toggleSidebar() {
+     2144:             const sidebar = document.getElementById("sidebar-panel");
+     2145:             const backdrop = document.getElementById("sidebar-backdrop");
+     2146:             if (sidebar && backdrop) {
+--------------------------------------------------
+Line 2318: const loadData = async () => {
+Context:
+     2313:                 }
+     2314:             }, 10000);
+     2315: 
+     2316:             try {
+     2317:                 // Supabase로부터 전체 매물을 비동기로 가져오는 함수를 정의합니다.
+  >> 2318:                 const loadData = async () => {
+     2319:                     let allData = [];
+     2320:                     let from = 0;
+     2321:                     const step = 1000;
+     2322:                     let hasMore = true;
+     2323: 
+--------------------------------------------------
+Line 2396: await loadData();
+Context:
+     2391:                     }
+     2392:                     isFirstLoad = false;
+     2393:                 };
+     2394: 
+     2395:                 // 최초 데이터 조회
+  >> 2396:                 await loadData();
+     2397:                 loadAdSettings(); // 📢 광고 정보 실시간 동기화
+     2398: 
+     2399:             } catch (error) {
+     2400:                 console.warn("⚠️ Supabase 연결 실패 - 예비 시뮬레이션 데이터를 안전 탑재합니다.", error);
+     2401:                 if (dbTimeoutTimer) {
+--------------------------------------------------
+Line 2763: document.addEventListener("DOMContentLoaded", function() {
+Context:
+     2758:             }
+     2759:         }
+     2760: 
+     2761:         window.addEventListener("resize", initResponsiveLayout);
+     2762: 
+  >> 2763:         document.addEventListener("DOMContentLoaded", function() {
+     2764:             // 원본 탭 HTML 백업
+     2765:             const p2 = document.getElementById("detail-group-panel-2");
+     2766:             const p3 = document.getElementById("detail-group-panel-3");
+     2767:             const p4 = document.getElementById("detail-group-panel-4");
+     2768:             if (p2) originalPanel2Html = p2.innerHTML;
+--------------------------------------------------
+Line 9064: <script>
+Context:
+     9059:             </div>
+     9060:         </div>
+     9061:     </div>
+     9062: 
+     9063:     <!-- ⚖️ 법적 고지 및 서비스 이용약관/개인정보/API정책 모달 제어 함수 -->
+  >> 9064:     <script>
+     9065:         function showPolicyModal(tabName = 'terms') {
+     9066:             const modal = document.getElementById("policy-modal");
+     9067:             if (modal) {
+     9068:                 modal.classList.remove("hidden");
+     9069:                 setTimeout(() => {
+--------------------------------------------------

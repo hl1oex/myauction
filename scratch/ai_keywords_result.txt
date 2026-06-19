@@ -1,0 +1,285 @@
+--- Line 6 ---
+   1: <!DOCTYPE html>
+   2: <html lang="ko">
+   3: <head>
+   4:     <meta charset="UTF-8">
+   5:     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+>> 6:     <title>AI 遺?숈궛 寃쎌떆/怨듬ℓ ?ㅼ떆媛??듯빀 異붿쿇 ?쒖뒪??v1.0</title>
+   7:     <!-- ?뭿 1. ?꾨━誘몄뾼 ?붿옄????댄룷洹몃옒?쇰? ?꾪븳 Google Fonts ?곕룞 -->
+   8:     <link rel="preconnect" href="https://fonts.googleapis.com">
+   9:     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+   10:     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Outfit:wght@400;500;600;700;800&family=Noto+Sans+KR:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+   11:     <!-- ?뭿 2. ?쒖븞 2 (Elegant Pearl White) 援ы쁽???꾪븳 Tailwind CSS CDN ?곕룞 -->
+
+--- Line 207 ---
+   202:             <div class="bg-royalBlue text-white w-9 h-9 rounded-xl flex items-center justify-center shadow-md shadow-blue-500/10 flex-shrink-0">
+   203:                 <i class="fa-solid fa-hotel text-sm"></i>
+   204:             </div>
+   205:             <div class="truncate">
+   206:                 <h1 class="text-sm sm:text-base font-extrabold tracking-tight text-slate-900 flex items-center gap-2 whitespace-nowrap">
+>> 207:                     AI 遺?숈궛 寃쎄났留?異붿쿇 ?쒖뒪??                    <span class="bg-blue-50 text-royalBlue text-[10px] px-2 py-0.5 rounded-full font-black border border-blue-200">v1.0</span>
+   208:                 </h1>
+   209:                 <p class="text-[9px] sm:text-[10px] text-slate-400 font-bold uppercase tracking-wider">Premium Elegant Pearl White</p>
+   210:             </div>
+   211:         </div>
+   212:         
+
+--- Line 359 ---
+   354:                         <input type="checkbox" id="hide-past-toggle" checked onchange="applyFilters()" class="sr-only peer">
+   355:                         <div class="w-9 h-5 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-royalBlue"></div>
+   356:                     </label>
+   357:                 </div>
+   358: 
+>> 359:                 <!-- AI ?먯궛 ?깃툒 ?꾪꽣 (?덉쟾 / ?꾪뿕 援щ텇 蹂닿린) -->
+   360:                 <div class="bg-slate-50 border border-slate-200 rounded-xl p-3.5 space-y-2">
+   361:                     <label class="block text-[11px] sm:text-xs font-black text-slate-500 uppercase tracking-wider">?좑툘 AI 沅뚮━ ?깃툒 遺꾨쪟 ?꾪꽣</label>
+   362:                     <div class="grid grid-cols-3 gap-1 bg-white p-1 rounded-lg border border-slate-200 text-[10px] font-bold text-center">
+   363:                         <label class="cursor-pointer py-1.5 rounded transition-all select-none">
+   364:                             <input type="radio" name="grade-filter" value="all" onchange="applyFilters()" class="hidden">
+
+--- Line 361 ---
+   356:                     </label>
+   357:                 </div>
+   358: 
+   359:                 <!-- AI ?먯궛 ?깃툒 ?꾪꽣 (?덉쟾 / ?꾪뿕 援щ텇 蹂닿린) -->
+   360:                 <div class="bg-slate-50 border border-slate-200 rounded-xl p-3.5 space-y-2">
+>> 361:                     <label class="block text-[11px] sm:text-xs font-black text-slate-500 uppercase tracking-wider">?좑툘 AI 沅뚮━ ?깃툒 遺꾨쪟 ?꾪꽣</label>
+   362:                     <div class="grid grid-cols-3 gap-1 bg-white p-1 rounded-lg border border-slate-200 text-[10px] font-bold text-center">
+   363:                         <label class="cursor-pointer py-1.5 rounded transition-all select-none">
+   364:                             <input type="radio" name="grade-filter" value="all" onchange="applyFilters()" class="hidden">
+   365:                             <span id="grade-filter-all" class="block rounded py-1 bg-slate-100 text-slate-700 font-extrabold">?꾩껜</span>
+   366:                         </label>
+
+--- Line 407 ---
+   402:             <!-- 以묒븰 ?곷떒 ?듦퀎 KPI 諛?(諛섏쓳?? 紐⑤컮????以??듯빀 vs PC 3??洹몃━?? -->
+   403:             <div class="bg-white border-b border-slate-200 p-3 z-10 shadow-sm">
+   404:                 <!-- ?벑 紐⑤컮???꾩슜: ??以??듯빀 ?몄텧 (1024px 誘몃쭔 lg:hidden) -->
+   405:                 <div class="lg:hidden text-center py-1.5 bg-slate-50 border border-slate-200 rounded-xl px-3 shadow-sm">
+   406:                     <div class="text-[10px] sm:text-[11px] font-extrabold text-slate-750 leading-normal flex flex-wrap items-center justify-center gap-1">
+>> 407:                         <span>異붿쿇 ?곹빀 留ㅻЪ <strong id="kpi-recommended-count-mob" class="text-royalBlue font-outfit font-black">0嫄?/strong> <span class="text-slate-400 font-bold font-sans">(?꾩껜 <span id="kpi-total-count-mob" class="font-outfit font-bold">0</span>嫄?以?</span></span>
+   408:                         <span class="text-slate-400 font-bold mx-1">,</span>
+   409:                         <span>?윟 怨좎쟻??<strong id="kpi-high-count-mob" class="text-emeraldSuccess font-outfit font-black">0嫄?/strong> <span class="text-slate-400 font-bold font-sans">(A~B?깃툒)</span></span>
+   410:                         <span class="text-slate-400 font-bold mx-1">,</span>
+   411:                         <span>?슚 ?꾪뿕 ?덈씫 留ㅻЪ <strong id="kpi-risk-count-mob" class="text-crimsonAlert font-outfit font-black">0嫄?/strong> <span class="text-slate-400 font-bold font-sans">(X)</span></span>
+   412:                     </div>
+
+--- Line 419 ---
+   414:                 
+   415:                 <!-- ?뮲 PC/?쒕툝由??꾩슜: 湲곗〈 3媛?移??섎늻湲?援ъ“ -->
+   416:                 <div class="hidden lg:grid grid-cols-3 gap-3">
+   417:                     <div class="bg-blue-50/50 border border-blue-100 rounded-xl p-2.5 text-center">
+   418:                         <p class="text-[10px] sm:text-xs font-black text-royalBlue uppercase tracking-wider mb-0.5">異붿쿇 ?곹빀 留ㅻЪ (?꾩껜 <span id="kpi-total-count" class="font-outfit text-slate-500 font-bold">0</span>嫄?以?</p>
+>> 419:                         <h3 id="kpi-recommended-count" class="text-sm sm:text-lg font-black text-slate-900 font-outfit">0嫄?/h3>
+   420:                     </div>
+   421:                     <div class="bg-emerald-50/50 border border-emerald-100 rounded-xl p-2.5 text-center">
+   422:                         <p class="text-[10px] sm:text-xs font-black text-emeraldSuccess uppercase tracking-wider mb-0.5">怨좎쟻??(A~B?깃툒)</p>
+   423:                         <h3 id="kpi-high-count" class="text-sm sm:text-lg font-black text-emeraldSuccess font-outfit">0嫄?/h3>
+   424:                     </div>
+
+--- Line 477 ---
+   472:                 <div id="bottom-preview-bar" class="sticky bottom-0 w-full bg-slate-900 text-slate-100 border-t border-slate-800 p-3 flex flex-col md:flex-row md:items-center md:justify-between gap-2.5 z-30 shadow-2xl text-[10.5px] transition-all duration-300 select-none">
+   473:                     <!-- Left Column: Site Info & LIVE PREVIEW Title -->
+   474:                     <div class="flex flex-col gap-1 w-full md:w-auto truncate">
+   475:                         <!-- Site Info (PC?섍꼍泥섎읆 紐⑤컮?쇱뿉??怨좎젙 ?쒖떆) -->
+   476:                         <div class="flex items-center justify-between md:justify-start gap-2 text-[9px] text-slate-400 font-extrabold tracking-wide uppercase border-b border-slate-800 md:border-b-0 pb-1 md:pb-0">
+>> 477:                             <span class="flex items-center gap-1"><i class="fa-solid fa-circle-nodes text-royalBlue animate-pulse"></i> AI 寃쎌떆/怨듬ℓ ?듯빀 ?쒖뒪??v1.0</span>
+   478:                             <span class="md:before:content-['|'] md:before:mx-2 md:before:text-slate-700 flex items-center gap-1"><i class="fa-solid fa-clock-rotate-left text-slate-500"></i> ?ㅼ떆媛??섏쭛 ?곕が 媛??以?/span>
+   479:                         </div>
+   480:                         <!-- Live Preview Title -->
+   481:                         <div class="flex items-center gap-2 font-bold truncate mt-1 md:mt-0">
+   482:                             <span class="bg-royalBlue text-white text-[8px] px-1 py-0.2 rounded flex-shrink-0 font-black tracking-tighter">LIVE PREVIEW</span>
+
+--- Line 736 ---
+   731:                         <span id="detail-ai-market-compare" class="text-[11px] sm:text-xs font-black text-emeraldSuccess leading-relaxed"></span>
+   732:                     </div>
+   733:                 </div>
+   734:             </div>
+   735: 
+>> 736:             <!-- ?썳截?3. AI 7? 沅뚮━ 由ъ뒪???뺣? ?섏씠釉뚮━??由ы룷??-->
+   737:             <div>
+   738:                 <h4 class="text-xs sm:text-sm font-black text-slate-500 uppercase tracking-wider mb-2.5 flex items-center gap-1.5">
+   739:                     <i class="fa-solid fa-shield-halved text-royalBlue"></i> AI 7? 沅뚮━ 由ъ뒪???뺣? ?섏씠釉뚮━??由ы룷??                </h4>
+   740:                 <div id="detail-risk-report" class="space-y-3">
+   741:                     <!-- 吏?ν삎 由ъ뒪??移대뱶媛 二쇱엯??-->
+
+--- Line 739 ---
+   734:             </div>
+   735: 
+   736:             <!-- ?썳截?3. AI 7? 沅뚮━ 由ъ뒪???뺣? ?섏씠釉뚮━??由ы룷??-->
+   737:             <div>
+   738:                 <h4 class="text-xs sm:text-sm font-black text-slate-500 uppercase tracking-wider mb-2.5 flex items-center gap-1.5">
+>> 739:                     <i class="fa-solid fa-shield-halved text-royalBlue"></i> AI 7? 沅뚮━ 由ъ뒪???뺣? ?섏씠釉뚮━??由ы룷??                </h4>
+   740:                 <div id="detail-risk-report" class="space-y-3">
+   741:                     <!-- 吏?ν삎 由ъ뒪??移대뱶媛 二쇱엯??-->
+   742:                 </div>
+   743:             </div>
+   744: 
+
+--- Line 818 ---
+   813:                     <div class="bg-slate-50/50 rounded-xl p-3 border border-slate-200/80 space-y-2.5">
+   814:                         <div class="flex items-center justify-between">
+   815:                             <label class="text-[10px] sm:text-xs font-black text-slate-700 uppercase tracking-wider flex items-center gap-1">
+   816:                                 <i class="fa-solid fa-building-columns text-royalBlue text-[10px]"></i> 寃쎈씫?붽툑?異??ㅼ젙 (LTV)
+   817:                             </label>
+>> 818:                             <span id="ltv-percentage-badge" class="text-[9px] font-black px-2 py-0.5 rounded-full border border-blue-200 bg-blue-50 text-royalBlue font-mono">鍮꾨?異?(0%)</span>
+   819:                         </div>
+   820:                         <div class="flex flex-wrap gap-1 bg-slate-100 p-1 rounded-xl border border-slate-200/60 shadow-inner">
+   821:                             <label class="flex-1 min-w-[34px] cursor-pointer text-center">
+   822:                                 <input type="radio" name="ltv-select" value="0" checked onchange="runCalculator()" class="sr-only peer">
+   823:                                 <span class="block py-1 text-[10px] sm:text-xs font-extrabold rounded-lg text-slate-500 peer-checked:bg-white peer-checked:text-royalBlue peer-checked:shadow-sm hover:text-slate-700 transition-all select-none">0%</span>
+
+--- Line 1442 ---
+   1437:                         const sg = sgFull.split(" ")[1];
+   1438:                         if (addressStr.includes(sg)) matchesSigungu = true;
+   1439:                     });
+   1440:                 }
+   1441: 
+>> 1442:                 // ??AI ?꾪뿕 ?깃툒(X?깃툒) 遺꾨쪟 留ㅼ묶
+   1443:                 let matchesGrade = true;
+   1444:                 if (gradeVal === 'safe') {
+   1445:                     matchesGrade = item.grade !== 'X';
+   1446:                 } else if (gradeVal === 'risk') {
+   1447:                     matchesGrade = item.grade === 'X';
+
+--- Line 1564 ---
+   1559:             }
+   1560:         }
+   1561: 
+   1562:         // 6. 硫붿씤 ?쇰뱶 ??쒕낫??KPI 媛?媛깆떊 諛??곷떒 湲濡쒕쾶 移댁슫??諛곗? 媛깆떊
+   1563:         function updateKPIDashboard() {
+>> 1564:             const recommendedText = `${filteredProperties.length}嫄?;
+   1565:             const totalText = originalProperties.length.toLocaleString();
+   1566:             const highGradeCount = filteredProperties.filter(item => item.grade === 'A' || item.grade === 'B').length;
+   1567:             const highText = `${highGradeCount}嫄?;
+   1568:             const riskCount = filteredProperties.filter(item => item.grade === 'X').length;
+   1569:             const riskText = `${riskCount}嫄?;
+
+--- Line 1572 ---
+   1567:             const highText = `${highGradeCount}嫄?;
+   1568:             const riskCount = filteredProperties.filter(item => item.grade === 'X').length;
+   1569:             const riskText = `${riskCount}嫄?;
+   1570: 
+   1571:             // Update PC/Desktop elements
+>> 1572:             const recPC = document.getElementById("kpi-recommended-count");
+   1573:             if (recPC) recPC.innerText = recommendedText;
+   1574:             const totPC = document.getElementById("kpi-total-count");
+   1575:             if (totPC) totPC.innerText = totalText;
+   1576:             const highPC = document.getElementById("kpi-high-count");
+   1577:             if (highPC) highPC.innerText = highText;
+
+--- Line 1573 ---
+   1568:             const riskCount = filteredProperties.filter(item => item.grade === 'X').length;
+   1569:             const riskText = `${riskCount}嫄?;
+   1570: 
+   1571:             // Update PC/Desktop elements
+   1572:             const recPC = document.getElementById("kpi-recommended-count");
+>> 1573:             if (recPC) recPC.innerText = recommendedText;
+   1574:             const totPC = document.getElementById("kpi-total-count");
+   1575:             if (totPC) totPC.innerText = totalText;
+   1576:             const highPC = document.getElementById("kpi-high-count");
+   1577:             if (highPC) highPC.innerText = highText;
+   1578:             const riskPC = document.getElementById("kpi-risk-count");
+
+--- Line 1582 ---
+   1577:             if (highPC) highPC.innerText = highText;
+   1578:             const riskPC = document.getElementById("kpi-risk-count");
+   1579:             if (riskPC) riskPC.innerText = riskText;
+   1580: 
+   1581:             // Update Mobile elements
+>> 1582:             const recMob = document.getElementById("kpi-recommended-count-mob");
+   1583:             if (recMob) recMob.innerText = recommendedText;
+   1584:             const totMob = document.getElementById("kpi-total-count-mob");
+   1585:             if (totMob) totMob.innerText = totalText;
+   1586:             const highMob = document.getElementById("kpi-high-count-mob");
+   1587:             if (highMob) highMob.innerText = highText;
+
+--- Line 1583 ---
+   1578:             const riskPC = document.getElementById("kpi-risk-count");
+   1579:             if (riskPC) riskPC.innerText = riskText;
+   1580: 
+   1581:             // Update Mobile elements
+   1582:             const recMob = document.getElementById("kpi-recommended-count-mob");
+>> 1583:             if (recMob) recMob.innerText = recommendedText;
+   1584:             const totMob = document.getElementById("kpi-total-count-mob");
+   1585:             if (totMob) totMob.innerText = totalText;
+   1586:             const highMob = document.getElementById("kpi-high-count-mob");
+   1587:             if (highMob) highMob.innerText = highText;
+   1588:             const riskMob = document.getElementById("kpi-risk-count-mob");
+
+--- Line 1784 ---
+   1779:                                     <span class="font-bold text-royalBlue font-mono">${est.discount}% ?媛?| ${est.failedCount}???좎같 (${item.round_info || '?좉굔'})</span>
+   1780:                                 </div>
+   1781:                             </div>
+   1782:                         </div>
+   1783: 
+>> 1784:                         <!-- AI Risk Summary Note -->
+   1785:                         <div class="mt-3.5 pt-3 border-t border-slate-100/80">
+   1786:                             <div class="text-[9px] ${item.grade === 'X' ? 'text-rose-600 font-black' : 'text-slate-500 font-bold'} truncate flex items-center gap-1.5" title="${item.notes_content}">
+   1787:                                 <i class="fa-solid fa-triangle-exclamation ${item.grade === 'X' ? 'text-rose-600 animate-pulse' : 'text-amber-500'} text-[8px] flex-shrink-0"></i>
+   1788:                                 <span class="truncate">${item.notes_content || '寃異쒕맂 ?뱀씠 沅뚮━ 愿怨꾧? ?놁뒿?덈떎.'}</span>
+   1789:                             </div>
+
+--- Line 1816 ---
+   1811:             debounceTimer = setTimeout(() => {
+   1812:                 applyFilters();
+   1813:             }, 150);
+   1814:         }
+   1815:  
+>> 1816:         // [?좉퇋 湲곕뒫 4] AI 7? 沅뚮━ ?섏옄 諛?由ъ뒪??吏?ν삎 ?먮룞 由ы룷??留ㅼ묶湲?        function generateLegalRiskReport(item) {
+   1817:             const textToSearch = `${item.address} ${item.desc_content} ${item.notes_content}`.toLowerCase();
+   1818:             let warnings = [];
+   1819:             
+   1820:             // 1. 嫄대Ъ留?留ㅺ컖 / ?吏沅??놁쓬
+   1821:             if (textToSearch.includes("?吏沅뚯뾾??) || textToSearch.includes("?좎?留?) || textToSearch.includes("嫄대Ъ留?) || textToSearch.includes("?吏沅?誘몃벑湲?)) {
+
+--- Line 1989 ---
+   1984:             const previewGrade = document.getElementById("preview-grade");
+   1985:             const previewRisk = document.getElementById("preview-risk");
+   1986:             
+   1987:             if (previewTitle && previewPrice && previewGrade && previewRisk) {
+   1988:                 previewTitle.innerHTML = `<span class="text-white font-extrabold">[${item.auction_no}]</span> <span class="text-slate-300 font-medium">${item.address}</span>`;
+>> 1989:                 previewPrice.innerHTML = `<i class="fa-solid fa-tags"></i> 理쒖?媛: ${formatKRW(item.minimum_bid)}`;
+   1990:                 previewGrade.innerHTML = `<i class="fa-solid fa-shield-halved"></i> AI: ${item.grade}?깃툒 (${item.score}??`;
+   1991:                 previewRisk.innerHTML = `<i class="fa-solid fa-triangle-exclamation text-amber-400"></i> ${item.notes_content || '寃異쒕맂 沅뚮━ ?섏옄 ?놁쓬'}`;
+   1992:             }
+   1993:             
+   1994:             // 諛곗? 諛??깃툒 ?먯닔 諛붿씤??            const badge = document.getElementById("detail-badge");
+
+--- Line 1990 ---
+   1985:             const previewRisk = document.getElementById("preview-risk");
+   1986:             
+   1987:             if (previewTitle && previewPrice && previewGrade && previewRisk) {
+   1988:                 previewTitle.innerHTML = `<span class="text-white font-extrabold">[${item.auction_no}]</span> <span class="text-slate-300 font-medium">${item.address}</span>`;
+   1989:                 previewPrice.innerHTML = `<i class="fa-solid fa-tags"></i> 理쒖?媛: ${formatKRW(item.minimum_bid)}`;
+>> 1990:                 previewGrade.innerHTML = `<i class="fa-solid fa-shield-halved"></i> AI: ${item.grade}?깃툒 (${item.score}??`;
+   1991:                 previewRisk.innerHTML = `<i class="fa-solid fa-triangle-exclamation text-amber-400"></i> ${item.notes_content || '寃異쒕맂 沅뚮━ ?섏옄 ?놁쓬'}`;
+   1992:             }
+   1993:             
+   1994:             // 諛곗? 諛??깃툒 ?먯닔 諛붿씤??            const badge = document.getElementById("detail-badge");
+   1995:             
+
+--- Line 2078 ---
+   2073:                         </div>
+   2074:                     `;
+   2075:                 }
+   2076:             }
+   2077:             
+>> 2078:             // AI 7? 由ъ뒪???뺣? 由ы룷???뚮뜑留?二쇱엯
+   2079:             const riskReportPanel = document.getElementById("detail-risk-report");
+   2080:             riskReportPanel.innerHTML = generateLegalRiskReport(item);
+   2081: 
+   2082:             // ?윟 [?좉퇋] ?숈쟻 媛移??됯? 諛??덉긽 紐낅룄 ?쒕??덉씠??吏???곗궛
+   2083:             const est = estimateAuctionRounds(item.appraised_value, item.minimum_bid, item.source);
+
+--- Line 2159 ---
+   2154:             const totalBudget = bidInputVal + acquisitionTax + agencyFee;
+   2155: 
+   2156:             // LTV 怨꾩궛 諛?湲덈━ ?쒕??덉씠??            const ltvRadio = document.querySelector('input[name="ltv-select"]:checked');
+   2157:             const ltvPercent = ltvRadio ? parseInt(ltvRadio.value) : 0;
+   2158:             
+>> 2159:             const ltvBadge = document.getElementById("ltv-percentage-badge");
+   2160:             const sliderArea = document.getElementById("loan-interest-slider-area");
+   2161:             const planArea = document.getElementById("financial-plan-area");
+   2162:             
+   2163:             if (ltvPercent > 0) {
+   2164:                 if (sliderArea) sliderArea.classList.remove("hidden");

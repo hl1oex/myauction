@@ -1,0 +1,2081 @@
+﻿commit 7aa10f4ebced8b576c87d0488ab52b9939bd24e0
+Author: hl1oex <hl1oex@users.noreply.github.com>
+Date:   Tue Jun 9 07:54:52 2026 +0900
+
+    Feat: 濡쒓렇????鍮??붾㈃ 踰꾧렇 ?섏젙 諛?愿??留ㅻЪ ?꾪꽣 踰꾪듉 異붽?
+
+diff --git a/auction.db b/auction.db
+index 7941cef..02ffacb 100644
+Binary files a/auction.db and b/auction.db differ
+diff --git a/checklist.md b/checklist.md
+index bc5dddf..9d22d2e 100644
+--- a/checklist.md
++++ b/checklist.md
+@@ -58,7 +58,45 @@ React Native 紐⑤컮????媛쒕컻 怨쇱젙???몃? ?④퀎蹂?泥댄겕由ъ뒪?몄엯
+   - [ ] FeedScreen.tsx ?꾪꽣 ?쇰꺼, 移? ?좉? ???꾨컲?곸씤 ?고듃 ?ш린 ?ㅼ??쇱뾽
+   - [ ] FeedScreen.tsx Firestore 濡쒕뱶 ?ㅽ뙣 ??LocalStorage 蹂듦뎄 罹먯떛 硫붿빱?덉쬁 ?묒옱
+   - [ ] 紐⑤컮?????뺤쟻 ??鍮뚮뱶 諛?Firebase Hosting ?щ같??-
++- [x] 紐⑤컮?????ㅻ줈媛湲????꾪꽣 珥덇린??諛⑹? 諛?怨꾩궛湲??덉씠?꾩썐 ?섏젙
++  - [x] App.tsx?먯꽌 selectedProperty ?곸꽭 吏꾩엯 ??FeedScreen ?몃쭏?댄듃 李⑤떒 (Modal ?ㅻ쾭?덉씠??
++  - [x] index.html??calc-bid-input ?명뭼 紐⑤컮??媛뺤젣 以뚯씤 諛⑹? (text-base ?곸슜)
++  - [x] index.html??640px ?댄븯 紐⑤컮??誘몃뵒??荑쇰━濡?媛???ㅽ뙣??肄ㅽ뙥???ㅽ???異붽?
++- [x] 紐⑤컮???댁긽???ㅻ뜑 李뚭렇?ъ쭚 諛??뚯뀥 濡쒓렇???곕룞 媛쒖꽑
++  - [x] index.html??connection-sensor ?띿뒪??諛섏쓳??遺꾨━ ?곸슜.
++  - [x] index.html 諛?AuthScreen.tsx ?뚯뀥濡쒓렇??由щ떎?대젆??二쇱냼 蹂댁젙 諛??ㅼ씠踰??덉쇅 泥섎━.
++  - [x] index.html??怨꾩궛湲??ㅽ뙣???レ옄 ?고듃 ?ш린 ?곹뼢.
++- [x] 紐⑤컮???곸꽭 ?붾㈃(DetailScreen) ?꾩닔 湲곕뒫 ?곕룞
++  - [x] DetailScreen.tsx???낆같 ?뱀씪 ?꾩닔 泥댄겕由ъ뒪???숈쟻 ?뚮뜑留?釉붾줉 異붽?.
++  - [x] DetailScreen.tsx??6? ?뺣? ?ㅻТ 怨듭슜 ?뺣낫留??곕룞 諛??쒕쪟 議고쉶 踰꾪듉 ?묒옱.
++  - [x] DetailScreen.tsx 媛???ㅽ뙣???レ옄 ?고듃 ?ш린 ?곹뼢.
++- [x] 紐⑤컮????鍮뚮뱶 諛?寃利?+  - [x] ?섏젙?ы빆 ?곸슜 ??Expo 鍮뚮뱶 ?뺤긽 媛??寃利?
++- [x] Supabase OAuth ?쒕쾭 ?쒓났??誘명솢?깊솕 ???諛?媛?대뱶 異붽?
++  - [x] index.html???뚯뀥 濡쒓렇???먮윭 諛??ъ슜??媛?대뱶 ??뿉 Supabase 肄섏넄 ?곕룞 ?덈궡 蹂닿컯.
++  - [x] AuthScreen.tsx???뚯뀥 濡쒓렇???ㅽ뙣 ??Supabase ?쒓났???쒖꽦???덈궡 ?앹뾽 蹂댁셿.
++  - [x] 援ш? 濡쒓렇????localhost:3000 由щ떎?대젆???닿껐 諛?濡쒓렇???깃났 ??利먭꺼李얘린 ?먮룞 ?대룞 ?ㅼ젙.
++    - [x] index.html??onAuthStateChange 肄쒕갚?먯꽌 濡쒓렇???깃났 ??showFavoritesOnly ?꾪꽣 ?먮룞 ?쒖꽦??援ы쁽.
++    - [x] mobile-app/App.tsx??AuthScreen onSuccess 肄쒕갚?먯꽌 setActiveTab('favorites')濡??먮룞 ???꾪솚 援ы쁽.
++    - [x] index.html??getFallbackGuideHTML()??Site URL 諛?Redirect URLs ?ㅼ젙踰?媛?대뱶 蹂닿컯.
++    - [x] mobile-app/src/screens/GuideScreen.tsx??Supabase 由щ떎?대젆???몃윭釉붿뒋??媛?대뱶 移대뱶 異붽?.
++    - [x] ?섏젙?ы빆 ?곸슜 ??理쒖쥌 鍮뚮뱶 諛?Firebase Hosting ?щ같???꾩닔.
++- [x] ?뚯썝媛??李?UI 諛?湲곕뒫 媛쒖꽑 (??& 紐⑤컮??
++  - [x] index.html 濡쒓렇??紐⑤떖??鍮꾨?踰덊샇 ?뺤씤 ?꾨뱶 異붽? 諛?媛??紐⑤뱶 ???좉? 泥섎━.
++  - [x] index.html ?뚯뀥 踰꾪듉 ?띿뒪?몃? 濡쒓렇??媛??紐⑤뱶???곕씪 ?숈쟻?쇰줈 媛蹂 ?뚮뜑留?
++  - [x] index.html ?대찓??媛???쒖텧(submitAuth) ??鍮꾨?踰덊샇 ?뺤씤 寃利?濡쒖쭅 異붽?.
++  - [x] AuthScreen.tsx??鍮꾨?踰덊샇 ?뺤씤 ?띿뒪?몄씤??異붽? 諛?媛??紐⑤뱶 ???몄텧 泥섎━.
++  - [x] AuthScreen.tsx ?뚯뀥 踰꾪듉 ?띿뒪???숈쟻 遺꾧린 諛??쒖텧(handleAuthSubmit) ??鍮꾨?踰덊샇 ?쇱튂 寃利?異붽?.
++  - [x] ?섏젙?ы빆 ?곸슜 ??理쒖쥌 鍮뚮뱶 諛?Firebase Hosting ?щ같???꾩닔.
++91: - [x] ?꾨━誘몄뾼 ?뚮퉬肄??쒖븞 ?쒖옉 諛?理쒖쥌 ?쒖븞(?쒖븞 B: 吏꾪븳 ?щ챸 AI ?뚰겕) ?댁떇 諛?諛고룷 ?꾩닔.
++92: - [x] 濡쒓렇???깃났 ??愿??紐⑸줉 媛뺤젣 ?꾪꽣留?諛????대룞 ?ㅼ옉???섏젙
++93:   - [x] index.html?먯꽌 濡쒓렇???깃났(SIGNED_IN) ??showFavoritesOnly = true 濡쒖쭅 ?쒓굅
++94:   - [x] mobile-app/App.tsx?먯꽌 濡쒓렇???깃났(onSuccess) ??setActiveTab('favorites') 媛뺤젣 ?꾪솚 濡쒖쭅 ?쒓굅
++95: - [x] ????쒕낫???쇰뱶 ?곷떒 ?뺣젹 ?듭뀡 ?곗륫???꾨━誘몄뾼 怨⑤뱶 ??愿?щぉ濡??꾪꽣 踰꾪듉 異붽?
++96:   - [x] index.html ?뺣젹 ?듭뀡 ?곸뿭 ?덉씠?꾩썐 媛쒗렪 諛?踰꾪듉 留덊겕??異붽?
++97:   - [x] 濡쒓렇???곹깭 諛?愿??紐⑸줉 媛쒖닔 ?ㅼ떆媛??곕룞 泥섎━ (updateFavoritesButtonUI 援ы쁽 諛??곕룞)
++98:   - [x] 踰꾪듉 ?대┃ ???꾪꽣留??꾪솚 ?몃뱾??(toggleFavoritesFilterBtn) 諛??ъ씠?쒕컮 ?좉?怨쇱쓽 ?곹깭 ?숆린??援ы쁽
++99: - [x] ?섏젙 ?ы빆 諛섏쁺 ??鍮뚮뱶 諛?Firebase Hosting ?щ같???꾩닔
+ 
+ 
+ 
+diff --git a/context-notes.md b/context-notes.md
+index 14fe488..3a1e5ba 100644
+--- a/context-notes.md
++++ b/context-notes.md
+@@ -40,7 +40,48 @@
+ - ?쒕쾭??1,895嫄댁쓽 ?곗씠?곌? ?덉쓬?먮룄 ?붾㈃??3媛쒕쭔 蹂댁씤 ?먯씤??異붿쟻??寃곌낵, 臾대즺 Firestore???쇱씪 ?쎄린 ?쒕룄(50,000 reads)媛 ?뚯쭊?섎㈃??Firestore SDK?먯꽌 `RESOURCE_EXHAUSTED` Quota 珥덇낵 ?먮윭媛 諛쒖깮??寃껋쓣 洹쒕챸?섏??듬땲??
+ - Firestore 濡쒕뱶 ?ㅽ뙣 ???덈퉬???섎뱶肄붾뵫 ?곗씠??`fallbackData` 4嫄?以?留덇컧 ?꾪꽣濡?3嫄??몄텧)留?諛섑솚?섎뜕 臾몄젣瑜?諛⑹뼱?섍린 ?꾪빐, ?곗씠??濡쒕뱶 ?깃났 ??釉뚮씪?곗? `localStorage`???곗씠?곕? 罹먯떛?대몢怨? ?먮윭 ????罹먯떆瑜?蹂듦뎄?섏뿬 1,895嫄댁쓽 ?ㅻ뜲?댄꽣瑜?臾댁쨷?⑥쑝濡?蹂????덈룄濡?罹먯떛 ?꾨왂??寃곗젙?섏??듬땲??
+ 
+-
+-
+-
+-
++### ?ㅻ뜑 諛섏쓳??李뚭렇?ъ쭚 諛?怨꾩궛湲??ㅽ뙣???쒖씤??媛쒖꽑 寃곗젙 (2026-06-08)
++- ?붾㈃ ??씠 醫곸? 紐⑤컮??酉곗뿉???ㅻ뜑???곕룞 ?쇱꽌 ?띿뒪??"?ㅼ떆媛??곗씠???곕룞 ?뺤긽 (N嫄?")媛 怨듦컙 遺議깆쑝濡?李뚭렇?ъ?怨??꾨줈 ?잕뎄移섎뒗 臾몄젣瑜??닿껐?섍린 ?꾪빐, CSS 誘몃뵒??荑쇰━? JS 媛깆떊 遺遺꾩뿉 諛섏쓳???대옒??`hidden sm:inline` 諛?`inline sm:hidden`)瑜??꾩엯?섏뿬 紐⑤컮?쇱뿉?쒕뒗 "?윟 N嫄? ?뺥깭濡?媛꾩냼?뷀빐 ?몄텧?섍린濡??섏??듬땲??
++- ?ㅻ쭏???뚯슂?먭툑 怨꾪쉷??媛???ㅽ뙣?쒖쓽 ?꾩껜 ?덉씠?꾩썐 洹쒓꺽???좎??섎㈃???レ옄 ?고듃 ?ш린留??좏깮?곸쑝濡??뺣??섍린 ?꾪빐, ?レ옄 踰꾪듉(?대옒??`font-outfit`??遺?щ맂 踰꾪듉?????쒗븯???고듃 ?ш린瑜??곗뒪?ы넲 湲곗? `16px`, 紐⑤컮??誘몃뵒??荑쇰━ 湲곗? `18px`濡??곹뼢 ?곸슜?섍린濡?寃곗젙?섏??듬땲??
++
++### ?뚯뀥 濡쒓렇???덉쇅 泥섎━ 諛??덉젙??寃곗젙 (2026-06-08)
++- Supabase Auth?먯꽌 怨듭떇?곸쑝濡?吏?먰븯吏 ?딅뒗 Naver ?뚯뀥 濡쒓렇???쒕룄 ?? ?ъ슜?먯뿉寃?"?ㅼ씠踰?濡쒓렇?몄? 以鍮?以??대씪???덈궡 硫붿떆吏瑜??앹뾽?쇰줈 ?몄텧?섍퀬 李⑤떒?섎뒗 諛⑹떇???앺븯??듬땲??
++- 援ш? 諛?移댁뭅??濡쒓렇????redirect URL??荑쇰━ ?ㅽ듃留곸씠 ?쒓굅???쒖닔 ?꾨찓??二쇱냼濡?紐낆떆?섏뿬 Supabase Auth 由щ떎?대젆???덉쇅瑜?諛⑹??섎룄濡?議곗튂?섍린濡?寃곗젙?섏??듬땲??
++
++### 紐⑤컮???곸꽭 ?붾㈃ (DetailScreen.tsx) ?꾩닔 湲곕뒫 ?곕룞 寃곗젙 (2026-06-08)
++- PC ??쒕낫???뱀뿉留?議댁옱?섎뜕 '?낆같 ?뱀씪 ?꾩닔 泥댄겕由ъ뒪??瑜?紐⑤컮???깆뿉???묒옱?섍린 ?꾪빐, 留ㅻЪ??異쒖쿂(`court` ?뱀? 湲고?)???곕씪 踰뺤썝寃쎈ℓ??諛??⑤퉬??怨듬ℓ??泥댄겕由ъ뒪?몃? ?숈쟻?쇰줈 援щ텇?섏뿬 ?뚮뜑留곹븯湲곕줈 寃곗젙?섏??듬땲??
++- '?뺣? ?ㅻТ 怨듭슜 ?뺣낫留??곕룞 諛??쒕쪟 議고쉶' 踰꾪듉 洹몃━?쒕? 紐⑤컮???곸꽭 酉?理쒗븯?⑥뿉 援ы쁽?섎ŉ, ?ㅼ씠踰?吏??諛??ㅼ씠踰?遺?숈궛 寃???곕룞 ???대떦 留ㅻЪ???ㅼ젣 二쇱냼瑜??몄퐫?⑺븯??利됱떆 ?ㅺ굅?섍? 諛??꾩튂瑜?議고쉶?????덇쾶 ?곕룞?깆쓣 洹밸??뷀븯湲곕줈 寃곗젙?섏??듬땲??
++- 紐⑤컮???깆쓽 媛???ㅽ뙣????떆 ?レ옄 湲???ш린瑜?18?먯꽌 22濡??곹뼢?섏뿬 媛?낆꽦??媛쒖꽑?섍린濡??섏??듬땲??
++
++### Supabase OAuth "Unsupported provider" ?ㅻ쪟 諛⑹? 諛??ъ슜??媛?대뱶 異붽? (2026-06-08)
++- 援ш? ?뚯뀥 濡쒓렇????諛쒖깮?섎뒗 Supabase ?쒕쾭 痢??쒓났??誘명솢?깊솕(Disabled) ?먮윭???좎뿰?섍쾶 ?泥섑븯湲??꾪빐, ?먮윭 諛쒖깮 ???⑥닚 ?먮윭 ?댁슜 ???"Supabase ??쒕낫?쒖뿉??Google/Kakao ?쒓났?먮? 癒쇱? ?쒖꽦?뷀빐???쒕떎"??議곗튂 諛⑸쾿??紐낇솗?섍쾶 ?뚮젮二쇰뒗 ?덈궡 ?앹뾽??異붽??섍린濡??섏??듬땲??
++- '?ъ슜??媛?대뱶' ???대???Supabase OAuth ?ㅼ젙 諛⑸쾿 諛??대찓??媛????硫붿씪 ?몄쬆??嫄대꼫?곕뒗 ??Confirm email ?ㅼ젙 ?꾧린)???ы븿???곸꽭 ?쒕쾭 肄섏넄 媛?대뱶瑜?異붽??섏뿬, ?ъ슜??`hl1oex@gmail.com` ?깆쓽 媛???뚯뒪?몃? ?⑹씠?섍쾶 ?섎룄濡??좊룄?섍린濡?寃곗젙?섏??듬땲??
++
++### 援ш? ?뚯뀥 濡쒓렇??由щ떎?대젆???닿껐 諛?濡쒓렇???깃났 ??利먭꺼李얘린 ?먮룞 ?꾪솚 寃곗젙 (2026-06-08)
++- 援ш? ?뚯뀥 濡쒓렇???깃났 ??localhost:3000?쇰줈 ?뺢린??臾몄젣??Supabase ?쒕쾭 痢≪쓽 URL Configuration ?ㅼ젙?먯꽌 ?덉슜 紐⑸줉??諛고룷 二쇱냼媛 鍮좎졇?덇린 ?뚮Ц??諛쒖깮?섎뒗 ?꾩긽?꾩쓣 洹쒕챸?섏??듬땲??
++- ?대? ?닿껐?섍린 ?꾪빐, ?ъ슜?먭? ??쒕낫?쒖뿉???섏젙?댁빞 ??媛?대뱶瑜?index.html 諛?紐⑤컮???깆쓽 GuideScreen.tsx??異붽??섏??듬땲??
++- ?먰븳, 濡쒓렇???꾨즺 ???먮룞?쇰줈 愿??紐⑸줉??蹂닿쾶 ?대떖?쇰뒗 ?붽뎄?ы빆??諛섏쁺?섏??듬땲??
++  - ????쒕낫??index.html)?먯꽌??onAuthStateChange 肄쒕갚?먯꽌 SIGNED_IN ?대깽??諛쒖깮 ??愿??留ㅻЪ 蹂닿린 ?꾪꽣(showFavoritesOnly = true)瑜??먮룞 媛?숉븯?꾨줉 ?곕룞?섏??듬땲??
++  - 紐⑤컮????App.tsx)?먯꽌??AuthScreen 濡쒓렇???깃났 ??activeTab??'favorites'濡?蹂寃쏀븯??愿??紐⑸줉 ??쑝濡??먮룞 ?꾪솚 泥섎━?섏??듬땲??
++
++### ?뚯썝媛??李?UI 媛쒖꽑 諛??뚯뀥濡쒓렇??由щ떎?대젆???대갚 ?곸슜 寃곗젙 (2026-06-08)
++- ?뚯썝媛??紐⑤뱶?????대찓??鍮꾨?踰덊샇 ?낅젰 ?몄뿉 鍮꾨?踰덊샇 ?ㅽ? 諛⑹?瑜??꾪빐 '鍮꾨?踰덊샇 ?뺤씤' ?낅젰 ?꾨뱶瑜???index.html)怨?紐⑤컮????AuthScreen.tsx)??媛곴컖 異붽??섏??듬땲??
++- 媛??紐⑤뱶 ?쒖텧 ????鍮꾨?踰덊샇???쇱튂 ?щ?瑜??議?寃利앺븯???대씪?댁뼵??濡쒖쭅??異붽??섏뿬 ?덉쟾?깆쓣 媛뺥솕?섏??듬땲??
++- ?뚯썝媛??紐⑤뱶 ?곹깭?먯꽌???섎떒??媛꾪렪 ?뚯뀥 濡쒓렇??踰꾪듉 ?쇰꺼 ?띿뒪?몃룄 ?숈쟻?쇰줈 'XX 怨꾩젙?쇰줈 ?뚯썝媛???쇰줈 媛蹂 ?몄텧?섎룄濡??섏뿬 ?꾨━誘몄뾼 ?쇱껜???붿옄?몄쓣 援ъ텞?섏??듬땲??
++- ?ъ슜?먭? 濡쒖뺄 ?뚯씪 寃쎈줈(file://)?먯꽌 ?댁뿀嫄곕굹 遺?뺥솗???섍꼍???덉쓣 寃쎌슦 ?뚯뀥 濡쒓렇???꾨즺 ??由щ떎?대젆???꾩쨷 ?뺢꺼???먮윭媛 ?섎뒗 臾몄젣瑜?諛⑹??섍린 ?꾪빐, ?밴낵 紐⑤컮???깆뿉??OAuth ?몄텧 ??由щ떎?대젆??二쇱냼(redirectTo)瑜??덉쟾??諛고룷 ?몄뒪???쒕쾭 二쇱냼(https://action-b8c75.web.app/)濡???긽 ?덉쟾 ?섎졃?섎룄濡??대갚 ?곕룞?섏??듬땲??
++
++### ?뚯뀥 濡쒓렇???ъ쟾 援ъ꽦(Authentication -> URL Configuration) 寃쎄퀬 ?앹뾽 異붽? 寃곗젙 (2026-06-08)
++- 援ш? ?뚯뀥 濡쒓렇???깃났 吏곹썑 localhost:3000?쇰줈??由щ떎?대젆???묒냽 遺덇???臾몄젣瑜??닿껐?섍린 ?꾪빐?쒕뒗, ?대씪?댁뼵??肄붾뱶?⑤퓧留??꾨땲??Supabase ?쒕쾭 痢?肄섏넄?먯꽌 諛고룷 ?꾨찓?몄쓣 ?깅줉?섎뒗 ?꾩닔 ?ъ쟾 ?덉감媛 ?꾩슂?⑸땲??
++- ?ъ슜?먭? ???ъ떎???쎄쾶 ?먭컖?섍퀬 ?먭? 議곗튂瑜?痍⑦븷 ???덈룄濡? ??index.html)怨?紐⑤컮????AuthScreen.tsx)???뚯뀥 濡쒓렇??踰꾪듉???대┃?덉쓣 ??Supabase URL Configuration ?ㅼ젙 ?깅줉 ?щ?瑜?臾삳뒗 ?ъ쟾 ?뺤씤 ??붿긽??Confirm 諛?Alert)瑜?媛뺤젣 ?앹뾽?섎룄濡?議곗튂?섏??듬땲??
++- ?대떦 ?앹뾽?먯꽌 ?ъ슜?먭? ?덈? ?대┃?댁빞留?濡쒓렇?몄씠 ?랁뻾?섎ŉ, ?깅줉?섏? ?딆븯??寃쎌슦 ?ъ쟾??李⑤떒?섏뼱 localhost:3000?쇰줈???ㅼ옉??諛??뺢? ?꾩긽???꾨꼍?섍쾶 諛⑹??섏??듬땲??
++
++### ?뚯뀥 濡쒓렇???ъ쟾 援ъ꽦 ?뺤씤 ?앹뾽 ?쒓굅 寃곗젙 (2026-06-09)
++- Supabase ??쒕낫???댁쓽 Site URL 諛?Redirect URLs ?ㅼ젙???꾨웾 ?щ컮瑜닿쾶 ?숆린???꾨즺?섏뼱 ?뺤긽 ?숈옉?⑥쓣 吏곸젒 寃利앺븯??쇰?濡? ?ъ슜??諛⑺빐?섎뒗 湲곗〈 ?ъ쟾 ?뺤씤????붿긽??confirm 諛?Alert)瑜??밴낵 紐⑤컮?????꾩껜?먯꽌 ?꾩쟾 ??젣 泥섎━?섏??듬땲??
++
++### ?꾨━誘몄뾼 ?뚮퉬肄??쒖븞 B (吏꾪븳 ?щ챸 AI ?뚰겕) 理쒖쥌 梨꾪깮 諛??댁떇 寃곗젙 (2026-06-09)
++- ?ъ슜?먯쓽 ?쇰뱶諛깆뿉 ?곕씪 '誘몃옒??AI ?뚰겕' ?쒖븞 B瑜?理쒖쥌 ?뚮퉬肄섏쑝濡?梨꾪깮?섏??듬땲??
++- 釉뚮씪?곗? ??諛??ㅼ뼇??OS ?ㅽ겕/?쇱씠??紐⑤뱶?먯꽌 ?щ낵 ?꾩씠肄섏씠 紐낇솗?섍쾶 ?뚮뜑留곷릺?꾨줉 諛곌꼍???꾩쟾???щ챸(transparent)?쇰줈 蹂댁젙?섍퀬, ?됱긽 ?鍮꾩? ?좎쓽 ?먭퍡瑜??쒖링 吏숆퀬 ?좊챸?섍쾶 ?ㅻ벉? '吏꾪븳 ?щ챸 AI ?뚰겕' 踰꾩쟾???앹꽦?섏뿬 猷⑦듃 諛?諛고룷 ?대뜑???뺤떇 ?댁떇?섏??듬땲??
++
++### 濡쒓렇???깃났 ??愿??紐⑸줉 媛뺤젣 ?꾪꽣留?諛????대룞 ?쒓굅 (2026-06-09)
++- 濡쒓렇???꾨즺 吏곹썑 ?ъ슜?먯쓽 愿??留ㅻЪ ?댁뿭??鍮꾩뼱 ?덉쓣 寃쎌슦(0嫄?, ?붾㈃???꾩쟾????鍮꾩뼱 蹂댁씠??踰꾧렇???ъ슜?깆쓣 媛쒖꽑?섍린 ?꾪빐 濡쒓렇???꾨즺 利됱떆 愿??紐⑸줉 ?꾪꽣瑜?媛뺤젣 ?쒖꽦?뷀븯嫄곕굹(index.html) 愿?щぉ濡???쑝濡?媛뺤젣 ?대룞(App.tsx)?섎뜕 ?먮룞 濡쒖쭅???쒓굅?섏??듬땲??
++- ??? 濡쒓렇?명븳 ?좎????쒗빐 硫붿씤 異붿쿇 留ㅻЪ ?쇰뱶 ?곷떒??'?뺣젹 ?듭뀡' 諛??곗륫???ㅼ떆媛꾩쑝濡?愿??紐⑸줉 媛쒖닔瑜??곕룞??蹂댁뿬二쇰뒗 ?꾨━誘몄뾼 怨⑤뱶/?곕쾭 ?ㅼ쓽 '??愿??留ㅻЪ' ?꾪꽣 踰꾪듉??異붽??섏뿬 ?꾩슂 ??媛꾪렪?섍쾶 紐⑥븘蹂????덈뒗 二쇰룄??UX瑜??ㅺ퀎?섏??듬땲??
+diff --git a/favicon.png b/favicon.png
+new file mode 100644
+index 0000000..53c9fa6
+Binary files /dev/null and b/favicon.png differ
+diff --git a/index.html b/index.html
+index 73d1172..9bf3292 100644
+--- a/index.html
++++ b/index.html
+@@ -16,6 +16,7 @@
+         })();
+     </script>
+     <title>AI 遺?숈궛 寃쎌떆/怨듬ℓ ?ㅼ떆媛??듯빀 異붿쿇 ?쒖뒪??v1.1</title>
++    <link rel="icon" type="image/png" href="/favicon.png">
+     <!-- ?뭿 1. ?꾨━誘몄뾼 ?붿옄????댄룷洹몃옒?쇰? ?꾪븳 Google Fonts ?곕룞 -->
+     <link rel="preconnect" href="https://fonts.googleapis.com">
+     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+@@ -125,6 +126,29 @@
+             }
+         }
+ 
++        /* ?벑 紐⑤컮???댁긽??640px ?댄븯) 怨꾩궛湲??꾩슜 理쒖쟻???ㅽ???*/
++        @media (max-width: 640px) {
++            #calc-bid-input {
++                font-size: 16px !important;
++            }
++            .calculator-keypad button {
++                font-size: 14px !important;
++                padding-top: 4px !important;
++                padding-bottom: 4px !important;
++                letter-spacing: -0.5px !important;
++            }
++            /* 媛???ㅽ뙣???レ옄 踰꾪듉 湲???ш린留??ㅼ슦湲?(洹쒓꺽 ?ш린???좎?) */
++            .calculator-keypad button.font-outfit {
++                font-size: 19px !important;
++            }
++            .calculator-keypad button.font-sans,
++            .calculator-keypad button.font-bold,
++            .calculator-keypad button#preset-minimum-btn,
++            .calculator-keypad button#preset-appraisal-btn {
++                font-size: 10.5px !important;
++            }
++        }
++
+         /* ?뱞 ?ъ슜??媛?대뱶 & 踰뺣쪧 ?ъ쟾 - ?쒖? 蹂닿퀬??臾몄꽌 ?ㅽ???(媛?낆꽦 洹밸??? */
+         .document-view h2 {
+             font-size: 1.25rem !important; /* 20px */
+@@ -209,6 +233,9 @@
+             margin: 0.875rem 0 !important;
+             text-align: left !important;
+         }
++        .calculator-keypad button.font-outfit {
++            font-size: 16px !important;
++        }
+     </style>
+ 
+ </head>
+@@ -236,10 +263,11 @@
+         <!-- [?곗륫 ?곸뿭] ?ㅼ떆媛??먯궛 ?꾪솴??諛??곌껐 ?쇱꽌 (hidden ?댁젣 諛??곗륫 ?뺣? 諛곗튂) -->
+         <div class="flex items-center gap-2 ml-auto">
+             <div id="connection-sensor" onclick="fetchDataFromServer(); fetchSyncStatus();" 
+-                 class="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-slate-50 border border-slate-200 text-slate-705 text-[9.5px] font-black shadow-sm transition-all duration-300 cursor-pointer hover:bg-slate-100 active:scale-95 whitespace-nowrap" 
++                 class="flex items-center gap-1 min-[360px]:gap-1.5 px-1.5 min-[360px]:px-2.5 py-0.5 min-[360px]:py-1 rounded-full bg-slate-50 border border-slate-200 text-slate-705 text-[8.5px] min-[360px]:text-[9.5px] font-black shadow-sm transition-all duration-300 cursor-pointer hover:bg-slate-100 active:scale-95 whitespace-nowrap" 
+                  title="?대┃?섏떆硫?利됱떆 ?ㅼ떆媛??곗씠???곕룞 諛??숆린?붾? ?ъ떆?꾪빀?덈떎.">
+                 <span class="w-1.5 h-1.5 rounded-full bg-slate-400"></span>
+-                <span>?곕룞 ?湲?以?/span>
++                <span class="hidden sm:inline">?곕룞 ?湲?以?/span>
++                <span class="inline sm:hidden">?湲?以?/span>
+             </div>
+             
+             <div class="hidden md:flex items-center gap-1 px-2.5 py-1 bg-blue-50/80 border border-blue-100 text-royalBlue text-[9.5px] font-black rounded-full shadow-sm whitespace-nowrap">
+@@ -251,6 +279,13 @@
+                 <i class="fa-solid fa-clock-rotate-left"></i>
+                 <span>諛깃렇?쇱슫???ㅼ?以??섏쭛 以?/span>
+             </div>
++            
++            <!-- [異붽?] 濡쒓렇??/ ?뚯썝媛???곹깭 愿由?諛곗? -->
++            <div id="auth-status-container" class="flex items-center gap-1 sm:gap-1.5">
++                <button onclick="openLoginModal()" class="px-1.5 min-[360px]:px-2.5 py-0.5 min-[360px]:py-1 rounded-full border border-royalBlue text-royalBlue bg-white text-[8.5px] min-[360px]:text-[9.5px] font-black shadow-sm transition-all duration-300 cursor-pointer hover:bg-blue-50 active:scale-95 whitespace-nowrap">
++                    <i class="fa-solid fa-user-lock mr-0.5"></i> 濡쒓렇??/ ?뚯썝媛??+                </button>
++            </div>
+         </div>
+     </header>
+  
+@@ -379,6 +414,15 @@
+                     </label>
+                 </div>
+ 
++                <!-- ??愿??紐⑸줉留?蹂닿린 ?좉? ?ㅼ쐞移?-->
++                <div class="flex items-center justify-between bg-slate-50 border border-slate-200 rounded-xl p-3">
++                    <span class="text-xs font-black text-slate-500 uppercase tracking-wider">????愿??紐⑸줉留?蹂닿린</span>
++                    <label class="relative inline-flex items-center cursor-pointer">
++                        <input type="checkbox" id="show-favorites-toggle" onchange="toggleFavoritesFilter()" class="sr-only peer">
++                        <div class="w-9 h-5 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-royalBlue"></div>
++                    </label>
++                </div>
++
+                 <!-- AI ?먯궛 ?깃툒 ?꾪꽣 (?덉쟾 / ?꾪뿕 援щ텇 蹂닿린) -->
+                 <div class="bg-slate-50 border border-slate-200 rounded-xl p-3.5 space-y-2">
+                     <label class="block text-[11px] sm:text-xs font-black text-slate-500 uppercase tracking-wider">?좑툘 AI 沅뚮━ ?깃툒 遺꾨쪟 ?꾪꽣</label>
+@@ -485,15 +529,21 @@
+             <!-- ?렞 [TAB 1: 異붿쿇 留ㅻЪ ?쇰뱶 而⑦뀒?대꼫] -->
+             <div id="dashboard-view" class="flex flex-col flex-1 overflow-hidden">
+                 <!-- ?뺣젹 諛?由ъ뒪???꾪꽣 諛?-->
+-                <div class="px-3.5 py-1.5 bg-white border-b border-slate-200 flex justify-between items-center z-10 shadow-sm">
+-                    <span class="text-xs font-black text-slate-400 uppercase tracking-wider">?뺣젹 ?듭뀡</span>
+-                    <div class="flex flex-wrap gap-1">
+-                        <button id="sort-score-btn" onclick="sortData('score')" class="bg-royalBlue text-white px-2 py-1 rounded text-[10px] font-black shadow-sm transition-all">???먯닔??/button>
+-                        <button id="sort-date-btn" onclick="sortData('date')" class="bg-white border border-slate-200 text-slate-600 px-2 py-1 rounded text-[10px] font-black hover:bg-slate-50 transition-all">?뱟 湲곗씪??/button>
+-                        <button id="sort-price-btn" onclick="sortData('price')" class="bg-white border border-slate-200 text-slate-600 px-2 py-1 rounded text-[10px] font-black hover:bg-slate-50 transition-all">?뮥 湲덉븸??/button>
+-                        <button id="sort-discount-btn" onclick="sortData('discount')" class="bg-white border border-slate-200 text-slate-600 px-2 py-1 rounded text-[10px] font-black hover:bg-slate-50 transition-all">?뱣 ?媛먯쑉??/button>
+-                        <button id="sort-failed-btn" onclick="sortData('failed')" class="bg-white border border-slate-200 text-slate-600 px-2 py-1 rounded text-[10px] font-black hover:bg-slate-50 transition-all">?봽 ?좎같??/button>
++                <div class="px-3.5 py-1.5 bg-white border-b border-slate-200 flex flex-wrap justify-between items-center z-10 shadow-sm gap-2">
++                    <div class="flex items-center gap-2 flex-wrap">
++                        <span class="text-xs font-black text-slate-400 uppercase tracking-wider">?뺣젹 ?듭뀡</span>
++                        <div class="flex flex-wrap gap-1">
++                            <button id="sort-score-btn" onclick="sortData('score')" class="bg-royalBlue text-white px-2 py-1 rounded text-[10px] font-black shadow-sm transition-all">???먯닔??/button>
++                            <button id="sort-date-btn" onclick="sortData('date')" class="bg-white border border-slate-200 text-slate-600 px-2 py-1 rounded text-[10px] font-black hover:bg-slate-50 transition-all">?뱟 湲곗씪??/button>
++                            <button id="sort-price-btn" onclick="sortData('price')" class="bg-white border border-slate-200 text-slate-600 px-2 py-1 rounded text-[10px] font-black hover:bg-slate-50 transition-all">?뮥 湲덉븸??/button>
++                            <button id="sort-discount-btn" onclick="sortData('discount')" class="bg-white border border-slate-200 text-slate-600 px-2 py-1 rounded text-[10px] font-black hover:bg-slate-50 transition-all">?뱣 ?媛먯쑉??/button>
++                            <button id="sort-failed-btn" onclick="sortData('failed')" class="bg-white border border-slate-200 text-slate-600 px-2 py-1 rounded text-[10px] font-black hover:bg-slate-50 transition-all">?봽 ?좎같??/button>
++                        </div>
+                     </div>
++                    <!-- ?뙚 ??愿??紐⑸줉 諛붾줈媛湲?踰꾪듉 (?꾨━誘몄뾼 怨⑤뱶/?곕쾭 ?뚮쭏) -->
++                    <button id="fav-filter-btn" onclick="toggleFavoritesFilterBtn()" class="px-2.5 py-1 rounded text-[10px] font-black shadow-sm transition-all duration-300 flex items-center gap-1 cursor-pointer bg-white border border-slate-200 text-slate-400 hover:bg-slate-50 active:scale-95 opacity-60">
++                        <i class="fa-solid fa-star"></i> <span id="fav-filter-btn-text">??愿??留ㅻЪ</span>
++                    </button>
+                 </div>
+ 
+                 <!-- 留ㅻЪ 紐⑸줉 ?ㅽ겕濡??쇰뱶 ?곸뿭 (?깅뒫 洹밸????곗씠???뚯씠釉?酉??묒옱) -->
+@@ -833,10 +883,10 @@
+                         </div>
+ 
+                         <input type="number" id="calc-bid-input" oninput="runCalculator()"
+-                               class="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-1.5 text-xs sm:text-sm font-black focus:outline-none focus:border-royalBlue focus:bg-white transition-all text-royalBlue font-outfit mb-1.5">
++                               class="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-1.5 text-base font-black focus:outline-none focus:border-royalBlue focus:bg-white transition-all text-royalBlue font-outfit mb-1.5">
+ 
+                         <!-- ?명꽣?숉떚釉?怨꾩궛湲?洹몃━??踰꾪듉 ?ㅽ뙣??-->
+-                        <div class="grid grid-cols-4 gap-1 pt-1">
++                        <div class="grid grid-cols-4 gap-1 pt-1 calculator-keypad">
+                             <!-- Row 1 -->
+                             <button type="button" onclick="pressCalcKey('+1??)" class="bg-royalBlue/5 hover:bg-royalBlue/15 text-royalBlue text-[11px] font-black py-1.5 rounded-md transition-all select-none font-sans">+1??/button>
+                             <button type="button" onclick="pressCalcKey('+1泥?)" class="bg-royalBlue/5 hover:bg-royalBlue/15 text-royalBlue text-[11px] font-black py-1.5 rounded-md transition-all select-none font-sans">+1泥쒕쭔</button>
+@@ -1007,7 +1057,7 @@
+                     </a>
+ 
+                     <!-- 3. ?踰뺤썝 ?명꽣?룸벑湲곗냼 -->
+-                    <a href="https://www.iros.go.kr" target="_blank" class="bg-white border border-slate-200 hover:border-royalBlue hover:shadow-md rounded-xl p-2 flex items-center gap-2.5 transition-all shadow-sm group">
++                    <a href="http://www.iros.go.kr/PMainJ.jsp?main=1" target="_blank" class="bg-white border border-slate-200 hover:border-royalBlue hover:shadow-md rounded-xl p-2 flex items-center gap-2.5 transition-all shadow-sm group">
+                         <div class="bg-blue-50 text-royalBlue group-hover:bg-royalBlue group-hover:text-white w-7 h-7 rounded-lg flex items-center justify-center flex-shrink-0 transition-colors">
+                             <i class="fa-solid fa-file-signature text-[10px]"></i>
+                         </div>
+@@ -1018,7 +1068,7 @@
+                     </a>
+ 
+                     <!-- 4. ?뺣?24 ?꾩엯?몃??뺤씤??-->
+-                    <a href="https://www.gov.kr" target="_blank" class="bg-white border border-slate-200 hover:border-royalBlue hover:shadow-md rounded-xl p-2 flex items-center gap-2.5 transition-all shadow-sm group">
++                    <a href="https://www.gov.kr/main?a=9999&srvcId=131100000021" target="_blank" class="bg-white border border-slate-200 hover:border-royalBlue hover:shadow-md rounded-xl p-2 flex items-center gap-2.5 transition-all shadow-sm group">
+                         <div class="bg-blue-50 text-royalBlue group-hover:bg-royalBlue group-hover:text-white w-7 h-7 rounded-lg flex items-center justify-center flex-shrink-0 transition-colors">
+                             <i class="fa-solid fa-users text-[10px]"></i>
+                         </div>
+@@ -1029,7 +1079,7 @@
+                     </a>
+ 
+                     <!-- 5. 嫄댁텞臾쇰???臾대즺?대엺 -->
+-                    <a href="https://www.gov.kr/portal/main" target="_blank" class="bg-white border border-slate-200 hover:border-royalBlue hover:shadow-md rounded-xl p-2 flex items-center gap-2.5 transition-all shadow-sm group">
++                    <a href="https://www.gov.kr/mw/AA020InfoCappView.do?HighCtgCD=A01004001&CappBizCD=15000000098" target="_blank" class="bg-white border border-slate-200 hover:border-royalBlue hover:shadow-md rounded-xl p-2 flex items-center gap-2.5 transition-all shadow-sm group">
+                         <div class="bg-blue-50 text-royalBlue group-hover:bg-royalBlue group-hover:text-white w-7 h-7 rounded-lg flex items-center justify-center flex-shrink-0 transition-colors">
+                             <i class="fa-solid fa-building text-[10px]"></i>
+                         </div>
+@@ -1357,8 +1407,8 @@
+                         if (headerCourt) headerCourt.innerText = court;
+                         if (headerOnbid) headerOnbid.innerText = onbid;
+                         
+-                        sensor.innerHTML = '<span class="w-2 h-2 rounded-full bg-[#10b981] animate-ping"></span><span>?윟 ?ㅼ떆媛??곗씠???곕룞 ?뺤긽 (' + originalProperties.length.toLocaleString() + '嫄?</span>';
+-                        sensor.className = "flex items-center gap-2 px-3 py-1.5 rounded-full bg-emerald-50 border border-emerald-200 text-emerald-700 text-[10px] font-black shadow-sm cursor-pointer";
++                        sensor.innerHTML = '<span class="w-2 h-2 rounded-full bg-[#10b981] animate-ping"></span><span class="hidden sm:inline">?윟 ?ㅼ떆媛??곗씠???곕룞 ?뺤긽 (' + originalProperties.length.toLocaleString() + '嫄?</span><span class="inline sm:hidden">?윟 ' + originalProperties.length.toLocaleString() + '嫄?/span>';
++                        sensor.className = "flex items-center gap-1.5 sm:gap-2 px-2 sm:px-3 py-1 sm:py-1.5 rounded-full bg-emerald-50 border border-emerald-200 text-emerald-700 text-[9px] sm:text-[10px] font-black shadow-sm cursor-pointer";
+                         
+                         applyFilters();
+                     } else {
+@@ -1422,8 +1472,8 @@
+                 console.warn('濡쒖뺄 罹먯떆 蹂듦뎄 ?ㅽ뙣', cacheErr);
+             }
+ 
+-            sensor.innerHTML = '<span class="w-2 h-2 rounded-full bg-amber-500"></span><span>?윞 濡쒖뺄 ?ㅽ봽?쇱씤 紐⑤뱶 媛??(' + originalProperties.length.toLocaleString() + '嫄?</span>';
+-            sensor.className = "flex items-center gap-2 px-3 py-1.5 rounded-full bg-amber-50 border border-amber-200 text-amber-700 text-[10px] font-black shadow-sm cursor-pointer";
++            sensor.innerHTML = '<span class="w-2 h-2 rounded-full bg-amber-500"></span><span class="hidden sm:inline">?윞 濡쒖뺄 ?ㅽ봽?쇱씤 紐⑤뱶 媛??(' + originalProperties.length.toLocaleString() + '嫄?</span><span class="inline sm:hidden">?윞 ' + originalProperties.length.toLocaleString() + '嫄?/span>';
++            sensor.className = "flex items-center gap-1.5 sm:gap-2 px-2 sm:px-3 py-1 sm:py-1.5 rounded-full bg-amber-50 border border-amber-200 text-amber-700 text-[9px] sm:text-[10px] font-black shadow-sm cursor-pointer";
+             applyFilters();
+         }
+ 
+@@ -1744,7 +1794,13 @@
+                     }
+                 }
+                 
+-                return matchesKeyword && matchesBudget && matchesSource && matchesDate && matchesPast && matchesSido && matchesSigungu && matchesGrade && matchesPtype;
++                // ????愿??紐⑸줉留?蹂닿린 ?꾪꽣
++                let matchesFavorite = true;
++                if (showFavoritesOnly) {
++                    matchesFavorite = favoritePropertyIds.has(item.id);
++                }
++                
++                return matchesKeyword && matchesBudget && matchesSource && matchesDate && matchesPast && matchesSido && matchesSigungu && matchesGrade && matchesPtype && matchesFavorite;
+             });
+             
+             currentPage = 1; // ?꾪꽣 ?곸슜 ??1?섏씠吏遺???ㅼ떆 洹몃━湲?@@ -2027,6 +2083,12 @@
+                         <!-- Top Badges Row -->
+                         <div class="flex justify-between items-center mb-2">
+                             <div class="flex gap-1.5 items-center">
++                                <!-- 愿???깅줉 蹂꾪몴 踰꾪듉 -->
++                                <button id="star-btn-${item.id}" onclick="toggleFavoriteProperty(${item.id}, event)" class="p-1 hover:scale-110 active:scale-95 transition-all select-none mr-0.5" title="愿???깅줉 ?좉?">
++                                    ${favoritePropertyIds.has(item.id) 
++                                        ? `<i class="fa-solid fa-star text-amber-400 text-[13px]"></i>` 
++                                        : `<i class="fa-regular fa-star text-slate-400 text-[13px]"></i>`}
++                                </button>
+                                 ${sourceBadge}
+                                 <span class="${ddayClass} text-[11.5px] font-black px-1.5 py-0.5 rounded-md">${ddayText}</span>
+                             </div>
+@@ -3104,9 +3166,440 @@
+                             ?踰뺤썝 ?섏떊 諛붿씠???몄퐫?⑹쓣 UTF-8 ?쒖??쇰줈 蹂듦뎄?섏뿬, ?ш굔踰덊샇??"?寃? ?쒖옄???뚯옱吏 ?숇챸/?꾨줈紐낆씠 源⑥쭊 臾몄옄 ?놁씠 留ㅻ걚?ъ슫 ?쒓? ?곹깭濡?DB???덉쟾 ??λ릺?꾨줉 媛쒖꽑?덉뒿?덈떎.
+                         </div>
+                     </div>
++
++                    <div class="border-t border-slate-200 my-4"></div>
++                    
++                    <!-- 4. Supabase ?몄쬆 諛??뚯뀥濡쒓렇???ㅼ젙 媛?대뱶 -->
++                    <h3 class="text-xs sm:text-sm font-extrabold text-royalBlue mb-2 flex items-center justify-center lg:justify-start gap-1.5">
++                        <i class="fa-solid fa-key"></i> 4. Supabase ?몄쬆 諛??뚯뀥濡쒓렇???쒖꽦??媛?대뱶
++                    </h3>
++                    <p class="text-[9.5px] sm:text-[11px] text-slate-655 leading-relaxed mb-3 font-medium">
++                        援ш? 諛?移댁뭅??濡쒓렇???곕룞 ?ㅽ뙣("Unsupported provider") ?? Supabase ?대씪?곕뱶 ??쒕낫?쒖뿉???ㅼ쓬怨?媛숈? ?꾩냽 ?ㅼ젙??吏꾪뻾?댁빞 ?뺤긽 ?묐룞?⑸땲??
++                    </p>
++                    <div class="space-y-2.5 text-[9.5px] sm:text-[11px] text-slate-600">
++                        <div class="p-3 border border-slate-200 bg-white rounded-xl leading-relaxed text-center lg:text-left shadow-sm">
++                            <strong class="text-royalBlue font-extrabold block mb-0.5">?뵎 1) Google / Kakao OAuth ?쒓났???쒖꽦??/strong>
++                            Supabase 肄섏넄(https://supabase.com)??濡쒓렇?명븳 ?? ?대떦 ?꾨줈?앺듃??<strong>Authentication -> Providers</strong> 硫붾돱濡??대룞?섏떗?쒖삤. Google 諛?Kakao ?쒓났?먮? ?좏깮?섍퀬 'Enable' ?ㅼ쐞移섎? 耳??? 諛쒓툒諛쏆? Client ID? Client Secret???낅젰?섍퀬 ??ν빐???뚯뀥濡쒓렇???붾㈃???몄텧?⑸땲??
++                        </div>
++                        <div class="p-3 border border-slate-200 bg-white rounded-xl leading-relaxed text-center lg:text-left shadow-sm">
++                            <strong class="text-royalBlue font-extrabold block mb-0.5">?벁 2) ?대찓???몄쬆 ?덉감 鍮꾪솢?깊솕 (臾댁씤利??뚯뒪????</strong>
++                            ?ъ슜??<strong>hl1oex@gmail.com</strong> 怨꾩젙 ?깆쑝濡?媛??利됱떆 濡쒓렇?몄씠 媛?ν븯?꾨줉 ?섎젮硫? <strong>Authentication -> Providers -> Email</strong> ?ㅼ젙?먯꽌 <strong>'Confirm email'</strong> ?ㅼ쐞移섎? 爰쇰몢??떆?? ???ㅼ젙??爰쇰몢?쒕㈃ ?대찓???섏떊?⑥뿉???몄쬆 留곹겕瑜??대┃?섏? ?딄퀬??媛??利됱떆 濡쒓렇?몄씠 媛?ν빐吏묐땲??
++                        </div>
++                        <div class="p-3 border border-slate-200 bg-white rounded-xl leading-relaxed text-center lg:text-left shadow-sm">
++                            <strong class="text-royalBlue font-extrabold block mb-0.5">?뵕 3) 濡쒓렇????localhost:3000 由щ떎?대젆???꾩긽 ?닿껐 (Site URL ?ㅼ젙)</strong>
++                            ?뚯뀥 濡쒓렇???꾨즺 吏곹썑 諛고룷???뱀궗?댄듃 二쇱냼 ???localhost:3000 二쇱냼濡??뺢꺼??'?ъ씠?몄뿉 ?곌껐?????놁쓬' ?먮윭媛 諛쒖깮?섎뒗 ?댁쑀??Supabase ?쒕쾭??由щ떎?대젆???덉슜 紐⑸줉??諛고룷 二쇱냼媛 鍮좎졇?덇린 ?뚮Ц?낅땲?? <br>
++                            ?닿껐 諛⑸쾿: <strong>Authentication -> URL Configuration</strong> 硫붾돱濡??대룞?섏뿬 <strong>Site URL</strong>??諛고룷????二쇱냼??<code>https://action-b8c75.web.app</code>濡?蹂寃쏀븯??떆?? ?먰븳, ?섎떒??<strong>Redirect URLs</strong> 紐⑸줉??<code>https://action-b8c75.web.app/**</code> 諛?<code>https://action-b8c75.web.app/mobile/**</code>瑜?紐낆떆?섏뿬 ?깅줉?댁빞 ?뺤긽?곸쑝濡?濡쒓렇????蹂??쒕퉬???붾㈃?쇰줈 蹂듦??????덉뒿?덈떎.
++                        </div>
++                    </div>
+                 </div>
+             `;
+         }
++
++        // ==========================================
++        // ?뭿 [?좉퇋 ?듯빀] 濡쒓렇???몄뀡 諛?愿??紐⑸줉 ?곕룞 濡쒖쭅
++        // ==========================================
++        let currentUser = null;
++        let favoritePropertyIds = new Set();
++        let showFavoritesOnly = false;
++        let isSignUpMode = false;
++
++        // Supabase ?몄쬆 ?곹깭 由ъ뒪??援щ룆
++        supabaseClient.auth.onAuthStateChange(async (event, session) => {
++            currentUser = session ? session.user : null;
++            updateAuthUI();
++            if (currentUser) {
++                await loadFavoritesFromServer();
++            } else {
++                favoritePropertyIds.clear();
++                showFavoritesOnly = false;
++                const favToggle = document.getElementById("show-favorites-toggle");
++                if (favToggle) favToggle.checked = false;
++            }
++            // 愿??紐⑸줉 ?꾪꽣 踰꾪듉 UI??媛쒖닔? ?쒖꽦???곹깭瑜??낅뜲?댄듃?⑸땲??
++            updateFavoritesButtonUI();
++            applyFilters();
++        });
++
++        // ?ㅻ뜑 濡쒓렇??UI ?낅뜲?댄듃 ?⑥닔
++        function updateAuthUI() {
++            const container = document.getElementById("auth-status-container");
++            if (!container) return;
++            
++            if (currentUser) {
++                const emailId = currentUser.email.split('@')[0];
++                container.innerHTML = `
++                    <span class="text-[8.5px] sm:text-[9.5px] font-black text-slate-600 bg-slate-100 px-1.5 sm:px-2.5 py-0.5 sm:py-1 rounded-full border border-slate-200 flex items-center gap-0.5 sm:gap-1 shadow-sm">
++                        <i class="fa-solid fa-user text-[8px] text-royalBlue"></i> <span class="max-w-[50px] sm:max-w-none truncate">${emailId}??/span>
++                    </span>
++                    <button onclick="handleLogout()" class="px-1.5 sm:px-2.5 py-0.5 sm:py-1 rounded-full border border-rose-200 text-rose-600 bg-white text-[8.5px] sm:text-[9.5px] font-black shadow-sm transition-all duration-300 cursor-pointer hover:bg-rose-50 active:scale-95 whitespace-nowrap">
++                        <i class="fa-solid fa-right-from-bracket mr-0.5"></i> 濡쒓렇?꾩썐
++                    </button>
++                `;
++            } else {
++                container.innerHTML = `
++                    <button onclick="openLoginModal()" class="px-1.5 sm:px-2.5 py-0.5 sm:py-1 rounded-full border border-royalBlue text-royalBlue bg-white text-[8.5px] sm:text-[9.5px] font-black shadow-sm transition-all duration-300 cursor-pointer hover:bg-blue-50 active:scale-95 whitespace-nowrap">
++                        <i class="fa-solid fa-user-lock mr-0.5"></i> 濡쒓렇??/ ?뚯썝媛??+                    </button>
++                `;
++            }
++        }
++
++        // 濡쒓렇??紐⑤떖 ?닿린 ?⑥닔
++        function openLoginModal() {
++            const modal = document.getElementById("login-modal");
++            if (modal) {
++                modal.classList.remove("hidden");
++                // ?좊땲硫붿씠???뚮뜑留?蹂댁젙
++                setTimeout(() => {
++                    modal.classList.remove("opacity-0");
++                    modal.querySelector(".transform").classList.remove("scale-95");
++                    modal.querySelector(".transform").classList.add("scale-100");
++                }, 10);
++            }
++        }
++
++        // 濡쒓렇??紐⑤떖 ?リ린 ?⑥닔
++        function closeLoginModal() {
++            const modal = document.getElementById("login-modal");
++            if (modal) {
++                modal.classList.add("opacity-0");
++                modal.querySelector(".transform").classList.remove("scale-100");
++                modal.querySelector(".transform").classList.add("scale-95");
++                setTimeout(() => {
++                    modal.classList.add("hidden");
++                    // 紐⑤떖???レ쓣 ??濡쒓렇??紐⑤뱶濡??곹깭 蹂듭썝
++                    if (isSignUpMode) {
++                        toggleAuthMode();
++                    }
++                    // ?낅젰 ?꾨뱶 珥덇린??+                    document.getElementById("login-email").value = "";
++                    document.getElementById("login-password").value = "";
++                    const confirmInput = document.getElementById("login-confirm-password");
++                    if (confirmInput) confirmInput.value = "";
++                }, 300);
++            }
++        }
++
++        // 濡쒓렇???뚯썝媛??紐⑤뱶 ?꾪솚 ?⑥닔
++        function toggleAuthMode() {
++            isSignUpMode = !isSignUpMode;
++            const title = document.getElementById("modal-title");
++            const subtitle = document.getElementById("modal-subtitle");
++            const submitBtn = document.getElementById("modal-submit-btn");
++            const switchBtn = document.getElementById("modal-switch-btn");
++            const confirmPasswordContainer = document.getElementById("modal-confirm-password-container");
++            const googleText = document.getElementById("social-text-google");
++            const kakaoText = document.getElementById("social-text-kakao");
++            const naverText = document.getElementById("social-text-naver");
++            
++            // 鍮꾨?踰덊샇 ?낅젰?꾨뱶 珥덇린??+            document.getElementById("login-password").value = "";
++            const confirmInput = document.getElementById("login-confirm-password");
++            if (confirmInput) confirmInput.value = "";
++            
++            if (isSignUpMode) {
++                title.innerText = "?꾨━誘몄뾼 ?뚯썝媛??;
++                subtitle.innerText = "怨꾩젙???앹꽦?섏뿬 愿??留ㅻЪ???대씪?곕뱶???곕룞??蹂댁떗?쒖삤.";
++                submitBtn.innerHTML = `<span>媛???꾨즺</span>`;
++                switchBtn.innerText = "?대? 怨꾩젙???덉쑝?좉??? 濡쒓렇?명븯湲?;
++                
++                // 鍮꾨?踰덊샇 ?뺤씤 ?낅젰李??쒖떆
++                if (confirmPasswordContainer) {
++                    confirmPasswordContainer.classList.remove("hidden");
++                }
++                
++                // ?뚯뀥 濡쒓렇??踰꾪듉 ?띿뒪??蹂寃?+                if (googleText) googleText.innerText = "Google 怨꾩젙?쇰줈 ?뚯썝媛??;
++                if (kakaoText) kakaoText.innerText = "移댁뭅??怨꾩젙?쇰줈 ?뚯썝媛??;
++                if (naverText) naverText.innerText = "?ㅼ씠踰?怨꾩젙?쇰줈 ?뚯썝媛??;
++            } else {
++                title.innerText = "?꾨━誘몄뾼 濡쒓렇??;
++                subtitle.innerText = "濡쒓렇?명븯??留욎땄??寃쎄났留??뺣낫 ?쒕퉬?ㅻ? ?댁슜??蹂댁떗?쒖삤.";
++                submitBtn.innerHTML = `<span>濡쒓렇??/span>`;
++                switchBtn.innerText = "泥섏쓬?댁떊媛?? ?뚯썝媛?낇븯湲?;
++                
++                // 鍮꾨?踰덊샇 ?뺤씤 ?낅젰李??④?
++                if (confirmPasswordContainer) {
++                    confirmPasswordContainer.classList.add("hidden");
++                }
++                
++                // ?뚯뀥 濡쒓렇??踰꾪듉 ?띿뒪??蹂듭썝
++                if (googleText) googleText.innerText = "Google 怨꾩젙?쇰줈 濡쒓렇??;
++                if (kakaoText) kakaoText.innerText = "移댁뭅??怨꾩젙?쇰줈 濡쒓렇??;
++                if (naverText) naverText.innerText = "?ㅼ씠踰?怨꾩젙?쇰줈 濡쒓렇??;
++            }
++        }
++
++        // ?대찓??鍮꾨?踰덊샇 濡쒓렇???뚯썝媛???쒖텧 ?⑥닔
++        async function submitAuth() {
++            const email = document.getElementById("login-email").value.trim();
++            const password = document.getElementById("login-password").value;
++            
++            if (!email || !password) {
++                alert("?대찓?쇨낵 鍮꾨?踰덊샇瑜?紐⑤몢 ?낅젰??二쇱떗?쒖삤.");
++                return;
++            }
++            
++            if (password.length < 6) {
++                alert("鍮꾨?踰덊샇??理쒖냼 6???댁긽?댁뼱???⑸땲??");
++                return;
++            }
++            
++            try {
++                if (isSignUpMode) {
++                    const confirmPassword = document.getElementById("login-confirm-password").value;
++                    if (password !== confirmPassword) {
++                        alert("鍮꾨?踰덊샇? 鍮꾨?踰덊샇 ?뺤씤???쇱튂?섏? ?딆뒿?덈떎.");
++                        return;
++                    }
++                    
++                    const { error } = await supabaseClient.auth.signUp({ email, password });
++                    if (error) throw error;
++                    alert("?뚯썝媛?낆씠 ?꾨즺?섏뿀?듬땲??");
++                } else {
++                    const { error } = await supabaseClient.auth.signInWithPassword({ email, password });
++                    if (error) throw error;
++                }
++                closeLoginModal();
++            } catch (err) {
++                console.error("?몄쬆 ?ㅽ뙣", err);
++                let errMsg = err.message || "?몄쬆 泥섎━ 以??먮윭媛 諛쒖깮?덉뒿?덈떎.";
++                if (errMsg.includes("already registered") || errMsg.includes("Email already exists")) {
++                    errMsg = "?대? ?ъ슜 以묒씤 ?대찓??二쇱냼?낅땲??";
++                } else if (errMsg.includes("Invalid login credentials")) {
++                    errMsg = "?대찓???먮뒗 鍮꾨?踰덊샇媛 ?쇱튂?섏? ?딆뒿?덈떎.";
++                }
++                alert(errMsg);
++            }
++        }
++
++        // ?뚯뀥 濡쒓렇???몃━嫄??⑥닔
++        async function loginWithSocial(provider) {
++            if (provider === 'naver') {
++                alert("?ㅼ씠踰??뚯뀥 濡쒓렇?몄? ?꾩옱 Supabase ?몄쬆 ?곕룞 ?ㅽ럺 ??吏??以鍮?以묒엯?덈떎. 援ш? ?먮뒗 移댁뭅??怨꾩젙???댁슜??二쇱떗?쒖삤.");
++                return;
++            }
++            try {
++                // 濡쒖뺄 file:// ?ㅽ뻾 ?섍꼍??諛⑹뼱?섍퀬 ?⑤씪??諛고룷 ?쒕쾭濡???긽 ?덉쟾?섍쾶 ?섎룎?꾧??꾨줉 ?대갚 二쇱냼瑜??명똿?⑸땲??
++                let redirectUrl = 'https://action-b8c75.web.app/';
++                const origin = window.location.origin;
++                if (origin && origin.startsWith('http') && !origin.includes('file:')) {
++                    redirectUrl = origin + '/';
++                }
++
++                const { error } = await supabaseClient.auth.signInWithOAuth({
++                    provider: provider,
++                    options: {
++                        redirectTo: redirectUrl
++                    }
++                });
++                if (error) throw error;
++            } catch (err) {
++                console.error("?뚯뀥 濡쒓렇???ㅽ뙣", err);
++                let errMsg = err.message || "?뚯뀥 濡쒓렇??泥섎━ 以??먮윭媛 諛쒖깮?덉뒿?덈떎.";
++                if (errMsg.includes("provider is not enabled") || errMsg.includes("Unsupported provider")) {
++                    errMsg = "?꾩옱 Supabase ?쒕쾭 痢≪뿉 ?대떦 ?뚯뀥 濡쒓렇???쒓났??Provider) ?ㅼ젙??耳쒖졇 ?덉? ?딆뒿?덈떎.\n\n?닿껐 諛⑸쾿:\n1. Supabase ??쒕낫??Authentication -> Providers)?먯꽌 Google 諛?Kakao ?ㅼ쐞移섎? ?쒖꽦??Enable)?섍퀬 Credentials瑜??깅줉?댁빞 ?⑸땲??\n2. ?뚯뒪?몃? ?꾪빐 ?쇰컲 ?대찓??鍮꾨?踰덊샇 媛??hl1oex@gmail.com ???쇰줈 利됱떆 濡쒓렇?명븯?????덉뒿?덈떎.";
++                }
++                alert(errMsg);
++            }
++        }
++
++        // 濡쒓렇?꾩썐 ?섑뻾 ?⑥닔
++        async function handleLogout() {
++            try {
++                const { error } = await supabaseClient.auth.signOut();
++                if (error) throw error;
++                alert("濡쒓렇?꾩썐?섏뿀?듬땲??");
++            } catch (err) {
++                console.error("濡쒓렇?꾩썐 ?ㅽ뙣", err);
++            }
++        }
++
++        // Supabase濡쒕???濡쒓렇???좎???愿??紐⑸줉 濡쒕뱶 ?⑥닔
++        async function loadFavoritesFromServer() {
++            if (!currentUser) return;
++            try {
++                const { data, error } = await supabaseClient
++                    .from('user_favorites')
++                    .select('property_id')
++                    .eq('user_id', currentUser.id);
++                if (error) throw error;
++                
++                favoritePropertyIds = new Set((data || []).map(f => f.property_id));
++            } catch (err) {
++                console.error("愿??紐⑸줉 ?숆린???ㅽ뙣", err);
++            }
++        }
++
++        // 留ㅻЪ 移대뱶?먯꽌 愿??蹂꾪몴 ?대┃ ???좉? ?⑥닔
++        async function toggleFavoriteProperty(propertyId, event) {
++            if (event) event.stopPropagation(); // 移대뱶 ?곸꽭 ?쒕엻 ?대┝ ?대깽??諛⑹?
++            
++            if (!currentUser) {
++                alert("濡쒓렇?몄씠 ?꾩슂??湲곕뒫?낅땲?? 濡쒓렇???붾㈃?쇰줈 ?덈궡?⑸땲??");
++                openLoginModal();
++                return;
++            }
++            
++            const id = parseInt(propertyId);
++            const isFav = favoritePropertyIds.has(id);
++            
++            try {
++                if (isFav) {
++                    const { error } = await supabaseClient
++                        .from('user_favorites')
++                        .delete()
++                        .eq('user_id', currentUser.id)
++                        .eq('property_id', id);
++                    if (error) throw error;
++                    favoritePropertyIds.delete(id);
++                } else {
++                    const { error } = await supabaseClient
++                        .from('user_favorites')
++                        .insert({
++                            user_id: currentUser.id,
++                            property_id: id
++                        });
++                    if (error) throw error;
++                    favoritePropertyIds.add(id);
++                }
++                
++                // ?대떦 移대뱶??蹂꾪몴 UI ?ㅼ떆媛?媛깆떊
++                updateFavoriteStarUI(id);
++                
++                // 愿??留ㅻЪ ?꾪꽣 踰꾪듉 UI ?ㅼ떆媛?媛깆떊
++                updateFavoritesButtonUI();
++                
++                // ??愿??紐⑸줉留?蹂닿린 ?꾪꽣 媛???곹깭?쇰㈃ 由ъ뒪???щ젋?붾쭅
++                if (showFavoritesOnly) {
++                    applyFilters();
++                }
++            } catch (err) {
++                console.error("愿???깅줉 ?ㅽ뙣", err);
++                alert("?몄쬆 ?ㅻ쪟 ?먮뒗 ?쇱떆???ㅽ듃?뚰겕 ?μ븷濡?愿??紐⑸줉 蹂寃쎌뿉 ?ㅽ뙣?덉뒿?덈떎.");
++            }
++        }
++
++        // ?⑥씪 蹂꾪몴 UI ?곹깭 ?ㅼ떆媛??숈쟻 蹂댁젙
++        function updateFavoriteStarUI(propertyId) {
++            const btn = document.getElementById(`star-btn-${propertyId}`);
++            if (btn) {
++                const isFav = favoritePropertyIds.has(propertyId);
++                btn.innerHTML = isFav 
++                    ? `<i class="fa-solid fa-star text-amber-400 text-[13px]"></i>` 
++                    : `<i class="fa-regular fa-star text-slate-400 text-[13px]"></i>`;
++            }
++        }
++
++        // 愿??紐⑸줉 ?좉? ?ㅼ쐞移??대깽???몃뱾??+        function toggleFavoritesFilter() {
++            const toggle = document.getElementById("show-favorites-toggle");
++            if (toggle.checked && !currentUser) {
++                toggle.checked = false;
++                alert("濡쒓렇????愿??紐⑸줉 ?꾩슜 議고쉶媛 媛?ν빀?덈떎.");
++                openLoginModal();
++                return;
++            }
++            showFavoritesOnly = toggle.checked;
++            updateFavoritesButtonUI(); // 愿?щぉ濡??꾪꽣 踰꾪듉 UI ?숆린??+            applyFilters();
++        }
++
++        // ?뙚 [?좉퇋] ?뺣젹 諛???愿??紐⑸줉 ?꾪꽣 踰꾪듉 ?대┃ ?몃뱾??+        function toggleFavoritesFilterBtn() {
++            if (!currentUser) {
++                alert("濡쒓렇????愿??紐⑸줉 議고쉶媛 媛?ν빀?덈떎.");
++                openLoginModal();
++                return;
++            }
++            showFavoritesOnly = !showFavoritesOnly;
++            
++            // ?쇱そ ?ъ씠?쒕컮 ?좉? ?ㅼ쐞移섏? ?곹깭 ?숆린??+            const toggle = document.getElementById("show-favorites-toggle");
++            if (toggle) toggle.checked = showFavoritesOnly;
++            
++            updateFavoritesButtonUI();
++            applyFilters();
++        }
++
++        // ?뙚 [?좉퇋] 愿??紐⑸줉 踰꾪듉 UI ?곹깭 ?ㅼ떆媛?媛깆떊 ?⑥닔 (?꾨━誘몄뾼 ?곕쾭/怨⑤뱶 ?뚮쭏 ?곸슜)
++        function updateFavoritesButtonUI() {
++            const btn = document.getElementById("fav-filter-btn");
++            const textSpan = document.getElementById("fav-filter-btn-text");
++            if (!btn || !textSpan) return;
++            
++            if (currentUser) {
++                const favCount = favoritePropertyIds.size;
++                textSpan.textContent = `??愿??留ㅻЪ (${favCount})`;
++                
++                if (showFavoritesOnly) {
++                    btn.className = "px-2.5 py-1 rounded text-[10px] font-black shadow-sm transition-all duration-300 flex items-center gap-1 cursor-pointer bg-gradient-to-r from-amber-500 to-yellow-500 text-white hover:brightness-110 active:scale-95";
++                } else {
++                    btn.className = "px-2.5 py-1 rounded text-[10px] font-black shadow-sm transition-all duration-300 flex items-center gap-1 cursor-pointer bg-white border border-amber-300 text-amber-600 hover:bg-amber-50 active:scale-95";
++                }
++            } else {
++                textSpan.textContent = "??愿??留ㅻЪ";
++                btn.className = "px-2.5 py-1 rounded text-[10px] font-black shadow-sm transition-all duration-300 flex items-center gap-1 cursor-pointer bg-white border border-slate-200 text-slate-400 hover:bg-slate-50 active:scale-95 opacity-60";
++            }
++        }
+     </script>
++
++    <!-- ?㎜ 6. ?꾨━誘몄뾼 濡쒓렇??諛??뚯썝媛??紐⑤떖 (Elegant Pearl White ?뚮쭏) -->
++    <div id="login-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center hidden opacity-0 transition-opacity duration-300">
++        <div class="bg-white border border-slate-200 rounded-3xl w-[90%] max-w-[400px] p-6 shadow-2xl transform scale-95 transition-transform duration-300 relative">
++            <button onclick="closeLoginModal()" class="absolute top-4 right-4 text-slate-400 hover:text-rose-500 transition-colors select-none">
++                <i class="fa-solid fa-xmark text-lg"></i>
++            </button>
++            <div class="text-center mb-6">
++                <h3 id="modal-title" class="text-lg font-black text-slate-900">?꾨━誘몄뾼 濡쒓렇??/h3>
++                <p id="modal-subtitle" class="text-[10px] text-slate-500 font-bold mt-1">濡쒓렇?명븯??愿??留ㅻЪ???대씪?곕뱶???곕룞??蹂댁떗?쒖삤.</p>
++            </div>
++            
++            <div class="space-y-4">
++                <div>
++                    <label class="block text-[10px] font-black text-slate-400 uppercase tracking-wider mb-1.5">?대찓??二쇱냼</label>
++                    <input type="email" id="login-email" placeholder="example@email.com" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2 text-sm font-semibold focus:bg-white focus:outline-none focus:ring-2 focus:ring-royalBlue/10 focus:border-royalBlue transition-all">
++                </div>
++                <div>
++                    <label class="block text-[10px] font-black text-slate-400 uppercase tracking-wider mb-1.5">鍮꾨?踰덊샇</label>
++                    <input type="password" id="login-password" placeholder="6???댁긽??鍮꾨?踰덊샇" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2 text-sm font-semibold focus:bg-white focus:outline-none focus:ring-2 focus:ring-royalBlue/10 focus:border-royalBlue transition-all">
++                </div>
++                <!-- [異붽?] ?뚯썝媛?낆슜 鍮꾨?踰덊샇 ?뺤씤 ?낅젰?꾨뱶 -->
++                <div id="modal-confirm-password-container" class="hidden">
++                    <label class="block text-[10px] font-black text-slate-400 uppercase tracking-wider mb-1.5">鍮꾨?踰덊샇 ?뺤씤</label>
++                    <input type="password" id="login-confirm-password" placeholder="鍮꾨?踰덊샇 ?ъ엯?? class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2 text-sm font-semibold focus:bg-white focus:outline-none focus:ring-2 focus:ring-royalBlue/10 focus:border-royalBlue transition-all">
++                </div>
++                
++                <button id="modal-submit-btn" onclick="submitAuth()" class="w-full h-11 bg-royalBlue hover:bg-royalHover text-white font-black rounded-xl text-xs shadow-md shadow-blue-500/10 transition-all active:scale-[0.98] flex items-center justify-center gap-1.5">
++                    <span>濡쒓렇??/span>
++                </button>
++                
++                <button id="modal-switch-btn" onclick="toggleAuthMode()" class="w-full text-center text-[10.5px] font-black text-royalBlue hover:underline py-1 transition-all">
++                    泥섏쓬?댁떊媛?? ?뚯썝媛?낇븯湲?+                </button>
++                
++                <div class="relative flex items-center justify-center my-4">
++                    <div class="border-t border-slate-200 w-full"></div>
++                    <span class="absolute bg-white px-3 text-[9.5px] font-black text-slate-400 uppercase tracking-wider">媛꾪렪 ?뚯뀥 濡쒓렇??/span>
++                </div>
++                
++                <!-- ?뚯뀥 濡쒓렇??踰꾪듉 3醫?(援ш?, 移댁뭅?? ?ㅼ씠踰? -->
++                <div class="space-y-2.5">
++                    <button onclick="loginWithSocial('google')" class="w-full h-10 bg-white border border-slate-200 hover:bg-slate-50 text-slate-700 font-extrabold rounded-xl text-[11px] shadow-sm flex items-center justify-center gap-2 transition-all active:scale-[0.98]">
++                        <i class="fa-brands fa-google text-slate-700 text-xs"></i>
++                        <span id="social-text-google">Google 怨꾩젙?쇰줈 濡쒓렇??/span>
++                    </button>
++                    <button onclick="loginWithSocial('kakao')" class="w-full h-10 bg-[#FEE500] hover:bg-[#FDD000] text-[#191919] font-extrabold rounded-xl text-[11px] shadow-sm flex items-center justify-center gap-2 transition-all active:scale-[0.98]">
++                        <i class="fa-solid fa-comment text-[#191919] text-xs"></i>
++                        <span id="social-text-kakao">移댁뭅??怨꾩젙?쇰줈 濡쒓렇??/span>
++                    </button>
++                    <button onclick="loginWithSocial('naver')" class="w-full h-10 bg-[#03C75A] hover:bg-[#02B14F] text-white font-extrabold rounded-xl text-[11px] shadow-sm flex items-center justify-center gap-2 transition-all active:scale-[0.98]">
++                        <span class="font-black text-xs">N</span>
++                        <span id="social-text-naver">?ㅼ씠踰?怨꾩젙?쇰줈 濡쒓렇??/span>
++                    </button>
++                </div>
++            </div>
++        </div>
++    </div>
+ </body>
+ </html>
+\ No newline at end of file
+diff --git a/mobile-app/App.tsx b/mobile-app/App.tsx
+index c5cdbcf..9e20e28 100644
+--- a/mobile-app/App.tsx
++++ b/mobile-app/App.tsx
+@@ -1,7 +1,7 @@
+ // 紐⑤컮???좏뵆由ъ??댁뀡?????곹깭? ?곸꽭 ?붾㈃ ?ㅻ퉬寃뚯씠?섏쓣 議곗쑉?섎뒗 硫붿씤 吏꾩엯???뚯씪?낅땲??
+ 
+ import React, { useState, useEffect } from 'react';
+-import { StyleSheet, Text, View, TouchableOpacity, SafeAreaView, Modal } from 'react-native';
++import { StyleSheet, Text, View, TouchableOpacity, SafeAreaView, Modal, Platform } from 'react-native';
+ import { StatusBar } from 'expo-status-bar';
+ import { COLORS } from './src/components/Theme';
+ import { Property } from './src/types';
+@@ -35,6 +35,42 @@ export default function App() {
+     return () => subscription.unsubscribe();
+   }, []);
+ 
++  // 釉뚮씪?곗? 諛?踰꾪듉 ?곕룞 諛??ㅻ줈媛湲?媛???앹꽦
++  useEffect(() => {
++    if (Platform.OS !== 'web') return;
++
++    const handlePopState = (event: PopStateEvent) => {
++      // ?ㅻ줈媛湲?媛먯? ??紐⑤떖???쒖꽦?붾맂 ?곹깭?쇰㈃ 紐⑤떖 ?곹깭瑜?醫낅즺?⑸땲??
++      setSelectedProperty(null);
++    };
++
++    if (selectedProperty) {
++      // ?꾩옱 二쇱냼瑜?紐낆떆?섏뿬 寃쎈줈 蹂寃??놁씠 ?덉뒪?좊━??媛??紐⑤떖 ?곹깭瑜??쎌엯?⑸땲??
++      window.history.pushState({ isModal: true }, '', window.location.pathname + window.location.search);
++      window.addEventListener('popstate', handlePopState);
++    }
++
++    return () => {
++      if (Platform.OS === 'web') {
++        window.removeEventListener('popstate', handlePopState);
++      }
++    };
++  }, [selectedProperty]);
++
++  // ?곸꽭 ?섏씠吏 ?リ린 怨듯넻 ?쒖뼱
++  const handleCloseDetail = () => {
++    if (Platform.OS === 'web') {
++      // ?덉뒪?좊━ 媛?쒓? ?쒖꽦?붾맂 ?곹깭?쇰㈃ 釉뚮씪?곗? ?ㅻ줈媛湲곕? ?몄텧?섏뿬 ?먯뿰?ㅻ윭???곕룞???좊룄?⑸땲??
++      if (window.history.state?.isModal) {
++        window.history.back();
++      } else {
++        setSelectedProperty(null);
++      }
++    } else {
++      setSelectedProperty(null);
++    }
++  };
++
+   // 濡쒓렇?꾩썐???섑뻾???? UI ?쇨??깆쓣 ?꾪빐 異붿쿇 ?쇰뱶 ?붾㈃?쇰줈 媛뺤젣 ?대룞 泥섎━?⑸땲??
+   const handleLogout = async () => {
+     try {
+@@ -45,17 +81,8 @@ export default function App() {
+     }
+   };
+ 
+-  // ?좏깮???곸꽭 ?붾㈃???덈뒗 寃쎌슦, ?곸꽭 ?붾㈃???곗꽑 ?뚮뜑留곹빀?덈떎. (Stack Navigation ?쒕??덉씠??
++  // ??蹂寃????대떦 ???붾㈃???뚮뜑留곹빀?덈떎. (?곸꽭 ?붾㈃? ?댁젣 紐⑤떖濡??뚮뜑留곷릺誘濡???而⑦뀗痢좎뿉??遺꾨━)
+   const renderContent = () => {
+-    if (selectedProperty) {
+-      return (
+-        <DetailScreen
+-          property={selectedProperty}
+-          onBack={() => setSelectedProperty(null)}
+-        />
+-      );
+-    }
+-
+     switch (activeTab) {
+       case 'feed':
+         return (
+@@ -103,80 +130,90 @@ export default function App() {
+     <SafeAreaView style={styles.container}>
+       <StatusBar style="dark" />
+       
+-      {/* ?꾨━誘몄뾼 濡쒓퀬 諛?湲濡쒕쾶 ?ㅻ뜑 (?곸꽭 ?붾㈃?먯꽌??誘몃끂異? */}
+-      {!selectedProperty && (
+-        <View style={styles.header}>
+-          <View style={styles.logoIcon}>
+-            <Text style={styles.logoIconText}>?룳</Text>
+-          </View>
+-          <View style={styles.logoTextContainer}>
+-            <Text style={styles.logoTitle}>AI 遺?숈궛 寃쎌떆/怨듬ℓ ?듯빀 ??/Text>
+-            <Text style={styles.logoSubtitle}>PREMIUM ELEGANT PEARL WHITE</Text>
+-          </View>
+-          {user ? (
+-            <View style={styles.userBadgeHeader}>
+-              <Text style={styles.userBadgeText}>LIVE</Text>
+-            </View>
+-          ) : (
+-            <TouchableOpacity 
+-              style={styles.loginHeaderButton}
+-              onPress={() => setShowAuthScreen(true)}
+-            >
+-              <Text style={styles.loginHeaderButtonText}>濡쒓렇??/Text>
+-            </TouchableOpacity>
+-          )}
++      {/* ?꾨━誘몄뾼 濡쒓퀬 諛?湲濡쒕쾶 ?ㅻ뜑 (?곸꽭 紐⑤떖???꾨땺 ??諛곌꼍 ?뚮뜑留??쇨???蹂댁〈) */}
++      <View style={styles.header}>
++        <View style={styles.logoIcon}>
++          <Text style={styles.logoIconText}>?룳</Text>
+         </View>
+-      )}
++        <View style={styles.logoTextContainer}>
++          <Text style={styles.logoTitle}>AI 遺?숈궛 寃쎌떆/怨듬ℓ ?듯빀 ??/Text>
++          <Text style={styles.logoSubtitle}>PREMIUM ELEGANT PEARL WHITE</Text>
++        </View>
++        {user ? (
++          <View style={styles.userBadgeHeader}>
++            <Text style={styles.userBadgeText}>LIVE</Text>
++          </View>
++        ) : (
++          <TouchableOpacity 
++            style={styles.loginHeaderButton}
++            onPress={() => setShowAuthScreen(true)}
++          >
++            <Text style={styles.loginHeaderButtonText}>濡쒓렇??/Text>
++          </TouchableOpacity>
++        )}
++      </View>
+ 
+       {/* 硫붿씤 肄섑뀗痢??붾㈃ ?곸뿭 */}
+       <View style={styles.content}>
+         {renderContent()}
+       </View>
+ 
+-      {/* ?섎떒 ?꾨━誘몄뾼 ??컮 (?곸꽭 ?붾㈃?먯꽌??誘몃끂異? */}
+-      {!selectedProperty && (
+-        <View style={styles.tabBar}>
+-          <TouchableOpacity
+-            style={[styles.tabItem, activeTab === 'feed' && styles.tabItemActive]}
+-            onPress={() => setActiveTab('feed')}
+-          >
+-            <Text style={styles.tabIcon}>{activeTab === 'feed' ? '?? : '狩?}</Text>
+-            <Text style={[styles.tabLabel, activeTab === 'feed' && styles.tabLabelActive]}>
+-              異붿쿇 ?쇰뱶
+-            </Text>
+-          </TouchableOpacity>
++      {/* ?섎떒 ?꾨━誘몄뾼 ??컮 */}
++      <View style={styles.tabBar}>
++        <TouchableOpacity
++          style={[styles.tabItem, activeTab === 'feed' && styles.tabItemActive]}
++          onPress={() => setActiveTab('feed')}
++        >
++          <Text style={styles.tabIcon}>{activeTab === 'feed' ? '?? : '狩?}</Text>
++          <Text style={[styles.tabLabel, activeTab === 'feed' && styles.tabLabelActive]}>
++            異붿쿇 ?쇰뱶
++          </Text>
++        </TouchableOpacity>
+ 
+-          <TouchableOpacity
+-            style={[styles.tabItem, activeTab === 'favorites' && styles.tabItemActive]}
+-            onPress={() => setActiveTab('favorites')}
+-          >
+-            <Text style={styles.tabIcon}>{activeTab === 'favorites' ? '?? : '??}</Text>
+-            <Text style={[styles.tabLabel, activeTab === 'favorites' && styles.tabLabelActive]}>
+-              愿??紐⑸줉
+-            </Text>
+-          </TouchableOpacity>
++        <TouchableOpacity
++          style={[styles.tabItem, activeTab === 'favorites' && styles.tabItemActive]}
++          onPress={() => setActiveTab('favorites')}
++        >
++          <Text style={styles.tabIcon}>{activeTab === 'favorites' ? '?? : '??}</Text>
++          <Text style={[styles.tabLabel, activeTab === 'favorites' && styles.tabLabelActive]}>
++            愿??紐⑸줉
++          </Text>
++        </TouchableOpacity>
+ 
+-          <TouchableOpacity
+-            style={[styles.tabItem, activeTab === 'glossary' && styles.tabItemActive]}
+-            onPress={() => setActiveTab('glossary')}
+-          >
+-            <Text style={styles.tabIcon}>?뱰</Text>
+-            <Text style={[styles.tabLabel, activeTab === 'glossary' && styles.tabLabelActive]}>
+-              ?⑹뼱 ?ъ쟾
+-            </Text>
+-          </TouchableOpacity>
++        <TouchableOpacity
++          style={[styles.tabItem, activeTab === 'glossary' && styles.tabItemActive]}
++          onPress={() => setActiveTab('glossary')}
++        >
++          <Text style={styles.tabIcon}>?뱰</Text>
++          <Text style={[styles.tabLabel, activeTab === 'glossary' && styles.tabLabelActive]}>
++            ?⑹뼱 ?ъ쟾
++          </Text>
++        </TouchableOpacity>
+ 
+-          <TouchableOpacity
+-            style={[styles.tabItem, activeTab === 'guide' && styles.tabItemActive]}
+-            onPress={() => setActiveTab('guide')}
+-          >
+-            <Text style={styles.tabIcon}>?숋툘</Text>
+-            <Text style={[styles.tabLabel, activeTab === 'guide' && styles.tabLabelActive]}>
+-              ?곕룞 媛?대뱶
+-            </Text>
+-          </TouchableOpacity>
+-        </View>
+-      )}
++        <TouchableOpacity
++          style={[styles.tabItem, activeTab === 'guide' && styles.tabItemActive]}
++          onPress={() => setActiveTab('guide')}
++        >
++          <Text style={styles.tabIcon}>?숋툘</Text>
++          <Text style={[styles.tabLabel, activeTab === 'guide' && styles.tabLabelActive]}>
++            ?곕룞 媛?대뱶
++          </Text>
++        </TouchableOpacity>
++      </View>
++
++      {/* 臾쇨굔 ?곸꽭 蹂닿린 紐⑤떖 ?ㅻ쾭?덉씠 ?곸뿭 */}
++      <Modal
++        visible={selectedProperty !== null}
++        animationType="slide"
++        onRequestClose={handleCloseDetail}
++      >
++        {selectedProperty && (
++          <DetailScreen
++            property={selectedProperty}
++            onBack={handleCloseDetail}
++          />
++        )}
++      </Modal>
+ 
+       {/* ?몄쬆??紐⑤떖 ?ㅻ쾭?덉씠 ?곸뿭 */}
+       <Modal
+@@ -185,7 +222,9 @@ export default function App() {
+         onRequestClose={() => setShowAuthScreen(false)}
+       >
+         <AuthScreen 
+-          onSuccess={() => setShowAuthScreen(false)}
++          onSuccess={() => {
++            setShowAuthScreen(false);
++          }}
+           onCancel={() => setShowAuthScreen(false)}
+         />
+       </Modal>
+diff --git a/mobile-app/src/screens/AuthScreen.tsx b/mobile-app/src/screens/AuthScreen.tsx
+index 37ba773..05b0ccc 100644
+--- a/mobile-app/src/screens/AuthScreen.tsx
++++ b/mobile-app/src/screens/AuthScreen.tsx
+@@ -1,7 +1,7 @@
+ // Supabase Auth ?쒕퉬?ㅻ? ?듯빐 ?ъ슜???뚯썝媛??諛?濡쒓렇?몄쓣 泥섎━?섎뒗 ?몄쬆 ?붾㈃ 而댄룷?뚰듃?낅땲??
+ 
+ import React, { useState } from 'react';
+-import { StyleSheet, Text, View, TextInput, TouchableOpacity, Alert, ActivityIndicator } from 'react-native';
++import { StyleSheet, Text, View, TextInput, TouchableOpacity, Alert, ActivityIndicator, Platform } from 'react-native';
+ import { supabase } from '../utils/supabase';
+ import { COLORS } from '../components/Theme';
+ 
+@@ -13,6 +13,7 @@ interface AuthScreenProps {
+ export function AuthScreen({ onSuccess, onCancel }: AuthScreenProps) {
+   const [email, setEmail] = useState('');
+   const [password, setPassword] = useState('');
++  const [confirmPassword, setConfirmPassword] = useState('');
+   const [isSignUp, setIsSignUp] = useState(false);
+   const [loading, setLoading] = useState(false);
+ 
+@@ -39,6 +40,11 @@ export function AuthScreen({ onSuccess, onCancel }: AuthScreenProps) {
+       return;
+     }
+ 
++    if (isSignUp && password !== confirmPassword) {
++      Alert.alert('?뚮┝', '鍮꾨?踰덊샇? 鍮꾨?踰덊샇 ?뺤씤???쇱튂?섏? ?딆뒿?덈떎.');
++      return;
++    }
++
+     setLoading(true);
+ 
+     try {
+@@ -74,6 +80,43 @@ export function AuthScreen({ onSuccess, onCancel }: AuthScreenProps) {
+     }
+   };
+ 
++  // 援ш?, 移댁뭅?? ?ㅼ씠踰??뚯뀥 OAuth 濡쒓렇?몄쓣 ?ㅽ뻾?⑸땲??
++  const handleSocialLogin = async (provider: 'google' | 'kakao' | 'naver') => {
++    if (provider === 'naver') {
++      Alert.alert('?덈궡', '?ㅼ씠踰??뚯뀥 濡쒓렇?몄? ?꾩옱 Supabase ?몄쬆 ?곕룞 ?ㅽ럺 ??吏??以鍮?以묒엯?덈떎. 援ш? ?먮뒗 移댁뭅??怨꾩젙???댁슜??二쇱떗?쒖삤.');
++      return;
++    }
++
++    setLoading(true);
++    try {
++      // 濡쒖뺄 file:// ?묒냽 ?섍꼍??怨좊젮?섏뿬 ?덉쟾??諛고룷 ?몄뒪??二쇱냼瑜??대갚 由щ떎?대젆?멸컪?쇰줈 ?ъ슜?⑸땲??
++      let redirectTo = 'https://action-b8c75.web.app/mobile/';
++      if (Platform.OS === 'web') {
++        const origin = window.location.origin;
++        if (origin && origin.startsWith('http') && !origin.includes('file:')) {
++          redirectTo = origin + '/mobile/';
++        }
++      }
++
++      const { error } = await supabase.auth.signInWithOAuth({
++        provider: provider as any,
++        options: {
++          redirectTo,
++        },
++      });
++      if (error) throw error;
++    } catch (error: any) {
++      console.error(`${provider} 濡쒓렇??泥섎━ ?ㅻ쪟`, error);
++      let errMsg = error.message || '濡쒓렇??泥섎━ 以??먮윭媛 諛쒖깮?덉뒿?덈떎.';
++      if (errMsg.includes('provider is not enabled') || errMsg.includes('Unsupported provider')) {
++        errMsg = '?꾩옱 Supabase ?쒕쾭 痢??뚯뀥 濡쒓렇???쒓났??Provider) ?ㅼ젙??耳쒖졇 ?덉? ?딆뒿?덈떎.\n\n?닿껐 諛⑸쾿:\n1. Supabase ??쒕낫??Authentication -> Providers)?먯꽌 Google 諛?Kakao瑜??쒖꽦?뷀븯怨??ㅼ젙?댁빞 ?⑸땲??\n2. ?뚯뒪?몃? ?꾪빐 ?쇰컲 ?대찓??鍮꾨?踰덊샇 媛??hl1oex@gmail.com ???쇰줈 利됱떆 濡쒓렇?명븯???쒕퉬?ㅻ? ?댁슜?섏떎 ?섎룄 ?덉뒿?덈떎.';
++      }
++      Alert.alert('?ㅻ쪟', errMsg);
++    } finally {
++      setLoading(false);
++    }
++  };
++
+   return (
+     <View style={styles.container}>
+       <View style={styles.card}>
+@@ -110,6 +153,21 @@ export function AuthScreen({ onSuccess, onCancel }: AuthScreenProps) {
+           />
+         </View>
+ 
++        {isSignUp && (
++          <View style={styles.inputContainer}>
++            <Text style={styles.label}>鍮꾨?踰덊샇 ?뺤씤</Text>
++            <TextInput
++              style={styles.input}
++              placeholder="鍮꾨?踰덊샇 ?ъ엯??
++              placeholderTextColor={COLORS.slate400}
++              value={confirmPassword}
++              onChangeText={setConfirmPassword}
++              secureTextEntry
++              autoCapitalize="none"
++            />
++          </View>
++        )}
++
+         <TouchableOpacity 
+           style={styles.primaryButton} 
+           onPress={handleAuthSubmit}
+@@ -126,7 +184,11 @@ export function AuthScreen({ onSuccess, onCancel }: AuthScreenProps) {
+ 
+         <TouchableOpacity 
+           style={styles.switchButton} 
+-          onPress={() => setIsSignUp(!isSignUp)}
++          onPress={() => {
++            setIsSignUp(!isSignUp);
++            setPassword('');
++            setConfirmPassword('');
++          }}
+           disabled={loading}
+         >
+           <Text style={styles.switchButtonText}>
+@@ -134,6 +196,43 @@ export function AuthScreen({ onSuccess, onCancel }: AuthScreenProps) {
+           </Text>
+         </TouchableOpacity>
+ 
++        {/* [異붽?] 媛꾪렪 ?뚯뀥 濡쒓렇??援щ텇??諛?踰꾪듉 */}
++        <View style={styles.dividerContainer}>
++          <View style={styles.dividerLine} />
++          <Text style={styles.dividerText}>媛꾪렪 ?뚯뀥 濡쒓렇??/Text>
++          <View style={styles.dividerLine} />
++        </View>
++
++        <TouchableOpacity 
++          style={[styles.socialButton, styles.googleButton]} 
++          onPress={() => handleSocialLogin('google')}
++          disabled={loading}
++        >
++          <Text style={styles.googleButtonText}>
++            {isSignUp ? 'Google 怨꾩젙?쇰줈 ?뚯썝媛?? : 'Google 怨꾩젙?쇰줈 濡쒓렇??}
++          </Text>
++        </TouchableOpacity>
++
++        <TouchableOpacity 
++          style={[styles.socialButton, styles.kakaoButton]} 
++          onPress={() => handleSocialLogin('kakao')}
++          disabled={loading}
++        >
++          <Text style={styles.kakaoButtonText}>
++            {isSignUp ? '?뮠 移댁뭅??怨꾩젙?쇰줈 ?뚯썝媛?? : '?뮠 移댁뭅??怨꾩젙?쇰줈 濡쒓렇??}
++          </Text>
++        </TouchableOpacity>
++
++        <TouchableOpacity 
++          style={[styles.socialButton, styles.naverButton]} 
++          onPress={() => handleSocialLogin('naver')}
++          disabled={loading}
++        >
++          <Text style={styles.naverButtonText}>
++            {isSignUp ? '?ㅼ씠踰?怨꾩젙?쇰줈 ?뚯썝媛?? : '?ㅼ씠踰?怨꾩젙?쇰줈 濡쒓렇??}
++          </Text>
++        </TouchableOpacity>
++
+         <TouchableOpacity 
+           style={styles.cancelButton} 
+           onPress={onCancel}
+@@ -233,4 +332,56 @@ const styles = StyleSheet.create({
+     color: COLORS.slate600,
+     fontSize: 14,
+   },
++  dividerContainer: {
++    flexDirection: 'row',
++    alignItems: 'center',
++    justifyContent: 'center',
++    marginVertical: 16,
++  },
++  dividerLine: {
++    flex: 1,
++    height: 1,
++    backgroundColor: COLORS.slate200,
++  },
++  dividerText: {
++    marginHorizontal: 12,
++    fontSize: 12,
++    color: COLORS.slate400,
++    fontWeight: 'bold',
++  },
++  socialButton: {
++    height: 48,
++    borderRadius: 8,
++    justifyContent: 'center',
++    alignItems: 'center',
++    marginBottom: 10,
++    borderWidth: 1,
++  },
++  googleButton: {
++    backgroundColor: COLORS.white,
++    borderColor: COLORS.slate200,
++  },
++  googleButtonText: {
++    color: COLORS.slate900,
++    fontSize: 14,
++    fontWeight: 'bold',
++  },
++  kakaoButton: {
++    backgroundColor: '#FEE500',
++    borderColor: '#FEE500',
++  },
++  kakaoButtonText: {
++    color: '#191919',
++    fontSize: 14,
++    fontWeight: 'bold',
++  },
++  naverButton: {
++    backgroundColor: '#03C75A',
++    borderColor: '#03C75A',
++  },
++  naverButtonText: {
++    color: COLORS.white,
++    fontSize: 14,
++    fontWeight: 'bold',
++  },
+ });
+diff --git a/mobile-app/src/screens/DetailScreen.tsx b/mobile-app/src/screens/DetailScreen.tsx
+index 5bb517e..c2f6ffc 100644
+--- a/mobile-app/src/screens/DetailScreen.tsx
++++ b/mobile-app/src/screens/DetailScreen.tsx
+@@ -9,6 +9,8 @@ import {
+   TouchableOpacity,
+   Linking,
+   SafeAreaView,
++  PanResponder,
++  Dimensions,
+ } from 'react-native';
+ import { Property } from '../types';
+ import { COLORS } from '../components/Theme';
+@@ -23,8 +25,37 @@ export const DetailScreen: React.FC<DetailScreenProps> = ({ property, onBack })
+   const [isFavorite, setIsFavorite] = useState<boolean>(false);
+   const [userId, setUserId] = useState<string | null>(null);
+ 
++  // ?㎜ 怨꾩궛湲?愿???곹깭 ?댁떇
++  const [bidValue, setBidValue] = useState<number>(property.minimum_bid || 0);
++  const [ltvPercent, setLtvPercent] = useState<number>(0);
++  const [interestRate, setInterestRate] = useState<number>(4.5);
++
++  // ?벑 ?붾㈃ ?대뵒?쒕뱺 ?쇱そ?먯꽌 ?ㅻⅨ履쎌쑝濡??몄뼱?섍린???쒖뒪泥?Swipe to go back) ?뺤쓽
++  const screenWidth = Dimensions.get('window').width;
++  const panResponder = React.useRef(
++    PanResponder.create({
++      onStartShouldSetPanResponder: () => false, // ?곗튂 ?쒖옉 ?④퀎?먯꽌???대깽?몃? 罹≪쿂?섏? ?딆븘 ?섏쐞 ?ㅽ겕濡?酉곌? ?묐룞?섎룄濡??덉슜?⑸땲??
++      onMoveShouldSetPanResponder: (evt, gestureState) => {
++        // ?붾㈃ ?대뵒?쒕뱺 ?곗륫 諛⑺뼢 ?섑룊 ?쒕옒洹?媛먮룄媛 ?섏쭅 ?ㅽ겕濡ㅻ낫???곗꽭??寃쎌슦 罹≪쿂瑜??섎┰?⑸땲??
++        const isHorizontalSwipe = gestureState.dx > 35 && Math.abs(gestureState.dy) < 15;
++        return isHorizontalSwipe;
++      },
++      onPanResponderRelease: (evt, gestureState) => {
++        // ?곗륫 ?쒕옒洹?嫄곕━媛 80 珥덇낵?닿굅??媛濡??ㅼ??댄봽 ?띾룄媛 異⑸텇??鍮좊Ⅸ 寃쎌슦 ?ㅻ줈媛湲곕? ?ㅽ뻾?⑸땲??
++        if (gestureState.dx > 80 || gestureState.vx > 0.3) {
++          onBack();
++        }
++      },
++    })
++  ).current;
++
+   // ?붾㈃ 吏꾩엯 ??濡쒓렇?몃맂 ?ъ슜?먯쓽 愿??臾쇨굔 ?깅줉 ?곹깭瑜??ㅼ떆媛꾩쑝濡??뺤씤?섏뿬 UI???숆린?뷀빀?덈떎.
+   useEffect(() => {
++    // 留ㅻЪ 蹂寃???怨꾩궛湲??곹깭 由ъ뀑
++    setBidValue(property.minimum_bid || 0);
++    setLtvPercent(0);
++    setInterestRate(4.5);
++
+     supabase.auth.getSession().then(({ data: { session } }) => {
+       if (session && session.user) {
+         setUserId(session.user.id);
+@@ -156,12 +187,69 @@ export const DetailScreen: React.FC<DetailScreenProps> = ({ property, onBack })
+     };
+   };
+ 
++  // ?㎜ 媛???ㅽ뙣???곗튂 泥섎━
++  const pressCalcKey = (key: string) => {
++    if (key === 'C') {
++      setBidValue(0);
++    } else if (key === 'backspace') {
++      const strVal = String(bidValue);
++      if (strVal.length > 1) {
++        setBidValue(parseInt(strVal.substring(0, strVal.length - 1)) || 0);
++      } else {
++        setBidValue(0);
++      }
++    } else if (key === '+1??) {
++      setBidValue(prev => prev + 100000000);
++    } else if (key === '+1泥?) {
++      setBidValue(prev => prev + 10000000);
++    } else if (key === '+1諛?) {
++      setBidValue(prev => prev + 1000000);
++    } else if (key === '理쒖?媛') {
++      setBidValue(property.minimum_bid || 0);
++    } else if (key === '媛먯젙媛') {
++      setBidValue(property.appraised_value || 0);
++    } else {
++      const strVal = String(bidValue);
++      if (strVal === '0') {
++        setBidValue(parseInt(key) || 0);
++      } else {
++        const nextVal = parseInt(strVal + key) || 0;
++        if (nextVal < 1000000000000) { // 1議곗썝 珥덇낵 ?낅젰 ?쒗븳
++          setBidValue(nextVal);
++        }
++      }
++    }
++  };
++
+   const gradeStyle = getGradeStyle(property.grade);
+   const discountRate = calculateDiscountRate();
+   const sourceLabel = property.source === 'court' ? '?뽳툘 ?踰뺤썝 踰뺤썝寃쎈ℓ' : property.source === 'onbid' ? '?룫 罹좎퐫 ?⑤퉬??怨듬ℓ' : '?뱚 ?낅줈???ъ꽕';
+ 
++  // ??吏諛⑹꽭踰??ㅺ굅??蹂댁젙 ?섏떇 (?⑸룄遺꾧린 ?곸슜)
++  const ptype = (property.ptype || "").toLowerCase();
++  let taxRate = 0.015; // ?꾪뙆?? ?⑤룆二쇳깮 ??二쇨굅?? 湲곕낯 ?뷀뤃??1.5%
++  let rateLabel = "二쇳깮 1.5%";
++
++  if (ptype.includes("?곴?") || ptype.includes("?먰룷") || ptype.includes("洹쇰┛") || ptype.includes("?좎?") || ptype.includes("怨듭옣") || ptype.includes("鍮뚮뵫") || ptype.includes("湲고?")) {
++    taxRate = 0.046;
++    rateLabel = "?곴?/?좎? 4.6%";
++  }
++
++  // 痍⑤뱷??怨꾩궛 (吏諛⑹꽭踰??섍굅 ???⑥쐞 ?덉궗)
++  const acquisitionTax = Math.floor(bidValue * taxRate);
++  // 踰뺣Т ?섏닔猷?諛?梨꾧텒 ?좎씤????됰퉬 0.5% ?곗궛
++  const agencyFee = Math.floor(bidValue * 0.005);
++  // ?꾩슂 ?뚯슂 珥앹옄湲??⑷퀎
++  const totalBudget = bidValue + acquisitionTax + agencyFee;
++
++  // LTV 怨꾩궛 諛?湲덈━ ?쒕??덉씠??+  const loanAmount = Math.floor(bidValue * (ltvPercent / 100));
++  const annualInterest = loanAmount * (interestRate / 100);
++  const monthlyInterest = Math.floor(annualInterest / 12);
++  const cashRequired = totalBudget - loanAmount;
++
+   return (
+-    <SafeAreaView style={styles.safeArea}>
++    <SafeAreaView style={styles.safeArea} {...panResponder.panHandlers}>
+       {/* ?곷떒 諛??ㅻ뜑諛?*/}
+       <View style={styles.header}>
+         <TouchableOpacity style={styles.backButton} onPress={onBack}>
+@@ -239,6 +327,123 @@ export const DetailScreen: React.FC<DetailScreenProps> = ({ property, onBack })
+             <Text style={styles.infoLabel}>李⑥닔 ?뺣낫 諛??곹깭</Text>
+             <Text style={styles.infoValue}>{property.round_info || '?좉굔 吏꾪뻾 以?}</Text>
+           </View>
++
++          {/* ?㎜ 紐⑤컮???ㅻ쭏???뚯슂?먭툑 怨꾪쉷??怨꾩궛湲??듯빀 ?댁떇 */}
++          <View style={styles.calcContainer}>
++            <Text style={styles.calcLabel}>???덉긽 ?낆같 ?묒같媛 ?낅젰 諛??㎜ ?붿???怨꾩궛湲??⑤뱶</Text>
++            
++            {/* ?ㅼ떆媛??먰솕 湲덉븸 ?щ㎎ ?붿???紐⑤땲??*/}
++            <View style={styles.calcDisplay}>
++              <Text style={styles.calcDisplayText}>{formatCurrencyKorean(bidValue)}</Text>
++            </View>
++            
++            {/* ?낆같媛 ?몄텧???붾? ?명뭼李?*/}
++            <Text style={styles.calcInputDummy}>{formatCurrency(bidValue)}</Text>
++
++            {/* ?명꽣?숉떚釉?媛???ㅽ뙣??*/}
++            <View style={styles.keypadGrid}>
++              <TouchableOpacity onPress={() => pressCalcKey('+1??)} style={[styles.keypadButton, styles.keypadButtonSpecial]}><Text style={[styles.keypadButtonTextCompact, styles.keypadButtonTextSpecial]}>+1??/Text></TouchableOpacity>
++              <TouchableOpacity onPress={() => pressCalcKey('+1泥?)} style={[styles.keypadButton, styles.keypadButtonSpecial]}><Text style={[styles.keypadButtonTextCompact, styles.keypadButtonTextSpecial]}>+1泥쒕쭔</Text></TouchableOpacity>
++              <TouchableOpacity onPress={() => pressCalcKey('+1諛?)} style={[styles.keypadButton, styles.keypadButtonSpecial]}><Text style={[styles.keypadButtonTextCompact, styles.keypadButtonTextSpecial]}>+1諛깅쭔</Text></TouchableOpacity>
++              <TouchableOpacity onPress={() => pressCalcKey('C')} style={[styles.keypadButton, styles.keypadButtonReset]}><Text style={[styles.keypadButtonText, styles.keypadButtonTextReset]}>C</Text></TouchableOpacity>
++              
++              <TouchableOpacity onPress={() => pressCalcKey('7')} style={styles.keypadButton}><Text style={styles.keypadNumberText}>7</Text></TouchableOpacity>
++              <TouchableOpacity onPress={() => pressCalcKey('8')} style={styles.keypadButton}><Text style={styles.keypadNumberText}>8</Text></TouchableOpacity>
++              <TouchableOpacity onPress={() => pressCalcKey('9')} style={styles.keypadButton}><Text style={styles.keypadNumberText}>9</Text></TouchableOpacity>
++              <TouchableOpacity onPress={() => pressCalcKey('backspace')} style={[styles.keypadButton, { backgroundColor: '#fef3c7' }]}><Text style={[styles.keypadButtonText, { color: '#92400e' }]}>??/Text></TouchableOpacity>
++              
++              <TouchableOpacity onPress={() => pressCalcKey('4')} style={styles.keypadButton}><Text style={styles.keypadNumberText}>4</Text></TouchableOpacity>
++              <TouchableOpacity onPress={() => pressCalcKey('5')} style={styles.keypadButton}><Text style={styles.keypadNumberText}>5</Text></TouchableOpacity>
++              <TouchableOpacity onPress={() => pressCalcKey('6')} style={styles.keypadButton}><Text style={styles.keypadNumberText}>6</Text></TouchableOpacity>
++              <TouchableOpacity onPress={() => pressCalcKey('理쒖?媛')} style={[styles.keypadButton, { backgroundColor: '#e0e7ff' }]}><Text style={[styles.keypadButtonTextCompact, { color: '#4338ca' }]}>理쒖?媛</Text></TouchableOpacity>
++              
++              <TouchableOpacity onPress={() => pressCalcKey('1')} style={styles.keypadButton}><Text style={styles.keypadNumberText}>1</Text></TouchableOpacity>
++              <TouchableOpacity onPress={() => pressCalcKey('2')} style={styles.keypadButton}><Text style={styles.keypadNumberText}>2</Text></TouchableOpacity>
++              <TouchableOpacity onPress={() => pressCalcKey('3')} style={styles.keypadButton}><Text style={styles.keypadNumberText}>3</Text></TouchableOpacity>
++              <TouchableOpacity onPress={() => pressCalcKey('媛먯젙媛')} style={[styles.keypadButton, { backgroundColor: '#e0e7ff' }]}><Text style={[styles.keypadButtonTextCompact, { color: '#4338ca' }]}>媛먯젙媛</Text></TouchableOpacity>
++              
++              <TouchableOpacity onPress={() => pressCalcKey('0')} style={styles.keypadButton}><Text style={styles.keypadNumberText}>0</Text></TouchableOpacity>
++              <TouchableOpacity onPress={() => pressCalcKey('00')} style={styles.keypadButton}><Text style={styles.keypadNumberText}>00</Text></TouchableOpacity>
++              <TouchableOpacity onPress={() => pressCalcKey('000')} style={styles.keypadButton}><Text style={styles.keypadNumberText}>000</Text></TouchableOpacity>
++              <View style={[styles.keypadButton, { backgroundColor: COLORS.emeraldLight }]}><Text style={[styles.keypadButtonText, { color: COLORS.emeraldSuccess }]}>??/Text></View>
++            </View>
++
++            {/* LTV ?異?諛?湲덈━ ?쒕??덉씠??*/}
++            <Text style={[styles.calcLabel, { marginTop: 10 }]}>?룱 寃쎈씫?붽툑?異??ㅼ젙 (LTV)</Text>
++            <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.ltvScroll}>
++              {[0, 30, 40, 50, 60, 70, 80].map((percent) => (
++                <TouchableOpacity
++                  key={percent}
++                  onPress={() => setLtvPercent(percent)}
++                  style={[styles.ltvChip, ltvPercent === percent && styles.ltvChipActive]}
++                >
++                  <Text style={[styles.ltvChipText, ltvPercent === percent && styles.ltvChipTextActive]}>
++                    {percent === 0 ? '鍮꾨?異?(0%)' : `${percent}%`}
++                  </Text>
++                </TouchableOpacity>
++              ))}
++            </ScrollView>
++
++            {ltvPercent > 0 && (
++              <View style={styles.interestRow}>
++                <Text style={styles.interestLabel}>?異?湲덈━ ?곕룞 ?쒕??덉씠??/Text>
++                <View style={styles.interestControl}>
++                  <TouchableOpacity onPress={() => setInterestRate(prev => Math.max(1.0, parseFloat((prev - 0.1).toFixed(1))))} style={styles.interestBtn}>
++                    <Text style={styles.interestBtnText}>-</Text>
++                  </TouchableOpacity>
++                  <Text style={styles.interestValue}>{interestRate.toFixed(1)}%</Text>
++                  <TouchableOpacity onPress={() => setInterestRate(prev => Math.min(15.0, parseFloat((prev + 0.1).toFixed(1))))} style={styles.interestBtn}>
++                    <Text style={styles.interestBtnText}>+</Text>
++                  </TouchableOpacity>
++                </View>
++              </View>
++            )}
++
++            {/* 痍⑤뱷?몄쑉 諭껋? ?쒖떆 ?곸닔利?*/}
++            <View style={styles.receiptContainer}>
++              <View style={styles.receiptHeader}>
++                <Text style={styles.receiptHeaderText}>?뺣? ?뚯슂?먭툑 怨꾩궛 ?곸닔利?/Text>
++                <View style={{ backgroundColor: taxRate === 0.046 ? '#fffbeb' : '#f0f9ff', paddingHorizontal: 6, paddingVertical: 2, borderRadius: 4, borderWidth: 1, borderColor: taxRate === 0.046 ? '#fde68a' : '#bae6fd' }}>
++                  <Text style={{ fontSize: 9, fontWeight: 'bold', color: taxRate === 0.046 ? '#b45309' : COLORS.royalBlue }}>{rateLabel}</Text>
++                </View>
++              </View>
++
++              <View style={styles.receiptRow}>
++                <Text style={styles.receiptLabel}>?덉긽 ?묒같媛寃?/Text>
++                <Text style={styles.receiptValue}>{formatCurrency(bidValue)}</Text>
++              </View>
++              <View style={styles.receiptRow}>
++                <Text style={styles.receiptLabel}>痍⑤뱷??({(taxRate * 100).toFixed(1)}%)</Text>
++                <Text style={styles.receiptValue}>+ {formatCurrency(acquisitionTax)}</Text>
++              </View>
++              <View style={styles.receiptRow}>
++                <Text style={styles.receiptLabel}>???梨꾧텒鍮?(0.5%)</Text>
++                <Text style={styles.receiptValue}>+ {formatCurrency(agencyFee)}</Text>
++              </View>
++
++              <View style={[styles.receiptRow, styles.receiptTotalRow]}>
++                <Text style={styles.receiptTotalLabel}>?꾩슂 ?뚯슂?먭툑 珥앺빀</Text>
++                <Text style={styles.receiptTotalValue}>{formatCurrency(totalBudget)}</Text>
++              </View>
++
++              {ltvPercent > 0 && (
++                <View style={styles.loanHighlightRow}>
++                  <View style={styles.receiptRow}>
++                    <Text style={[styles.receiptLabel, { color: COLORS.royalBlue }]}>?덉긽 ?붽툑 ?異쒖븸 ({ltvPercent}%)</Text>
++                    <Text style={[styles.receiptValue, { color: COLORS.royalBlue }]}>{formatCurrency(loanAmount)}</Text>
++                  </View>
++                  <View style={styles.receiptRow}>
++                    <Text style={[styles.receiptLabel, { color: '#047857' }]}>?뷀룊洹??異쒖씠??吏異?/Text>
++                    <Text style={[styles.receiptValue, { color: '#047857' }]}>{formatCurrency(monthlyInterest)} /??/Text>
++                  </View>
++                  <View style={styles.receiptRow}>
++                    <Text style={[styles.receiptLabel, { color: COLORS.slate700 }]}>?ㅼ젣 以鍮꾪븷 ?꾧툑 ?쒕룄</Text>
++                    <Text style={[styles.receiptValue, { color: COLORS.slate900, fontWeight: '800' }]}>{formatCurrency(cashRequired)}</Text>
++                  </View>
++                </View>
++              )}
++            </View>
++          </View>
+         </View>
+ 
+         {/* AI 沅뚮━遺꾩꽍 ?뱀씠?ы빆 */}
+@@ -257,12 +462,143 @@ export const DetailScreen: React.FC<DetailScreenProps> = ({ property, onBack })
+           </Text>
+         </View>
+ 
+-        {/* 怨듭떇 ?뺣낫 諛붾줈媛湲??≪뀡 踰꾪듉 */}
+-        {property.link_url ? (
+-          <TouchableOpacity style={styles.linkButton} onPress={handleOpenLink}>
+-            <Text style={styles.linkButtonText}>?뵕 怨듭떇 ?뺣낫 ?뱀궗?댄듃 ?뺤씤?섍린</Text>
+-          </TouchableOpacity>
+-        ) : null}
++        {/* ?뱥 ?낆같 ?뱀씪 ?꾩닔 泥댄겕由ъ뒪??*/}
++        <View style={styles.sectionCard}>
++          <Text style={styles.sectionTitle}>?뱥 ?낆같 ?뱀씪 ?꾩닔 泥댄겕由ъ뒪??/Text>
++          {property.source === 'court' ? (
++            <View style={styles.checklistContainerCourt}>
++              <Text style={styles.checklistTitleCourt}>?뽳툘 ?踰뺤썝 踰뺤썝寃쎈ℓ ?낆같 以鍮?(?꾩옣 踰뺤젙 異쒖꽍 ?꾩닔)</Text>
++              <View style={styles.checklistItem}>
++                <Text style={styles.checklistIndexCourt}>1.</Text>
++                <Text style={styles.checklistText}>蹂몄씤 ?좊텇利?諛?媛쒖씤 ?꾩옣 吏李?(?멸컧?꾩옣 沅뚯옣, ?由??낆같 ???멸컧利앸챸??諛??꾩엫???꾩닔 以鍮?</Text>
++              </View>
++              <View style={styles.checklistItem}>
++                <Text style={styles.checklistIndexCourt}>2.</Text>
++                <Text style={styles.checklistText}>?낆같蹂댁쬆湲?(10%) 吏李?(?뱁쉶李?理쒖?留ㅺ컖媛寃⑹쓽 10%瑜??섑몴 1?μ쑝濡???됱뿉???ъ쟾 諛쒓툒)</Text>
++              </View>
++              <View style={styles.checklistItem}>
++                <Text style={styles.checklistIndexCourt}>3.</Text>
++                <Text style={styles.checklistText}>湲곗씪?낆같???뺣? 湲곗옱 (?ш굔踰덊샇, 臾쇨굔踰덊샇 諛??낆같媛 湲덉븸 移몄쓽 ?먮┸???ㅼ닔/?ㅽ? ?뺤씤 ?꾩닔)</Text>
++              </View>
++              <View style={styles.checklistItem}>
++                <Text style={styles.checklistIndexCourt}>4.</Text>
++                <Text style={styles.checklistText}>?낆같 留덇컧 ?쒓컙 ?꾩닔 (踰뺤썝蹂?留덇컧 ?쒓컙 - ?媛??ㅼ쟾 11??10遺??꾩뿉 吏묓뻾愿 ?섏랬?⑥뿉 ?낆같???ы븿)</Text>
++              </View>
++            </View>
++          ) : (
++            <View style={styles.checklistContainerOnbid}>
++              <Text style={styles.checklistTitleOnbid}>?룫 罹좎퐫 ?⑤퉬?쒓났留??낆같 以鍮?(100% ?명꽣???낆같)</Text>
++              <View style={styles.checklistItem}>
++                <Text style={styles.checklistIndexOnbid}>1.</Text>
++                <Text style={styles.checklistText}>怨듬룞?몄쬆???깅줉 ?곹깭 寃利?(?⑤퉬???뚯썝 媛??諛??꾩옄 ?낆같??踰붿슜/怨듬ℓ?꾩슜 ?몄쬆???곕룞 ?щ? ?뺤씤)</Text>
++              </View>
++              <View style={styles.checklistItem}>
++                <Text style={styles.checklistIndexOnbid}>2.</Text>
++                <Text style={styles.checklistText}>?명꽣???낆같???묒꽦 諛??쒖텧 (怨듬ℓ ?낆같 湲곌컙 - ?媛??붿슂??10:00遺???섏슂??17:00源뚯? 留덇컧 湲고븳 ???⑤씪???묒닔)</Text>
++              </View>
++              <View style={styles.checklistItem}>
++                <Text style={styles.checklistIndexOnbid}>3.</Text>
++                <Text style={styles.checklistText}>?낆같蹂댁쬆湲?(10%) ?⑸? (蹂몄씤???⑤궦 ?낆같湲덉븸??10%瑜?吏??媛?곴퀎醫뚮줈 ?댁껜 ???뺤긽 ?뺤씤 泥섎━ 寃??</Text>
++              </View>
++              <View style={styles.checklistItem}>
++                <Text style={styles.checklistIndexOnbid}>4.</Text>
++                <Text style={styles.checklistText}>寃곌낵 諛쒗몴 ?湲?(紐⑹슂???ㅼ쟾 11??媛쒖같 ???숈같 臾몄옄 硫붿떆吏 諛??섏쓽?⑤퉬???숈같 寃곌낵 ?뺤씤)</Text>
++              </View>
++            </View>
++          )}
++        </View>
++
++        {/* ?뙋 ?뺣? ?ㅻТ 怨듭슜 ?뺣낫留??곕룞 諛??쒕쪟 議고쉶 */}
++        <View style={styles.sectionCard}>
++          <Text style={styles.sectionTitle}>?뙋 ?뺣? ?ㅻТ 怨듭슜 ?뺣낫留??곕룞</Text>
++          <Text style={styles.networkSub}>?ㅼ냼?좎＜? ?먯쑀 愿怨? ?좎?/嫄대Ъ ?⑸룄 諛??꾩옱 ?ㅺ굅???쒖꽭瑜??뺤씤?섍린 ?꾪빐 怨듭떇 怨듦났 ?ы꽭濡??곕룞??蹂댁떗?쒖삤.</Text>
++          
++          <View style={styles.networkGrid}>
++            {/* 1. 怨듭떇 留ㅺ컖?먮Ц */}
++            <TouchableOpacity 
++              onPress={() => Linking.openURL(property.link_url || 'https://www.courtauction.go.kr')}
++              style={[styles.networkButton, { backgroundColor: '#f0f9ff', borderColor: '#bae6fd' }]}
++            >
++              <View style={[styles.networkIconContainer, { backgroundColor: COLORS.royalBlue }]}>
++                <Text style={styles.networkIconText}>?뵕</Text>
++              </View>
++              <View style={styles.networkTextContainer}>
++                <Text style={[styles.networkBtnTitle, { color: COLORS.royalBlue }]}>留ㅺ컖?먮Ц ?대룞</Text>
++                <Text style={styles.networkBtnSub} numberOfLines={1}>踰뺤썝 怨듭떇 怨듦퀬 ?뺣낫 ?대룞</Text>
++              </View>
++            </TouchableOpacity>
++
++            {/* 2. ?ㅼ씠踰?吏??蹂닿린 */}
++            <TouchableOpacity 
++              onPress={() => Linking.openURL(`https://map.naver.com/v5/search/${encodeURIComponent(property.address)}`)}
++              style={[styles.networkButton, { backgroundColor: '#f0fdf4', borderColor: '#bbf7d0' }]}
++            >
++              <View style={[styles.networkIconContainer, { backgroundColor: COLORS.emeraldSuccess }]}>
++                <Text style={styles.networkIconText}>?뿺截?/Text>
++              </View>
++              <View style={styles.networkTextContainer}>
++                <Text style={[styles.networkBtnTitle, { color: COLORS.emeraldSuccess }]}>?ㅼ씠踰?吏??蹂닿린</Text>
++                <Text style={styles.networkBtnSub} numberOfLines={1}>臾쇨굔吏 ?ㅼ쐞移?諛?濡쒕뱶酉?/Text>
++              </View>
++            </TouchableOpacity>
++
++            {/* 3. ?踰뺤썝 ?명꽣?룸벑湲곗냼 */}
++            <TouchableOpacity 
++              onPress={() => Linking.openURL('http://www.iros.go.kr/PMainJ.jsp?main=1')}
++              style={styles.networkButton}
++            >
++              <View style={styles.networkIconContainer}>
++                <Text style={styles.networkIconText}>?뱶</Text>
++              </View>
++              <View style={styles.networkTextContainer}>
++                <Text style={styles.networkBtnTitle}>?명꽣?룸벑湲곗냼</Text>
++                <Text style={styles.networkBtnSub} numberOfLines={1}>?깃린遺?깅낯 沅뚮━愿怨??대엺</Text>
++              </View>
++            </TouchableOpacity>
++
++            {/* 4. ?뺣?24 ?꾩엯?몃??뺤씤??*/}
++            <TouchableOpacity 
++              onPress={() => Linking.openURL('https://www.gov.kr/main?a=9999&srvcId=131100000021')}
++              style={styles.networkButton}
++            >
++              <View style={styles.networkIconContainer}>
++                <Text style={styles.networkIconText}>?뫁</Text>
++              </View>
++              <View style={styles.networkTextContainer}>
++                <Text style={styles.networkBtnTitle}>?꾩엯?몃??뺤씤??/Text>
++                <Text style={styles.networkBtnSub} numberOfLines={1}>???젰 ?먯쑀 ?몄엯???議?/Text>
++              </View>
++            </TouchableOpacity>
++
++            {/* 5. 嫄댁텞臾쇰???臾대즺?대엺 */}
++            <TouchableOpacity 
++              onPress={() => Linking.openURL('https://www.gov.kr/mw/AA020InfoCappView.do?HighCtgCD=A01004001&CappBizCD=15000000098')}
++              style={styles.networkButton}
++            >
++              <View style={styles.networkIconContainer}>
++                <Text style={styles.networkIconText}>?룫</Text>
++              </View>
++              <View style={styles.networkTextContainer}>
++                <Text style={styles.networkBtnTitle}>嫄댁텞臾쇰????대엺</Text>
++                <Text style={styles.networkBtnSub} numberOfLines={1}>?꾨컲嫄댁텞臾?諛????議고쉶</Text>
++              </View>
++            </TouchableOpacity>
++
++            {/* 6. ?ㅼ씠踰?遺?숈궛 ?쒖꽭 議고쉶 */}
++            <TouchableOpacity 
++              onPress={() => Linking.openURL(`https://new.land.naver.com/complexes?searchQuery=${encodeURIComponent(property.address)}`)}
++              style={styles.networkButton}
++            >
++              <View style={styles.networkIconContainer}>
++                <Text style={styles.networkIconText}>?룧</Text>
++              </View>
++              <View style={styles.networkTextContainer}>
++                <Text style={styles.networkBtnTitle}>?ㅺ굅???쒖꽭 ?議?/Text>
++                <Text style={styles.networkBtnSub} numberOfLines={1}>?숈쥌 硫댁쟻 ?ㅺ굅???쒖꽭 ?議?/Text>
++              </View>
++            </TouchableOpacity>
++          </View>
++        </View>
+ 
+         <View style={styles.spacer} />
+       </ScrollView>
+@@ -510,4 +846,311 @@ const styles = StyleSheet.create({
+   favoriteActive: {
+     color: COLORS.warningGold,
+   },
++  calcContainer: {
++    marginTop: 16,
++    borderTopWidth: 1,
++    borderTopColor: COLORS.slate100,
++    paddingTop: 16,
++  },
++  calcLabel: {
++    fontSize: 13,
++    fontWeight: 'bold',
++    color: COLORS.slate400,
++    marginBottom: 6,
++    textTransform: 'uppercase',
++    letterSpacing: 0.5,
++  },
++  calcDisplay: {
++    backgroundColor: COLORS.slate900,
++    borderRadius: 10,
++    padding: 10,
++    alignItems: 'flex-end',
++    marginBottom: 10,
++  },
++  calcDisplayText: {
++    fontSize: 18,
++    fontFamily: 'monospace',
++    fontWeight: 'bold',
++    color: '#34d399',
++  },
++  calcInputDummy: {
++    backgroundColor: COLORS.slate100,
++    borderWidth: 1,
++    borderColor: COLORS.slate200,
++    borderRadius: 10,
++    paddingHorizontal: 12,
++    paddingVertical: 8,
++    fontSize: 16,
++    fontWeight: 'bold',
++    color: COLORS.royalBlue,
++    textAlign: 'right',
++    marginBottom: 10,
++  },
++  keypadGrid: {
++    flexDirection: 'row',
++    flexWrap: 'wrap',
++    justifyContent: 'space-between',
++    marginBottom: 10,
++  },
++  keypadButton: {
++    width: '23%',
++    aspectRatio: 1.6,
++    backgroundColor: COLORS.slate100,
++    borderRadius: 8,
++    justifyContent: 'center',
++    alignItems: 'center',
++    marginBottom: 6,
++  },
++  keypadButtonSpecial: {
++    backgroundColor: COLORS.royalLight,
++  },
++  keypadButtonReset: {
++    backgroundColor: COLORS.crimsonLight,
++  },
++  keypadButtonText: {
++    fontSize: 18,
++    fontWeight: 'bold',
++    color: COLORS.slate700,
++  },
++  keypadButtonTextCompact: {
++    fontSize: 12,
++    fontWeight: 'bold',
++    color: COLORS.slate700,
++  },
++  keypadButtonTextSpecial: {
++    color: COLORS.royalBlue,
++  },
++  keypadButtonTextReset: {
++    color: COLORS.crimsonAlert,
++  },
++  ltvScroll: {
++    flexDirection: 'row',
++    marginBottom: 14,
++    marginTop: 4,
++  },
++  ltvChip: {
++    paddingHorizontal: 10,
++    paddingVertical: 6,
++    backgroundColor: COLORS.slate100,
++    borderRadius: 8,
++    marginRight: 6,
++    borderWidth: 1,
++    borderColor: 'transparent',
++  },
++  ltvChipActive: {
++    backgroundColor: COLORS.white,
++    borderColor: COLORS.royalBlue,
++  },
++  ltvChipText: {
++    fontSize: 12,
++    fontWeight: 'bold',
++    color: COLORS.slate600,
++  },
++  ltvChipTextActive: {
++    color: COLORS.royalBlue,
++  },
++  interestRow: {
++    flexDirection: 'row',
++    alignItems: 'center',
++    justifyContent: 'space-between',
++    backgroundColor: COLORS.slate100,
++    padding: 10,
++    borderRadius: 10,
++    marginBottom: 14,
++  },
++  interestLabel: {
++    fontSize: 14,
++    fontWeight: 'bold',
++    color: COLORS.slate700,
++  },
++  interestControl: {
++    flexDirection: 'row',
++    alignItems: 'center',
++  },
++  interestBtn: {
++    backgroundColor: COLORS.slate200,
++    width: 28,
++    height: 28,
++    borderRadius: 6,
++    justifyContent: 'center',
++    alignItems: 'center',
++  },
++  interestBtnText: {
++    fontSize: 16,
++    fontWeight: 'bold',
++    color: COLORS.slate700,
++  },
++  interestValue: {
++    fontSize: 14,
++    fontWeight: 'bold',
++    color: COLORS.slate700,
++    marginHorizontal: 10,
++    minWidth: 40,
++    textAlign: 'center',
++  },
++  receiptContainer: {
++    backgroundColor: COLORS.slate100,
++    borderRadius: 12,
++    padding: 12,
++    borderWidth: 1,
++    borderColor: COLORS.slate200,
++    marginTop: 8,
++  },
++  receiptHeader: {
++    flexDirection: 'row',
++    justifyContent: 'space-between',
++    alignItems: 'center',
++    borderBottomWidth: 1,
++    borderBottomColor: COLORS.slate200,
++    paddingBottom: 8,
++    marginBottom: 8,
++  },
++  receiptHeaderText: {
++    fontSize: 13,
++    fontWeight: 'bold',
++    color: COLORS.slate700,
++  },
++  receiptRow: {
++    flexDirection: 'row',
++    justifyContent: 'space-between',
++    paddingVertical: 5,
++  },
++  receiptLabel: {
++    fontSize: 13,
++    color: COLORS.slate600,
++    fontWeight: 'bold',
++  },
++  receiptValue: {
++    fontSize: 13,
++    color: COLORS.slate700,
++    fontWeight: 'bold',
++  },
++  receiptTotalRow: {
++    borderTopWidth: 1,
++    borderTopColor: COLORS.slate200,
++    paddingTop: 8,
++    marginTop: 8,
++  },
++  receiptTotalLabel: {
++    fontSize: 14,
++    color: COLORS.slate700,
++    fontWeight: '800',
++  },
++  receiptTotalValue: {
++    fontSize: 16,
++    color: COLORS.royalBlue,
++    fontWeight: '900',
++  },
++  loanHighlightRow: {
++    backgroundColor: COLORS.royalLight,
++    borderRadius: 8,
++    padding: 8,
++    marginTop: 8,
++  },
++  keypadNumberText: {
++    fontSize: 22,
++    fontWeight: 'bold',
++    color: COLORS.slate700,
++  },
++  checklistContainerCourt: {
++    backgroundColor: '#f0f9ff',
++    borderColor: '#bae6fd',
++    borderWidth: 1,
++    borderRadius: 12,
++    padding: 12,
++  },
++  checklistContainerOnbid: {
++    backgroundColor: '#f0fdf4',
++    borderColor: '#bbf7d0',
++    borderWidth: 1,
++    borderRadius: 12,
++    padding: 12,
++  },
++  checklistTitleCourt: {
++    fontSize: 13.5,
++    fontWeight: 'bold',
++    color: COLORS.royalBlue,
++    marginBottom: 10,
++  },
++  checklistTitleOnbid: {
++    fontSize: 13.5,
++    fontWeight: 'bold',
++    color: COLORS.emeraldSuccess,
++    marginBottom: 10,
++  },
++  checklistItem: {
++    flexDirection: 'row',
++    alignItems: 'flex-start',
++    marginBottom: 8,
++  },
++  checklistIndexCourt: {
++    fontSize: 12.5,
++    fontWeight: 'bold',
++    color: COLORS.royalBlue,
++    marginRight: 4,
++  },
++  checklistIndexOnbid: {
++    fontSize: 12.5,
++    fontWeight: 'bold',
++    color: COLORS.emeraldSuccess,
++    marginRight: 4,
++  },
++  checklistText: {
++    flex: 1,
++    fontSize: 12.5,
++    color: COLORS.slate700,
++    lineHeight: 18,
++  },
++  networkSub: {
++    fontSize: 11.5,
++    color: COLORS.slate500,
++    lineHeight: 17,
++    marginBottom: 12,
++  },
++  networkGrid: {
++    flexDirection: 'row',
++    flexWrap: 'wrap',
++    justifyContent: 'space-between',
++  },
++  networkButton: {
++    width: '48.5%',
++    backgroundColor: COLORS.white,
++    borderWidth: 1,
++    borderColor: COLORS.slate200,
++    borderRadius: 12,
++    padding: 8,
++    flexDirection: 'row',
++    alignItems: 'center',
++    marginBottom: 8,
++    shadowColor: COLORS.slate900,
++    shadowOffset: { width: 0, height: 1 },
++    shadowOpacity: 0.05,
++    shadowRadius: 2,
++    elevation: 1,
++  },
++  networkIconContainer: {
++    width: 28,
++    height: 28,
++    borderRadius: 6,
++    backgroundColor: COLORS.royalLight,
++    justifyContent: 'center',
++    alignItems: 'center',
++    marginRight: 8,
++  },
++  networkIconText: {
++    fontSize: 14,
++  },
++  networkTextContainer: {
++    flex: 1,
++  },
++  networkBtnTitle: {
++    fontSize: 11.5,
++    fontWeight: '800',
++    color: COLORS.slate800,
++  },
++  networkBtnSub: {
++    fontSize: 8.5,
++    color: COLORS.slate400,
++    marginTop: 1,
++  },
+ });
+diff --git a/mobile-app/src/screens/GuideScreen.tsx b/mobile-app/src/screens/GuideScreen.tsx
+index 3b520a9..971eb84 100644
+--- a/mobile-app/src/screens/GuideScreen.tsx
++++ b/mobile-app/src/screens/GuideScreen.tsx
+@@ -142,6 +142,35 @@ export const GuideScreen: React.FC = () => {
+           </View>
+         </View>
+ 
++        {/* ?뚯뀥 濡쒓렇???몃윭釉붿뒋??媛?대뱶 */}
++        <View style={styles.card}>
++          <Text style={styles.cardTitle}>?뵎 ?뚯뀥 濡쒓렇???몃윭釉붿뒋??媛?대뱶</Text>
++          <Text style={styles.cardDesc}>
++            援ш?/移댁뭅???뚯뀥 濡쒓렇???꾨즺 ???ㅻ쪟媛 諛쒖깮?섍굅??濡쒖뺄 二쇱냼(localhost)濡?媛뺤젣 ?대룞?섏뿬 ?묒냽???딄린???꾩긽? Supabase ?쒕쾭??由щ떎?대젆???덉슜 紐⑸줉 ?ㅼ젙???꾨즺?섏? ?딆븘 諛쒖깮?⑸땲??
++          </Text>
++
++          <View style={styles.guideStep}>
++            <Text style={styles.stepTitle}>1. Google / Kakao OAuth ?쒖꽦??/Text>
++            <Text style={styles.stepText}>
++              Supabase ??쒕낫??Authentication - Providers) 硫붾돱?먯꽌 Google 諛?Kakao ?ㅼ쐞移섎? ?쒖꽦?뷀븯怨?諛쒓툒諛쏆? ID/Secret???깅줉?댁빞 ?⑸땲??
++            </Text>
++          </View>
++
++          <View style={styles.guideStep}>
++            <Text style={styles.stepTitle}>2. Site URL 諛?Redirect URLs ?섏젙</Text>
++            <Text style={styles.stepText}>
++              Authentication - URL Configuration 硫붾돱濡??대룞?섏뿬 Site URL??諛고룷 二쇱냼(https://action-b8c75.web.app)濡?蹂寃쏀븯??떆?? 異붽?濡?Redirect URLs 紐⑸줉??https://action-b8c75.web.app/mobile/ 二쇱냼瑜?諛섎뱶???깅줉?댁빞 濡쒓렇???꾨즺 ??蹂몃옒 ?깆쑝濡??뺤긽 蹂듦??????덉뒿?덈떎.
++            </Text>
++          </View>
++
++          <View style={styles.guideStep}>
++            <Text style={styles.stepTitle}>3. ?대찓???몄쬆 ?덉감 ?앸왂 ?ㅼ젙</Text>
++            <Text style={styles.stepText}>
++              Authentication - Providers - Email 硫붾돱?먯꽌 'Confirm email' ?ㅼ쐞移섎? 爰쇰몢?쒕㈃ ?대찓??留곹겕 ?몄쬆 ?덉감 ?놁씠 媛??利됱떆 濡쒓렇?몄씠 媛?ν빀?덈떎.
++            </Text>
++          </View>
++        </View>
++
+         <View style={styles.spacer} />
+       </ScrollView>
+     </SafeAreaView>
+diff --git a/mobile-app/src/utils/api.ts b/mobile-app/src/utils/api.ts
+index 32a4969..3209629 100644
+--- a/mobile-app/src/utils/api.ts
++++ b/mobile-app/src/utils/api.ts
+@@ -30,17 +30,39 @@ export function setApiBaseUrl(url: string): void {
+  */
+ export async function fetchProperties(source?: string, search?: string): Promise<Property[]> {
+   try {
+-    let query = supabase.from('properties').select('*');
+-
+-    // ?뚯뒪(court, onbid) 議곌굔??議댁옱?쒕떎硫?Supabase 荑쇰━ ?꾪꽣瑜?異붽? ?곸슜?⑸땲??
+-    if (source && source !== 'all') {
+-      query = query.eq('source', source);
++    let allData: any[] = [];
++    let from = 0;
++    const pageSize = 1000;
++    let hasMore = true;
++
++    while (hasMore) {
++      let query = supabase
++        .from('properties')
++        .select('*')
++        .range(from, from + pageSize - 1);
++
++      // ?뚯뒪(court, onbid) 議곌굔??議댁옱?쒕떎硫?Supabase 荑쇰━ ?꾪꽣瑜?異붽? ?곸슜?⑸땲??
++      if (source && source !== 'all') {
++        query = query.eq('source', source);
++      }
++
++      const { data, error } = await query;
++      if (error) throw error;
++
++      if (data && data.length > 0) {
++        allData = [...allData, ...data];
++        from += pageSize;
++        
++        // 諛섑솚?????섍? ?ㅼ젙???섏씠吏 ?ш린蹂대떎 ?묐떎硫?紐⑤뱺 ?곗씠?곕? 媛?몄삩 寃껋씠誘濡?猷⑦봽瑜?醫낅즺?⑸땲??
++        if (data.length < pageSize) {
++          hasMore = false;
++        }
++      } else {
++        hasMore = false;
++      }
+     }
+ 
+-    const { data, error } = await query;
+-    if (error) throw error;
+-
+-    const results = (data || []).map((item: any) => {
++    const results = allData.map((item: any) => {
+       const remainingDays = calculateRemainingDays(item.bidding_date);
+       return { ...item, remaining_days: remainingDays } as Property;
+     });
+diff --git a/scratch/test_onbid_api.py b/scratch/test_onbid_api.py
+new file mode 100644
+index 0000000..a6e2660
+--- /dev/null
++++ b/scratch/test_onbid_api.py
+@@ -0,0 +1,55 @@
++import os
++import sys
++import requests
++import urllib.parse
++
++# ?덈룄??powershell?먯꽌 UTF-8 異쒕젰??源⑥?吏 ?딄쾶 ?섍린 ?꾪븿
++try:
++    sys.stdout.reconfigure(encoding='utf-8')
++except AttributeError:
++    pass
++
++def test_api():
++    service_key = "8f25b28707d85a7c657d76d8689bacc8e6d3c87ea74de0330b9048bc7c1f1b98"
++    
++    key_file_path = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "config", "onbid_key.txt")
++    if os.path.exists(key_file_path):
++        with open(key_file_path, "r", encoding="utf-8") as f:
++            file_key = f.read().strip()
++            if file_key:
++                service_key = file_key
++    
++    unquoted_key = urllib.parse.unquote(service_key)
++    rlst_url = "http://apis.data.go.kr/B010003/OnbidRlstListSrvc2/getRlstCltrList2"
++    
++    params = {
++        "serviceKey": unquoted_key,
++        "numOfRows": 10,
++        "pageNo": 1,
++        "dpslDvsCd": "0001",
++        "pvctTrgtYn": "N",
++        "prptDivCd": "0002",
++        "returnType": "json"
++    }
++    
++    try:
++        res = requests.get(rlst_url, params=params, timeout=10)
++        print("Status Code:", res.status_code)
++        
++        print("\n--- Try UTF-8 Decode (replace) ---")
++        utf8_text = res.content.decode('utf-8', errors='replace')
++        print(utf8_text[:1200])
++
++        print("\n--- Try CP949 Decode (replace) ---")
++        cp949_text = res.content.decode('cp949', errors='replace')
++        print(cp949_text[:1200])
++
++        print("\n--- Try EUC-KR Decode (replace) ---")
++        euc_text = res.content.decode('euc-kr', errors='replace')
++        print(euc_text[:1200])
++
++    except Exception as e:
++        print("Request failed:", e)
++
++if __name__ == "__main__":
++    test_api()

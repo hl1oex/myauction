@@ -1,0 +1,1440 @@
+Commit: commit 745e27908cef38d91c3a094c49a02f1f9a72b007 | Date:   Wed Jun 17 14:26:24 2026 +0900
+Line 44: +                        본 경공매 검색시스템은 공적 장부의 데이터 누락을 보완하고 다차원 가치 분석 정보를 직관적으로 전달하고자 추정 및 허수 배지 표시 제도를 운영하고 있습니다. 각 배지와 마스킹의 세부 기준은 다음과 같습니다.
+Context context:
+     39: +                <div class="bg-slate-50 border border-slate-200/80 rounded-2xl p-4 mt-5 space-y-3 text-[11px] sm:text-xs text-slate-600 font-medium">
+     40: +                    <h5 class="text-xs sm:text-[13px] font-black text-slate-800 flex items-center gap-1.5 mb-1.5">
+     41: +                        <i class="fa-solid fa-circle-info text-royalBlue"></i> ⚠️ 데이터 수집 및 추정/허수 표기 안내
+     42: +                    </h5>
+     43: +                    <p class="leading-relaxed">
+  >> 44: +                        본 경공매 검색시스템은 공적 장부의 데이터 누락을 보완하고 다차원 가치 분석 정보를 직관적으로 전달하고자 추정 및 허수 배지 표시 제도를 운영하고 있습니다. 각 배지와 마스킹의 세부 기준은 다음과 같습니다.
+     45: +                    </p>
+     46: +                    <div class="space-y-3 pl-1">
+     47: +                        <div>
+     48: +                            <span class="inline-flex items-center gap-0.5 px-2 py-0.5 rounded-full text-[10px] font-black bg-rose-600 text-white select-none">⚠️ 허수</span>
+     49: +                            <span class="font-black text-slate-800 ml-1">누락 및 수집 불가 데이터</span>
+--------------------------------------------------
+Commit: commit 745e27908cef38d91c3a094c49a02f1f9a72b007 | Date:   Wed Jun 17 14:26:24 2026 +0900
+Line 98: +                        본 경공매 검색시스템은 공적 장부의 데이터 누락을 보완하고 다차원 가치 분석 정보를 직관적으로 전달하고자 추정 및 허수 배지 표시 제도를 운영하고 있습니다. 각 배지와 마스킹의 세부 기준은 다음과 같습니다.
+Context context:
+     93: +                <div class="bg-slate-50 border border-slate-200/80 rounded-2xl p-4 mt-5 space-y-3 text-[11px] sm:text-xs text-slate-600 font-medium">
+     94: +                    <h5 class="text-xs sm:text-[13px] font-black text-slate-800 flex items-center gap-1.5 mb-1.5">
+     95: +                        <i class="fa-solid fa-circle-info text-royalBlue"></i> ⚠️ 데이터 수집 및 추정/허수 표기 안내
+     96: +                    </h5>
+     97: +                    <p class="leading-relaxed">
+  >> 98: +                        본 경공매 검색시스템은 공적 장부의 데이터 누락을 보완하고 다차원 가치 분석 정보를 직관적으로 전달하고자 추정 및 허수 배지 표시 제도를 운영하고 있습니다. 각 배지와 마스킹의 세부 기준은 다음과 같습니다.
+     99: +                    </p>
+     100: +                    <div class="space-y-3 pl-1">
+     101: +                        <div>
+     102: +                            <span class="inline-flex items-center gap-0.5 px-2 py-0.5 rounded-full text-[10px] font-black bg-rose-600 text-white select-none">⚠️ 허수</span>
+     103: +                            <span class="font-black text-slate-800 ml-1">누락 및 수집 불가 데이터</span>
+--------------------------------------------------
+Commit: commit 745e27908cef38d91c3a094c49a02f1f9a72b007 | Date:   Wed Jun 17 14:26:24 2026 +0900
+Line 159: +                        본 경공매 검색시스템은 공적 장부의 데이터 누락을 보완하고 다차원 가치 분석 정보를 직관적으로 전달하고자 추정 및 허수 배지 표시 제도를 운영하고 있습니다. 각 배지와 마스킹의 세부 기준은 다음과 같습니다.
+Context context:
+     154: +                <div class="bg-slate-50 border border-slate-200/80 rounded-2xl p-4 mt-5 space-y-3 text-[11px] sm:text-xs text-slate-600 font-medium">
+     155: +                    <h5 class="text-xs sm:text-[13px] font-black text-slate-800 flex items-center gap-1.5 mb-1.5">
+     156: +                        <i class="fa-solid fa-circle-info text-royalBlue"></i> ⚠️ 데이터 수집 및 추정/허수 표기 안내
+     157: +                    </h5>
+     158: +                    <p class="leading-relaxed">
+  >> 159: +                        본 경공매 검색시스템은 공적 장부의 데이터 누락을 보완하고 다차원 가치 분석 정보를 직관적으로 전달하고자 추정 및 허수 배지 표시 제도를 운영하고 있습니다. 각 배지와 마스킹의 세부 기준은 다음과 같습니다.
+     160: +                    </p>
+     161: +                    <div class="space-y-3 pl-1">
+     162: +                        <div>
+     163: +                            <span class="inline-flex items-center gap-0.5 px-2 py-0.5 rounded-full text-[10px] font-black bg-rose-600 text-white select-none">⚠️ 허수</span>
+     164: +                            <span class="font-black text-slate-800 ml-1">누락 및 수집 불가 데이터</span>
+--------------------------------------------------
+Commit: commit 745e27908cef38d91c3a094c49a02f1f9a72b007 | Date:   Wed Jun 17 14:26:24 2026 +0900
+Line 211: +                        본 경공매 검색시스템은 공적 장부의 데이터 누락을 보완하고 다차원 가치 분석 정보를 직관적으로 전달하고자 추정 및 허수 배지 표시 제도를 운영하고 있습니다. 각 배지와 마스킹의 세부 기준은 다음과 같습니다.
+Context context:
+     206: +                <div class="bg-slate-50 border border-slate-200/80 rounded-2xl p-4 mt-5 space-y-3 text-[11px] sm:text-xs text-slate-600 font-medium">
+     207: +                    <h5 class="text-xs sm:text-[13px] font-black text-slate-800 flex items-center gap-1.5 mb-1.5">
+     208: +                        <i class="fa-solid fa-circle-info text-royalBlue"></i> ⚠️ 데이터 수집 및 추정/허수 표기 안내
+     209: +                    </h5>
+     210: +                    <p class="leading-relaxed">
+  >> 211: +                        본 경공매 검색시스템은 공적 장부의 데이터 누락을 보완하고 다차원 가치 분석 정보를 직관적으로 전달하고자 추정 및 허수 배지 표시 제도를 운영하고 있습니다. 각 배지와 마스킹의 세부 기준은 다음과 같습니다.
+     212: +                    </p>
+     213: +                    <div class="space-y-3 pl-1">
+     214: +                        <div>
+     215: +                            <span class="inline-flex items-center gap-0.5 px-2 py-0.5 rounded-full text-[10px] font-black bg-rose-600 text-white select-none">⚠️ 허수</span>
+     216: +                            <span class="font-black text-slate-800 ml-1">누락 및 수집 불가 데이터</span>
+--------------------------------------------------
+Commit: commit 884169c7bc2ea0e7d9f03f2342bed78c67b9bff9 | Date:   Sun Jun 14 21:59:12 2026 +0900
+Line 2181: +                        <i class="fa-solid fa-tags text-royalBlue"></i> 주변 아파트 실거래 시세 대조
+Context context:
+     2176: +
+     2177: +                    <div id="detail-panel-market" class="space-y-4 sm:space-y-5">
+     2178: +                        <div class="bg-white border border-slate-200 rounded-2xl p-4 shadow-sm space-y-3">
+     2179: +                <div class="flex items-center justify-between pb-2 border-b border-slate-100">
+     2180: +                    <h4 class="text-xs sm:text-sm font-black text-slate-800 flex items-center gap-1.5">
+  >> 2181: +                        <i class="fa-solid fa-tags text-royalBlue"></i> 주변 아파트 실거래 시세 대조
+     2182: +                    </h4>
+     2183: +                    <button onclick="copyAddressToClipboardAndOpenSeeReal()" class="px-2 py-1 bg-amber-50 hover:bg-amber-100 border border-amber-200 text-amber-700 text-[10px] font-black rounded-lg transition-all flex items-center gap-1">
+     2184: +                        <i class="fa-solid fa-copy"></i> 주소복사 & 시세확인 (씨리얼)
+     2185: +                    </button>
+     2186: +                </div>
+--------------------------------------------------
+Commit: commit 884169c7bc2ea0e7d9f03f2342bed78c67b9bff9 | Date:   Sun Jun 14 21:59:12 2026 +0900
+Line 2385: -                        <i class="fa-solid fa-tags text-royalBlue"></i> 주변 아파트 실거래 시세 대조
+Context context:
+     2380: -
+     2381: -                    <div id="detail-panel-market" class="space-y-4 sm:space-y-5">
+     2382: -                        <div class="bg-white border border-slate-200 rounded-2xl p-4 shadow-sm space-y-3">
+     2383: -                <div class="flex items-center justify-between pb-2 border-b border-slate-100">
+     2384: -                    <h4 class="text-xs sm:text-sm font-black text-slate-800 flex items-center gap-1.5">
+  >> 2385: -                        <i class="fa-solid fa-tags text-royalBlue"></i> 주변 아파트 실거래 시세 대조
+     2386: -                    </h4>
+     2387: -                    <button onclick="copyAddressToClipboardAndOpenSeeReal()" class="px-2 py-1 bg-amber-50 hover:bg-amber-100 border border-amber-200 text-amber-700 text-[10px] font-black rounded-lg transition-all flex items-center gap-1">
+     2388: -                        <i class="fa-solid fa-copy"></i> 주소복사 & 시세확인 (씨리얼)
+     2389: -                    </button>
+     2390: -                </div>
+--------------------------------------------------
+Commit: commit 3259bec281d056d315a52407993de97e57523bc6 | Date:   Sun Jun 14 10:19:04 2026 +0900
+Line 3057: -            <!-- 🤝 주변 유사 물건 추천 섹션 -->
+Context context:
+     3052: -                        </div>
+     3053: -                    </a>
+     3054: -                </div>
+     3055: -            </div>
+     3056: -                
+  >> 3057: -            <!-- 🤝 주변 유사 물건 추천 섹션 -->
+     3058: -            <div class="bg-white border border-slate-200 rounded-2xl p-3.5 sm:p-4 space-y-3 shadow-sm">
+     3059: -                <h4 class="text-xs sm:text-sm font-black text-slate-800 flex items-center gap-1.5 pb-2 border-b border-slate-100">
+     3060: -                    <i class="fa-solid fa-handshake text-royalBlue"></i> 🤝 동일 용도/지역 기반 유사 추천 매물
+     3061: -                </h4>
+     3062: -                <div id="detail-similar-container" class="grid grid-cols-3 gap-2">
+--------------------------------------------------
+Commit: commit 3259bec281d056d315a52407993de97e57523bc6 | Date:   Sun Jun 14 10:19:04 2026 +0900
+Line 3060: -                    <i class="fa-solid fa-handshake text-royalBlue"></i> 🤝 동일 용도/지역 기반 유사 추천 매물
+Context context:
+     3055: -            </div>
+     3056: -                
+     3057: -            <!-- 🤝 주변 유사 물건 추천 섹션 -->
+     3058: -            <div class="bg-white border border-slate-200 rounded-2xl p-3.5 sm:p-4 space-y-3 shadow-sm">
+     3059: -                <h4 class="text-xs sm:text-sm font-black text-slate-800 flex items-center gap-1.5 pb-2 border-b border-slate-100">
+  >> 3060: -                    <i class="fa-solid fa-handshake text-royalBlue"></i> 🤝 동일 용도/지역 기반 유사 추천 매물
+     3061: -                </h4>
+     3062: -                <div id="detail-similar-container" class="grid grid-cols-3 gap-2">
+     3063: -                    <!-- 동적 렌더링 카드 3개 -->
+     3064: -                </div>
+     3065: -            </div>
+--------------------------------------------------
+Commit: commit 65cba74f31bc162ddac4ea50c7ada4aba431d952 | Date:   Sun Jun 14 08:39:27 2026 +0900
+Line 4203: +                    <!-- 우측 묶음: 외부 연동 허브 및 추천 매물 -->
+Context context:
+     4198: +                                </tbody>
+     4199: +                            </table>
+     4200: +                        </div>
+     4201: +                    </div>
+     4202: +
+  >> 4203: +                    <!-- 우측 묶음: 외부 연동 허브 및 추천 매물 -->
+     4204: +                    <div class="space-y-4 sm:space-y-5 w-full">
+     4205: +                        <!-- 원스톱 외부 공식 정보망 연동 -->
+     4206: +                        <div class="bg-white border border-slate-200 rounded-2xl p-4 space-y-2.5 shadow-sm">
+     4207: +                            <h4 class="text-xs sm:text-sm font-black text-slate-800 flex items-center gap-1.5">
+     4208: +                                <i class="fa-solid fa-globe text-royalBlue"></i> 🌐 원스톱 외부 공식 정보망 연동
+--------------------------------------------------
+Commit: commit 65cba74f31bc162ddac4ea50c7ada4aba431d952 | Date:   Sun Jun 14 08:39:27 2026 +0900
+Line 4331: +                        <!-- 동일 용도/지역 기반 유사 추천 매물 -->
+Context context:
+     4326: -                    </table>
+     4327: +                                </a>
+     4328: +                            </div>
+     4329: +                        </div>
+     4330: +
+  >> 4331: +                        <!-- 동일 용도/지역 기반 유사 추천 매물 -->
+     4332: +                        <div class="bg-white border border-slate-200 rounded-2xl p-4 space-y-3 shadow-sm">
+     4333: +                            <h4 class="text-xs sm:text-sm font-black text-slate-800 flex items-center gap-1.5 pb-2 border-b border-slate-100">
+     4334: +                                <i class="fa-solid fa-handshake text-royalBlue"></i> 🤝 동일 용도/지역 기반 유사 추천 매물
+     4335: +                            </h4>
+     4336: +                            <div id="detail-similar-container" class="grid grid-cols-3 gap-2">
+--------------------------------------------------
+Commit: commit 65cba74f31bc162ddac4ea50c7ada4aba431d952 | Date:   Sun Jun 14 08:39:27 2026 +0900
+Line 4334: +                                <i class="fa-solid fa-handshake text-royalBlue"></i> 🤝 동일 용도/지역 기반 유사 추천 매물
+Context context:
+     4329: +                        </div>
+     4330: +
+     4331: +                        <!-- 동일 용도/지역 기반 유사 추천 매물 -->
+     4332: +                        <div class="bg-white border border-slate-200 rounded-2xl p-4 space-y-3 shadow-sm">
+     4333: +                            <h4 class="text-xs sm:text-sm font-black text-slate-800 flex items-center gap-1.5 pb-2 border-b border-slate-100">
+  >> 4334: +                                <i class="fa-solid fa-handshake text-royalBlue"></i> 🤝 동일 용도/지역 기반 유사 추천 매물
+     4335: +                            </h4>
+     4336: +                            <div id="detail-similar-container" class="grid grid-cols-3 gap-2">
+     4337: +                                <!-- 동적 렌더링 카드 3개 -->
+     4338: +                            </div>
+     4339: +                        </div>
+--------------------------------------------------
+Commit: commit e0173f98f325e60c4beb9a18d7888ff6c63dae54 | Date:   Sun Jun 14 00:13:47 2026 +0900
+Line 4686: +            <!-- 📢 좌측 검색필터 하단 광고 슬롯 -->
+Context context:
+     4681:              <div id="auth-status-container" class="flex items-center gap-1 sm:gap-1.5 flex-shrink-0">
+     4682: @@ -703,10 +698,13 @@
+     4683:                  </div>
+     4684:              </div>
+     4685:  
+  >> 4686: +            <!-- 📢 좌측 검색필터 하단 광고 슬롯 -->
+     4687: +            <div id="sidebar-filter-ad-slot" class="p-4 border-t border-slate-200 bg-white hidden"></div>
+     4688: +
+     4689:              <!-- 하단 수집 동기화 메타 현황 -->
+     4690:              <div class="p-4 border-t border-slate-200 bg-slate-50/50">
+     4691:                  <h3 class="text-[10px] font-black text-slate-400 uppercase tracking-wider mb-1.5 flex items-center justify-between">
+--------------------------------------------------
+Commit: commit e0173f98f325e60c4beb9a18d7888ff6c63dae54 | Date:   Sun Jun 14 00:13:47 2026 +0900
+Line 6085: +            const scripts = container.getElementsByTagName("script");
+Context context:
+     6080:  
+     6081: -        // 📢 Supabase ads 광고 연동 로드 함수
+     6082: +        // 📢 구글 애드센스 활성화용 동적 스크립트 파싱 및 실행기
+     6083: +        function executeAdScripts(container) {
+     6084: +            if (!container) return;
+  >> 6085: +            const scripts = container.getElementsByTagName("script");
+     6086: +            for (let i = 0; i < scripts.length; i++) {
+     6087: +                const s = document.createElement("script");
+     6088: +                s.type = "text/javascript";
+     6089: +                if (scripts[i].src) {
+     6090: +                    s.src = scripts[i].src;
+--------------------------------------------------
+Commit: commit e0173f98f325e60c4beb9a18d7888ff6c63dae54 | Date:   Sun Jun 14 00:13:47 2026 +0900
+Line 6414: +                                    <span class="text-[8px] text-slate-400 font-normal">주소 검색 이동</span>
+Context context:
+     6409: +                                    <span class="text-xs font-black text-[#10b981] mb-0.5">네이버 지도</span>
+     6410: +                                    <span class="text-[8px] text-slate-400 font-normal">위치/로드뷰 찾기</span>
+     6411: +                                </a>
+     6412: +                                <a href="https://map.kakao.com/?q=${encodeURIComponent(storageLoc)}" target="_blank" class="bg-slate-50 border border-slate-200 hover:border-royalBlue rounded-xl p-2 flex flex-col items-center justify-center transition-all shadow-sm">
+     6413: +                                    <span class="text-xs font-black text-royalBlue mb-0.5">카카오 맵</span>
+  >> 6414: +                                    <span class="text-[8px] text-slate-400 font-normal">주소 검색 이동</span>
+     6415: +                                </a>
+     6416: +                                <a href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(storageLoc)}" target="_blank" class="bg-slate-50 border border-slate-200 hover:border-red-500 rounded-xl p-2 flex flex-col items-center justify-center transition-all shadow-sm">
+     6417: +                                    <span class="text-xs font-black text-red-500 mb-0.5">구글 지도</span>
+     6418: +                                    <span class="text-[8px] text-slate-400 font-normal">위성/지리 검색</span>
+     6419: +                                </a>
+--------------------------------------------------
+Commit: commit e0173f98f325e60c4beb9a18d7888ff6c63dae54 | Date:   Sun Jun 14 00:13:47 2026 +0900
+Line 6418: +                                    <span class="text-[8px] text-slate-400 font-normal">위성/지리 검색</span>
+Context context:
+     6413: +                                    <span class="text-xs font-black text-royalBlue mb-0.5">카카오 맵</span>
+     6414: +                                    <span class="text-[8px] text-slate-400 font-normal">주소 검색 이동</span>
+     6415: +                                </a>
+     6416: +                                <a href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(storageLoc)}" target="_blank" class="bg-slate-50 border border-slate-200 hover:border-red-500 rounded-xl p-2 flex flex-col items-center justify-center transition-all shadow-sm">
+     6417: +                                    <span class="text-xs font-black text-red-500 mb-0.5">구글 지도</span>
+  >> 6418: +                                    <span class="text-[8px] text-slate-400 font-normal">위성/지리 검색</span>
+     6419: +                                </a>
+     6420: +                            </div>
+     6421: +                        </div>
+     6422: +
+     6423: +                        <div class="bg-white border border-slate-200 rounded-2xl p-4 shadow-sm space-y-3">
+--------------------------------------------------
+Commit: commit da2ab0473838de5953b92af09d9a07133558e404 | Date:   Sat Jun 13 03:18:44 2026 +0900
+Line 7395: +                    showToastAlert(`📋 주소가 클립보드에 복사되었습니다.\n\n[${cleanedNavAddress}]\n\n토지이음 검색창에 붙여넣어(Ctrl+V) 조회해 보세요!`, "https://www.eum.go.kr/web/ar/lu/luLand.jsp");
+Context context:
+     7390: +            }
+     7391: +
+     7392: +            try {
+     7393: +                if (navigator.clipboard && navigator.clipboard.writeText) {
+     7394: +                    await navigator.clipboard.writeText(cleanedNavAddress);
+  >> 7395: +                    showToastAlert(`📋 주소가 클립보드에 복사되었습니다.\n\n[${cleanedNavAddress}]\n\n토지이음 검색창에 붙여넣어(Ctrl+V) 조회해 보세요!`, "https://www.eum.go.kr/web/ar/lu/luLand.jsp");
+     7396: +                } else {
+     7397: +                    const textArea = document.createElement("textarea");
+     7398: +                    textArea.value = cleanedNavAddress;
+     7399: +                    textArea.style.position = "fixed";
+     7400: +                    document.body.appendChild(textArea);
+--------------------------------------------------
+Commit: commit da2ab0473838de5953b92af09d9a07133558e404 | Date:   Sat Jun 13 03:18:44 2026 +0900
+Line 7406: +                        showToastAlert(`📋 주소가 클립보드에 복사되었습니다.\n\n[${cleanedNavAddress}]\n\n토지이음 검색창에 붙여넣어(Ctrl+V) 조회해 보세요!`, "https://www.eum.go.kr/web/ar/lu/luLand.jsp");
+Context context:
+     7401: +                    textArea.focus();
+     7402: +                    textArea.select();
+     7403: +                    const successful = document.execCommand('copy');
+     7404: +                    document.body.removeChild(textArea);
+     7405: +                    if (successful) {
+  >> 7406: +                        showToastAlert(`📋 주소가 클립보드에 복사되었습니다.\n\n[${cleanedNavAddress}]\n\n토지이음 검색창에 붙여넣어(Ctrl+V) 조회해 보세요!`, "https://www.eum.go.kr/web/ar/lu/luLand.jsp");
+     7407: +                    } else {
+     7408: +                        throw new Error('복사 실패');
+     7409: +                    }
+     7410: +                }
+     7411: +            } catch (err) {
+--------------------------------------------------
+Commit: commit da2ab0473838de5953b92af09d9a07133558e404 | Date:   Sat Jun 13 03:18:44 2026 +0900
+Line 7412: +                alert(`[주소 복사] 아래 주소를 직접 복사하여 토지이음에 검색해 보십시오.\n\n${cleanedNavAddress}`);
+Context context:
+     7407: +                    } else {
+     7408: +                        throw new Error('복사 실패');
+     7409: +                    }
+     7410: +                }
+     7411: +            } catch (err) {
+  >> 7412: +                alert(`[주소 복사] 아래 주소를 직접 복사하여 토지이음에 검색해 보십시오.\n\n${cleanedNavAddress}`);
+     7413: +                window.open("https://www.eum.go.kr/web/ar/lu/luLand.jsp", "_blank");
+     7414: +            }
+     7415: +        }
+     7416: +
+     7417:          // 모던 스타일 토스트 알림 메시지 (alert 대신 우아하게 노출한 뒤 지정 페이지 이동)
+--------------------------------------------------
+Commit: commit b1a6643ed079a619e90e59db9966021392b0336d | Date:   Thu Jun 11 09:03:38 2026 +0900
+Line 10388: -                <!-- 키워드 검색 -->
+Context context:
+     10383: @@ -310,218 +310,361 @@
+     10384:              </div>
+     10385:  
+     10386:              <!-- 스크롤 가능한 필터 폼 -->
+     10387: -            <div class="flex-1 overflow-y-auto p-3.5 space-y-3.5 custom-scrollbar">
+  >> 10388: -                <!-- 키워드 검색 -->
+     10389: -                <div>
+     10390: -                    <label class="block text-[11px] sm:text-xs font-black text-slate-500 uppercase tracking-wider mb-1.5">🔍 통합 검색 키워드</label>
+     10391: -                    <input type="text" id="search-input" oninput="debouncedApplyFilters()" placeholder="사건번호, 주소, 용도 입력..." 
+     10392: -                           class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-sm font-semibold focus:bg-white focus:outline-none focus:ring-2 focus:ring-royalBlue/10 focus:border-royalBlue transition-all">
+     10393: -                </div>
+--------------------------------------------------
+Commit: commit b1a6643ed079a619e90e59db9966021392b0336d | Date:   Thu Jun 11 09:03:38 2026 +0900
+Line 10390: -                    <label class="block text-[11px] sm:text-xs font-black text-slate-500 uppercase tracking-wider mb-1.5">🔍 통합 검색 키워드</label>
+Context context:
+     10385:  
+     10386:              <!-- 스크롤 가능한 필터 폼 -->
+     10387: -            <div class="flex-1 overflow-y-auto p-3.5 space-y-3.5 custom-scrollbar">
+     10388: -                <!-- 키워드 검색 -->
+     10389: -                <div>
+  >> 10390: -                    <label class="block text-[11px] sm:text-xs font-black text-slate-500 uppercase tracking-wider mb-1.5">🔍 통합 검색 키워드</label>
+     10391: -                    <input type="text" id="search-input" oninput="debouncedApplyFilters()" placeholder="사건번호, 주소, 용도 입력..." 
+     10392: -                           class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-sm font-semibold focus:bg-white focus:outline-none focus:ring-2 focus:ring-royalBlue/10 focus:border-royalBlue transition-all">
+     10393: -                </div>
+     10394: -
+     10395: -                <!-- 자산 공급 출처 -->
+--------------------------------------------------
+Commit: commit b1a6643ed079a619e90e59db9966021392b0336d | Date:   Thu Jun 11 09:03:38 2026 +0900
+Line 10406: +                <!-- 통합 검색 -->
+Context context:
+     10401: -                        <option value="court">⚖️ 법원 경매 물건</option>
+     10402: -                        <option value="onbid">🏢 캠코 온비드 공매</option>
+     10403: -                        <option value="private">📁 업로드 사설 매물</option>
+     10404: -                    </select>
+     10405: +            <div class="flex-1 overflow-y-auto p-3 space-y-2.5 custom-scrollbar text-xs">
+  >> 10406: +                <!-- 통합 검색 -->
+     10407: +                <div class="border-b border-slate-100 pb-1.5">
+     10408: +                    <button type="button" onclick="toggleAccordion('accordion-search')" class="w-full flex justify-between items-center text-[10px] sm:text-xs font-black text-slate-700 py-1 select-none">
+     10409: +                        <span>🔍 통합 검색 키워드</span>
+     10410: +                        <i id="accordion-search-icon" class="fa-solid fa-chevron-down text-[8px] text-slate-400"></i>
+     10411: +                    </button>
+--------------------------------------------------
+Commit: commit b1a6643ed079a619e90e59db9966021392b0336d | Date:   Thu Jun 11 09:03:38 2026 +0900
+Line 10409: +                        <span>🔍 통합 검색 키워드</span>
+Context context:
+     10404: -                    </select>
+     10405: +            <div class="flex-1 overflow-y-auto p-3 space-y-2.5 custom-scrollbar text-xs">
+     10406: +                <!-- 통합 검색 -->
+     10407: +                <div class="border-b border-slate-100 pb-1.5">
+     10408: +                    <button type="button" onclick="toggleAccordion('accordion-search')" class="w-full flex justify-between items-center text-[10px] sm:text-xs font-black text-slate-700 py-1 select-none">
+  >> 10409: +                        <span>🔍 통합 검색 키워드</span>
+     10410: +                        <i id="accordion-search-icon" class="fa-solid fa-chevron-down text-[8px] text-slate-400"></i>
+     10411: +                    </button>
+     10412: +                    <div id="accordion-search" class="hidden mt-1">
+     10413: +                        <input type="text" id="search-input" oninput="debouncedApplyFilters()" placeholder="사건번호, 주소, 용도 입력..." 
+     10414: +                               class="w-full bg-slate-50 border border-slate-200 rounded-xl px-2.5 py-1.5 text-xs font-semibold focus:bg-white focus:outline-none focus:ring-2 focus:ring-royalBlue/10 focus:border-royalBlue transition-all">
+--------------------------------------------------
+Commit: commit b1a6643ed079a619e90e59db9966021392b0336d | Date:   Thu Jun 11 09:03:38 2026 +0900
+Line 10931: -                            <p class="text-[8px] min-[360px]:text-[9px] font-black text-royalBlue mb-0.5 whitespace-nowrap">추천 적합 매물</p>
+Context context:
+     10926:              <div class="bg-white border-b border-slate-200 p-2 z-10 shadow-sm">
+     10927:                  <!-- 📱 모바일 전용: 3열 구조의 미니 그리드 카드로 개편하여 가독성 밸런스 극대화 (1024px 미만 lg:hidden) -->
+     10928:                  <div class="lg:hidden bg-white z-10">
+     10929: -                    <div class="grid grid-cols-3 gap-1.5 text-center">
+     10930: -                        <div class="bg-blue-50/40 border border-blue-100/60 rounded-xl py-1 px-1.5">
+  >> 10931: -                            <p class="text-[8px] min-[360px]:text-[9px] font-black text-royalBlue mb-0.5 whitespace-nowrap">추천 적합 매물</p>
+     10932: -                            <h3 class="text-[9.5px] min-[360px]:text-[11px] font-black text-slate-900 font-outfit leading-none">
+     10933: +                    <div class="grid grid-cols-3 gap-1 text-center">
+     10934: +                        <div class="bg-blue-50/40 border border-blue-100/60 rounded-lg py-0.5 px-1">
+     10935: +                            <p class="text-[6.5px] min-[360px]:text-[7.5px] font-black text-royalBlue mb-0.2 whitespace-nowrap">추천 적합 매물</p>
+     10936: +                            <h3 class="text-[7.5px] min-[360px]:text-[8.5px] font-black text-slate-900 font-outfit leading-none">
+--------------------------------------------------
+Commit: commit b1a6643ed079a619e90e59db9966021392b0336d | Date:   Thu Jun 11 09:03:38 2026 +0900
+Line 10935: +                            <p class="text-[6.5px] min-[360px]:text-[7.5px] font-black text-royalBlue mb-0.2 whitespace-nowrap">추천 적합 매물</p>
+Context context:
+     10930: -                        <div class="bg-blue-50/40 border border-blue-100/60 rounded-xl py-1 px-1.5">
+     10931: -                            <p class="text-[8px] min-[360px]:text-[9px] font-black text-royalBlue mb-0.5 whitespace-nowrap">추천 적합 매물</p>
+     10932: -                            <h3 class="text-[9.5px] min-[360px]:text-[11px] font-black text-slate-900 font-outfit leading-none">
+     10933: +                    <div class="grid grid-cols-3 gap-1 text-center">
+     10934: +                        <div class="bg-blue-50/40 border border-blue-100/60 rounded-lg py-0.5 px-1">
+  >> 10935: +                            <p class="text-[6.5px] min-[360px]:text-[7.5px] font-black text-royalBlue mb-0.2 whitespace-nowrap">추천 적합 매물</p>
+     10936: +                            <h3 class="text-[7.5px] min-[360px]:text-[8.5px] font-black text-slate-900 font-outfit leading-none">
+     10937:                                  <span id="kpi-recommended-count-mob">0건</span>
+     10938: -                                <span class="text-[8px] font-bold text-slate-400 font-sans">(전체 <span id="kpi-total-count-mob">0</span>)</span>
+     10939: +                                <span class="text-[6.5px] font-bold text-slate-400 font-sans">(전체 <span id="kpi-total-count-mob">0</span>)</span>
+     10940:                              </h3>
+--------------------------------------------------
+Commit: commit b1a6643ed079a619e90e59db9966021392b0336d | Date:   Thu Jun 11 09:03:38 2026 +0900
+Line 10962: -                        <p class="text-[10px] sm:text-xs font-black text-royalBlue uppercase tracking-wider mb-0.5">추천 적합 매물 (전체 <span id="kpi-total-count" class="font-outfit text-slate-500 font-bold">0</span>건 중)</p>
+Context context:
+     10957:                  </div>
+     10958:                  
+     10959:                  <!-- 💻 PC/태블릿 전용: 기존 3개 칸 나누기 구조 -->
+     10960: -                <div class="hidden lg:grid grid-cols-3 gap-2">
+     10961: -                    <div class="bg-blue-50/50 border border-blue-100 rounded-xl p-1.5 text-center">
+  >> 10962: -                        <p class="text-[10px] sm:text-xs font-black text-royalBlue uppercase tracking-wider mb-0.5">추천 적합 매물 (전체 <span id="kpi-total-count" class="font-outfit text-slate-500 font-bold">0</span>건 중)</p>
+     10963: -                        <h3 id="kpi-recommended-count" class="text-xs sm:text-sm font-black text-slate-900 font-outfit">0건</h3>
+     10964: +                <div class="hidden lg:grid grid-cols-3 gap-1">
+     10965: +                    <div class="bg-blue-50/50 border border-blue-100 rounded-lg p-1 text-center">
+     10966: +                        <p class="text-[8px] sm:text-[9.5px] font-black text-royalBlue uppercase tracking-wider mb-0.2">추천 적합 매물 (전체 <span id="kpi-total-count" class="font-outfit text-slate-500 font-bold">0</span>건 중)</p>
+     10967: +                        <h3 id="kpi-recommended-count" class="text-[10px] sm:text-[11px] font-black text-slate-900 font-outfit">0건</h3>
+--------------------------------------------------
+Commit: commit b1a6643ed079a619e90e59db9966021392b0336d | Date:   Thu Jun 11 09:03:38 2026 +0900
+Line 10963: -                        <h3 id="kpi-recommended-count" class="text-xs sm:text-sm font-black text-slate-900 font-outfit">0건</h3>
+Context context:
+     10958:                  
+     10959:                  <!-- 💻 PC/태블릿 전용: 기존 3개 칸 나누기 구조 -->
+     10960: -                <div class="hidden lg:grid grid-cols-3 gap-2">
+     10961: -                    <div class="bg-blue-50/50 border border-blue-100 rounded-xl p-1.5 text-center">
+     10962: -                        <p class="text-[10px] sm:text-xs font-black text-royalBlue uppercase tracking-wider mb-0.5">추천 적합 매물 (전체 <span id="kpi-total-count" class="font-outfit text-slate-500 font-bold">0</span>건 중)</p>
+  >> 10963: -                        <h3 id="kpi-recommended-count" class="text-xs sm:text-sm font-black text-slate-900 font-outfit">0건</h3>
+     10964: +                <div class="hidden lg:grid grid-cols-3 gap-1">
+     10965: +                    <div class="bg-blue-50/50 border border-blue-100 rounded-lg p-1 text-center">
+     10966: +                        <p class="text-[8px] sm:text-[9.5px] font-black text-royalBlue uppercase tracking-wider mb-0.2">추천 적합 매물 (전체 <span id="kpi-total-count" class="font-outfit text-slate-500 font-bold">0</span>건 중)</p>
+     10967: +                        <h3 id="kpi-recommended-count" class="text-[10px] sm:text-[11px] font-black text-slate-900 font-outfit">0건</h3>
+     10968:                      </div>
+--------------------------------------------------
+Commit: commit b1a6643ed079a619e90e59db9966021392b0336d | Date:   Thu Jun 11 09:03:38 2026 +0900
+Line 10966: +                        <p class="text-[8px] sm:text-[9.5px] font-black text-royalBlue uppercase tracking-wider mb-0.2">추천 적합 매물 (전체 <span id="kpi-total-count" class="font-outfit text-slate-500 font-bold">0</span>건 중)</p>
+Context context:
+     10961: -                    <div class="bg-blue-50/50 border border-blue-100 rounded-xl p-1.5 text-center">
+     10962: -                        <p class="text-[10px] sm:text-xs font-black text-royalBlue uppercase tracking-wider mb-0.5">추천 적합 매물 (전체 <span id="kpi-total-count" class="font-outfit text-slate-500 font-bold">0</span>건 중)</p>
+     10963: -                        <h3 id="kpi-recommended-count" class="text-xs sm:text-sm font-black text-slate-900 font-outfit">0건</h3>
+     10964: +                <div class="hidden lg:grid grid-cols-3 gap-1">
+     10965: +                    <div class="bg-blue-50/50 border border-blue-100 rounded-lg p-1 text-center">
+  >> 10966: +                        <p class="text-[8px] sm:text-[9.5px] font-black text-royalBlue uppercase tracking-wider mb-0.2">추천 적합 매물 (전체 <span id="kpi-total-count" class="font-outfit text-slate-500 font-bold">0</span>건 중)</p>
+     10967: +                        <h3 id="kpi-recommended-count" class="text-[10px] sm:text-[11px] font-black text-slate-900 font-outfit">0건</h3>
+     10968:                      </div>
+     10969: -                    <div class="bg-emerald-50/50 border border-emerald-100 rounded-xl p-1.5 text-center">
+     10970: -                        <p class="text-[10px] sm:text-xs font-black text-emeraldSuccess uppercase tracking-wider mb-0.5">고적합 (A~B등급)</p>
+     10971: -                        <h3 id="kpi-high-count" class="text-xs sm:text-sm font-black text-emeraldSuccess font-outfit">0건</h3>
+--------------------------------------------------
+Commit: commit b1a6643ed079a619e90e59db9966021392b0336d | Date:   Thu Jun 11 09:03:38 2026 +0900
+Line 10967: +                        <h3 id="kpi-recommended-count" class="text-[10px] sm:text-[11px] font-black text-slate-900 font-outfit">0건</h3>
+Context context:
+     10962: -                        <p class="text-[10px] sm:text-xs font-black text-royalBlue uppercase tracking-wider mb-0.5">추천 적합 매물 (전체 <span id="kpi-total-count" class="font-outfit text-slate-500 font-bold">0</span>건 중)</p>
+     10963: -                        <h3 id="kpi-recommended-count" class="text-xs sm:text-sm font-black text-slate-900 font-outfit">0건</h3>
+     10964: +                <div class="hidden lg:grid grid-cols-3 gap-1">
+     10965: +                    <div class="bg-blue-50/50 border border-blue-100 rounded-lg p-1 text-center">
+     10966: +                        <p class="text-[8px] sm:text-[9.5px] font-black text-royalBlue uppercase tracking-wider mb-0.2">추천 적합 매물 (전체 <span id="kpi-total-count" class="font-outfit text-slate-500 font-bold">0</span>건 중)</p>
+  >> 10967: +                        <h3 id="kpi-recommended-count" class="text-[10px] sm:text-[11px] font-black text-slate-900 font-outfit">0건</h3>
+     10968:                      </div>
+     10969: -                    <div class="bg-emerald-50/50 border border-emerald-100 rounded-xl p-1.5 text-center">
+     10970: -                        <p class="text-[10px] sm:text-xs font-black text-emeraldSuccess uppercase tracking-wider mb-0.5">고적합 (A~B등급)</p>
+     10971: -                        <h3 id="kpi-high-count" class="text-xs sm:text-sm font-black text-emeraldSuccess font-outfit">0건</h3>
+     10972: +                    <div class="bg-emerald-50/50 border border-emerald-100 rounded-lg p-1 text-center">
+--------------------------------------------------
+Commit: commit b1a6643ed079a619e90e59db9966021392b0336d | Date:   Thu Jun 11 09:03:38 2026 +0900
+Line 11133: +            <!-- 🤝 주변 유사 물건 추천 섹션 -->
+Context context:
+     11128: +                    정부24 건축물대장 현황도면 신청 바로가기
+     11129: +                </a>
+     11130: +            </div>
+     11131: +        </div>
+     11132: +                
+  >> 11133: +            <!-- 🤝 주변 유사 물건 추천 섹션 -->
+     11134: +            <div class="bg-white border border-slate-200 rounded-2xl p-3.5 sm:p-4 space-y-3 shadow-sm">
+     11135: +                <h4 class="text-xs sm:text-sm font-black text-slate-800 flex items-center gap-1.5 pb-2 border-b border-slate-100">
+     11136: +                    <i class="fa-solid fa-handshake text-royalBlue"></i> 🤝 동일 용도/지역 기반 유사 추천 매물
+     11137: +                </h4>
+     11138: +                <div id="detail-similar-container" class="grid grid-cols-3 gap-2">
+--------------------------------------------------
+Commit: commit b1a6643ed079a619e90e59db9966021392b0336d | Date:   Thu Jun 11 09:03:38 2026 +0900
+Line 11136: +                    <i class="fa-solid fa-handshake text-royalBlue"></i> 🤝 동일 용도/지역 기반 유사 추천 매물
+Context context:
+     11131: +        </div>
+     11132: +                
+     11133: +            <!-- 🤝 주변 유사 물건 추천 섹션 -->
+     11134: +            <div class="bg-white border border-slate-200 rounded-2xl p-3.5 sm:p-4 space-y-3 shadow-sm">
+     11135: +                <h4 class="text-xs sm:text-sm font-black text-slate-800 flex items-center gap-1.5 pb-2 border-b border-slate-100">
+  >> 11136: +                    <i class="fa-solid fa-handshake text-royalBlue"></i> 🤝 동일 용도/지역 기반 유사 추천 매물
+     11137: +                </h4>
+     11138: +                <div id="detail-similar-container" class="grid grid-cols-3 gap-2">
+     11139: +                    <!-- 동적 렌더링 카드 3개 -->
+     11140: +                </div>
+     11141: +            </div>
+--------------------------------------------------
+Commit: commit b1a6643ed079a619e90e59db9966021392b0336d | Date:   Thu Jun 11 09:03:38 2026 +0900
+Line 11345: -                        <i class="fa-solid fa-tags text-royalBlue"></i> 주변 아파트 실거래 시세 대조
+Context context:
+     11340:          <!-- 💰 [9] 시세/실거래가 탭 패널 (기본 숨김) -->
+     11341: -        <div id="detail-panel-market" class="flex-1 overflow-y-auto p-4 sm:p-5 space-y-4 sm:space-y-5 custom-scrollbar bg-slate-50/50 hidden">
+     11342: -            <div class="bg-white border border-slate-200 rounded-2xl p-3.5 sm:p-4 shadow-sm space-y-3">
+     11343: -                <div class="flex items-center justify-between pb-2 border-b border-slate-100">
+     11344: -                    <h4 class="text-xs sm:text-sm font-black text-slate-800 flex items-center gap-1.5">
+  >> 11345: -                        <i class="fa-solid fa-tags text-royalBlue"></i> 주변 아파트 실거래 시세 대조
+     11346: -                    </h4>
+     11347: -                    <button onclick="copyAddressToClipboardAndOpenSeeReal()" class="px-2 py-1 bg-amber-50 hover:bg-amber-100 border border-amber-200 text-amber-700 text-[10px] font-black rounded-lg transition-all flex items-center gap-1">
+     11348: -                        <i class="fa-solid fa-copy"></i> 주소복사 & 시세확인 (씨리얼)
+     11349: -                    </button>
+     11350: -                </div>
+--------------------------------------------------
+Commit: commit b1a6643ed079a619e90e59db9966021392b0336d | Date:   Thu Jun 11 09:03:38 2026 +0900
+Line 11442: +                        <i class="fa-solid fa-tags text-royalBlue"></i> 주변 아파트 실거래 시세 대조
+Context context:
+     11437: -                    <img src="./floorplan_modern_apartment.png" alt="부동산 평면도" class="w-full h-full object-contain">
+     11438: +                <div id="detail-panel-market" class="space-y-4 sm:space-y-5">
+     11439: +            <div class="bg-white border border-slate-200 rounded-2xl p-3.5 sm:p-4 shadow-sm space-y-3">
+     11440: +                <div class="flex items-center justify-between pb-2 border-b border-slate-100">
+     11441: +                    <h4 class="text-xs sm:text-sm font-black text-slate-800 flex items-center gap-1.5">
+  >> 11442: +                        <i class="fa-solid fa-tags text-royalBlue"></i> 주변 아파트 실거래 시세 대조
+     11443: +                    </h4>
+     11444: +                    <button onclick="copyAddressToClipboardAndOpenSeeReal()" class="px-2 py-1 bg-amber-50 hover:bg-amber-100 border border-amber-200 text-amber-700 text-[10px] font-black rounded-lg transition-all flex items-center gap-1">
+     11445: +                        <i class="fa-solid fa-copy"></i> 주소복사 & 시세확인 (씨리얼)
+     11446: +                    </button>
+     11447: +                </div>
+--------------------------------------------------
+Commit: commit b1a6643ed079a619e90e59db9966021392b0336d | Date:   Thu Jun 11 09:03:38 2026 +0900
+Line 11662: -                // ❶ 키워드 검색
+Context context:
+     11657: -            const selectedSido = document.getElementById("sido-filter").value;
+     11658:              const sigunguCheckBoxes = document.querySelectorAll('input[name="sigungu-check"]:checked');
+     11659:              const selectedSigungus = Array.from(sigunguCheckBoxes).map(cb => cb.value);
+     11660:  
+     11661:              filteredProperties = originalProperties.filter(item => {
+  >> 11662: -                // ❶ 키워드 검색
+     11663:                  const addressStr = item.address || "";
+     11664:                  const matchesKeyword = !searchQuery || 
+     11665:                      addressStr.toLowerCase().includes(searchQuery) ||
+     11666: @@ -2236,31 +2530,28 @@
+     11667:                      (item.notes_content && item.notes_content.toLowerCase().includes(searchQuery)) ||
+--------------------------------------------------
+Commit: commit b1a6643ed079a619e90e59db9966021392b0336d | Date:   Thu Jun 11 09:03:38 2026 +0900
+Line 11968: +            // 하단 주변 유사 매물 추천 렌더링 호출
+Context context:
+     11963: +                    opinion += `다만 권리 등급 분류 상 위험(X등급) 판정을 받은 자산으로, 유치권 내지 대항력 있는 임차보증금 등의 추가 인수 부담 위험이 매우 큽니다. 시뮬레이션 수치 상의 수익률에 현혹되지 마시고, 보수적인 추가 유찰 시점까지 입찰을 미루시거나 전문 법률 분석을 선행하시기를 권장합니다.`;
+     11964: +                }
+     11965: +                commentEl.innerHTML = `<p class="leading-relaxed font-bold text-slate-700">${opinion}</p>`;
+     11966: +            }
+     11967: +
+  >> 11968: +            // 하단 주변 유사 매물 추천 렌더링 호출
+     11969: +            renderSimilarProperties(item);
+     11970: +
+     11971:              // 📂 [서류/이력] 탭 내의 기본 명세 동적 바인딩
+     11972:              const docAddressEl = document.getElementById("detail-doc-address");
+     11973:              const docPtypeEl = document.getElementById("detail-doc-ptype");
+--------------------------------------------------
+Commit: commit b1a6643ed079a619e90e59db9966021392b0336d | Date:   Thu Jun 11 09:03:38 2026 +0900
+Line 12034: +        // 🧠 주변 유사 추천 매물 미터(m) 단위 동적 연산 렌더러
+Context context:
+     12029:              // 계산기 디폴트 입력값 세팅 (사용자가 타이핑 중인 경우 덮어쓰기 차단)
+     12030: @@ -3635,6 +4075,68 @@
+     12031:              }
+     12032:          }
+     12033:  
+  >> 12034: +        // 🧠 주변 유사 추천 매물 미터(m) 단위 동적 연산 렌더러
+     12035: +        function renderSimilarProperties(currentItem) {
+     12036: +            const container = document.getElementById("detail-similar-container");
+     12037: +            if (!container) return;
+     12038: +
+     12039: +            const currentPtype = currentItem.ptype || "";
+--------------------------------------------------
+Commit: commit b1a6643ed079a619e90e59db9966021392b0336d | Date:   Thu Jun 11 09:03:38 2026 +0900
+Line 12055: +                container.innerHTML = `<div class="col-span-3 text-center text-[10px] text-slate-400 py-6">유사 추천 매물이 없습니다.</div>`;
+Context context:
+     12050: +                return bSidoMatch - aSidoMatch;
+     12051: +            });
+     12052: +
+     12053: +            const targetList = similarList.slice(0, 3);
+     12054: +            if (targetList.length === 0) {
+  >> 12055: +                container.innerHTML = `<div class="col-span-3 text-center text-[10px] text-slate-400 py-6">유사 추천 매물이 없습니다.</div>`;
+     12056: +                return;
+     12057: +            }
+     12058: +
+     12059: +            container.innerHTML = targetList.map((item, index) => {
+     12060: +                // ID 기반으로 500m~2000m 이내 고유 가상 거리 연산
+--------------------------------------------------
+Commit: commit b1a6643ed079a619e90e59db9966021392b0336d | Date:   Thu Jun 11 09:03:38 2026 +0900
+Line 12146: +        // 📱 검색 필터 아코디언 패널 토글 함수
+Context context:
+     12141:                  `;
+     12142: @@ -4560,6 +5081,235 @@
+     12143:              }
+     12144:          }
+     12145:  
+  >> 12146: +        // 📱 검색 필터 아코디언 패널 토글 함수
+     12147: +        function toggleAccordion(id) {
+     12148: +            const el = document.getElementById(id);
+     12149: +            const icon = document.getElementById(id + "-icon");
+     12150: +            if (el) {
+     12151: +                if (el.classList.contains("hidden")) {
+--------------------------------------------------
+Commit: commit b1a6643ed079a619e90e59db9966021392b0336d | Date:   Thu Jun 11 09:03:38 2026 +0900
+Line 12369: +                document.title = `부동산경공매 검색시스템 - ${cleanNo} [${tabLabel}]`;
+Context context:
+     12364: +                    2: "권리분석",
+     12365: +                    3: "수익분석",
+     12366: +                    4: "위치분석"
+     12367: +                };
+     12368: +                const tabLabel = tabNames[currentDetailGroupTab] || "상세";
+  >> 12369: +                document.title = `부동산경공매 검색시스템 - ${cleanNo} [${tabLabel}]`;
+     12370: +            } else {
+     12371: +                document.title = "부동산경공매 검색시스템 - 실시간 추천";
+     12372: +            }
+     12373: +        }
+     12374: +
+--------------------------------------------------
+Commit: commit b1a6643ed079a619e90e59db9966021392b0336d | Date:   Thu Jun 11 09:03:38 2026 +0900
+Line 12371: +                document.title = "부동산경공매 검색시스템 - 실시간 추천";
+Context context:
+     12366: +                    4: "위치분석"
+     12367: +                };
+     12368: +                const tabLabel = tabNames[currentDetailGroupTab] || "상세";
+     12369: +                document.title = `부동산경공매 검색시스템 - ${cleanNo} [${tabLabel}]`;
+     12370: +            } else {
+  >> 12371: +                document.title = "부동산경공매 검색시스템 - 실시간 추천";
+     12372: +            }
+     12373: +        }
+     12374: +
+     12375:          // Supabase로부터 로그인 유저의 관심 목록 로드 함수
+     12376:          async function loadFavoritesFromServer() {
+--------------------------------------------------
+Commit: commit 5ef68496f3175fc6f5b309412a1ba8a8854a370a | Date:   Wed Jun 10 23:43:52 2026 +0900
+Line 12471: -                    AI 부동산 경공매 추천 시스템
+Context context:
+     12466: @@ -252,8 +252,8 @@
+     12467:                  <i class="fa-solid fa-hotel text-xs"></i>
+     12468:              </div>
+     12469:              <div class="truncate">
+     12470: -                <h1 class="text-[10px] min-[360px]:text-xs sm:text-sm font-extrabold tracking-tight text-slate-900 flex items-center gap-1 min-[360px]:gap-1.5 whitespace-nowrap">
+  >> 12471: -                    AI 부동산 경공매 추천 시스템
+     12472: +                <h1 onclick="goToHome()" class="cursor-pointer text-[10px] min-[360px]:text-xs sm:text-sm font-extrabold tracking-tight text-slate-900 flex items-center gap-1 min-[360px]:gap-1.5 whitespace-nowrap hover:text-royalBlue transition-all">
+     12473: +                    부동산경공매 검색시스템
+     12474:                      <span class="bg-blue-50 text-royalBlue text-[8px] min-[360px]:text-[9px] px-1 min-[360px]:px-1.5 py-0.2 rounded-full font-black border border-blue-200">v1.1</span>
+     12475:                  </h1>
+     12476:                  <p class="text-[8px] text-slate-400 font-bold uppercase tracking-wider leading-none">Premium Elegant Pearl White</p>
+--------------------------------------------------
+Commit: commit 5ef68496f3175fc6f5b309412a1ba8a8854a370a | Date:   Wed Jun 10 23:43:52 2026 +0900
+Line 12473: +                    부동산경공매 검색시스템
+Context context:
+     12468:              </div>
+     12469:              <div class="truncate">
+     12470: -                <h1 class="text-[10px] min-[360px]:text-xs sm:text-sm font-extrabold tracking-tight text-slate-900 flex items-center gap-1 min-[360px]:gap-1.5 whitespace-nowrap">
+     12471: -                    AI 부동산 경공매 추천 시스템
+     12472: +                <h1 onclick="goToHome()" class="cursor-pointer text-[10px] min-[360px]:text-xs sm:text-sm font-extrabold tracking-tight text-slate-900 flex items-center gap-1 min-[360px]:gap-1.5 whitespace-nowrap hover:text-royalBlue transition-all">
+  >> 12473: +                    부동산경공매 검색시스템
+     12474:                      <span class="bg-blue-50 text-royalBlue text-[8px] min-[360px]:text-[9px] px-1 min-[360px]:px-1.5 py-0.2 rounded-full font-black border border-blue-200">v1.1</span>
+     12475:                  </h1>
+     12476:                  <p class="text-[8px] text-slate-400 font-bold uppercase tracking-wider leading-none">Premium Elegant Pearl White</p>
+     12477: @@ -330,6 +330,85 @@
+     12478:                      </select>
+--------------------------------------------------
+Commit: commit 5ef68496f3175fc6f5b309412a1ba8a8854a370a | Date:   Wed Jun 10 23:43:52 2026 +0900
+Line 13077: +                        <i class="fa-solid fa-tags text-royalBlue"></i> 주변 아파트 실거래 시세 대조
+Context context:
+     13072: +        <!-- 💰 [9] 시세/실거래가 탭 패널 (기본 숨김) -->
+     13073: +        <div id="detail-panel-market" class="flex-1 overflow-y-auto p-4 sm:p-5 space-y-4 sm:space-y-5 custom-scrollbar bg-slate-50/50 hidden">
+     13074: +            <div class="bg-white border border-slate-200 rounded-2xl p-3.5 sm:p-4 shadow-sm space-y-3">
+     13075: +                <div class="flex items-center justify-between pb-2 border-b border-slate-100">
+     13076: +                    <h4 class="text-xs sm:text-sm font-black text-slate-800 flex items-center gap-1.5">
+  >> 13077: +                        <i class="fa-solid fa-tags text-royalBlue"></i> 주변 아파트 실거래 시세 대조
+     13078: +                    </h4>
+     13079: +                    <button onclick="copyAddressToClipboardAndOpenSeeReal()" class="px-2 py-1 bg-amber-50 hover:bg-amber-100 border border-amber-200 text-amber-700 text-[10px] font-black rounded-lg transition-all flex items-center gap-1">
+     13080: +                        <i class="fa-solid fa-copy"></i> 주소복사 & 시세확인 (씨리얼)
+     13081: +                    </button>
+     13082: +                </div>
+--------------------------------------------------
+Commit: commit 5ef68496f3175fc6f5b309412a1ba8a8854a370a | Date:   Wed Jun 10 23:43:52 2026 +0900
+Line 13422: +                        showToastAlert(`📋 주소가 클립보드에 복사되었습니다.\n\n[${addr}]\n\n씨:리얼 검색창에 붙여넣어 조회해 보세요!`);
+Context context:
+     13417: +                const addr = selectedProperty.address;
+     13418: +                
+     13419: +                // 브라우저 클립보드 복사 API 가동
+     13420: +                if (navigator.clipboard && navigator.clipboard.writeText) {
+     13421: +                    navigator.clipboard.writeText(addr).then(() => {
+  >> 13422: +                        showToastAlert(`📋 주소가 클립보드에 복사되었습니다.\n\n[${addr}]\n\n씨:리얼 검색창에 붙여넣어 조회해 보세요!`);
+     13423: +                    }).catch(err => {
+     13424: +                        console.error('클립보드 복사 에러', err);
+     13425: +                        fallbackCopyText(addr);
+     13426: +                    });
+     13427: +                } else {
+--------------------------------------------------
+Commit: commit 5ef68496f3175fc6f5b309412a1ba8a8854a370a | Date:   Wed Jun 10 23:43:52 2026 +0900
+Line 13435: +        // 💎 대법원 경매 사건번호 복사 후 빠른 사건검색 페이지 이동 함수
+Context context:
+     13430: +            } else {
+     13431: +                alert('매물 정보가 올바르지 않습니다.');
+     13432: +            }
+     13433: +        }
+     13434: +
+  >> 13435: +        // 💎 대법원 경매 사건번호 복사 후 빠른 사건검색 페이지 이동 함수
+     13436: +        function copyAuctionNoAndOpenCourt(auctionNo) {
+     13437: +            if (!auctionNo) return;
+     13438: +            const courtSearchUrl = "https://www.courtauction.go.kr/pgj/pgj100/selectSrchInfo.on";
+     13439: +            
+     13440: +            // 브라우저 클립보드 복사 API
+--------------------------------------------------
+Commit: commit 5ef68496f3175fc6f5b309412a1ba8a8854a370a | Date:   Wed Jun 10 23:43:52 2026 +0900
+Line 13443: +                    showToastAlert(`📋 사건번호가 클립보드에 복사되었습니다.\n\n[${auctionNo}]\n\n대법원 검색창에 붙여넣어 바로 검색하십시오!`, courtSearchUrl);
+Context context:
+     13438: +            const courtSearchUrl = "https://www.courtauction.go.kr/pgj/pgj100/selectSrchInfo.on";
+     13439: +            
+     13440: +            // 브라우저 클립보드 복사 API
+     13441: +            if (navigator.clipboard && navigator.clipboard.writeText) {
+     13442: +                navigator.clipboard.writeText(auctionNo).then(() => {
+  >> 13443: +                    showToastAlert(`📋 사건번호가 클립보드에 복사되었습니다.\n\n[${auctionNo}]\n\n대법원 검색창에 붙여넣어 바로 검색하십시오!`, courtSearchUrl);
+     13444: +                }).catch(err => {
+     13445: +                    console.error('클립보드 복사 에러', err);
+     13446: +                    fallbackCopyAuctionNo(auctionNo, courtSearchUrl);
+     13447: +                });
+     13448: +            } else {
+--------------------------------------------------
+Commit: commit 5ef68496f3175fc6f5b309412a1ba8a8854a370a | Date:   Wed Jun 10 23:43:52 2026 +0900
+Line 13465: +                    showToastAlert(`📋 사건번호가 클립보드에 복사되었습니다.\n\n[${text}]\n\n대법원 검색창에 붙여넣어 바로 검색하십시오!`, targetUrl);
+Context context:
+     13460: +                textArea.focus();
+     13461: +                textArea.select();
+     13462: +                const successful = document.execCommand('copy');
+     13463: +                document.body.removeChild(textArea);
+     13464: +                if (successful) {
+  >> 13465: +                    showToastAlert(`📋 사건번호가 클립보드에 복사되었습니다.\n\n[${text}]\n\n대법원 검색창에 붙여넣어 바로 검색하십시오!`, targetUrl);
+     13466: +                } else {
+     13467: +                    throw new Error('복사 실패');
+     13468: +                }
+     13469: +            } catch (err) {
+     13470: +                alert(`[사건번호 복사] 아래 사건번호를 직접 복사하여 대법원에 검색해 보십시오.\n\n${text}`);
+--------------------------------------------------
+Commit: commit 5ef68496f3175fc6f5b309412a1ba8a8854a370a | Date:   Wed Jun 10 23:43:52 2026 +0900
+Line 13470: +                alert(`[사건번호 복사] 아래 사건번호를 직접 복사하여 대법원에 검색해 보십시오.\n\n${text}`);
+Context context:
+     13465: +                    showToastAlert(`📋 사건번호가 클립보드에 복사되었습니다.\n\n[${text}]\n\n대법원 검색창에 붙여넣어 바로 검색하십시오!`, targetUrl);
+     13466: +                } else {
+     13467: +                    throw new Error('복사 실패');
+     13468: +                }
+     13469: +            } catch (err) {
+  >> 13470: +                alert(`[사건번호 복사] 아래 사건번호를 직접 복사하여 대법원에 검색해 보십시오.\n\n${text}`);
+     13471: +                window.open(targetUrl, "_blank");
+     13472: +            }
+     13473: +        }
+     13474: +
+     13475: +        // 구형 브라우저 대응 클립보드 복사 폴백
+--------------------------------------------------
+Commit: commit 5ef68496f3175fc6f5b309412a1ba8a8854a370a | Date:   Wed Jun 10 23:43:52 2026 +0900
+Line 13487: +                    showToastAlert(`📋 주소가 클립보드에 복사되었습니다.\n\n[${text}]\n\n씨:리얼 검색창에 붙여넣어 조회해 보세요!`);
+Context context:
+     13482: +                textArea.focus();
+     13483: +                textArea.select();
+     13484: +                const successful = document.execCommand('copy');
+     13485: +                document.body.removeChild(textArea);
+     13486: +                if (successful) {
+  >> 13487: +                    showToastAlert(`📋 주소가 클립보드에 복사되었습니다.\n\n[${text}]\n\n씨:리얼 검색창에 붙여넣어 조회해 보세요!`);
+     13488: +                } else {
+     13489: +                    throw new Error('복사 실패');
+     13490: +                }
+     13491: +            } catch (err) {
+     13492: +                alert(`[주소 복사] 아래 주소를 직접 복사하여 씨:리얼에 검색해 보십시오.\n\n${text}`);
+--------------------------------------------------
+Commit: commit 5ef68496f3175fc6f5b309412a1ba8a8854a370a | Date:   Wed Jun 10 23:43:52 2026 +0900
+Line 13492: +                alert(`[주소 복사] 아래 주소를 직접 복사하여 씨:리얼에 검색해 보십시오.\n\n${text}`);
+Context context:
+     13487: +                    showToastAlert(`📋 주소가 클립보드에 복사되었습니다.\n\n[${text}]\n\n씨:리얼 검색창에 붙여넣어 조회해 보세요!`);
+     13488: +                } else {
+     13489: +                    throw new Error('복사 실패');
+     13490: +                }
+     13491: +            } catch (err) {
+  >> 13492: +                alert(`[주소 복사] 아래 주소를 직접 복사하여 씨:리얼에 검색해 보십시오.\n\n${text}`);
+     13493: +                window.open("https://seereal.lh.or.kr/", "_blank");
+     13494: +            }
+     13495: +        }
+     13496: +
+     13497: +        // 모던 스타일 토스트 알림 메시지 (alert 대신 우아하게 노출한 뒤 지정 페이지 이동)
+--------------------------------------------------
+Commit: commit 5ef68496f3175fc6f5b309412a1ba8a8854a370a | Date:   Wed Jun 10 23:43:52 2026 +0900
+Line 13509: +                btnText = "대법원 사건검색 페이지로 이동";
+Context context:
+     13504: +            toast.className = "fixed bottom-8 left-1/2 transform -translate-x-1/2 bg-slate-900/95 text-white py-3 px-5 rounded-2xl shadow-xl z-55 flex flex-col items-center justify-center space-y-2 border border-slate-700/50 max-w-sm text-center animate-bounce-short";
+     13505: +            toast.style.zIndex = "9999";
+     13506: +            
+     13507: +            let btnText = "씨:리얼 종합정보 페이지로 이동";
+     13508: +            if (targetUrl.includes("courtauction")) {
+  >> 13509: +                btnText = "대법원 사건검색 페이지로 이동";
+     13510: +            }
+     13511: +
+     13512: +            toast.innerHTML = `
+     13513: +                <div class="flex items-center gap-2 text-emerald-400 font-extrabold text-xs sm:text-sm">
+     13514: +                    <i class="fa-solid fa-circle-check"></i>
+--------------------------------------------------
+Commit: commit 8a89ac56b0e6e4d4a2c5835aa3d4ab6b976cabed | Date:   Sun Jun 7 16:17:46 2026 +0900
+Line 15129: -                    <i class="fa-solid fa-chart-line text-[9px] sm:text-xs"></i> <span>추천 매물 피드</span>
+Context context:
+     15124: -            <div class="bg-white border-b border-slate-200 grid grid-cols-3 z-10 text-center">
+     15125: +            <!-- 💎 프리미엄 4대 탭 탐색기 (가독성을 극대화한 미니멀 디자인) -->
+     15126: +            <div class="bg-white border-b border-slate-200 grid grid-cols-4 z-10 text-center">
+     15127:                  <button id="tab-dashboard-btn" onclick="switchMiddleTab('dashboard')" 
+     15128: -                        class="border-b-2 border-royalBlue text-royalBlue py-1.5 text-[8.5px] min-[360px]:text-[9.5px] min-[400px]:text-[10.5px] sm:text-xs md:text-sm font-black flex flex-col min-[390px]:flex-row items-center justify-center gap-0.5 min-[390px]:gap-1 transition-all w-full whitespace-nowrap">
+  >> 15129: -                    <i class="fa-solid fa-chart-line text-[9px] sm:text-xs"></i> <span>추천 매물 피드</span>
+     15130: +                        class="border-b-2 border-royalBlue text-royalBlue py-2 text-[8.5px] min-[360px]:text-[9.5px] min-[400px]:text-[10.5px] sm:text-xs md:text-sm font-black flex flex-col min-[390px]:flex-row items-center justify-center gap-0.5 min-[390px]:gap-1 transition-all w-full whitespace-nowrap">
+     15131: +                    <i class="fa-solid fa-chart-line text-[10px] sm:text-xs"></i> <span>추천 매물 피드</span>
+     15132:                  </button>
+     15133:                  <button id="tab-glossary-btn" onclick="switchMiddleTab('glossary')" 
+     15134: -                        class="border-b-2 border-transparent text-slate-500 py-1.5 text-[8.5px] min-[360px]:text-[9.5px] min-[400px]:text-[10.5px] sm:text-xs md:text-sm font-black flex flex-col min-[390px]:flex-row items-center justify-center gap-0.5 min-[390px]:gap-1 transition-all hover:text-royalBlue w-full whitespace-nowrap">
+--------------------------------------------------
+Commit: commit 8a89ac56b0e6e4d4a2c5835aa3d4ab6b976cabed | Date:   Sun Jun 7 16:17:46 2026 +0900
+Line 15131: +                    <i class="fa-solid fa-chart-line text-[10px] sm:text-xs"></i> <span>추천 매물 피드</span>
+Context context:
+     15126: +            <div class="bg-white border-b border-slate-200 grid grid-cols-4 z-10 text-center">
+     15127:                  <button id="tab-dashboard-btn" onclick="switchMiddleTab('dashboard')" 
+     15128: -                        class="border-b-2 border-royalBlue text-royalBlue py-1.5 text-[8.5px] min-[360px]:text-[9.5px] min-[400px]:text-[10.5px] sm:text-xs md:text-sm font-black flex flex-col min-[390px]:flex-row items-center justify-center gap-0.5 min-[390px]:gap-1 transition-all w-full whitespace-nowrap">
+     15129: -                    <i class="fa-solid fa-chart-line text-[9px] sm:text-xs"></i> <span>추천 매물 피드</span>
+     15130: +                        class="border-b-2 border-royalBlue text-royalBlue py-2 text-[8.5px] min-[360px]:text-[9.5px] min-[400px]:text-[10.5px] sm:text-xs md:text-sm font-black flex flex-col min-[390px]:flex-row items-center justify-center gap-0.5 min-[390px]:gap-1 transition-all w-full whitespace-nowrap">
+  >> 15131: +                    <i class="fa-solid fa-chart-line text-[10px] sm:text-xs"></i> <span>추천 매물 피드</span>
+     15132:                  </button>
+     15133:                  <button id="tab-glossary-btn" onclick="switchMiddleTab('glossary')" 
+     15134: -                        class="border-b-2 border-transparent text-slate-500 py-1.5 text-[8.5px] min-[360px]:text-[9.5px] min-[400px]:text-[10.5px] sm:text-xs md:text-sm font-black flex flex-col min-[390px]:flex-row items-center justify-center gap-0.5 min-[390px]:gap-1 transition-all hover:text-royalBlue w-full whitespace-nowrap">
+     15135: -                    <i class="fa-solid fa-book text-[9px] sm:text-xs"></i> <span>법률 용어/리스크 사전</span>
+     15136: +                        class="border-b-2 border-transparent text-slate-500 py-2 text-[8.5px] min-[360px]:text-[9.5px] min-[400px]:text-[10.5px] sm:text-xs md:text-sm font-black flex flex-col min-[390px]:flex-row items-center justify-center gap-0.5 min-[390px]:gap-1 transition-all hover:text-royalBlue w-full whitespace-nowrap">
+--------------------------------------------------
+Commit: commit 8a89ac56b0e6e4d4a2c5835aa3d4ab6b976cabed | Date:   Sun Jun 7 16:17:46 2026 +0900
+Line 15163: +                        <p class="text-[10px] sm:text-xs text-slate-500 leading-relaxed font-medium">본 추천 시스템의 100% 클라우드화 설계 사상과 데이터 연동 흐름을 명시한 공식 문서입니다.<br/>Firebase Hosting 서버에 배포된 최신 원본 마크다운 파일을 실시간으로 로드하여 렌더링합니다.</p>
+Context context:
+     15158: +                <div class="max-w-3xl mx-auto w-full space-y-6 py-2">
+     15159: +                    <div class="bg-white border border-slate-200 rounded-2xl p-4 sm:p-5 shadow-sm space-y-2 text-center lg:text-left">
+     15160: +                        <strong class="text-xs sm:text-sm font-extrabold text-royalBlue uppercase tracking-wider block flex items-center justify-center lg:justify-start gap-1.5">
+     15161: +                            <i class="fa-solid fa-network-wired"></i> 📡 시스템 아키텍처 명세서 (실시간 동기화)
+     15162: +                        </strong>
+  >> 15163: +                        <p class="text-[10px] sm:text-xs text-slate-500 leading-relaxed font-medium">본 추천 시스템의 100% 클라우드화 설계 사상과 데이터 연동 흐름을 명시한 공식 문서입니다.<br/>Firebase Hosting 서버에 배포된 최신 원본 마크다운 파일을 실시간으로 로드하여 렌더링합니다.</p>
+     15164: +                    </div>
+     15165: +                    
+     15166: +                    <div class="bg-white border border-slate-200 rounded-2xl p-4 sm:p-6 shadow-sm" id="architecture-content-area">
+     15167: +                        <div class="text-center py-10">
+     15168: +                            <div class="inline-block w-6 h-6 border-4 border-royalBlue border-t-transparent rounded-full animate-spin mb-2"></div>
+--------------------------------------------------
+Commit: commit 66038526bac711ebd4e29a756f0d1199791f62d4 | Date:   Sat Jun 6 12:49:06 2026 +0900
+Line 15607: -                        <span>추천 적합 매물 <strong id="kpi-recommended-count-mob" class="text-royalBlue font-outfit font-black">0건</strong> <span class="text-slate-400 font-bold font-sans">(전체 <span id="kpi-total-count-mob" class="font-outfit font-bold">0</span>건 중)</span></span>
+Context context:
+     15602:              <!-- 중앙 상단 통계 KPI 바 (반응형: 모바일 한 줄 통합 vs PC 3단 그리드) -->
+     15603:              <div class="bg-white border-b border-slate-200 p-2 z-10 shadow-sm">
+     15604: -                <!-- 📱 모바일 전용: 한 줄 통합 노출 (1024px 미만 lg:hidden) -->
+     15605: -                <div class="lg:hidden text-center py-1.5 bg-slate-50 border border-slate-200 rounded-xl px-3 shadow-sm">
+     15606: -                    <div class="text-[10px] sm:text-[11px] font-extrabold text-slate-750 leading-normal flex flex-wrap items-center justify-center gap-1">
+  >> 15607: -                        <span>추천 적합 매물 <strong id="kpi-recommended-count-mob" class="text-royalBlue font-outfit font-black">0건</strong> <span class="text-slate-400 font-bold font-sans">(전체 <span id="kpi-total-count-mob" class="font-outfit font-bold">0</span>건 중)</span></span>
+     15608: -                        <span class="text-slate-400 font-bold mx-1">,</span>
+     15609: -                        <span>🟢 고적합 <strong id="kpi-high-count-mob" class="text-emeraldSuccess font-outfit font-black">0건</strong> <span class="text-slate-400 font-bold font-sans">(A~B등급)</span></span>
+     15610: -                        <span class="text-slate-400 font-bold mx-1">,</span>
+     15611: -                        <span>🚨 위험 탈락 매물 <strong id="kpi-risk-count-mob" class="text-crimsonAlert font-outfit font-black">0건</strong> <span class="text-slate-400 font-bold font-sans">(X)</span></span>
+     15612: +                <!-- 📱 모바일 전용: 3열 구조의 미니 그리드 카드로 개편하여 가독성 밸런스 극대화 (1024px 미만 lg:hidden) -->
+--------------------------------------------------
+Commit: commit 66038526bac711ebd4e29a756f0d1199791f62d4 | Date:   Sat Jun 6 12:49:06 2026 +0900
+Line 15616: +                            <p class="text-[8px] min-[360px]:text-[9px] font-black text-royalBlue mb-0.5 whitespace-nowrap">추천 적합 매물</p>
+Context context:
+     15611: -                        <span>🚨 위험 탈락 매물 <strong id="kpi-risk-count-mob" class="text-crimsonAlert font-outfit font-black">0건</strong> <span class="text-slate-400 font-bold font-sans">(X)</span></span>
+     15612: +                <!-- 📱 모바일 전용: 3열 구조의 미니 그리드 카드로 개편하여 가독성 밸런스 극대화 (1024px 미만 lg:hidden) -->
+     15613: +                <div class="lg:hidden bg-white z-10">
+     15614: +                    <div class="grid grid-cols-3 gap-1.5 text-center">
+     15615: +                        <div class="bg-blue-50/40 border border-blue-100/60 rounded-xl py-1 px-1.5">
+  >> 15616: +                            <p class="text-[8px] min-[360px]:text-[9px] font-black text-royalBlue mb-0.5 whitespace-nowrap">추천 적합 매물</p>
+     15617: +                            <h3 class="text-[9.5px] min-[360px]:text-[11px] font-black text-slate-900 font-outfit leading-none">
+     15618: +                                <span id="kpi-recommended-count-mob">0건</span>
+     15619: +                                <span class="text-[8px] font-bold text-slate-400 font-sans">(전체 <span id="kpi-total-count-mob">0</span>)</span>
+     15620: +                            </h3>
+     15621: +                        </div>
+--------------------------------------------------
+Commit: commit 66038526bac711ebd4e29a756f0d1199791f62d4 | Date:   Sat Jun 6 12:49:06 2026 +0900
+Line 15618: +                                <span id="kpi-recommended-count-mob">0건</span>
+Context context:
+     15613: +                <div class="lg:hidden bg-white z-10">
+     15614: +                    <div class="grid grid-cols-3 gap-1.5 text-center">
+     15615: +                        <div class="bg-blue-50/40 border border-blue-100/60 rounded-xl py-1 px-1.5">
+     15616: +                            <p class="text-[8px] min-[360px]:text-[9px] font-black text-royalBlue mb-0.5 whitespace-nowrap">추천 적합 매물</p>
+     15617: +                            <h3 class="text-[9.5px] min-[360px]:text-[11px] font-black text-slate-900 font-outfit leading-none">
+  >> 15618: +                                <span id="kpi-recommended-count-mob">0건</span>
+     15619: +                                <span class="text-[8px] font-bold text-slate-400 font-sans">(전체 <span id="kpi-total-count-mob">0</span>)</span>
+     15620: +                            </h3>
+     15621: +                        </div>
+     15622: +                        <div class="bg-emerald-50/40 border border-emerald-100/60 rounded-xl py-1 px-1.5">
+     15623: +                            <p class="text-[8px] min-[360px]:text-[9px] font-black text-emeraldSuccess mb-0.5 whitespace-nowrap">🟢 고적합 (A~B)</p>
+--------------------------------------------------
+Commit: commit 66038526bac711ebd4e29a756f0d1199791f62d4 | Date:   Sat Jun 6 12:49:06 2026 +0900
+Line 15638: -                    <i class="fa-solid fa-chart-line text-[10px] sm:text-xs"></i> 추천 매물 피드
+Context context:
+     15633: @@ -449,16 +459,16 @@
+     15634:              <!-- 💎 프리미엄 3대 탭 탐색기 (가독성을 극대화한 미니멀 디자인) -->
+     15635:              <div class="bg-white border-b border-slate-200 grid grid-cols-3 z-10 text-center">
+     15636:                  <button id="tab-dashboard-btn" onclick="switchMiddleTab('dashboard')" 
+     15637: -                        class="border-b-2 border-royalBlue text-royalBlue py-1.5 text-[10px] min-[360px]:text-[11px] sm:text-xs md:text-sm font-black flex items-center justify-center gap-1 transition-all w-full">
+  >> 15638: -                    <i class="fa-solid fa-chart-line text-[10px] sm:text-xs"></i> 추천 매물 피드
+     15639: +                        class="border-b-2 border-royalBlue text-royalBlue py-1.5 text-[8.5px] min-[360px]:text-[9.5px] min-[400px]:text-[10.5px] sm:text-xs md:text-sm font-black flex flex-col min-[390px]:flex-row items-center justify-center gap-0.5 min-[390px]:gap-1 transition-all w-full whitespace-nowrap">
+     15640: +                    <i class="fa-solid fa-chart-line text-[9px] sm:text-xs"></i> <span>추천 매물 피드</span>
+     15641:                  </button>
+     15642:                  <button id="tab-glossary-btn" onclick="switchMiddleTab('glossary')" 
+     15643: -                        class="border-b-2 border-transparent text-slate-500 py-1.5 text-[10px] min-[360px]:text-[11px] sm:text-xs md:text-sm font-black flex items-center justify-center gap-1 transition-all hover:text-royalBlue w-full">
+--------------------------------------------------
+Commit: commit 66038526bac711ebd4e29a756f0d1199791f62d4 | Date:   Sat Jun 6 12:49:06 2026 +0900
+Line 15640: +                    <i class="fa-solid fa-chart-line text-[9px] sm:text-xs"></i> <span>추천 매물 피드</span>
+Context context:
+     15635:              <div class="bg-white border-b border-slate-200 grid grid-cols-3 z-10 text-center">
+     15636:                  <button id="tab-dashboard-btn" onclick="switchMiddleTab('dashboard')" 
+     15637: -                        class="border-b-2 border-royalBlue text-royalBlue py-1.5 text-[10px] min-[360px]:text-[11px] sm:text-xs md:text-sm font-black flex items-center justify-center gap-1 transition-all w-full">
+     15638: -                    <i class="fa-solid fa-chart-line text-[10px] sm:text-xs"></i> 추천 매물 피드
+     15639: +                        class="border-b-2 border-royalBlue text-royalBlue py-1.5 text-[8.5px] min-[360px]:text-[9.5px] min-[400px]:text-[10.5px] sm:text-xs md:text-sm font-black flex flex-col min-[390px]:flex-row items-center justify-center gap-0.5 min-[390px]:gap-1 transition-all w-full whitespace-nowrap">
+  >> 15640: +                    <i class="fa-solid fa-chart-line text-[9px] sm:text-xs"></i> <span>추천 매물 피드</span>
+     15641:                  </button>
+     15642:                  <button id="tab-glossary-btn" onclick="switchMiddleTab('glossary')" 
+     15643: -                        class="border-b-2 border-transparent text-slate-500 py-1.5 text-[10px] min-[360px]:text-[11px] sm:text-xs md:text-sm font-black flex items-center justify-center gap-1 transition-all hover:text-royalBlue w-full">
+     15644: -                    <i class="fa-solid fa-book text-[10px] sm:text-xs"></i> 법률 용어/리스크 사전
+     15645: +                        class="border-b-2 border-transparent text-slate-500 py-1.5 text-[8.5px] min-[360px]:text-[9.5px] min-[400px]:text-[10.5px] sm:text-xs md:text-sm font-black flex flex-col min-[390px]:flex-row items-center justify-center gap-0.5 min-[390px]:gap-1 transition-all hover:text-royalBlue w-full whitespace-nowrap">
+--------------------------------------------------
+Commit: commit e0dbd8ed87ed5672e3d10ca1ded693c28ad135b3 | Date:   Sat Jun 6 03:02:44 2026 +0900
+Line 15967: -                        <h3 id="kpi-recommended-count" class="text-sm sm:text-lg font-black text-slate-900 font-outfit">0건</h3>
+Context context:
+     15962:                  <!-- 💻 PC/태블릿 전용: 기존 3개 칸 나누기 구조 -->
+     15963:                  <div class="hidden lg:grid grid-cols-3 gap-2">
+     15964: -                    <div class="bg-blue-50/50 border border-blue-100 rounded-xl p-2 text-center">
+     15965: +                    <div class="bg-blue-50/50 border border-blue-100 rounded-xl p-1.5 text-center">
+     15966:                          <p class="text-[10px] sm:text-xs font-black text-royalBlue uppercase tracking-wider mb-0.5">추천 적합 매물 (전체 <span id="kpi-total-count" class="font-outfit text-slate-500 font-bold">0</span>건 중)</p>
+  >> 15967: -                        <h3 id="kpi-recommended-count" class="text-sm sm:text-lg font-black text-slate-900 font-outfit">0건</h3>
+     15968: +                        <h3 id="kpi-recommended-count" class="text-xs sm:text-sm font-black text-slate-900 font-outfit">0건</h3>
+     15969:                      </div>
+     15970: -                    <div class="bg-emerald-50/50 border border-emerald-100 rounded-xl p-2 text-center">
+     15971: +                    <div class="bg-emerald-50/50 border border-emerald-100 rounded-xl p-1.5 text-center">
+     15972:                          <p class="text-[10px] sm:text-xs font-black text-emeraldSuccess uppercase tracking-wider mb-0.5">고적합 (A~B등급)</p>
+--------------------------------------------------
+Commit: commit e0dbd8ed87ed5672e3d10ca1ded693c28ad135b3 | Date:   Sat Jun 6 03:02:44 2026 +0900
+Line 15968: +                        <h3 id="kpi-recommended-count" class="text-xs sm:text-sm font-black text-slate-900 font-outfit">0건</h3>
+Context context:
+     15963:                  <div class="hidden lg:grid grid-cols-3 gap-2">
+     15964: -                    <div class="bg-blue-50/50 border border-blue-100 rounded-xl p-2 text-center">
+     15965: +                    <div class="bg-blue-50/50 border border-blue-100 rounded-xl p-1.5 text-center">
+     15966:                          <p class="text-[10px] sm:text-xs font-black text-royalBlue uppercase tracking-wider mb-0.5">추천 적합 매물 (전체 <span id="kpi-total-count" class="font-outfit text-slate-500 font-bold">0</span>건 중)</p>
+     15967: -                        <h3 id="kpi-recommended-count" class="text-sm sm:text-lg font-black text-slate-900 font-outfit">0건</h3>
+  >> 15968: +                        <h3 id="kpi-recommended-count" class="text-xs sm:text-sm font-black text-slate-900 font-outfit">0건</h3>
+     15969:                      </div>
+     15970: -                    <div class="bg-emerald-50/50 border border-emerald-100 rounded-xl p-2 text-center">
+     15971: +                    <div class="bg-emerald-50/50 border border-emerald-100 rounded-xl p-1.5 text-center">
+     15972:                          <p class="text-[10px] sm:text-xs font-black text-emeraldSuccess uppercase tracking-wider mb-0.5">고적합 (A~B등급)</p>
+     15973: -                        <h3 id="kpi-high-count" class="text-sm sm:text-lg font-black text-emeraldSuccess font-outfit">0건</h3>
+--------------------------------------------------
+Commit: commit d6c3528cceddf8e6cb04bd670772850ecb213447 | Date:   Sat Jun 6 02:55:15 2026 +0900
+Line 16083: -                    <i class="fa-solid fa-chart-line"></i> 추천 매물 피드
+Context context:
+     16078: @@ -441,16 +441,16 @@
+     16079:              <!-- 💎 프리미엄 3대 탭 탐색기 (가독성을 극대화한 미니멀 디자인) -->
+     16080:              <div class="bg-white border-b border-slate-200 grid grid-cols-3 z-10 text-center">
+     16081:                  <button id="tab-dashboard-btn" onclick="switchMiddleTab('dashboard')" 
+     16082: -                        class="border-b-2 border-royalBlue text-royalBlue py-2.5 text-sm font-black flex items-center justify-center gap-1.5 transition-all w-full">
+  >> 16083: -                    <i class="fa-solid fa-chart-line"></i> 추천 매물 피드
+     16084: +                        class="border-b-2 border-royalBlue text-royalBlue py-2.5 text-[10px] min-[360px]:text-[11px] sm:text-xs md:text-sm font-black flex items-center justify-center gap-1 transition-all w-full">
+     16085: +                    <i class="fa-solid fa-chart-line text-[10px] sm:text-xs"></i> 추천 매물 피드
+     16086:                  </button>
+     16087:                  <button id="tab-glossary-btn" onclick="switchMiddleTab('glossary')" 
+     16088: -                        class="border-b-2 border-transparent text-slate-500 py-2.5 text-sm font-black flex items-center justify-center gap-1.5 transition-all hover:text-royalBlue w-full">
+--------------------------------------------------
+Commit: commit d6c3528cceddf8e6cb04bd670772850ecb213447 | Date:   Sat Jun 6 02:55:15 2026 +0900
+Line 16085: +                    <i class="fa-solid fa-chart-line text-[10px] sm:text-xs"></i> 추천 매물 피드
+Context context:
+     16080:              <div class="bg-white border-b border-slate-200 grid grid-cols-3 z-10 text-center">
+     16081:                  <button id="tab-dashboard-btn" onclick="switchMiddleTab('dashboard')" 
+     16082: -                        class="border-b-2 border-royalBlue text-royalBlue py-2.5 text-sm font-black flex items-center justify-center gap-1.5 transition-all w-full">
+     16083: -                    <i class="fa-solid fa-chart-line"></i> 추천 매물 피드
+     16084: +                        class="border-b-2 border-royalBlue text-royalBlue py-2.5 text-[10px] min-[360px]:text-[11px] sm:text-xs md:text-sm font-black flex items-center justify-center gap-1 transition-all w-full">
+  >> 16085: +                    <i class="fa-solid fa-chart-line text-[10px] sm:text-xs"></i> 추천 매물 피드
+     16086:                  </button>
+     16087:                  <button id="tab-glossary-btn" onclick="switchMiddleTab('glossary')" 
+     16088: -                        class="border-b-2 border-transparent text-slate-500 py-2.5 text-sm font-black flex items-center justify-center gap-1.5 transition-all hover:text-royalBlue w-full">
+     16089: -                    <i class="fa-solid fa-book"></i> 법률 용어/리스크 사전
+     16090: +                        class="border-b-2 border-transparent text-slate-500 py-2.5 text-[10px] min-[360px]:text-[11px] sm:text-xs md:text-sm font-black flex items-center justify-center gap-1 transition-all hover:text-royalBlue w-full">
+--------------------------------------------------
+Commit: commit a8c353b3eb3d65fd512543bd0dff88fa73b04248 | Date:   Sat Jun 6 02:47:36 2026 +0900
+Line 16302: -    <title>AI 부동산 경시/공매 실시간 통합 추천 시스템 v1.0</title>
+Context context:
+     16297: +++ b/index.html
+     16298: @@ -3,7 +3,7 @@
+     16299:  <head>
+     16300:      <meta charset="UTF-8">
+     16301:      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  >> 16302: -    <title>AI 부동산 경시/공매 실시간 통합 추천 시스템 v1.0</title>
+     16303: +    <title>AI 부동산 경시/공매 실시간 통합 추천 시스템 v1.1</title>
+     16304:      <!-- 💎 1. 프리미엄 디자인 타이포그래피를 위한 Google Fonts 연동 -->
+     16305:      <link rel="preconnect" href="https://fonts.googleapis.com">
+     16306:      <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+     16307: @@ -35,6 +35,10 @@
+--------------------------------------------------
+Commit: commit a8c353b3eb3d65fd512543bd0dff88fa73b04248 | Date:   Sat Jun 6 02:47:36 2026 +0900
+Line 16303: +    <title>AI 부동산 경시/공매 실시간 통합 추천 시스템 v1.1</title>
+Context context:
+     16298: @@ -3,7 +3,7 @@
+     16299:  <head>
+     16300:      <meta charset="UTF-8">
+     16301:      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+     16302: -    <title>AI 부동산 경시/공매 실시간 통합 추천 시스템 v1.0</title>
+  >> 16303: +    <title>AI 부동산 경시/공매 실시간 통합 추천 시스템 v1.1</title>
+     16304:      <!-- 💎 1. 프리미엄 디자인 타이포그래피를 위한 Google Fonts 연동 -->
+     16305:      <link rel="preconnect" href="https://fonts.googleapis.com">
+     16306:      <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+     16307: @@ -35,6 +35,10 @@
+     16308:          }
+--------------------------------------------------
+Commit: commit ab49c22e3a76029c1c56afc7a48a16ab28a5d5b7 | Date:   Thu Jun 4 15:41:53 2026 +0900
+Line 16719: -                    <p class="text-[10px] sm:text-xs font-black text-royalBlue uppercase tracking-wider mb-0.5">추천 적합 매물 (전체 <span id="kpi-total-count" class="font-outfit text-slate-500 font-bold">0</span>건 중)</p>
+Context context:
+     16714:          <!-- 📊 [COLUMN 2] 중앙 메인 피드: 통계 KPI & 추천 매물 카드 피드 (Width: 50%) -->
+     16715: -        <section class="flex-1 bg-slate-50 border-r border-slate-200 flex flex-col h-full overflow-hidden">
+     16716: -            <!-- 중앙 상단 통계 KPI 바 -->
+     16717: -            <div class="bg-white border-b border-slate-200 p-3 grid grid-cols-1 sm:grid-cols-3 gap-3 z-10 shadow-sm">
+     16718: -                <div class="bg-blue-50/50 border border-blue-100 rounded-xl p-2.5 text-center">
+  >> 16719: -                    <p class="text-[10px] sm:text-xs font-black text-royalBlue uppercase tracking-wider mb-0.5">추천 적합 매물 (전체 <span id="kpi-total-count" class="font-outfit text-slate-500 font-bold">0</span>건 중)</p>
+     16720: -                    <h3 id="kpi-recommended-count" class="text-sm sm:text-lg font-black text-slate-900 font-outfit">0건</h3>
+     16721: -                </div>
+     16722: -                <div class="bg-emerald-50/50 border border-emerald-100 rounded-xl p-2.5 text-center">
+     16723: -                    <p class="text-[10px] sm:text-xs font-black text-emeraldSuccess uppercase tracking-wider mb-0.5">고적합 (A~B등급)</p>
+     16724: -                    <h3 id="kpi-high-count" class="text-sm sm:text-lg font-black text-emeraldSuccess font-outfit">0건</h3>
+--------------------------------------------------
+Commit: commit ab49c22e3a76029c1c56afc7a48a16ab28a5d5b7 | Date:   Thu Jun 4 15:41:53 2026 +0900
+Line 16720: -                    <h3 id="kpi-recommended-count" class="text-sm sm:text-lg font-black text-slate-900 font-outfit">0건</h3>
+Context context:
+     16715: -        <section class="flex-1 bg-slate-50 border-r border-slate-200 flex flex-col h-full overflow-hidden">
+     16716: -            <!-- 중앙 상단 통계 KPI 바 -->
+     16717: -            <div class="bg-white border-b border-slate-200 p-3 grid grid-cols-1 sm:grid-cols-3 gap-3 z-10 shadow-sm">
+     16718: -                <div class="bg-blue-50/50 border border-blue-100 rounded-xl p-2.5 text-center">
+     16719: -                    <p class="text-[10px] sm:text-xs font-black text-royalBlue uppercase tracking-wider mb-0.5">추천 적합 매물 (전체 <span id="kpi-total-count" class="font-outfit text-slate-500 font-bold">0</span>건 중)</p>
+  >> 16720: -                    <h3 id="kpi-recommended-count" class="text-sm sm:text-lg font-black text-slate-900 font-outfit">0건</h3>
+     16721: -                </div>
+     16722: -                <div class="bg-emerald-50/50 border border-emerald-100 rounded-xl p-2.5 text-center">
+     16723: -                    <p class="text-[10px] sm:text-xs font-black text-emeraldSuccess uppercase tracking-wider mb-0.5">고적합 (A~B등급)</p>
+     16724: -                    <h3 id="kpi-high-count" class="text-sm sm:text-lg font-black text-emeraldSuccess font-outfit">0건</h3>
+     16725: +        <section id="center-feed-section" class="flex-1 bg-slate-50 border-r border-slate-200 flex flex-col h-full overflow-hidden">
+--------------------------------------------------
+Commit: commit ab49c22e3a76029c1c56afc7a48a16ab28a5d5b7 | Date:   Thu Jun 4 15:41:53 2026 +0900
+Line 16731: +                        <span>추천 적합 매물 <strong id="kpi-recommended-count-mob" class="text-royalBlue font-outfit font-black">0건</strong> <span class="text-slate-400 font-bold font-sans">(전체 <span id="kpi-total-count-mob" class="font-outfit font-bold">0</span>건 중)</span></span>
+Context context:
+     16726: +            <!-- 중앙 상단 통계 KPI 바 (반응형: 모바일 한 줄 통합 vs PC 3단 그리드) -->
+     16727: +            <div class="bg-white border-b border-slate-200 p-3 z-10 shadow-sm">
+     16728: +                <!-- 📱 모바일 전용: 한 줄 통합 노출 (1024px 미만 lg:hidden) -->
+     16729: +                <div class="lg:hidden text-center py-1.5 bg-slate-50 border border-slate-200 rounded-xl px-3 shadow-sm">
+     16730: +                    <div class="text-[10px] sm:text-[11px] font-extrabold text-slate-750 leading-normal flex flex-wrap items-center justify-center gap-1">
+  >> 16731: +                        <span>추천 적합 매물 <strong id="kpi-recommended-count-mob" class="text-royalBlue font-outfit font-black">0건</strong> <span class="text-slate-400 font-bold font-sans">(전체 <span id="kpi-total-count-mob" class="font-outfit font-bold">0</span>건 중)</span></span>
+     16732: +                        <span class="text-slate-400 font-bold mx-1">,</span>
+     16733: +                        <span>🟢 고적합 <strong id="kpi-high-count-mob" class="text-emeraldSuccess font-outfit font-black">0건</strong> <span class="text-slate-400 font-bold font-sans">(A~B등급)</span></span>
+     16734: +                        <span class="text-slate-400 font-bold mx-1">,</span>
+     16735: +                        <span>🚨 위험 탈락 매물 <strong id="kpi-risk-count-mob" class="text-crimsonAlert font-outfit font-black">0건</strong> <span class="text-slate-400 font-bold font-sans">(X)</span></span>
+     16736: +                    </div>
+--------------------------------------------------
+Commit: commit ab49c22e3a76029c1c56afc7a48a16ab28a5d5b7 | Date:   Thu Jun 4 15:41:53 2026 +0900
+Line 16745: +                        <p class="text-[10px] sm:text-xs font-black text-royalBlue uppercase tracking-wider mb-0.5">추천 적합 매물 (전체 <span id="kpi-total-count" class="font-outfit text-slate-500 font-bold">0</span>건 중)</p>
+Context context:
+     16740: -                    <h3 id="kpi-risk-count" class="text-sm sm:text-lg font-black text-crimsonAlert font-outfit">0건</h3>
+     16741: +                
+     16742: +                <!-- 💻 PC/태블릿 전용: 기존 3개 칸 나누기 구조 -->
+     16743: +                <div class="hidden lg:grid grid-cols-3 gap-3">
+     16744: +                    <div class="bg-blue-50/50 border border-blue-100 rounded-xl p-2.5 text-center">
+  >> 16745: +                        <p class="text-[10px] sm:text-xs font-black text-royalBlue uppercase tracking-wider mb-0.5">추천 적합 매물 (전체 <span id="kpi-total-count" class="font-outfit text-slate-500 font-bold">0</span>건 중)</p>
+     16746: +                        <h3 id="kpi-recommended-count" class="text-sm sm:text-lg font-black text-slate-900 font-outfit">0건</h3>
+     16747: +                    </div>
+     16748: +                    <div class="bg-emerald-50/50 border border-emerald-100 rounded-xl p-2.5 text-center">
+     16749: +                        <p class="text-[10px] sm:text-xs font-black text-emeraldSuccess uppercase tracking-wider mb-0.5">고적합 (A~B등급)</p>
+     16750: +                        <h3 id="kpi-high-count" class="text-sm sm:text-lg font-black text-emeraldSuccess font-outfit">0건</h3>
+--------------------------------------------------
+Commit: commit ab49c22e3a76029c1c56afc7a48a16ab28a5d5b7 | Date:   Thu Jun 4 15:41:53 2026 +0900
+Line 16746: +                        <h3 id="kpi-recommended-count" class="text-sm sm:text-lg font-black text-slate-900 font-outfit">0건</h3>
+Context context:
+     16741: +                
+     16742: +                <!-- 💻 PC/태블릿 전용: 기존 3개 칸 나누기 구조 -->
+     16743: +                <div class="hidden lg:grid grid-cols-3 gap-3">
+     16744: +                    <div class="bg-blue-50/50 border border-blue-100 rounded-xl p-2.5 text-center">
+     16745: +                        <p class="text-[10px] sm:text-xs font-black text-royalBlue uppercase tracking-wider mb-0.5">추천 적합 매물 (전체 <span id="kpi-total-count" class="font-outfit text-slate-500 font-bold">0</span>건 중)</p>
+  >> 16746: +                        <h3 id="kpi-recommended-count" class="text-sm sm:text-lg font-black text-slate-900 font-outfit">0건</h3>
+     16747: +                    </div>
+     16748: +                    <div class="bg-emerald-50/50 border border-emerald-100 rounded-xl p-2.5 text-center">
+     16749: +                        <p class="text-[10px] sm:text-xs font-black text-emeraldSuccess uppercase tracking-wider mb-0.5">고적합 (A~B등급)</p>
+     16750: +                        <h3 id="kpi-high-count" class="text-sm sm:text-lg font-black text-emeraldSuccess font-outfit">0건</h3>
+     16751: +                    </div>
+--------------------------------------------------
+Commit: commit ab49c22e3a76029c1c56afc7a48a16ab28a5d5b7 | Date:   Thu Jun 4 15:41:53 2026 +0900
+Line 17346: +                            <span id="ltv-percentage-badge" class="text-[9px] font-black px-2 py-0.5 rounded-full border border-blue-200 bg-blue-50 text-royalBlue font-mono">비대출 (0%)</span>
+Context context:
+     17341: +                    <div class="bg-slate-50/50 rounded-xl p-3 border border-slate-200/80 space-y-2.5">
+     17342: +                        <div class="flex items-center justify-between">
+     17343: +                            <label class="text-[10px] sm:text-xs font-black text-slate-700 uppercase tracking-wider flex items-center gap-1">
+     17344: +                                <i class="fa-solid fa-building-columns text-royalBlue text-[10px]"></i> 경락잔금대출 설정 (LTV)
+     17345: +                            </label>
+  >> 17346: +                            <span id="ltv-percentage-badge" class="text-[9px] font-black px-2 py-0.5 rounded-full border border-blue-200 bg-blue-50 text-royalBlue font-mono">비대출 (0%)</span>
+     17347: +                        </div>
+     17348: +                        <div class="flex flex-wrap gap-1 bg-slate-100 p-1 rounded-xl border border-slate-200/60 shadow-inner">
+     17349: +                            <label class="flex-1 min-w-[34px] cursor-pointer text-center">
+     17350: +                                <input type="radio" name="ltv-select" value="0" checked onchange="runCalculator()" class="sr-only peer">
+     17351: +                                <span class="block py-1 text-[10px] sm:text-xs font-extrabold rounded-lg text-slate-500 peer-checked:bg-white peer-checked:text-royalBlue peer-checked:shadow-sm hover:text-slate-700 transition-all select-none">0%</span>
+--------------------------------------------------
+Commit: commit ab49c22e3a76029c1c56afc7a48a16ab28a5d5b7 | Date:   Thu Jun 4 15:41:53 2026 +0900
+Line 17661: -            document.getElementById("kpi-recommended-count").innerText = `${filteredProperties.length}건`;
+Context context:
+     17656:          // 5. 정렬 기준 정렬 함수 (헤더 양방향 정렬 및 다차원 정렬 완벽 지원)
+     17657: @@ -1204,10 +1576,32 @@
+     17658:  
+     17659:          // 6. 메인 피드 대시보드 KPI 값 갱신 및 상단 글로벌 카운트 배지 갱신
+     17660:          function updateKPIDashboard() {
+  >> 17661: -            document.getElementById("kpi-recommended-count").innerText = `${filteredProperties.length}건`;
+     17662: -            
+     17663: -            const totalEl = document.getElementById("kpi-total-count");
+     17664: -            if (totalEl) totalEl.innerText = originalProperties.length.toLocaleString();
+     17665: +            const recommendedText = `${filteredProperties.length}건`;
+     17666: +            const totalText = originalProperties.length.toLocaleString();
+--------------------------------------------------
+Commit: commit ab49c22e3a76029c1c56afc7a48a16ab28a5d5b7 | Date:   Thu Jun 4 15:41:53 2026 +0900
+Line 17665: +            const recommendedText = `${filteredProperties.length}건`;
+Context context:
+     17660:          function updateKPIDashboard() {
+     17661: -            document.getElementById("kpi-recommended-count").innerText = `${filteredProperties.length}건`;
+     17662: -            
+     17663: -            const totalEl = document.getElementById("kpi-total-count");
+     17664: -            if (totalEl) totalEl.innerText = originalProperties.length.toLocaleString();
+  >> 17665: +            const recommendedText = `${filteredProperties.length}건`;
+     17666: +            const totalText = originalProperties.length.toLocaleString();
+     17667: +            const highGradeCount = filteredProperties.filter(item => item.grade === 'A' || item.grade === 'B').length;
+     17668: +            const highText = `${highGradeCount}건`;
+     17669: +            const riskCount = filteredProperties.filter(item => item.grade === 'X').length;
+     17670: +            const riskText = `${riskCount}건`;
+--------------------------------------------------
+Commit: commit ab49c22e3a76029c1c56afc7a48a16ab28a5d5b7 | Date:   Thu Jun 4 15:41:53 2026 +0900
+Line 17673: +            const recPC = document.getElementById("kpi-recommended-count");
+Context context:
+     17668: +            const highText = `${highGradeCount}건`;
+     17669: +            const riskCount = filteredProperties.filter(item => item.grade === 'X').length;
+     17670: +            const riskText = `${riskCount}건`;
+     17671: +
+     17672: +            // Update PC/Desktop elements
+  >> 17673: +            const recPC = document.getElementById("kpi-recommended-count");
+     17674: +            if (recPC) recPC.innerText = recommendedText;
+     17675: +            const totPC = document.getElementById("kpi-total-count");
+     17676: +            if (totPC) totPC.innerText = totalText;
+     17677: +            const highPC = document.getElementById("kpi-high-count");
+     17678: +            if (highPC) highPC.innerText = highText;
+--------------------------------------------------
+Commit: commit ab49c22e3a76029c1c56afc7a48a16ab28a5d5b7 | Date:   Thu Jun 4 15:41:53 2026 +0900
+Line 17674: +            if (recPC) recPC.innerText = recommendedText;
+Context context:
+     17669: +            const riskCount = filteredProperties.filter(item => item.grade === 'X').length;
+     17670: +            const riskText = `${riskCount}건`;
+     17671: +
+     17672: +            // Update PC/Desktop elements
+     17673: +            const recPC = document.getElementById("kpi-recommended-count");
+  >> 17674: +            if (recPC) recPC.innerText = recommendedText;
+     17675: +            const totPC = document.getElementById("kpi-total-count");
+     17676: +            if (totPC) totPC.innerText = totalText;
+     17677: +            const highPC = document.getElementById("kpi-high-count");
+     17678: +            if (highPC) highPC.innerText = highText;
+     17679: +            const riskPC = document.getElementById("kpi-risk-count");
+--------------------------------------------------
+Commit: commit ab49c22e3a76029c1c56afc7a48a16ab28a5d5b7 | Date:   Thu Jun 4 15:41:53 2026 +0900
+Line 17683: +            const recMob = document.getElementById("kpi-recommended-count-mob");
+Context context:
+     17678: +            if (highPC) highPC.innerText = highText;
+     17679: +            const riskPC = document.getElementById("kpi-risk-count");
+     17680: +            if (riskPC) riskPC.innerText = riskText;
+     17681: +
+     17682: +            // Update Mobile elements
+  >> 17683: +            const recMob = document.getElementById("kpi-recommended-count-mob");
+     17684: +            if (recMob) recMob.innerText = recommendedText;
+     17685: +            const totMob = document.getElementById("kpi-total-count-mob");
+     17686: +            if (totMob) totMob.innerText = totalText;
+     17687: +            const highMob = document.getElementById("kpi-high-count-mob");
+     17688: +            if (highMob) highMob.innerText = highText;
+--------------------------------------------------
+Commit: commit ab49c22e3a76029c1c56afc7a48a16ab28a5d5b7 | Date:   Thu Jun 4 15:41:53 2026 +0900
+Line 17684: +            if (recMob) recMob.innerText = recommendedText;
+Context context:
+     17679: +            const riskPC = document.getElementById("kpi-risk-count");
+     17680: +            if (riskPC) riskPC.innerText = riskText;
+     17681: +
+     17682: +            // Update Mobile elements
+     17683: +            const recMob = document.getElementById("kpi-recommended-count-mob");
+  >> 17684: +            if (recMob) recMob.innerText = recommendedText;
+     17685: +            const totMob = document.getElementById("kpi-total-count-mob");
+     17686: +            if (totMob) totMob.innerText = totalText;
+     17687: +            const highMob = document.getElementById("kpi-high-count-mob");
+     17688: +            if (highMob) highMob.innerText = highText;
+     17689: +            const riskMob = document.getElementById("kpi-risk-count-mob");
+--------------------------------------------------
+Commit: commit ab49c22e3a76029c1c56afc7a48a16ab28a5d5b7 | Date:   Thu Jun 4 15:41:53 2026 +0900
+Line 17869: +            const ltvBadge = document.getElementById("ltv-percentage-badge");
+Context context:
+     17864:  
+     17865: +            // LTV 계산 및 금리 시뮬레이션
+     17866: +            const ltvRadio = document.querySelector('input[name="ltv-select"]:checked');
+     17867: +            const ltvPercent = ltvRadio ? parseInt(ltvRadio.value) : 0;
+     17868: +            
+  >> 17869: +            const ltvBadge = document.getElementById("ltv-percentage-badge");
+     17870: +            const sliderArea = document.getElementById("loan-interest-slider-area");
+     17871: +            const planArea = document.getElementById("financial-plan-area");
+     17872: +            
+     17873: +            if (ltvPercent > 0) {
+     17874: +                if (sliderArea) sliderArea.classList.remove("hidden");
+--------------------------------------------------
+Commit: commit ab49c22e3a76029c1c56afc7a48a16ab28a5d5b7 | Date:   Thu Jun 4 15:41:53 2026 +0900
+Line 18138: -                    <p class="text-[10px] text-slate-500">본 대시보드는 대법원 경매 정보망의 실시간 자동 스크래핑 시스템 및 하이브리드 추천 대시보드의 작동 원리와 패치 내역을 완벽하게 내장하고 있습니다.</p>
+Context context:
+     18133: -        // 백업용 고화질 오프라인 HTML 가이드
+     18134:          function getFallbackGuideHTML() {
+     18135:              return `
+     18136: -                <div class="space-y-4">
+     18137: -                    <h2 class="text-sm font-extrabold text-slate-900 border-b border-slate-200 pb-2 mb-4">🏠 대법원 경매 크롤러 및 대시보드 사용 가이드</h2>
+  >> 18138: -                    <p class="text-[10px] text-slate-500">본 대시보드는 대법원 경매 정보망의 실시간 자동 스크래핑 시스템 및 하이브리드 추천 대시보드의 작동 원리와 패치 내역을 완벽하게 내장하고 있습니다.</p>
+     18139: +                <div class="space-y-5 font-sans text-center lg:text-left">
+     18140: +                    <h2 class="text-sm sm:text-base font-extrabold text-slate-900 border-b border-slate-200 pb-2 mb-4 flex items-center justify-center lg:justify-start gap-1.5">
+     18141: +                        <i class="fa-solid fa-book-open text-royalBlue"></i> 🏠 대시보드 시스템 안내 및 사용자 가이드
+     18142: +                    </h2>
+     18143: +                    <p class="text-[9.5px] sm:text-[11px] text-slate-500 leading-relaxed font-medium">본 대시보드는 대법원 경매 정보망의 실시간 자동 스크래핑 시스템 및 캠코 온비드 공매의 실시간 연동 데몬, 그리고 하이브리드 추천 엔진의 작동 가이드라인입니다.</p>
+--------------------------------------------------
+Commit: commit ab49c22e3a76029c1c56afc7a48a16ab28a5d5b7 | Date:   Thu Jun 4 15:41:53 2026 +0900
+Line 18143: +                    <p class="text-[9.5px] sm:text-[11px] text-slate-500 leading-relaxed font-medium">본 대시보드는 대법원 경매 정보망의 실시간 자동 스크래핑 시스템 및 캠코 온비드 공매의 실시간 연동 데몬, 그리고 하이브리드 추천 엔진의 작동 가이드라인입니다.</p>
+Context context:
+     18138: -                    <p class="text-[10px] text-slate-500">본 대시보드는 대법원 경매 정보망의 실시간 자동 스크래핑 시스템 및 하이브리드 추천 대시보드의 작동 원리와 패치 내역을 완벽하게 내장하고 있습니다.</p>
+     18139: +                <div class="space-y-5 font-sans text-center lg:text-left">
+     18140: +                    <h2 class="text-sm sm:text-base font-extrabold text-slate-900 border-b border-slate-200 pb-2 mb-4 flex items-center justify-center lg:justify-start gap-1.5">
+     18141: +                        <i class="fa-solid fa-book-open text-royalBlue"></i> 🏠 대시보드 시스템 안내 및 사용자 가이드
+     18142: +                    </h2>
+  >> 18143: +                    <p class="text-[9.5px] sm:text-[11px] text-slate-500 leading-relaxed font-medium">본 대시보드는 대법원 경매 정보망의 실시간 자동 스크래핑 시스템 및 캠코 온비드 공매의 실시간 연동 데몬, 그리고 하이브리드 추천 엔진의 작동 가이드라인입니다.</p>
+     18144: +                    
+     18145: +                    <div class="border-t border-slate-200 my-4"></div>
+     18146: +                    
+     18147: +                    <!-- 1. 부동산 경매 vs 캠코 공매 실무 비교 분석 -->
+     18148: +                    <h3 class="text-xs sm:text-sm font-extrabold text-royalBlue mb-2 flex items-center justify-center lg:justify-start gap-1.5">
+--------------------------------------------------
+Commit: commit d43660ab60a5e264ef2f7763ea79251cacbc0ed4 | Date:   Wed Jun 3 13:12:23 2026 +0900
+Line 18353: +    <title>AI 부동산 경시/공매 실시간 통합 추천 시스템 v1.0</title>
+Context context:
+     18348: +<!DOCTYPE html>
+     18349: +<html lang="ko">
+     18350: +<head>
+     18351: +    <meta charset="UTF-8">
+     18352: +    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  >> 18353: +    <title>AI 부동산 경시/공매 실시간 통합 추천 시스템 v1.0</title>
+     18354: +    <!-- 💎 1. 프리미엄 디자인 타이포그래피를 위한 Google Fonts 연동 -->
+     18355: +    <link rel="preconnect" href="https://fonts.googleapis.com">
+     18356: +    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+     18357: +    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Outfit:wght@400;500;600;700;800&family=Noto+Sans+KR:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+     18358: +    <!-- 💎 2. 시안 2 (Elegant Pearl White) 구현을 위한 Tailwind CSS CDN 연동 -->
+--------------------------------------------------
+Commit: commit d43660ab60a5e264ef2f7763ea79251cacbc0ed4 | Date:   Wed Jun 3 13:12:23 2026 +0900
+Line 18421: +                    AI 부동산 경공매 추천 시스템
+Context context:
+     18416: +            <div class="bg-royalBlue text-white w-9 h-9 rounded-xl flex items-center justify-center shadow-md shadow-blue-500/10 flex-shrink-0">
+     18417: +                <i class="fa-solid fa-hotel text-sm"></i>
+     18418: +            </div>
+     18419: +            <div class="truncate">
+     18420: +                <h1 class="text-xs sm:text-base font-extrabold tracking-tight text-slate-900 flex items-center gap-2 whitespace-nowrap">
+  >> 18421: +                    AI 부동산 경공매 추천 시스템
+     18422: +                    <span class="bg-blue-50 text-royalBlue text-[10px] px-2 py-0.5 rounded-full font-black border border-blue-200">v1.0</span>
+     18423: +                </h1>
+     18424: +                <p class="text-[9px] sm:text-[10px] text-slate-400 font-bold uppercase tracking-wider">Premium Elegant Pearl White</p>
+     18425: +            </div>
+     18426: +        </div>
+--------------------------------------------------
+Commit: commit d43660ab60a5e264ef2f7763ea79251cacbc0ed4 | Date:   Wed Jun 3 13:12:23 2026 +0900
+Line 18472: +                <!-- 키워드 검색 -->
+Context context:
+     18467: +                </div>
+     18468: +            </div>
+     18469: +
+     18470: +            <!-- 스크롤 가능한 필터 폼 -->
+     18471: +            <div class="flex-1 overflow-y-auto p-4 space-y-4 custom-scrollbar">
+  >> 18472: +                <!-- 키워드 검색 -->
+     18473: +                <div>
+     18474: +                    <label class="block text-[11px] sm:text-xs font-black text-slate-500 uppercase tracking-wider mb-1.5">🔍 통합 검색 키워드</label>
+     18475: +                    <input type="text" id="search-input" oninput="debouncedApplyFilters()" placeholder="사건번호, 주소, 용도 입력..." 
+     18476: +                           class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-sm font-semibold focus:bg-white focus:outline-none focus:ring-2 focus:ring-royalBlue/10 focus:border-royalBlue transition-all">
+     18477: +                </div>
+--------------------------------------------------
+Commit: commit d43660ab60a5e264ef2f7763ea79251cacbc0ed4 | Date:   Wed Jun 3 13:12:23 2026 +0900
+Line 18474: +                    <label class="block text-[11px] sm:text-xs font-black text-slate-500 uppercase tracking-wider mb-1.5">🔍 통합 검색 키워드</label>
+Context context:
+     18469: +
+     18470: +            <!-- 스크롤 가능한 필터 폼 -->
+     18471: +            <div class="flex-1 overflow-y-auto p-4 space-y-4 custom-scrollbar">
+     18472: +                <!-- 키워드 검색 -->
+     18473: +                <div>
+  >> 18474: +                    <label class="block text-[11px] sm:text-xs font-black text-slate-500 uppercase tracking-wider mb-1.5">🔍 통합 검색 키워드</label>
+     18475: +                    <input type="text" id="search-input" oninput="debouncedApplyFilters()" placeholder="사건번호, 주소, 용도 입력..." 
+     18476: +                           class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-sm font-semibold focus:bg-white focus:outline-none focus:ring-2 focus:ring-royalBlue/10 focus:border-royalBlue transition-all">
+     18477: +                </div>
+     18478: +
+     18479: +                <!-- 자산 공급 출처 -->
+--------------------------------------------------
+Commit: commit d43660ab60a5e264ef2f7763ea79251cacbc0ed4 | Date:   Wed Jun 3 13:12:23 2026 +0900
+Line 18625: +        <!-- 📊 [COLUMN 2] 중앙 메인 피드: 통계 KPI & 추천 매물 카드 피드 (Width: 50%) -->
+Context context:
+     18620: +                    </div>
+     18621: +                </div>
+     18622: +            </div>
+     18623: +        </aside>
+     18624: +
+  >> 18625: +        <!-- 📊 [COLUMN 2] 중앙 메인 피드: 통계 KPI & 추천 매물 카드 피드 (Width: 50%) -->
+     18626: +        <section class="flex-1 bg-slate-50 border-r border-slate-200 flex flex-col h-full overflow-hidden">
+     18627: +            <!-- 중앙 상단 통계 KPI 바 -->
+     18628: +            <div class="bg-white border-b border-slate-200 p-3 grid grid-cols-1 sm:grid-cols-3 gap-3 z-10 shadow-sm">
+     18629: +                <div class="bg-blue-50/50 border border-blue-100 rounded-xl p-2.5 text-center">
+     18630: +                    <p class="text-[10px] sm:text-xs font-black text-royalBlue uppercase tracking-wider mb-0.5">추천 적합 매물 (전체 <span id="kpi-total-count" class="font-outfit text-slate-500 font-bold">0</span>건 중)</p>
+--------------------------------------------------
+Commit: commit d43660ab60a5e264ef2f7763ea79251cacbc0ed4 | Date:   Wed Jun 3 13:12:23 2026 +0900
+Line 18630: +                    <p class="text-[10px] sm:text-xs font-black text-royalBlue uppercase tracking-wider mb-0.5">추천 적합 매물 (전체 <span id="kpi-total-count" class="font-outfit text-slate-500 font-bold">0</span>건 중)</p>
+Context context:
+     18625: +        <!-- 📊 [COLUMN 2] 중앙 메인 피드: 통계 KPI & 추천 매물 카드 피드 (Width: 50%) -->
+     18626: +        <section class="flex-1 bg-slate-50 border-r border-slate-200 flex flex-col h-full overflow-hidden">
+     18627: +            <!-- 중앙 상단 통계 KPI 바 -->
+     18628: +            <div class="bg-white border-b border-slate-200 p-3 grid grid-cols-1 sm:grid-cols-3 gap-3 z-10 shadow-sm">
+     18629: +                <div class="bg-blue-50/50 border border-blue-100 rounded-xl p-2.5 text-center">
+  >> 18630: +                    <p class="text-[10px] sm:text-xs font-black text-royalBlue uppercase tracking-wider mb-0.5">추천 적합 매물 (전체 <span id="kpi-total-count" class="font-outfit text-slate-500 font-bold">0</span>건 중)</p>
+     18631: +                    <h3 id="kpi-recommended-count" class="text-sm sm:text-lg font-black text-slate-900 font-outfit">0건</h3>
+     18632: +                </div>
+     18633: +                <div class="bg-emerald-50/50 border border-emerald-100 rounded-xl p-2.5 text-center">
+     18634: +                    <p class="text-[10px] sm:text-xs font-black text-emeraldSuccess uppercase tracking-wider mb-0.5">고적합 (A~B등급)</p>
+     18635: +                    <h3 id="kpi-high-count" class="text-sm sm:text-lg font-black text-emeraldSuccess font-outfit">0건</h3>
+--------------------------------------------------
+Commit: commit d43660ab60a5e264ef2f7763ea79251cacbc0ed4 | Date:   Wed Jun 3 13:12:23 2026 +0900
+Line 18631: +                    <h3 id="kpi-recommended-count" class="text-sm sm:text-lg font-black text-slate-900 font-outfit">0건</h3>
+Context context:
+     18626: +        <section class="flex-1 bg-slate-50 border-r border-slate-200 flex flex-col h-full overflow-hidden">
+     18627: +            <!-- 중앙 상단 통계 KPI 바 -->
+     18628: +            <div class="bg-white border-b border-slate-200 p-3 grid grid-cols-1 sm:grid-cols-3 gap-3 z-10 shadow-sm">
+     18629: +                <div class="bg-blue-50/50 border border-blue-100 rounded-xl p-2.5 text-center">
+     18630: +                    <p class="text-[10px] sm:text-xs font-black text-royalBlue uppercase tracking-wider mb-0.5">추천 적합 매물 (전체 <span id="kpi-total-count" class="font-outfit text-slate-500 font-bold">0</span>건 중)</p>
+  >> 18631: +                    <h3 id="kpi-recommended-count" class="text-sm sm:text-lg font-black text-slate-900 font-outfit">0건</h3>
+     18632: +                </div>
+     18633: +                <div class="bg-emerald-50/50 border border-emerald-100 rounded-xl p-2.5 text-center">
+     18634: +                    <p class="text-[10px] sm:text-xs font-black text-emeraldSuccess uppercase tracking-wider mb-0.5">고적합 (A~B등급)</p>
+     18635: +                    <h3 id="kpi-high-count" class="text-sm sm:text-lg font-black text-emeraldSuccess font-outfit">0건</h3>
+     18636: +                </div>
+--------------------------------------------------
+Commit: commit d43660ab60a5e264ef2f7763ea79251cacbc0ed4 | Date:   Wed Jun 3 13:12:23 2026 +0900
+Line 18647: +                    <i class="fa-solid fa-chart-line"></i> 추천 매물 피드
+Context context:
+     18642: +
+     18643: +            <!-- 💎 프리미엄 3대 탭 탐색기 (가독성을 극대화한 미니멀 디자인) -->
+     18644: +            <div class="bg-white border-b border-slate-200 px-5 flex gap-4 z-10 overflow-x-auto whitespace-nowrap scrollbar-none">
+     18645: +                <button id="tab-dashboard-btn" onclick="switchMiddleTab('dashboard')" 
+     18646: +                        class="border-b-2 border-royalBlue text-royalBlue py-3 text-sm font-black flex items-center gap-1.5 transition-all">
+  >> 18647: +                    <i class="fa-solid fa-chart-line"></i> 추천 매물 피드
+     18648: +                </button>
+     18649: +                <button id="tab-glossary-btn" onclick="switchMiddleTab('glossary')" 
+     18650: +                        class="border-b-2 border-transparent text-slate-500 py-3 text-sm font-black flex items-center gap-1.5 transition-all hover:text-royalBlue">
+     18651: +                    <i class="fa-solid fa-book"></i> 법률 용어/리스크 사전
+     18652: +                </button>
+--------------------------------------------------
+Commit: commit d43660ab60a5e264ef2f7763ea79251cacbc0ed4 | Date:   Wed Jun 3 13:12:23 2026 +0900
+Line 18659: +            <!-- 🎯 [TAB 1: 추천 매물 피드 컨테이너] -->
+Context context:
+     18654: +                        class="border-b-2 border-transparent text-slate-500 py-3 text-sm font-black flex items-center gap-1.5 transition-all hover:text-royalBlue">
+     18655: +                    <i class="fa-solid fa-circle-info"></i> 크롤러 사용 가이드
+     18656: +                </button>
+     18657: +            </div>
+     18658: +
+  >> 18659: +            <!-- 🎯 [TAB 1: 추천 매물 피드 컨테이너] -->
+     18660: +            <div id="dashboard-view" class="flex flex-col flex-1 overflow-hidden">
+     18661: +                <!-- [핵심 차이 & 5대 자동화 플랜] Collapsible premium notices -->
+     18662: +                <div class="p-4 pb-0 space-y-3">
+     18663: +                    <!-- 온비드 vs 법원 경매 비교 안내 (기본 오픈, 토글 가능) -->
+     18664: +                    <div class="bg-emerald-50 border border-emerald-200 rounded-2xl p-4 shadow-sm relative overflow-hidden">
+--------------------------------------------------
+Commit: commit d43660ab60a5e264ef2f7763ea79251cacbc0ed4 | Date:   Wed Jun 3 13:12:23 2026 +0900
+Line 19040: +        let filteredProperties = [];  // 검색/필터 가공 데이터
+Context context:
+     19035: +
+     19036: +        // 로컬 FastAPI 개발 서버 주소 설정 (서버 자체 서빙 및 로컬 file:// 실행 환경 감지 하이브리드 연동)
+     19037: +        const API_BASE_URL = window.location.origin.startsWith("file") ? "http://127.0.0.1:8000" : window.location.origin;
+     19038: +        
+     19039: +        let originalProperties = [];  // 서버에서 수신한 전체 데이터 원본
+  >> 19040: +        let filteredProperties = [];  // 검색/필터 가공 데이터
+     19041: +        let currentSortKey = 'score'; // 현재 정렬 기준
+     19042: +        let activeSortChain = [{ key: 'score', direction: 'desc' }]; // 🟢 [복수 정렬 체인 상태 엔진]
+     19043: +        let selectedProperty = null;  // 현재 선택된 활성화 매물 객체
+     19044: +
+     19045: +        // 🚀 성능 극대화 고도화: 대용량 데이터 지연 로딩(Pagination) 및 디바운싱 데몬 설정
+--------------------------------------------------
+Commit: commit d43660ab60a5e264ef2f7763ea79251cacbc0ed4 | Date:   Wed Jun 3 13:12:23 2026 +0900
+Line 19348: +        // 4. [신규 로직 통합] 실시간 다차원 지역/출처/일정 검색 필터 엔진 (페이지네이션 연동)
+Context context:
+     19343: +            if (uk > 0) parts.push(`${uk}억`);
+     19344: +            if (man > 0) parts.push(`${man.toLocaleString()}만`);
+     19345: +            return parts.length > 0 ? parts.join(" ") + " 원" : `${val.toLocaleString()}원`;
+     19346: +        }
+     19347: +
+  >> 19348: +        // 4. [신규 로직 통합] 실시간 다차원 지역/출처/일정 검색 필터 엔진 (페이지네이션 연동)
+     19349: +        function applyFilters() {
+     19350: +            const searchQuery = document.getElementById("search-input").value.trim().toLowerCase();
+     19351: +            const sourceFilter = document.getElementById("source-filter").value;
+     19352: +            const ptypeFilter = document.getElementById("ptype-filter").value;
+     19353: +            const dateLimit = parseInt(document.getElementById("date-filter").value);
+--------------------------------------------------
+Commit: commit d43660ab60a5e264ef2f7763ea79251cacbc0ed4 | Date:   Wed Jun 3 13:12:23 2026 +0900
+Line 19378: +                // ❶ 키워드 검색
+Context context:
+     19373: +            const selectedSido = document.getElementById("sido-filter").value;
+     19374: +            const sigunguCheckBoxes = document.querySelectorAll('input[name="sigungu-check"]:checked');
+     19375: +            const selectedSigungus = Array.from(sigunguCheckBoxes).map(cb => cb.value);
+     19376: +
+     19377: +            filteredProperties = originalProperties.filter(item => {
+  >> 19378: +                // ❶ 키워드 검색
+     19379: +                const addressStr = item.address || "";
+     19380: +                const matchesKeyword = !searchQuery || 
+     19381: +                    addressStr.toLowerCase().includes(searchQuery) ||
+     19382: +                    (item.auction_no || "").toLowerCase().includes(searchQuery) ||
+     19383: +                    (item.desc_content && item.desc_content.toLowerCase().includes(searchQuery)) ||
+--------------------------------------------------
+Commit: commit d43660ab60a5e264ef2f7763ea79251cacbc0ed4 | Date:   Wed Jun 3 13:12:23 2026 +0900
+Line 19554: +            document.getElementById("kpi-recommended-count").innerText = `${filteredProperties.length}건`;
+Context context:
+     19549: +            }
+     19550: +        }
+     19551: +
+     19552: +        // 6. 메인 피드 대시보드 KPI 값 갱신 및 상단 글로벌 카운트 배지 갱신
+     19553: +        function updateKPIDashboard() {
+  >> 19554: +            document.getElementById("kpi-recommended-count").innerText = `${filteredProperties.length}건`;
+     19555: +            
+     19556: +            const totalEl = document.getElementById("kpi-total-count");
+     19557: +            if (totalEl) totalEl.innerText = originalProperties.length.toLocaleString();
+     19558: +            
+     19559: +            const headerTotal = document.getElementById("header-total-count");
+--------------------------------------------------
+Commit: commit d43660ab60a5e264ef2f7763ea79251cacbc0ed4 | Date:   Wed Jun 3 13:12:23 2026 +0900
+Line 19643: +                        <p class="text-[10px] text-slate-400">설정한 필터나 가용 예산 한도 내에 부합하는 추천 매물이 없습니다.</p>
+Context context:
+     19638: +            if (filteredProperties.length === 0) {
+     19639: +                container.innerHTML = `
+     19640: +                    <div class="text-center py-20 bg-white border border-slate-200 rounded-2xl p-8 shadow-sm m-5">
+     19641: +                        <i class="fa-solid fa-folder-open text-slate-300 text-4xl mb-3"></i>
+     19642: +                        <h4 class="font-extrabold text-slate-700 text-xs mb-1">매칭 자산 없음</h4>
+  >> 19643: +                        <p class="text-[10px] text-slate-400">설정한 필터나 가용 예산 한도 내에 부합하는 추천 매물이 없습니다.</p>
+     19644: +                    </div>
+     19645: +                `;
+     19646: +                return;
+     19647: +            }
+     19648: +            
+--------------------------------------------------
+Commit: commit d43660ab60a5e264ef2f7763ea79251cacbc0ed4 | Date:   Wed Jun 3 13:12:23 2026 +0900
+Line 19826: +                        <strong class="text-[10px] text-rose-700 block">👉 초보 대응 지침: 공유 지분은 자유로운 매도가 극도로 어렵습니다. 전문가가 아니라면 절대 추천하지 않습니다.</strong>
+Context context:
+     19821: +            if (textToSearch.includes("지분")) {
+     19822: +                warnings.push(`
+     19823: +                    <div class="border-l-4 border-rose-600 pl-3 py-1 space-y-1">
+     19824: +                        <strong class="text-xs font-black text-rose-800">👥 공동소유 지분 제한 리스크</strong>
+     19825: +                        <p class="text-[10px] text-slate-500 leading-relaxed">자산의 지분(일부)만 획득하는 물건으로, 독단적으로 임대 계약을 맺거나 실거주를 하기 어려우며, 차후 지분분할청구소송 등 복잡한 공유자 간 소송을 야기합니다.</p>
+  >> 19826: +                        <strong class="text-[10px] text-rose-700 block">👉 초보 대응 지침: 공유 지분은 자유로운 매도가 극도로 어렵습니다. 전문가가 아니라면 절대 추천하지 않습니다.</strong>
+     19827: +                    </div>
+     19828: +                `);
+     19829: +            }
+     19830: +            
+     19831: +            // 4. 유치권
+--------------------------------------------------
+Commit: commit d43660ab60a5e264ef2f7763ea79251cacbc0ed4 | Date:   Wed Jun 3 13:12:23 2026 +0900
+Line 19965: +                previewPrice.innerHTML = `<i class="fa-solid fa-tags"></i> 최저가: ${formatKRW(item.minimum_bid)}`;
+Context context:
+     19960: +            const previewGrade = document.getElementById("preview-grade");
+     19961: +            const previewRisk = document.getElementById("preview-risk");
+     19962: +            
+     19963: +            if (previewTitle && previewPrice && previewGrade && previewRisk) {
+     19964: +                previewTitle.innerHTML = `<span class="text-white font-extrabold">[${item.auction_no}]</span> <span class="text-slate-300 font-medium">${item.address}</span>`;
+  >> 19965: +                previewPrice.innerHTML = `<i class="fa-solid fa-tags"></i> 최저가: ${formatKRW(item.minimum_bid)}`;
+     19966: +                previewGrade.innerHTML = `<i class="fa-solid fa-shield-halved"></i> AI: ${item.grade}등급 (${item.score}점)`;
+     19967: +                previewRisk.innerHTML = `<i class="fa-solid fa-triangle-exclamation text-amber-400"></i> ${item.notes_content || '검출된 권리 하자 없음'}`;
+     19968: +            }
+     19969: +        }
+     19970: +
+--------------------------------------------------
+Commit: commit d43660ab60a5e264ef2f7763ea79251cacbc0ed4 | Date:   Wed Jun 3 13:12:23 2026 +0900
+Line 20434: +                    <p class="text-[10px] text-slate-500">본 대시보드는 대법원 경매 정보망의 실시간 자동 스크래핑 시스템 및 하이브리드 추천 대시보드의 작동 원리와 패치 내역을 완벽하게 내장하고 있습니다.</p>
+Context context:
+     20429: +        // 백업용 고화질 오프라인 HTML 가이드
+     20430: +        function getFallbackGuideHTML() {
+     20431: +            return `
+     20432: +                <div class="space-y-4">
+     20433: +                    <h2 class="text-sm font-extrabold text-slate-900 border-b border-slate-200 pb-2 mb-4">🏠 대법원 경매 크롤러 및 대시보드 사용 가이드</h2>
+  >> 20434: +                    <p class="text-[10px] text-slate-500">본 대시보드는 대법원 경매 정보망의 실시간 자동 스크래핑 시스템 및 하이브리드 추천 대시보드의 작동 원리와 패치 내역을 완벽하게 내장하고 있습니다.</p>
+     20435: +                    
+     20436: +                    <div class="border-t border-slate-200 my-4"></div>
+     20437: +                    
+     20438: +                    <h3 class="text-xs font-extrabold text-royalBlue mb-2"><i class="fa-solid fa-gears"></i> 1. 시스템 작동 아키텍처</h3>
+     20439: +                    <p class="text-[10px] text-slate-600 leading-relaxed">
+--------------------------------------------------

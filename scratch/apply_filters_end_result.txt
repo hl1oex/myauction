@@ -1,0 +1,130 @@
+Line 3171:                         }
+Line 3172:                     }
+Line 3173:                 }
+Line 3174:                 
+Line 3175:                 let matchesFavorite = true;
+Line 3176:                 if (showFavoritesOnly) {
+Line 3177:                     matchesFavorite = favoritePropertyIds.has(item.id);
+Line 3178:                 }
+Line 3179:                 
+Line 3180:                 let matchesCourt = true;
+Line 3181:                 const courtCheckBoxes = document.querySelectorAll('input[name="court-check"]:checked');
+Line 3182:                 const selectedCourts = Array.from(courtCheckBoxes).map(cb => cb.value);
+Line 3183:                 if (selectedCourts.length > 0) {
+Line 3184:                     matchesCourt = false;
+Line 3185:                     for (let courtName of selectedCourts) {
+Line 3186:                         if ((item.auction_no || "").includes(courtName)) {
+Line 3187:                             matchesCourt = true;
+Line 3188:                             break;
+Line 3189:                         }
+Line 3190:                     }
+Line 3191:                 }
+Line 3192:                 
+Line 3193:                 return matchesKeyword && matchesBudget && matchesSource && matchesDate && matchesPast && matchesSido && matchesSigungu && matchesGrade && matchesPtype && matchesFavorite && matchesCourt;
+Line 3194:             });
+Line 3195:             
+Line 3196:             currentPage = 1;
+Line 3197:             sortData('score');
+Line 3198:             saveFiltersToCache();
+Line 3199:         }
+Line 3200: 
+Line 3201:         // 5. 정렬 기준 정렬 함수 (단일 정렬 키 기준 양방향 토글 정렬 완벽 지원)
+Line 3202:         function sortData(key) {
+Line 3203:             if (currentSortKey === key) {
+Line 3204:                 // 동일 키 클릭 시 오름차순/내림차순 토글
+Line 3205:                 currentSortDir = currentSortDir === 'desc' ? 'asc' : 'desc';
+Line 3206:             } else {
+Line 3207:                 // 새로운 키 클릭 시 기준별 기본 방향 설정
+Line 3208:                 currentSortKey = key;
+Line 3209:                 currentSortDir = (key === 'score' || key === 'price' || key === 'discount' || key === 'failed') ? 'desc' : 'asc';
+Line 3210:             }
+Line 3211:             
+Line 3212:             updateSortButtonsUI();
+Line 3213:             
+Line 3214:             filteredProperties.sort((a, b) => {
+Line 3215:                 let valA, valB;
+Line 3216:                 if (currentSortKey === 'score') {
+Line 3217:                     valA = typeof a.score === 'number' ? a.score : 0;
+Line 3218:                     valB = typeof b.score === 'number' ? b.score : 0;
+Line 3219:                 } else if (currentSortKey === 'date') {
+Line 3220:                     valA = typeof a.remaining_days === 'number' ? a.remaining_days : 9999;
+Line 3221:                     valB = typeof b.remaining_days === 'number' ? b.remaining_days : 9999;
+Line 3222:                 } else if (currentSortKey === 'price') {
+Line 3223:                     valA = typeof a.minimum_bid === 'number' ? a.minimum_bid : 0;
+Line 3224:                     valB = typeof b.minimum_bid === 'number' ? b.minimum_bid : 0;
+Line 3225:                 } else if (currentSortKey === 'discount') {
+Line 3226:                     valA = estimateAuctionRounds(a.appraised_value, a.minimum_bid, a.source).discount;
+Line 3227:                     valB = estimateAuctionRounds(b.appraised_value, b.minimum_bid, b.source).discount;
+Line 3228:                 } else if (currentSortKey === 'failed') {
+Line 3229:                     valA = estimateAuctionRounds(a.appraised_value, a.minimum_bid, a.source).failedCount;
+Line 3230:                     valB = estimateAuctionRounds(b.appraised_value, b.minimum_bid, b.source).failedCount;
+Line 3231:                 } else {
+Line 3232:                     valA = 0;
+Line 3233:                     valB = 0;
+Line 3234:                 }
+Line 3235:                 
+Line 3236:                 if (valA !== valB) {
+Line 3237:                     return currentSortDir === 'asc' ? valA - valB : valB - valA;
+Line 3238:                 }
+Line 3239:                 return 0;
+Line 3240:             });
+Line 3241:             
+Line 3242:             currentPage = 1;
+Line 3243:             updateKPIDashboard();
+Line 3244:             renderProperties();
+Line 3245:         }
+Line 3246: 
+Line 3247:         function updateSortButtonsUI() {
+Line 3248:             const sortButtons = {
+Line 3249:                 'score': { btn: document.getElementById("sort-score-btn"), text: "✨ 점수순" },
+Line 3250:                 'date': { btn: document.getElementById("sort-date-btn"), text: "📅 기일순" },
+Line 3251:                 'price': { btn: document.getElementById("sort-price-btn"), text: "💰 금액순" },
+Line 3252:                 'discount': { btn: document.getElementById("sort-discount-btn"), text: "📉 저감율순" },
+Line 3253:                 'failed': { btn: document.getElementById("sort-failed-btn"), text: "🔄 유찰순" }
+Line 3254:             };
+Line 3255:             
+Line 3256:             const activeClass = "bg-royalBlue text-white px-2.5 py-1.5 rounded-lg text-xs font-black shadow-md transition-all flex items-center gap-1";
+Line 3257:             const inactiveClass = "bg-white border border-slate-200 text-slate-600 px-2.5 py-1.5 rounded-lg text-xs font-black hover:bg-slate-50 transition-all flex items-center gap-1";
+Line 3258:             
+Line 3259:             for (const [btnKey, item] of Object.entries(sortButtons)) {
+Line 3260:                 if (item.btn) {
+Line 3261:                     if (currentSortKey === btnKey) {
+Line 3262:                         const arrow = currentSortDir === 'asc' ? '▲' : '▼';
+Line 3263:                         item.btn.className = activeClass;
+Line 3264:                         item.btn.innerHTML = `${item.text} ${arrow}`;
+Line 3265:                     } else {
+Line 3266:                         item.btn.className = inactiveClass;
+Line 3267:                         item.btn.innerHTML = item.text;
+Line 3268:                     }
+Line 3269:                 }
+Line 3270:             }
+Line 3271:         }
+Line 3272: 
+Line 3273:         // 6. 메인 피드 대시보드 KPI 값 갱신 및 상단 글로벌 카운트 배지 갱신
+Line 3274:         function updateKPIDashboard() {
+Line 3275:             const recommendedText = `${filteredProperties.length}건`;
+Line 3276:             const totalText = originalProperties.length.toLocaleString();
+Line 3277:             const highGradeCount = filteredProperties.filter(item => item.grade === 'A' || item.grade === 'B').length;
+Line 3278:             const highText = `${highGradeCount}건`;
+Line 3279:             const riskCount = filteredProperties.filter(item => item.grade === 'X').length;
+Line 3280:             const riskText = `${riskCount}건`;
+Line 3281: 
+Line 3282:             // Update PC/Desktop elements
+Line 3283:             const recPC = document.getElementById("kpi-recommended-count");
+Line 3284:             if (recPC) recPC.innerText = recommendedText;
+Line 3285:             const totPC = document.getElementById("kpi-total-count");
+Line 3286:             if (totPC) totPC.innerText = totalText;
+Line 3287:             const highPC = document.getElementById("kpi-high-count");
+Line 3288:             if (highPC) highPC.innerText = highText;
+Line 3289:             const riskPC = document.getElementById("kpi-risk-count");
+Line 3290:             if (riskPC) riskPC.innerText = riskText;
+Line 3291: 
+Line 3292:             // Update Mobile elements
+Line 3293:             const recMob = document.getElementById("kpi-recommended-count-mob");
+Line 3294:             if (recMob) recMob.innerText = recommendedText;
+Line 3295:             const totMob = document.getElementById("kpi-total-count-mob");
+Line 3296:             if (totMob) totMob.innerText = totalText;
+Line 3297:             const highMob = document.getElementById("kpi-high-count-mob");
+Line 3298:             if (highMob) highMob.innerText = highText;
+Line 3299:             const riskMob = document.getElementById("kpi-risk-count-mob");
+Line 3300:             if (riskMob) riskMob.innerText = riskText;

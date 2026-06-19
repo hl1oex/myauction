@@ -598,10 +598,11 @@ def extract_court_areas(st_text, ptype="", appraised_value=0, address=""):
                 except ValueError:
                     pass
 
-        # 단위 생략 숫자 매칭 유추 (예: '아파트 84.95', '오피스텔 59')
+        # 단위 생략 숫자 매칭 유추 (예: '아파트 84.95', '오피스텔 59') - 주소 영역 제외
         if ex_area == 0.0:
+            text_without_addr = target_text.replace(address, "") if address else target_text
             # 59, 84 등 하드코딩된 리스트 외에도 일반적인 범위의 실수와 정수를 유추 가능하도록 확장
-            no_unit_match = re.search(r'\b(59|84|114|135|165|24|32|34|45)(?:\.\d+)?\s*(?:형|타입|py)?\b', target_text)
+            no_unit_match = re.search(r'\b(59|84|114|135|165|24|32|34|45)(?:\.\d+)?\s*(?:형|타입|py)?\b', text_without_addr)
             if no_unit_match:
                 try:
                     val = float(no_unit_match.group(0).split()[0].replace("형", "").replace("타입", ""))
@@ -614,9 +615,10 @@ def extract_court_areas(st_text, ptype="", appraised_value=0, address=""):
                 except ValueError:
                     pass
 
-        # 단위 생략 일반적인 전용면적 범위의 단독 숫자 매칭 백업
+        # 단위 생략 일반적인 전용면적 범위의 단독 숫자 매칭 백업 - 주소 영역 제외
         if ex_area == 0.0:
-            general_num_match = re.search(r'\b(1[0-9]|[2-9][0-9]|1[0-9]{2}|2[0-9]{2})\b(?:\.\d+)?\s*(?:형|타입|py)?\b', target_text)
+            text_without_addr = target_text.replace(address, "") if address else target_text
+            general_num_match = re.search(r'\b(1[0-9]|[2-9][0-9]|1[0-9]{2}|2[0-9]{2})\b(?:\.\d+)?\s*(?:형|타입|py)?\b', text_without_addr)
             if general_num_match:
                 try:
                     val = float(general_num_match.group(0).split()[0].replace("형", "").replace("타입", ""))
@@ -1238,54 +1240,7 @@ def scrape_court_data():
                         elementary_school = ""
                         recent_deals = []
                         
-                        is_residential = any(k in ptype for k in ["아파트", "오피스텔", "다세대", "빌라", "연립", "주택", "단독", "다가구"])
-                        if is_residential:
-                            school_names = ["대치초등학교", "송파초등학교", "반포초등학교", "청라초등학교", "정자초등학교", "범어초등학교", "해운대초등학교", "한빛초등학교"]
-                            addr_hash = abs(hash(address))
-                            addr_parts = address.split(" ")
-                            
-                            if "아파트" in ptype:
-                                builders = ["삼성물산(래미안)", "현대건설(힐스테이트)", "GS건설(자이)", "대우건설(푸르지오)", "DL이앤씨(e편한세상)", "포스코이앤씨(더샵)"]
-                                apt_name = addr_parts[-2] + " 아파트" if len(addr_parts) > 2 else "래미안 퍼스티지"
-                                if len(addr_parts) > 1 and "아파트" in addr_parts[-1]:
-                                    apt_name = addr_parts[-1]
-                                complex_info = {
-                                    "complex_name": apt_name,
-                                    "total_households": 350 + (addr_hash * 27) % 2500,
-                                    "construction_company": builders[addr_hash % len(builders)],
-                                    "built_year": 2005 + (addr_hash * 3) % 18
-                                }
-                            elif "오피스텔" in ptype:
-                                off_brands = ["마이빌 오피스텔", "현대 에띠앙", "두산위브센티움", "디아이빌", "푸르지오 시티", "효성해링턴"]
-                                off_name = addr_parts[-2] + " 오피스텔" if len(addr_parts) > 2 else "디아이빌 오피스텔"
-                                if len(addr_parts) > 1 and "오피스텔" in addr_parts[-1]:
-                                    off_name = addr_parts[-1]
-                                complex_info = {
-                                    "complex_name": off_name,
-                                    "total_households": 80 + (addr_hash * 13) % 400,
-                                    "construction_company": off_brands[addr_hash % len(off_brands)],
-                                    "built_year": 2010 + (addr_hash * 2) % 14
-                                }
-                            else:
-                                # 빌라, 주택 등
-                                villa_brands = ["청화빌라", "현대빌라", "대명하이츠", "대성빌라", "삼성하이츠", "청담타운"]
-                                villa_name = addr_parts[-2] + " 빌라" if len(addr_parts) > 2 else "청화하이츠"
-                                if len(addr_parts) > 1 and any(k in addr_parts[-1] for k in ["빌라", "다세대", "연립", "주택"]):
-                                    villa_name = addr_parts[-1]
-                                complex_info = {
-                                    "complex_name": villa_name,
-                                    "total_households": 10 + (addr_hash * 7) % 35,
-                                    "construction_company": villa_brands[addr_hash % len(villa_brands)],
-                                    "built_year": 1995 + (addr_hash * 4) % 28
-                                }
-                                
-                            elementary_school = school_names[addr_hash % len(school_names)]
-                            base_deal = appraisal if appraisal > 0 else 1000000000
-                            recent_deals = [
-                                {"deal_date": "2026-03", "deal_price": int(base_deal * 1.02), "floor": 12 + (addr_hash % 8)},
-                                {"deal_date": "2026-01", "deal_price": int(base_deal * 0.98), "floor": 5 + (addr_hash % 8)},
-                                {"deal_date": "2025-11", "deal_price": int(base_deal * 0.95), "floor": 18 - (addr_hash % 8)}
-                            ]
+
 
                         non_building_meta = {}
                         if is_etc_asset:

@@ -1,0 +1,80 @@
+Line 3521:                                     <span>감정가</span>
+Line 3522:                                     <span class="font-mono font-semibold text-slate-600">${formatKRW(item.appraised_value)}</span>
+Line 3523:                                 </div>
+Line 3524:                                 <div class="flex justify-between text-[11.5px] text-slate-400 font-medium">
+Line 3525:                                     <span>저감/유찰</span>
+Line 3526:                                     <span class="font-bold text-royalBlue font-mono">${est.discount}% 저감 | ${est.failedCount}회 유찰 (${item.round_info || '신건'})</span>
+Line 3527:                                 </div>
+Line 3528:                             </div>
+Line 3529:                         </div>
+Line 3530: 
+Line 3531:                         <!-- AI Risk Summary Note -->
+Line 3532:                         <div class="mt-2.5 pt-2 border-t border-slate-100/80">
+Line 3533:                             <div class="text-[11.5px] ${item.grade === 'X' ? 'text-rose-600 font-black' : 'text-slate-500 font-bold'} truncate flex items-center gap-1.5" title="${item.notes_content}">
+Line 3534:                                 <i class="fa-solid fa-triangle-exclamation ${item.grade === 'X' ? 'text-rose-600 animate-pulse' : 'text-amber-500'} text-[10px] flex-shrink-0"></i>
+Line 3535:                                 <span class="truncate">${item.notes_content || '검출된 특이 권리 관계가 없습니다.'}</span>
+Line 3536:                             </div>
+Line 3537:                         </div>
+Line 3538:                     </div>
+Line 3539:                 `;
+Line 3540:                 htmlBuffer.push(cardHtml);
+Line 3541:             });
+Line 3542:             
+Line 3543:             grid.insertAdjacentHTML('beforeend', htmlBuffer.join(""));
+Line 3544:         }
+Line 3545:  
+Line 3546:         // 🚀 스크롤 바닥 감지 기반 추가 페이지 로딩 기능 (지연 로딩 데몬)
+Line 3547:         function loadMoreProperties() {
+Line 3548:             const maxPage = Math.ceil(filteredProperties.length / itemsPerPage);
+Line 3549:             if (currentPage < maxPage) {
+Line 3550:                 currentPage++;
+Line 3551:                 renderProperties();
+Line 3552:             }
+Line 3553:         }
+Line 3554:  
+Line 3555:         // 🚀 입력 지연 디바운싱 필터 트리거 (성능 극대화)
+Line 3556:         function debouncedApplyFilters() {
+Line 3557:             clearTimeout(debounceTimer);
+Line 3558:             debounceTimer = setTimeout(() => {
+Line 3559:                 applyFilters();
+Line 3560:             }, 150);
+Line 3561:         }
+Line 3562:  
+Line 3563:         // [신규 기능 4] AI 7대 권리 하자 및 리스크 지능형 자동 리포트 매칭기
+Line 3564:         function generateLegalRiskReport(item) {
+Line 3565:             const textToSearch = `${item.address} ${item.desc_content} ${item.notes_content}`.toLowerCase();
+Line 3566:             let warnings = [];
+Line 3567:             
+Line 3568:             // 1. 건물만 매각 / 대지권 없음
+Line 3569:             if (textToSearch.includes("대지권없음") || textToSearch.includes("토지만") || textToSearch.includes("건물만") || textToSearch.includes("대지권 미등기")) {
+Line 3570:                 warnings.push(`
+Line 3571:                     <div class="border-l-4 border-rose-600 pl-3 py-1 space-y-1">
+Line 3572:                         <strong class="text-xs font-black text-rose-800">🧱 토지 사용권 분쟁 (건물만 매각 / 대지권 없음) 리스크</strong>
+Line 3573:                         <p class="text-[10px] text-slate-500 leading-relaxed">건물의 소유권만 낙찰받고 토지 사용권을 가져오지 못해 토지 소유주로부터 매달 땅 사용료(지료) 소송 또는 건물 철거 압박 소송에 처할 심각한 리스크가 있습니다.</p>
+Line 3574:                         <strong class="text-[10px] text-rose-700 block">👉 초보 대응 지침: 입찰 절대 금지. 토지 소유주와의 법적 대립으로 자산이 묶일 위험이 심대합니다.</strong>
+Line 3575:                     </div>
+Line 3576:                 `);
+Line 3577:             }
+Line 3578:             
+Line 3579:             // 2. 토지별도등기
+Line 3580:             if (textToSearch.includes("토지별도")) {
+Line 3581:                 warnings.push(`
+Line 3582:                     <div class="border-l-4 border-amber-500 pl-3 py-1 space-y-1">
+Line 3583:                         <strong class="text-xs font-black text-amber-800">📝 토지별도등기 인수 우려</strong>
+Line 3584:                         <p class="text-[10px] text-slate-500 leading-relaxed">토지에 집합건물 건축 전에 근저당 등 권리가 남아 있는 물건입니다. 낙찰금으로 해결되지 않고 소멸되지 않는 채무라면 고스란히 승계됩니다.</p>
+Line 3585:                         <strong class="text-[10px] text-amber-700 block">👉 초보 대응 지침: '매각물건명세서' 상에서 토지 근저당이 특별 매각조건으로 낙찰 후 말소되는지 반드시 재확인하십시오.</strong>
+Line 3586:                     </div>
+Line 3587:                 `);
+Line 3588:             }
+Line 3589:             
+Line 3590:             // 3. 지분제한
+Line 3591:             if (textToSearch.includes("지분")) {
+Line 3592:                 warnings.push(`
+Line 3593:                     <div class="border-l-4 border-rose-600 pl-3 py-1 space-y-1">
+Line 3594:                         <strong class="text-xs font-black text-rose-800">👥 공동소유 지분 제한 리스크</strong>
+Line 3595:                         <p class="text-[10px] text-slate-500 leading-relaxed">자산의 지분(일부)만 획득하는 물건으로, 독단적으로 임대 계약을 맺거나 실거주를 하기 어려우며, 차후 지분분할청구소송 등 복잡한 공유자 간 소송을 야기합니다.</p>
+Line 3596:                         <strong class="text-[10px] text-rose-700 block">👉 초보 대응 지침: 공유 지분은 자유로운 매도가 극도로 어렵습니다. 전문가가 아니라면 절대 추천하지 않습니다.</strong>
+Line 3597:                     </div>
+Line 3598:                 `);
+Line 3599:             }
+Line 3600:             

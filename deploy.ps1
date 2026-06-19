@@ -27,6 +27,9 @@ Copy-Item -Path "admin.html" -Destination "dist/" -Force
 Copy-Item -Path "favicon.png" -Destination "dist/" -Force
 Copy-Item -Path "apartment_elegant_facade.png" -Destination "dist/" -Force
 Copy-Item -Path "floorplan_modern_apartment.png" -Destination "dist/" -Force
+if (Test-Path "v1.2") {
+    Copy-Item -Path "v1.2" -Destination "dist/" -Recurse -Force
+}
 
 # 3. 상대 경로 치환 패치 적용
 Write-Host "[*] 3/4. relative_path_patch.py 파이썬 후처리 가동 중..." -ForegroundColor Yellow

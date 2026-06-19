@@ -1,0 +1,3 @@
+d5c5202 - hl1oex, 10 days ago : fix: cast appraised_value and minimum_bid to bigint in database.py 
+7576278 - hl1oex, 2 weeks ago : Highlight Onbid internet bidding advantages, add Naver Maps link, show bidding round/failed counts, redesign Grade X to warning card layout 
+a2f1999 - hl1oex, 2 weeks ago : Update program name to 부동산 경매 추천 시스템, add Onbid guides and visual styling 

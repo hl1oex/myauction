@@ -1,12 +1,12 @@
 === DetailScreen.tsx 탭 관련 검색 결과 ===
 총 매칭 라인 수: 9
 
-Line 342: const [activeTab, setActiveTab] = useState<TabType>('general');
-Line 1370: const tabs = isEtc
-Line 1395: style={[styles.tabButton, activeTab === tab.key && styles.tabButtonActive]}
-Line 1397: <Text style={[styles.tabButtonText, activeTab === tab.key && styles.tabButtonTextActive]}>
-Line 1407: {activeTab === 'general' && (
-Line 2030: {activeTab === 'rights' && (
-Line 2319: {activeTab === 'bidding' && (
-Line 2676: {activeTab === 'location' && (
-Line 3107: {activeTab === 'etc_specs' && (
+Line 363: const [activeTab, setActiveTab] = useState<TabType>('general');
+Line 1391: const tabs = isEtc
+Line 1416: style={[styles.tabButton, activeTab === tab.key && styles.tabButtonActive]}
+Line 1418: <Text style={[styles.tabButtonText, activeTab === tab.key && styles.tabButtonTextActive]}>
+Line 1428: {activeTab === 'general' && (
+Line 2134: {activeTab === 'rights' && (
+Line 2423: {activeTab === 'location' && (
+Line 2873: {activeTab === 'bidding' && (
+Line 3213: {activeTab === 'etc_specs' && (

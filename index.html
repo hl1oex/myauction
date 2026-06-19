@@ -831,42 +831,9 @@
             <div id="dashboard-view" class="flex flex-col flex-1 overflow-hidden">
                 <!-- 📢 메인 상단 배너 광고 슬롯 -->
                 <div id="main-top-ad-slot" class="w-full bg-white px-3.5 pt-2 hidden"></div>
-                <!-- 🔍 AI 추천 검색어 (초개인화 테마) 칩 바 -->
-                <div class="px-3.5 py-2 bg-slate-50 border-b border-slate-200/60 flex items-center gap-2 overflow-x-auto custom-scrollbar select-none w-full whitespace-nowrap">
-                    <span class="bg-gradient-to-r from-amber-500 to-orange-500 text-white text-[9px] font-black px-2 py-0.5 rounded-full flex items-center gap-1 flex-shrink-0 animate-pulse">
-                        <i class="fa-solid fa-wand-magic-sparkles"></i> AI 추천
-                    </span>
-                    <div class="flex gap-1.5 flex-nowrap flex-shrink-0">
-                        <button onclick="selectTheme(null)" id="btn-theme-all" class="bg-royalBlue text-white border-royalBlue px-2.5 py-0.5 rounded-full text-[10px] font-black border transition-all select-none flex items-center gap-1 shadow-sm whitespace-nowrap flex-shrink-0">전체 피드</button>
-                        <button onclick="selectTheme('clean_rights')" id="btn-theme-clean" class="bg-white border border-slate-200 text-slate-600 px-2.5 py-0.5 rounded-full text-[10px] font-black hover:border-emerald-500 hover:text-emerald-500 transition-all select-none flex items-center gap-1 whitespace-nowrap flex-shrink-0"><i class="fa-solid fa-shield-halved text-emerald-500"></i> 권리클린</button>
-                        <button onclick="selectTheme('half_price')" id="btn-theme-half" class="bg-white border border-slate-200 text-slate-600 px-2.5 py-0.5 rounded-full text-[10px] font-black hover:border-rose-500 hover:text-rose-500 transition-all select-none flex items-center gap-1 whitespace-nowrap flex-shrink-0"><i class="fa-solid fa-percent text-rose-500"></i> 반값 격전지</button>
-                        <button onclick="selectTheme('hot_yongin')" id="btn-theme-yongin" class="bg-white border border-slate-200 text-slate-600 px-2.5 py-0.5 rounded-full text-[10px] font-black hover:border-indigo-500 hover:text-indigo-500 transition-all select-none flex items-center gap-1 whitespace-nowrap flex-shrink-0"><i class="fa-solid fa-fire text-indigo-500"></i> 반도체 HOT 용인</button>
-                        <button onclick="selectTheme('lifestyle_3eok')" id="btn-theme-lifestyle" class="bg-white border border-slate-200 text-slate-600 px-2.5 py-0.5 rounded-full text-[10px] font-black hover:border-amber-500 hover:text-amber-500 transition-all select-none flex items-center gap-1 whitespace-nowrap flex-shrink-0"><i class="fa-solid fa-campground text-amber-500"></i> 제주/서울 3억 이하</button>
-                        <button onclick="selectTheme('yield_top')" id="btn-theme-yield" class="bg-white border border-slate-200 text-slate-600 px-2.5 py-0.5 rounded-full text-[10px] font-black hover:border-blue-500 hover:text-blue-500 transition-all select-none flex items-center gap-1 whitespace-nowrap flex-shrink-0"><i class="fa-solid fa-coins text-blue-500"></i> 상가 수익률 TOP</button>
-                        <button onclick="selectTheme('redevelopment')" id="btn-theme-redevelopment" class="bg-white border border-slate-200 text-slate-600 px-2.5 py-0.5 rounded-full text-[10px] font-black hover:border-orange-500 hover:text-orange-500 transition-all select-none flex items-center gap-1 whitespace-nowrap flex-shrink-0"><i class="fa-solid fa-building text-orange-500"></i> 아파트 재건축</button>
-                        <button onclick="selectTheme('mini_land')" id="btn-theme-miniland" class="bg-white border border-slate-200 text-slate-600 px-2.5 py-0.5 rounded-full text-[10px] font-black hover:border-lime-600 hover:text-lime-600 transition-all select-none flex items-center gap-1 whitespace-nowrap flex-shrink-0"><i class="fa-solid fa-tree text-lime-600"></i> 초소액 토지</button>
-                        <button onclick="selectTheme('auto_machinery')" id="btn-theme-automachinery" class="bg-white border border-slate-200 text-slate-600 px-2.5 py-0.5 rounded-full text-[10px] font-black hover:border-purple-500 hover:text-purple-500 transition-all select-none flex items-center gap-1 whitespace-nowrap flex-shrink-0"><i class="fa-solid fa-car text-purple-500"></i> 실속 차량/동산</button>
-                        <button onclick="selectTheme('officetel_income')" id="btn-theme-officetel" class="bg-white border border-slate-200 text-slate-600 px-2.5 py-0.5 rounded-full text-[10px] font-black hover:border-cyan-500 hover:text-cyan-500 transition-all select-none flex items-center gap-1 whitespace-nowrap flex-shrink-0"><i class="fa-solid fa-city text-cyan-500"></i> 월세 오피스텔</button>
-                        <button onclick="selectTheme('subway_safe')" id="btn-theme-subwaysafe" class="bg-white border border-slate-200 text-slate-600 px-2.5 py-0.5 rounded-full text-[10px] font-black hover:border-teal-500 hover:text-teal-500 transition-all select-none flex items-center gap-1 whitespace-nowrap flex-shrink-0"><i class="fa-solid fa-train-subway text-teal-500"></i> 역세권 대항력 안전</button>
-                        <button onclick="selectTheme('small_building')" id="btn-theme-smallbuilding" class="bg-white border border-slate-200 text-slate-600 px-2.5 py-0.5 rounded-full text-[10px] font-black hover:border-amber-700 hover:text-amber-700 transition-all select-none flex items-center gap-1 whitespace-nowrap flex-shrink-0"><i class="fa-solid fa-building-user text-amber-700"></i> 꼬마빌딩 건물주</button>
-                        <button onclick="selectTheme('school_district')" id="btn-theme-schooldistrict" class="bg-white border border-slate-200 text-slate-600 px-2.5 py-0.5 rounded-full text-[10px] font-black hover:border-emerald-600 hover:text-emerald-600 transition-all select-none flex items-center gap-1 whitespace-nowrap flex-shrink-0"><i class="fa-solid fa-graduation-cap text-emerald-600"></i> 학세권 우수 교육</button>
-                        <button onclick="selectTheme('capital_single')" id="btn-theme-capitalsingle" class="bg-white border border-slate-200 text-slate-600 px-2.5 py-0.5 rounded-full text-[10px] font-black hover:border-violet-500 hover:text-violet-500 transition-all select-none flex items-center gap-1 whitespace-nowrap flex-shrink-0"><i class="fa-solid fa-house-laptop text-violet-500"></i> 수도권 1인 가구 갭</button>
-                        <button onclick="selectTheme('local_healing')" id="btn-theme-localhealing" class="bg-white border border-slate-200 text-slate-600 px-2.5 py-0.5 rounded-full text-[10px] font-black hover:border-green-600 hover:text-green-600 transition-all select-none flex items-center gap-1 whitespace-nowrap flex-shrink-0"><i class="fa-solid fa-house-chimney-window text-green-600"></i> 지방 힐링 세컨하우스</button>
-                        <button onclick="selectTheme('heavy_dropped')" id="btn-theme-heavydropped" class="bg-white border border-slate-200 text-slate-600 px-2.5 py-0.5 rounded-full text-[10px] font-black hover:border-red-600 hover:text-red-600 transition-all select-none flex items-center gap-1 whitespace-nowrap flex-shrink-0"><i class="fa-solid fa-down-long text-red-600"></i> 줍줍! 70% 폭락</button>
-                        <button onclick="selectTheme('factory_warehouse')" id="btn-theme-factorywarehouse" class="bg-white border border-slate-200 text-slate-600 px-2.5 py-0.5 rounded-full text-[10px] font-black hover:border-slate-600 hover:text-slate-600 transition-all select-none flex items-center gap-1 whitespace-nowrap flex-shrink-0"><i class="fa-solid fa-industry text-slate-600"></i> 창업/물류 공장창고</button>
-                        <button onclick="selectTheme('share_investment')" id="btn-theme-shareinvestment" class="bg-white border border-slate-200 text-slate-600 px-2.5 py-0.5 rounded-full text-[10px] font-black hover:border-rose-400 hover:text-rose-400 transition-all select-none flex items-center gap-1 whitespace-nowrap flex-shrink-0"><i class="fa-solid fa-scissors text-rose-400"></i> 소액 지분 틈새투자</button>
-                        
-                        <!-- 🎁 신규 확장된 8대 AI 테마 칩 -->
-                        <button onclick="selectTheme('gangnam_class')" id="btn-theme-gangnam" class="bg-white border border-slate-200 text-slate-600 px-2.5 py-0.5 rounded-full text-[10px] font-black hover:border-amber-500 hover:text-amber-500 transition-all select-none flex items-center gap-1 whitespace-nowrap flex-shrink-0"><i class="fa-solid fa-gem text-amber-500"></i> 강남 3구 클래스</button>
-                        <button onclick="selectTheme('super_failed')" id="btn-theme-superfailed" class="bg-white border border-slate-200 text-slate-600 px-2.5 py-0.5 rounded-full text-[10px] font-black hover:border-rose-600 hover:text-rose-600 transition-all select-none flex items-center gap-1 whitespace-nowrap flex-shrink-0"><i class="fa-solid fa-circle-down text-rose-600"></i> 3회 유찰 대폭락</button>
-                        <button onclick="selectTheme('first_bid')" id="btn-theme-firstbid" class="bg-white border border-slate-200 text-slate-600 px-2.5 py-0.5 rounded-full text-[10px] font-black hover:border-yellow-500 hover:text-yellow-500 transition-all select-none flex items-center gap-1 whitespace-nowrap flex-shrink-0"><i class="fa-solid fa-star text-yellow-500"></i> 따끈따끈 신건</button>
-                        <button onclick="selectTheme('seoul_apartment')" id="btn-theme-seoulapt" class="bg-white border border-slate-200 text-slate-600 px-2.5 py-0.5 rounded-full text-[10px] font-black hover:border-blue-600 hover:text-blue-600 transition-all select-none flex items-center gap-1 whitespace-nowrap flex-shrink-0"><i class="fa-solid fa-building-flag text-blue-600"></i> 서울 아파트 실거주</button>
-                        <button onclick="selectTheme('gyeonggi_residence')" id="btn-theme-gyeonggires" class="bg-white border border-slate-200 text-slate-600 px-2.5 py-0.5 rounded-full text-[10px] font-black hover:border-green-500 hover:text-green-500 transition-all select-none flex items-center gap-1 whitespace-nowrap flex-shrink-0"><i class="fa-solid fa-tree-city text-green-500"></i> 경기 실거주 타운</button>
-                        <button onclick="selectTheme('safe_apartment')" id="btn-theme-safeapt" class="bg-white border border-slate-200 text-slate-600 px-2.5 py-0.5 rounded-full text-[10px] font-black hover:border-emerald-500 hover:text-emerald-500 transition-all select-none flex items-center gap-1 whitespace-nowrap flex-shrink-0"><i class="fa-solid fa-shield-heart text-emerald-500"></i> 안심 아파트 A급</button>
-                        <button onclick="selectTheme('monthly_rent_target')" id="btn-theme-monthlyrent" class="bg-white border border-slate-200 text-slate-600 px-2.5 py-0.5 rounded-full text-[10px] font-black hover:border-violet-500 hover:text-violet-500 transition-all select-none flex items-center gap-1 whitespace-nowrap flex-shrink-0"><i class="fa-solid fa-hand-holding-dollar text-violet-500"></i> 1억 이하 월세 타깃</button>
-                        <button onclick="selectTheme('non_residential_etc')" id="btn-theme-nonres" class="bg-white border border-slate-200 text-slate-600 px-2.5 py-0.5 rounded-full text-[10px] font-black hover:border-slate-500 hover:text-slate-500 transition-all select-none flex items-center gap-1 whitespace-nowrap flex-shrink-0"><i class="fa-solid fa-box-open text-slate-500"></i> 비주거 알짜 소액</button>
-                    </div>
-                </div>
+                <!-- v1.2 테마 큐레이션 바 바인딩용 컨테이너 -->
+                <div id="v12-curation-container" class="px-3.5 pt-3 bg-slate-50"></div>
+
                 <!-- 정렬 및 리스트 필터 바 -->
                 <div class="px-3.5 py-1.5 bg-white border-b border-slate-200 flex flex-wrap justify-between items-center z-10 shadow-sm gap-2">
                     <div class="flex items-center gap-2 flex-wrap">
@@ -1127,19 +1094,33 @@
             </button>
         </div>
 
-        
+        <!-- 📢 상세페이지 상단 고정형 애드센스 광고판 -->
+        <div id="detail-top-ad-slot" class="w-full bg-slate-50 border-b border-slate-200 px-3.5 py-1.5 flex-shrink-0">
+            <div class="bg-white border border-slate-200 rounded-xl p-2 flex items-center justify-between shadow-sm relative overflow-hidden h-[54px] sm:h-[64px]">
+                <div class="space-y-0.5 z-10 max-w-[75%]">
+                    <div class="flex items-center gap-1.5">
+                        <span class="bg-slate-900 text-white text-[7.5px] font-black px-1.5 py-0.2 rounded uppercase">AD</span>
+                        <h4 id="detail-top-ad-title" class="text-[9.5px] sm:text-xs font-black text-slate-800 line-clamp-1">★ 프리미엄 경공매 투자 VIP 멤버십 모집</h4>
+                    </div>
+                    <p id="detail-top-ad-desc" class="text-[8.5px] sm:text-[9.5px] text-slate-400 font-bold line-clamp-1">오직 1%만을 위한 NPL 부실채권 및 지분 경매 핵심 노하우 단독 공개!</p>
+                </div>
+                <img id="detail-top-ad-image" src="./apartment_elegant_facade.png" alt="AD" class="absolute right-0 top-0 h-full w-[22%] object-cover object-center opacity-60 sm:opacity-80">
+            </div>
+        </div>
+
         <!-- 💎 상세 Drawer 4대 대분류 프리미엄 탭 메뉴 바 -->
         <div class="flex overflow-x-auto whitespace-nowrap bg-white p-2 gap-1.5 z-10 flex-shrink-0 custom-scrollbar border-b border-slate-200">
             <button id="detail-group-tab-1-btn" onclick="changeDetailGroupTab(1)" class="inline-block py-1.5 px-3.5 text-center text-[10.5px] sm:text-xs font-black rounded-xl border border-transparent transition-all select-none bg-royalBlue text-white shadow-sm">1. 종합 & 권리분석</button>
             <button id="detail-group-tab-2-btn" onclick="changeDetailGroupTab(2)" class="inline-block py-1.5 px-3.5 text-center text-[10.5px] sm:text-xs font-black rounded-xl border border-transparent transition-all select-none text-slate-500 hover:text-royalBlue hover:bg-slate-50 bg-slate-50/50">2. 입찰 & 금융분석</button>
             <button id="detail-group-tab-3-btn" onclick="changeDetailGroupTab(3)" class="inline-block py-1.5 px-3.5 text-center text-[10.5px] sm:text-xs font-black rounded-xl border border-transparent transition-all select-none text-slate-500 hover:text-royalBlue hover:bg-slate-50 bg-slate-50/50">3. 입지 & 시세분석</button>
         </div>
-        <div id="detail-group-panel-1" class="flex-1 overflow-y-auto p-4 sm:p-5 space-y-4 sm:space-y-5 custom-scrollbar bg-slate-50/50">
+        <div id="detail-group-panel-1" class="flex-1 overflow-y-auto p-3 sm:p-3.5 space-y-3 sm:space-y-3.5 custom-scrollbar bg-slate-50/50">
             <div id="group-content-1" class="space-y-4 sm:space-y-5 w-full">
                 <!-- 1. 대표 이미지와 부동산 기본 명세 반응형 분기 레이아웃 -->
-                <div id="detail-panel-summary" class="grid grid-cols-1 xl:grid-cols-2 gap-4 sm:gap-5 items-start">
+                <!-- 1. 대표 이미지와 부동산 기본 명세 반응형 분기 레이아웃 (단일 카드로 통합하여 불필요한 공백 제거) -->
+                <div id="detail-panel-summary" class="bg-white border border-slate-200 rounded-2xl p-3 sm:p-3.5 shadow-sm w-full space-y-3">
                     <!-- 대표 이미지 영역 (부동산: 3대 포털 로드뷰 연동 / 비부동산: 자산 대표 실사진) -->
-                    <div id="detail-roadview-card" class="bg-white border border-slate-200 rounded-2xl p-4 shadow-sm w-full">
+                    <div id="detail-roadview-card" class="w-full">
                         <h4 id="detail-roadview-title" class="text-xs sm:text-sm font-black text-slate-800 flex items-center gap-1.5 mb-2.5">
                             <i class="fa-solid fa-image text-royalBlue"></i> 🏢 부동산 대표 전경
                         </h4>
@@ -1159,68 +1140,71 @@
                             </a>
                         </div>
                         <!-- 비부동산용 실사진 컨테이너 -->
-                        <div id="detail-roadview-image-container" class="w-full h-[220px] rounded-xl overflow-hidden border border-slate-200 bg-slate-100 relative hidden">
+                        <div id="detail-roadview-image-container" class="w-full h-[220px] rounded-xl overflow-hidden border border-slate-200 bg-slate-100 relative hidden mt-2">
                             <!-- JS에서 이미지 동적 주입 -->
                         </div>
                     </div>
 
+                    <!-- 구분선 -->
+                    <hr class="border-slate-100 my-2">
+
                     <!-- 부동산 기본 명세 보드 -->
-                    <div id="detail-spec-container" class="bg-white border border-slate-200 rounded-2xl p-4 space-y-2 shadow-sm w-full">
+                    <div id="detail-spec-container" class="space-y-3 w-full">
                         <h4 id="detail-spec-title" class="text-xs sm:text-sm font-black text-slate-800 flex items-center gap-1.5">
                             <i class="fa-solid fa-file-invoice text-royalBlue"></i> 📋 부동산 표시 및 기본 명세
                         </h4>
                         <div class="space-y-2.5 text-[11px] sm:text-xs font-bold text-slate-700">
                             <div class="bg-slate-50 border border-slate-100 p-2.5 rounded-xl flex justify-between items-center">
-                                <span class="text-slate-450 text-[10px] sm:text-xs font-bold">소재지 주소</span>
+                                <span class="text-slate-400 text-[10px] sm:text-xs font-bold">소재지 주소</span>
                                 <span id="detail-doc-address" class="font-extrabold text-slate-800 select-all text-right max-w-[70%] truncate"></span>
                             </div>
                             <div id="detail-spec-grid" class="grid grid-cols-2 gap-2 text-[11px] sm:text-xs text-slate-750">
                                 <div class="bg-slate-50 border border-slate-100 p-2 rounded-xl flex justify-between items-center">
-                                    <span class="text-slate-450 font-semibold text-[10px] sm:text-xs">부동산 용도</span>
+                                    <span class="text-slate-400 font-semibold text-[10px] sm:text-xs">부동산 용도</span>
                                     <span id="detail-spec-ptype" class="font-extrabold text-slate-800"></span>
                                 </div>
                                 <div class="bg-slate-50 border border-slate-100 p-2 rounded-xl flex justify-between items-center">
-                                    <span class="text-slate-450 font-semibold text-[10px] sm:text-xs">진행 회차</span>
+                                    <span class="text-slate-400 font-semibold text-[10px] sm:text-xs">진행 회차</span>
                                     <span id="detail-spec-round" class="font-extrabold text-slate-800"></span>
                                 </div>
                                 <div class="bg-slate-50 border border-slate-100 p-2 rounded-xl flex justify-between items-center">
-                                    <span class="text-slate-450 font-semibold text-[10px] sm:text-xs">소유자</span>
+                                    <span class="text-slate-400 font-semibold text-[10px] sm:text-xs">소유자</span>
                                     <span id="detail-owner" class="font-extrabold text-slate-800"></span>
                                 </div>
                                 <div class="bg-slate-50 border border-slate-100 p-2 rounded-xl flex justify-between items-center">
-                                    <span class="text-slate-450 font-semibold text-[10px] sm:text-xs">채무자</span>
+                                    <span class="text-slate-400 font-semibold text-[10px] sm:text-xs">채무자</span>
                                     <span id="detail-debtor" class="font-extrabold text-slate-800"></span>
                                 </div>
                                 <div class="bg-slate-50 border border-slate-100 p-2 rounded-xl flex justify-between items-center">
-                                    <span class="text-slate-450 font-semibold text-[10px] sm:text-xs">전용 면적</span>
+                                    <span class="text-slate-400 font-semibold text-[10px] sm:text-xs">전용 면적</span>
                                     <span id="detail-spec-exclusive-py" class="font-extrabold text-slate-800 font-mono"></span>
                                 </div>
                                 <div class="bg-slate-50 border border-slate-100 p-2 rounded-xl flex justify-between items-center">
-                                    <span class="text-slate-455 font-semibold text-[10px] sm:text-xs">공급 면적</span>
+                                    <span class="text-slate-500 font-semibold text-[10px] sm:text-xs">공급 면적</span>
                                     <span id="detail-spec-supply-py" class="font-extrabold text-slate-800 font-mono"></span>
                                 </div>
                                 <div class="bg-slate-50 border border-slate-100 p-2 rounded-xl flex justify-between items-center">
-                                    <span class="text-slate-450 font-semibold text-[10px] sm:text-xs">토지 대지권</span>
+                                    <span class="text-slate-400 font-semibold text-[10px] sm:text-xs">토지 대지권</span>
                                     <span id="detail-spec-land-py" class="font-extrabold text-slate-800 font-mono"></span>
                                 </div>
                                 <div class="bg-slate-50 border border-slate-100 p-2 rounded-xl flex justify-between items-center">
-                                    <span class="text-slate-450 font-semibold text-[10px] sm:text-xs">건물 전용</span>
+                                    <span class="text-slate-400 font-semibold text-[10px] sm:text-xs">건물 전용</span>
                                     <span id="detail-spec-building-py" class="font-extrabold text-slate-800 font-mono"></span>
                                 </div>
                                 <div class="bg-slate-50 border border-slate-100 p-2 rounded-xl flex justify-between items-center">
-                                    <span class="text-slate-450 font-semibold text-[10px] sm:text-xs">감정평가액</span>
+                                    <span class="text-slate-400 font-semibold text-[10px] sm:text-xs">감정평가액</span>
                                     <span id="detail-spec-appraisal" class="font-extrabold text-slate-800 font-outfit"></span>
                                 </div>
                                 <div class="bg-slate-50 border border-slate-100 p-2 rounded-xl flex justify-between items-center">
-                                    <span class="text-slate-450 font-semibold text-[10px] sm:text-xs">최저입찰액</span>
+                                    <span class="text-slate-400 font-semibold text-[10px] sm:text-xs">최저입찰액</span>
                                     <span id="detail-spec-minimum" class="font-extrabold text-rose-600 font-outfit"></span>
                                 </div>
                                 <div class="bg-slate-50 border border-slate-100 p-2 rounded-xl flex justify-between items-center col-span-2">
-                                    <span class="text-slate-455 font-semibold text-[10px] sm:text-xs">물건 구조/재질</span>
+                                    <span class="text-slate-500 font-semibold text-[10px] sm:text-xs">물건 구조/재질</span>
                                     <span id="detail-spec-structure" class="font-extrabold text-slate-800 text-right"></span>
                                 </div>
                                 <div class="bg-slate-50 border border-slate-100 p-2 rounded-xl flex justify-between items-center col-span-2">
-                                    <span class="text-slate-455 font-semibold text-[10px] sm:text-xs">입찰일/마감 여부</span>
+                                    <span class="text-slate-500 font-semibold text-[10px] sm:text-xs">입찰일/마감 여부</span>
                                     <span id="detail-spec-date" class="font-extrabold text-slate-800"></span>
                                 </div>
                             </div>
@@ -1231,16 +1215,16 @@
                                 </h5>
                                 <div class="grid grid-cols-2 gap-2 text-[10px] sm:text-xs">
                                     <div class="bg-white border border-slate-100 p-2 rounded-lg flex justify-between items-center">
-                                        <span class="text-slate-450 font-bold">건물 층수</span>
+                                        <span class="text-slate-400 font-bold">건물 층수</span>
                                         <span id="detail-villa-total-floors" class="font-extrabold text-slate-800"></span>
                                     </div>
                                     <div class="bg-white border border-slate-100 p-2 rounded-lg flex justify-between items-center">
-                                        <span class="text-slate-450 font-bold">전체 면적 합계</span>
+                                        <span class="text-slate-400 font-bold">전체 면적 합계</span>
                                         <span id="detail-villa-total-area" class="font-extrabold text-slate-800"></span>
                                     </div>
                                 </div>
                                 <div class="bg-white border border-slate-100 p-2 rounded-lg space-y-1">
-                                    <span class="text-slate-450 font-bold text-[10px] sm:text-[11px] block mb-1.5">층별 면적 명세</span>
+                                    <span class="text-slate-400 font-bold text-[10px] sm:text-[11px] block mb-1.5">층별 면적 명세</span>
                                     <div id="detail-villa-floor-list" class="grid grid-cols-2 gap-1 text-[10px] sm:text-[11px] text-slate-700 font-mono">
                                         <!-- 층별 명세가 동적으로 주입됨 -->
                                     </div>
@@ -1254,8 +1238,8 @@
                     </div>
                 </div>
 
-                <!-- 2. 단지 정보와 평면도/도면 발급 반응형 분기 레이아웃 -->
-                <div class="grid grid-cols-1 xl:grid-cols-2 gap-4 sm:gap-5 items-start">
+                <!-- 2. 단지 정보와 평면도/도면 발급 반응형 분기 레이아웃 (세로 1열 플로우 배치로 공백 제거) -->
+                <div class="space-y-4 sm:space-y-5 w-full">
                     <!-- 단지 기본 정보 및 시설 명세 -->
                     <div id="detail-panel-complex" class="bg-white border border-slate-200 rounded-2xl p-4 shadow-sm space-y-3 w-full">
                         <h4 class="text-xs sm:text-sm font-black text-slate-800 flex items-center gap-1.5 pb-2 border-b border-slate-100">
@@ -1316,112 +1300,126 @@
                     </div>
                 </div>
 
-                <!-- 3. 경매 기일 이력과 외부 정보 연동/유사 매물 반응형 분기 레이아웃 -->
-                <div class="grid grid-cols-1 xl:grid-cols-2 gap-4 sm:gap-5 items-start">
-                    <!-- 경매 진행 기일 이력 -->
-                    <div class="bg-white border border-slate-200 rounded-2xl p-4 space-y-2 shadow-sm w-full">
-                        <h4 class="text-xs sm:text-sm font-black text-slate-800 flex items-center gap-1.5 mb-2.5">
-                            <i class="fa-solid fa-calendar-days text-royalBlue"></i> 📅 경매 진행 기일 이력
-                        </h4>
-                        <div class="overflow-x-auto border border-slate-200 rounded-xl overflow-hidden shadow-sm bg-white">
-                            <table class="w-full text-left border-collapse text-[13px] document-view">
-                                <thead>
-                                    <tr class="bg-slate-50 border-b border-slate-200 text-slate-800 font-extrabold text-[12px]">
-                                        <th class="p-3 pl-4 w-1/4">회차</th>
-                                        <th class="p-3 w-1/3">입찰 기일</th>
-                                        <th class="p-3 text-right text-slate-800">최저 매각 가격</th>
-                                        <th class="p-3 pr-4 text-center">결과</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="detail-giiil-tbody" class="text-slate-700 font-medium">
-                                    <!-- 동적 주입 -->
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-
-                    <!-- 우측 묶음: 외부 연동 허브 및 추천 매물 -->
+                <!-- 3. 대화면 xl 해상도 대응 2열 반응형 그리드 레이아웃 (빈 공간 소거 및 테이블 가로 늘어짐 방지) -->
+                <div class="grid grid-cols-1 xl:grid-cols-2 gap-4 sm:gap-5 w-full items-start">
+                    <!-- 왼쪽 열: 기일 이력 및 외부 연동 허브와 유사 추천 매물 -->
                     <div class="space-y-4 sm:space-y-5 w-full">
+                        <!-- 경매 진행 기일 이력 -->
+                        <div class="bg-white border border-slate-200 rounded-2xl shadow-sm w-full overflow-hidden">
+                            <div class="bg-slate-50 px-4 py-2.5 border-b border-slate-200">
+                                <h4 class="text-xs sm:text-sm font-black text-slate-800 flex items-center gap-1.5">
+                                    <i class="fa-solid fa-calendar-days text-royalBlue"></i> 📅 경매 진행 기일 이력
+                                </h4>
+                            </div>
+                            <div class="p-3.5 space-y-3">
+                                <div class="overflow-x-auto border border-slate-200 rounded-xl overflow-hidden shadow-sm bg-white">
+                                    <table class="w-full text-left border-collapse text-[13px] document-view">
+                                        <thead>
+                                            <tr class="bg-slate-50 border-b border-slate-200 text-slate-800 font-extrabold text-[12px]">
+                                                <th class="p-3 pl-4 w-1/4">회차</th>
+                                                <th class="p-3 w-1/3">입찰 기일</th>
+                                                <th class="p-3 text-right text-slate-800">최저 매각 가격</th>
+                                                <th class="p-3 pr-4 text-center">결과</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="detail-giiil-tbody" class="text-slate-700 font-medium">
+                                            <!-- 동적 주입 -->
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+
                         <!-- 원스톱 외부 공식 정보망 연동 -->
-                        <div class="bg-white border border-slate-200 rounded-2xl p-4 space-y-2.5 shadow-sm">
-                            <h4 class="text-xs sm:text-sm font-black text-slate-800 flex items-center gap-1.5">
-                                <i class="fa-solid fa-globe text-royalBlue"></i> 🌐 원스톱 외부 공식 정보망 연동
-                            </h4>
-                            <p class="text-[9.5px] text-slate-500 leading-relaxed font-semibold">주요 외부 공식 포털 및 지도로 바로 이동합니다.</p>
-                            <div class="grid grid-cols-2 gap-2 text-xs">
-                                <a id="btn-official-site" href="https://www.courtauction.go.kr" target="_blank" class="bg-slate-50 border border-slate-200 hover:border-royalBlue hover:shadow-md rounded-xl p-2.5 flex items-center gap-2.5 transition-all group">
-                                    <div class="bg-blue-50 text-royalBlue group-hover:bg-royalBlue group-hover:text-white w-7 h-7 rounded-lg flex items-center justify-center flex-shrink-0 transition-colors">
-                                        <i class="fa-solid fa-arrow-up-right-from-square text-[10px]"></i>
-                                    </div>
-                                    <div class="truncate">
-                                        <strong class="block text-[10.5px] sm:text-xs font-black text-slate-800 group-hover:text-royalBlue transition-colors truncate">공식 매물상세</strong>
-                                        <span class="text-[9px] text-slate-400 font-bold block mt-0.5 truncate">법원/온비드 원본 정보</span>
-                                    </div>
-                                </a>
-                                <a id="btn-naver-map" href="https://map.naver.com" target="_blank" class="bg-slate-50 border border-slate-200 hover:border-emeraldSuccess hover:shadow-md rounded-xl p-2.5 flex items-center gap-2.5 transition-all group">
-                                    <div class="bg-emerald-50 text-emeraldSuccess group-hover:bg-emeraldSuccess group-hover:text-white w-7 h-7 rounded-lg flex items-center justify-center flex-shrink-0 transition-colors">
-                                        <i class="fa-solid fa-map-location-dot text-[10px]"></i>
-                                    </div>
-                                    <div class="truncate">
-                                        <strong class="block text-[10.5px] sm:text-xs font-black text-slate-800 group-hover:text-emeraldSuccess transition-colors truncate">네이버지도 보기</strong>
-                                        <span class="text-[9px] text-slate-400 font-bold block mt-0.5 truncate">위성뷰 지번 확인</span>
-                                    </div>
-                                </a>
-                                <a id="btn-naver-land-price" href="https://land.naver.com" target="_blank" class="bg-slate-50 border border-slate-200 hover:border-royalBlue hover:shadow-md rounded-xl p-2.5 flex items-center gap-2.5 transition-all group">
-                                    <div class="bg-blue-50 text-royalBlue group-hover:bg-royalBlue group-hover:text-white w-7 h-7 rounded-lg flex items-center justify-center flex-shrink-0 transition-colors">
-                                        <i class="fa-solid fa-house-chimney text-[10px]"></i>
-                                    </div>
-                                    <div class="truncate">
-                                        <strong class="block text-[10.5px] sm:text-xs font-black text-slate-800 group-hover:text-royalBlue transition-colors truncate">네이버부동산 시세</strong>
-                                        <span class="text-[9px] text-slate-400 font-bold block mt-0.5 truncate">주변 단지 거래 동향</span>
-                                    </div>
-                                </a>
-                                <a href="https://www.iros.go.kr" target="_blank" class="bg-slate-50 border border-slate-200 hover:border-royalBlue hover:shadow-md rounded-xl p-2.5 flex items-center gap-2.5 transition-all group">
-                                    <div class="bg-blue-50 text-royalBlue group-hover:bg-royalBlue group-hover:text-white w-7 h-7 rounded-lg flex items-center justify-center flex-shrink-0 transition-colors">
-                                        <i class="fa-solid fa-file-signature text-[10px]"></i>
-                                    </div>
-                                    <div class="truncate">
-                                        <strong class="block text-[10.5px] sm:text-xs font-black text-slate-800 group-hover:text-royalBlue transition-colors truncate">인터넷등기소</strong>
-                                        <span class="text-[9px] text-slate-400 font-bold block mt-0.5 truncate">등기부등본 열람</span>
-                                    </div>
-                                </a>
+                        <div class="bg-white border border-slate-200 rounded-2xl shadow-sm w-full overflow-hidden">
+                            <div class="bg-slate-50 px-4 py-2.5 border-b border-slate-200">
+                                <h4 class="text-xs sm:text-sm font-black text-slate-800 flex items-center gap-1.5">
+                                    <i class="fa-solid fa-globe text-royalBlue"></i> 🌐 원스톱 외부 공식 정보망 연동
+                                </h4>
+                            </div>
+                            <div class="p-3.5 space-y-2">
+                                <p class="text-[9.5px] text-slate-500 leading-relaxed font-semibold">주요 외부 공식 포털 및 지도로 바로 이동합니다.</p>
+                                <div class="grid grid-cols-2 gap-2 text-xs">
+                                    <a id="btn-official-site" href="https://www.courtauction.go.kr" target="_blank" class="bg-slate-50 border border-slate-200 hover:border-royalBlue hover:shadow-md rounded-xl p-2.5 flex items-center gap-2.5 transition-all group">
+                                        <div class="bg-blue-50 text-royalBlue group-hover:bg-royalBlue group-hover:text-white w-7 h-7 rounded-lg flex items-center justify-center flex-shrink-0 transition-colors">
+                                            <i class="fa-solid fa-arrow-up-right-from-square text-[10px]"></i>
+                                        </div>
+                                        <div class="truncate">
+                                            <strong class="block text-[10.5px] sm:text-xs font-black text-slate-800 group-hover:text-royalBlue transition-colors truncate">공식 매물상세</strong>
+                                            <span class="text-[9px] text-slate-400 font-bold block mt-0.5 truncate">법원/온비드 원본 정보</span>
+                                        </div>
+                                    </a>
+                                    <a id="btn-naver-map" href="https://map.naver.com" target="_blank" class="bg-slate-50 border border-slate-200 hover:border-emeraldSuccess hover:shadow-md rounded-xl p-2.5 flex items-center gap-2.5 transition-all group">
+                                        <div class="bg-emerald-50 text-emeraldSuccess group-hover:bg-emeraldSuccess group-hover:text-white w-7 h-7 rounded-lg flex items-center justify-center flex-shrink-0 transition-colors">
+                                            <i class="fa-solid fa-map-location-dot text-[10px]"></i>
+                                        </div>
+                                        <div class="truncate">
+                                            <strong class="block text-[10.5px] sm:text-xs font-black text-slate-800 group-hover:text-emeraldSuccess transition-colors truncate">네이버지도 보기</strong>
+                                            <span class="text-[9px] text-slate-400 font-bold block mt-0.5 truncate">위성뷰 지번 확인</span>
+                                        </div>
+                                    </a>
+                                    <a id="btn-naver-land-price" href="https://land.naver.com" target="_blank" class="bg-slate-50 border border-slate-200 hover:border-royalBlue hover:shadow-md rounded-xl p-2.5 flex items-center gap-2.5 transition-all group">
+                                        <div class="bg-blue-50 text-royalBlue group-hover:bg-royalBlue group-hover:text-white w-7 h-7 rounded-lg flex items-center justify-center flex-shrink-0 transition-colors">
+                                            <i class="fa-solid fa-house-chimney text-[10px]"></i>
+                                        </div>
+                                        <div class="truncate">
+                                            <strong class="block text-[10.5px] sm:text-xs font-black text-slate-800 group-hover:text-royalBlue transition-colors truncate">네이버부동산 시세</strong>
+                                            <span class="text-[9px] text-slate-400 font-bold block mt-0.5 truncate">주변 단지 거래 동향</span>
+                                        </div>
+                                    </a>
+                                    <a href="https://www.iros.go.kr" target="_blank" class="bg-slate-50 border border-slate-200 hover:border-royalBlue hover:shadow-md rounded-xl p-2.5 flex items-center gap-2.5 transition-all group">
+                                        <div class="bg-blue-50 text-royalBlue group-hover:bg-royalBlue group-hover:text-white w-7 h-7 rounded-lg flex items-center justify-center flex-shrink-0 transition-colors">
+                                            <i class="fa-solid fa-file-signature text-[10px]"></i>
+                                        </div>
+                                        <div class="truncate">
+                                            <strong class="block text-[10.5px] sm:text-xs font-black text-slate-800 group-hover:text-royalBlue transition-colors truncate">인터넷등기소</strong>
+                                            <span class="text-[9px] text-slate-400 font-bold block mt-0.5 truncate">등기부등본 열람</span>
+                                        </div>
+                                    </a>
+                                </div>
                             </div>
                         </div>
 
                         <!-- 동일 용도/지역 기반 유사 추천 매물 -->
-                        <div class="bg-white border border-slate-200 rounded-2xl p-4 space-y-3 shadow-sm">
-                            <h4 class="text-xs sm:text-sm font-black text-slate-800 flex items-center gap-1.5 pb-2 border-b border-slate-100">
-                                <i class="fa-solid fa-handshake text-royalBlue"></i> 🤝 동일 용도/지역 기반 유사 추천 매물
-                            </h4>
-                            <div id="detail-similar-container" class="grid grid-cols-3 gap-2">
-                                <!-- 동적 렌더링 카드 3개 -->
+                        <div class="bg-white border border-slate-200 rounded-2xl shadow-sm w-full overflow-hidden">
+                            <div class="bg-slate-50 px-4 py-2.5 border-b border-slate-200">
+                                <h4 class="text-xs sm:text-sm font-black text-slate-800 flex items-center gap-1.5">
+                                    <i class="fa-solid fa-handshake text-royalBlue"></i> 🤝 동일 용도/지역 기반 유사 추천 매물
+                                </h4>
+                            </div>
+                            <div class="p-3.5 space-y-3">
+                                <div id="detail-similar-container" class="grid grid-cols-3 gap-2">
+                                    <!-- 동적 렌더링 카드 3개 -->
+                                </div>
                             </div>
                         </div>
                     </div>
-                </div>
 
-                <!-- 4. 가로가 긴 법정 주요 서류 테이블 (단독 1열 배치) -->
-                <div class="bg-white border border-slate-200 rounded-2xl p-4 space-y-2.5 shadow-sm w-full">
-                    <h4 class="text-xs sm:text-sm font-black text-slate-800 flex items-center gap-1.5">
-                        <i class="fa-solid fa-scale-balanced text-royalBlue"></i> ⚖️ 법정 주요 서류 및 사건 기록
-                    </h4>
-                    <p class="text-[9.5px] text-slate-500 leading-relaxed font-semibold">대법원 경매 및 감정 법원에서 공식 발행된 법정 주요 서류의 정밀 분석 명세 테이블입니다.</p>
-                    <div class="overflow-x-auto border border-slate-200 rounded-xl overflow-hidden shadow-sm bg-white">
-                        <table class="w-full text-left border-collapse text-[13px] document-view">
-                            <thead>
-                                <tr class="bg-slate-50 border-b border-slate-200 text-slate-800 font-extrabold text-[12px]">
-                                    <th class="p-3 pl-4 w-[20%] text-slate-900">서류 구분</th>
-                                    <th class="p-3 w-[35%] text-slate-900">세부 항목 분석 명세</th>
-                                    <th class="p-3 w-[35%] text-slate-900">집행법원 / 의견 및 권리 진단</th>
-                                    <th class="p-3 pr-4 text-right w-[10%] text-slate-900">바로가기</th>
-                                </tr>
-                            </thead>
-                            <tbody class="text-slate-700 font-medium">
+                    <!-- 오른쪽 열: 법정 주요 서류 및 사건 기록 (대화면에서 가로폭이 늘어나는 문제 해결) -->
+                    <div class="bg-white border border-slate-200 rounded-2xl shadow-sm w-full overflow-hidden">
+                        <div class="bg-slate-50 px-4 py-2.5 border-b border-slate-200">
+                            <h4 class="text-xs sm:text-sm font-black text-slate-800 flex items-center gap-1.5">
+                                <i class="fa-solid fa-scale-balanced text-royalBlue"></i> ⚖️ 법정 주요 서류 및 사건 기록
+                            </h4>
+                        </div>
+                        <div class="p-3.5 space-y-2.5">
+                            <p class="text-[9.5px] text-slate-500 leading-relaxed font-semibold">대법원 경매 및 감정 법원에서 공식 발행된 법정 주요 서류의 정밀 분석 명세 테이블입니다.</p>
+                            <div class="overflow-x-auto border border-slate-200 rounded-xl overflow-hidden shadow-sm bg-white">
+                                <table class="w-full text-left border-collapse text-[13px] document-view">
+                                    <thead>
+                                        <tr class="bg-slate-50 border-b border-slate-200 text-slate-800 font-extrabold text-[12px]">
+                                            <th class="p-3 pl-4 w-[20%] text-slate-900">서류 구분</th>
+                                            <th class="p-3 w-[35%] text-slate-900">세부 항목 분석 명세</th>
+                                            <th class="p-3 w-[35%] text-slate-900">의견 및 권리 진단</th>
+                                            <th class="p-3 pr-4 text-right w-[10%] text-slate-900">바로가기</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="text-slate-700 font-medium">
                                 <tr class="border-b border-slate-100 hover:bg-slate-50/40 transition-colors">
                                     <td class="p-3 pl-4 font-extrabold text-slate-850">
                                         <div class="flex flex-col space-y-0.5">
                                             <span class="text-slate-900 text-[12.5px]">📋 감정평가서</span>
-                                            <span id="table-doc-appraisal-summary" class="text-[10.5px] text-slate-450 font-bold">공식 자산 감정 보고서</span>
+                                            <span id="table-doc-appraisal-summary" class="text-[10.5px] text-slate-400 font-bold">공식 자산 감정 보고서</span>
                                         </div>
                                     </td>
                                     <td class="p-3">
@@ -1443,7 +1441,7 @@
                                     <td class="p-3 pl-4 font-extrabold text-slate-850">
                                         <div class="flex flex-col space-y-0.5">
                                             <span class="text-slate-900 text-[12.5px]">🔍 현황조사서</span>
-                                            <span id="table-doc-survey-summary" class="text-[10.5px] text-slate-450 font-bold">부동산 점유 실태 기록</span>
+                                            <span id="table-doc-survey-summary" class="text-[10.5px] text-slate-400 font-bold">부동산 점유 실태 기록</span>
                                         </div>
                                     </td>
                                     <td class="p-3">
@@ -1465,7 +1463,7 @@
                                     <td class="p-3 pl-4 font-extrabold text-slate-850">
                                         <div class="flex flex-col space-y-0.5">
                                             <span class="text-slate-900 text-[12.5px]">📝 물건명세서</span>
-                                            <span id="table-doc-spec-summary" class="text-[10.5px] text-slate-450 font-bold">법원 공인 권리 분석서</span>
+                                            <span id="table-doc-spec-summary" class="text-[10.5px] text-slate-400 font-bold">법원 공인 권리 분석서</span>
                                         </div>
                                     </td>
                                     <td class="p-3">
@@ -1487,7 +1485,7 @@
                                     <td class="p-3 pl-4 font-extrabold text-slate-850">
                                         <div class="flex flex-col space-y-0.5">
                                             <span class="text-slate-900 text-[12.5px]">⚖️ 사건내역</span>
-                                            <span id="table-doc-history-summary" class="text-[10.5px] text-slate-450 font-bold">전체 경매 진행 사건 정보</span>
+                                            <span id="table-doc-history-summary" class="text-[10.5px] text-slate-400 font-bold">전체 경매 진행 사건 정보</span>
                                         </div>
                                     </td>
                                     <td class="p-3">
@@ -1509,10 +1507,7 @@
                         </table>
                     </div>
                 </div>
-            </div>
-        </div>
-        <div id="detail-group-panel-2" class="flex-1 overflow-y-auto p-4 sm:p-5 space-y-4 sm:space-y-5 custom-scrollbar bg-slate-50/50 hidden relative">
-            <div id="group-content-2" class="space-y-4 sm:space-y-5 w-full">
+                </div> <!-- 👈 2열 그리드 전체 닫기 -->
                 <!-- AI 7대 권리 리스크 및 공고문 반응형 분기 레이아웃 -->
                 <div id="detail-panel-analysis" class="grid grid-cols-1 xl:grid-cols-2 gap-4 sm:gap-5 items-start">
                     <!-- AI 7대 권리 리스크 정밀 하이브리드 리포트 -->
@@ -1606,7 +1601,7 @@
                 </div>
                 <!-- 📊 예상배당표 탭 패널 (권리 & 안전 분석 탭으로 이동 배치) -->
                 <div id="detail-panel-dividend" class="space-y-4 sm:space-y-5">
-                    <div class="bg-white border border-slate-200 rounded-2xl p-3.5 sm:p-4 shadow-sm space-y-3">
+                    <div class="bg-white border border-slate-200 rounded-2xl p-3 sm:p-3.5 space-y-2 shadow-sm">
                         <h4 class="text-xs sm:text-sm font-black text-slate-800 flex items-center gap-1.5 pb-2 border-b border-slate-100">
                             <i class="fa-solid fa-table-list text-royalBlue"></i> 예상 배당액 시뮬레이션 표
                         </h4>
@@ -1634,35 +1629,31 @@
             </div>
             <!-- 📈 [8] 매각통계 탭 패널 (기본 숨김) -->
             </div>
-            <div id="group-mask-2" class="absolute inset-0 bg-slate-900/60 backdrop-blur-sm z-30 flex flex-col items-center justify-center text-center p-6 hidden">
-                <div class="bg-white border border-slate-200 rounded-2xl p-6 max-w-sm shadow-2xl space-y-3">
-                    <i class="fa-solid fa-lock text-rose-500 text-3xl"></i>
-                    <h4 class="text-slate-800 text-sm font-black">🔒 권리 & 등기 분석 열람 제한</h4>
-                    <p class="text-slate-500 text-[10.5px] leading-relaxed font-semibold">본 매물의 권리 & 등기 정보는 우수 회원 등급 전용 콘텐츠입니다. 등급을 상향하여 심층 AI 권리진단을 확인해 보세요.</p>
-                    <button onclick="alert('등급 상향은 관리자 권한으로 즉시 조정 가능합니다.')" class="w-full bg-royalBlue text-white font-extrabold text-xs py-2 rounded-xl shadow-md hover:bg-royalHover transition-all">등급 상향 신청하기</button>
-                </div>
-            </div>
         </div>
-        <div id="detail-group-panel-3" class="flex-1 overflow-y-auto p-4 sm:p-5 space-y-4 sm:space-y-5 custom-scrollbar bg-slate-50/50 hidden relative">
-            <div id="group-content-3" class="space-y-4 sm:space-y-5 w-full">
+        <div id="detail-group-panel-3" class="flex-1 overflow-y-auto p-3 sm:p-3.5 space-y-3 sm:space-y-3.5 custom-scrollbar bg-slate-50/50 hidden relative">
+            <div id="group-content-3" class="space-y-3 sm:space-y-3.5 w-full">
                 <!-- 위치 & 시세 분석 1열 스택 레이아웃 -->
                 <div class="space-y-4 sm:space-y-5">
-                    <div id="detail-panel-map" class="space-y-4 sm:space-y-5">
+                    <div id="detail-panel-map" class="space-y-3 sm:space-y-3.5">
             <!-- 📍 물건지 실시간 위치 지도 -->
-            <div class="bg-white border border-slate-200 rounded-2xl p-3.5 sm:p-4 space-y-2.5 shadow-sm">
+            <div class="bg-white border border-slate-200 rounded-2xl p-3 sm:p-3.5 space-y-2 shadow-sm">
                 <h4 class="text-xs sm:text-sm font-black text-slate-800 flex items-center gap-1.5">
                     <i class="fa-solid fa-map-location-dot text-royalBlue"></i> 📍 물건지 실시간 위치 지도
                 </h4>
                 <div id="detail-map-container" class="w-full h-[220px] rounded-xl overflow-hidden border border-slate-200/60 bg-slate-50 relative group">
                     <!-- Javascript에서 iframe 동적 주입 -->
-                </div>
-            </div>
+                                </div>
+                            </div>
+                        </div> <!-- 👈 지도 카드 닫기 -->
 
-            <!-- 🗺️ 네이버 전문 지도 및 정보망 연동 허브 -->
-            <div class="bg-white border border-slate-200 rounded-2xl p-3.5 sm:p-4 space-y-3 shadow-sm">
-                <h4 class="text-xs sm:text-sm font-black text-slate-800 flex items-center gap-1.5">
-                    <i class="fa-solid fa-map text-royalBlue"></i> 🗺️ 네이버 전문 지도 및 정보망 연동
-                </h4>
+                        <!-- 🗺️ 네이버 전문 지도 및 정보망 연동 허브 -->
+                        <div class="bg-white border border-slate-200 rounded-2xl shadow-sm w-full overflow-hidden">
+                            <div class="bg-slate-50 px-4 py-2.5 border-b border-slate-200">
+                                <h4 class="text-xs sm:text-sm font-black text-slate-800 flex items-center gap-1.5">
+                                    <i class="fa-solid fa-map text-royalBlue"></i> 🗺️ 네이버 전문 지도 및 정보망 연동
+                                </h4>
+                            </div>
+                            <div class="p-3.5 space-y-2">
                 <p class="text-[9.5px] text-slate-500 leading-relaxed font-medium">다양한 지도 레이어를 네이버 지도로 열어 실경계를 분석하고 현장을 파악해 보십시오.</p>
                 <div class="grid grid-cols-2 gap-2 text-[11px] font-bold text-slate-700">
                     <!-- 지번도 (지적편집도) -->
@@ -1708,20 +1699,26 @@
                 </div>
             </div>
 
+            </div> <!-- 👈 연동 허브 p-3.5 및 카드 닫기 -->
+            </div> <!-- 👈 연동 허브 카드 닫기 보정 -->
+
             <!-- 🟢 토지이용계획 및 규제 진단 카드 -->
-            <div class="bg-white border border-slate-200 rounded-2xl p-3.5 sm:p-4 space-y-3 shadow-sm">
-                <h4 class="text-xs sm:text-sm font-black text-slate-800 flex items-center gap-1.5">
-                    <i class="fa-solid fa-leaf text-royalBlue"></i> 🌱 토지이용계획 및 규제 진단
-                </h4>
+            <div class="bg-white border border-slate-200 rounded-2xl shadow-sm w-full overflow-hidden">
+                <div class="bg-slate-50 px-4 py-2.5 border-b border-slate-200">
+                    <h4 class="text-xs sm:text-sm font-black text-slate-800 flex items-center gap-1.5">
+                        <i class="fa-solid fa-leaf text-royalBlue"></i> 🌱 토지이용계획 및 규제 진단
+                    </h4>
+                </div>
+                <div class="p-3.5 space-y-2.5">
                 <div class="bg-slate-50 border border-slate-200 rounded-xl p-3.5 space-y-2">
                     <div class="flex justify-between items-center text-xs">
-                        <span class="text-slate-455 font-bold">용도지역 구분</span>
+                        <span class="text-slate-500 font-bold">용도지역 구분</span>
                         <span id="detail-land-use-plan" class="font-extrabold text-royalBlue text-sm"></span>
                     </div>
                     <p id="detail-land-use-plan-desc" class="text-[10px] text-slate-500 leading-relaxed font-bold border-t border-slate-200/60 pt-2 mt-2"></p>
 
                     <div class="flex justify-between items-center text-xs border-t border-slate-200/60 pt-2 mt-2">
-                        <span class="text-slate-455 font-bold">예상 공시가격</span>
+                        <span class="text-slate-500 font-bold">예상 공시가격</span>
                         <span id="detail-spec-official-price" class="font-extrabold text-royalBlue text-sm"></span>
                     </div>
                     <p id="detail-spec-official-price-desc" class="text-[10px] text-slate-500 leading-relaxed font-bold border-t border-slate-200/60 pt-2 mt-2"></p>
@@ -1731,13 +1728,22 @@
                 </a>
                         </div>
                     </div>
+                    </div> <!-- 👈 토지규제 p-3.5 및 카드 닫기 -->
+                    </div> <!-- 👈 2열 왼쪽 열 전체 닫기 -->
 
-                    <div id="detail-panel-market" class="space-y-4 sm:space-y-5">
-                        <div class="bg-white border border-slate-200 rounded-2xl p-4 shadow-sm space-y-3">
-                <div class="flex items-center justify-between pb-2 border-b border-slate-100">
-                    <h4 class="text-xs sm:text-sm font-black text-slate-800 flex items-center gap-1.5">
-                        <i class="fa-solid fa-tags text-royalBlue"></i> 주변 아파트 실거래 시세 대조
-                    </h4>
+                    <!-- 오른쪽 열: 실거래 시세, 매각 통계, [🔮 AI 미래 예상 시세 시뮬레이터] -->
+                    <div class="space-y-4 sm:space-y-5 w-full">
+                        <!-- 주변 아파트 실거래 시세 대조 -->
+                        <div class="bg-white border border-slate-200 rounded-2xl shadow-sm w-full overflow-hidden">
+                            <div class="bg-slate-50 px-4 py-2.5 border-b border-slate-200 flex justify-between items-center">
+                                <h4 class="text-xs sm:text-sm font-black text-slate-800 flex items-center gap-1.5">
+                                    <i class="fa-solid fa-tags text-royalBlue"></i> 주변 아파트 실거래 시세 대조
+                                </h4>
+                                <button onclick="copyAddressToClipboardAndOpenSeeReal()" class="px-2 py-1 bg-amber-50 hover:bg-amber-100 border border-amber-200 text-amber-700 text-[10px] font-black rounded-lg transition-all flex items-center gap-1 select-none cursor-pointer">
+                                    <i class="fa-solid fa-copy"></i> 주소복사 & 시세확인 (씨리얼)
+                                </button>
+                            </div>
+                            <div class="p-3.5 space-y-2.5">
                     <button onclick="copyAddressToClipboardAndOpenSeeReal()" class="px-2 py-1 bg-amber-50 hover:bg-amber-100 border border-amber-200 text-amber-700 text-[10px] font-black rounded-lg transition-all flex items-center gap-1">
                         <i class="fa-solid fa-copy"></i> 주소복사 & 시세확인 (씨리얼)
                     </button>
@@ -1762,7 +1768,7 @@
                         </div>
                         <!-- 📊 최근 1년 매각 통계 (입지 & 시세 분석 탭으로 이동 배치) -->
                         <div id="detail-panel-statistics" class="space-y-4 sm:space-y-5">
-                            <div class="bg-white border border-slate-200 rounded-2xl p-3.5 sm:p-4 shadow-sm space-y-3">
+                            <div class="bg-white border border-slate-200 rounded-2xl p-3 sm:p-3.5 space-y-2 shadow-sm">
                                 <h4 class="text-xs sm:text-sm font-black text-slate-800 flex items-center gap-1.5 pb-2 border-b border-slate-100">
                                     <i class="fa-solid fa-chart-bar text-royalBlue"></i> 해당 법원/용도 최근 1년 매각 통계
                                 </h4>
@@ -1770,50 +1776,123 @@
                                     <!-- 동적 생성 -->
                                 </div>
                             </div>
-                        </div>
-                    </div>
-            </div>
+                        </div> <!-- 👈 매각 통계 카드 닫기 -->
+
+                        <!-- 🔮 AI 미래 예상 시세 시뮬레이터 (1년/3년/5년/10년 후 예상시세 예측) -->
+                        <div class="bg-white border border-slate-200 rounded-2xl shadow-sm w-full overflow-hidden">
+                            <div class="bg-slate-50 px-4 py-2.5 border-b border-slate-200 flex justify-between items-center">
+                                <h4 class="text-xs sm:text-sm font-black text-slate-800 flex items-center gap-1.5">
+                                    <i class="fa-solid fa-wand-magic-sparkles text-royalBlue"></i> 🔮 AI 미래 예상 시세 시뮬레이터
+                                </h4>
+                                <span class="bg-blue-50 border border-blue-200 text-royalBlue text-[9px] font-black px-2 py-0.5 rounded-full">예측 엔진 v1.2</span>
+                            </div>
+                            <div class="p-3.5 space-y-3">
+                                <div class="bg-amber-50/50 border border-amber-200 rounded-xl p-2.5 text-[9.5px] text-amber-700 leading-normal font-semibold">
+                                    ⚠️ 본 예측 시세는 시나리오별 연 복리 상승률을 적용한 단순 추정치이며 실제 시장 변화와 다를 수 있으므로 참고용으로만 사용하시기 바랍니다.
+                                </div>
+                                <div class="flex items-center justify-between gap-2 bg-slate-50 border border-slate-200 rounded-xl p-2">
+                                    <span class="text-xs font-bold text-slate-500">연평균 미래 성장률</span>
+                                    <div class="flex gap-1.5">
+                                        <label class="cursor-pointer">
+                                            <input type="radio" name="future-rate-select" value="1.5" onchange="updateFuturePricePrediction()" class="sr-only peer">
+                                            <span class="block px-2 py-1 rounded-lg text-[10px] font-black bg-slate-200/60 text-slate-600 peer-checked:bg-royalBlue peer-checked:text-white transition-all select-none">보수적 (1.5%)</span>
+                                        </label>
+                                        <label class="cursor-pointer">
+                                            <input type="radio" name="future-rate-select" value="3.0" checked onchange="updateFuturePricePrediction()" class="sr-only peer">
+                                            <span class="block px-2 py-1 rounded-lg text-[10px] font-black bg-slate-200/60 text-slate-600 peer-checked:bg-royalBlue peer-checked:text-white transition-all select-none">표준 (3.0%)</span>
+                                        </label>
+                                        <label class="cursor-pointer">
+                                            <input type="radio" name="future-rate-select" value="5.0" onchange="updateFuturePricePrediction()" class="sr-only peer">
+                                            <span class="block px-2 py-1 rounded-lg text-[10px] font-black bg-slate-200/60 text-slate-600 peer-checked:bg-royalBlue peer-checked:text-white transition-all select-none">적극적 (5.0%)</span>
+                                        </label>
+                                    </div>
+                                </div>
+                                <div class="overflow-x-auto border border-slate-200 rounded-xl overflow-hidden shadow-sm bg-white">
+                                    <table class="w-full text-left border-collapse text-[13px] document-view">
+                                        <thead>
+                                            <tr class="bg-slate-50 border-b border-slate-200 text-slate-800 font-extrabold text-[12px]">
+                                                <th class="p-3 pl-4">예상 시점</th>
+                                                <th class="p-3">누적 상승률</th>
+                                                <th class="p-3 text-right">예상 추정 가격</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody class="text-slate-700 font-medium">
+                                            <tr class="border-b border-slate-100 hover:bg-slate-50/40 transition-colors">
+                                                <td class="p-3 pl-4 font-bold">1년 후</td>
+                                                <td class="p-3 text-emeraldSuccess font-extrabold" id="future-rate-1y">+3.0%</td>
+                                                <td class="p-3 text-right font-black font-outfit" id="future-price-1y">-원</td>
+                                            </tr>
+                                            <tr class="border-b border-slate-100 hover:bg-slate-50/40 transition-colors">
+                                                <td class="p-3 pl-4 font-bold">3년 후</td>
+                                                <td class="p-3 text-emeraldSuccess font-extrabold" id="future-rate-3y">+9.27%</td>
+                                                <td class="p-3 text-right font-black font-outfit" id="future-price-3y">-원</td>
+                                            </tr>
+                                            <tr class="border-b border-slate-100 hover:bg-slate-50/40 transition-colors">
+                                                <td class="p-3 pl-4 font-bold">5년 후</td>
+                                                <td class="p-3 text-emeraldSuccess font-extrabold" id="future-rate-5y">+15.93%</td>
+                                                <td class="p-3 text-right font-black font-outfit" id="future-price-5y">-원</td>
+                                            </tr>
+                                            <tr class="hover:bg-slate-50/40 transition-colors">
+                                                <td class="p-3 pl-4 font-bold">10년 후</td>
+                                                <td class="p-3 text-emeraldSuccess font-extrabold" id="future-rate-10y">+34.39%</td>
+                                                <td class="p-3 text-right font-black font-outfit" id="future-price-10y">-원</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div> <!-- 👈 미래 예상 시뮬레이터 카드 닫기 -->
+                    </div> <!-- 👈 2열 오른쪽 열 전체 닫기 -->
+                </div> <!-- 👈 2열 그리드 전체 닫기 -->
+            </div> <!-- 👈 group-content-3 전체 닫기 -->
+            </div> <!-- 👈 detail-panel-market 닫기 보정 -->
             <div id="group-mask-3" class="absolute inset-0 bg-slate-900/60 backdrop-blur-sm z-30 flex flex-col items-center justify-center text-center p-6 hidden">
                 <div class="bg-white border border-slate-200 rounded-2xl p-6 max-w-sm shadow-2xl space-y-3">
                     <i class="fa-solid fa-lock text-rose-500 text-3xl"></i>
                     <h4 class="text-slate-800 text-sm font-black">🔒 입지 & 시세 분석 열람 제한</h4>
                     <p class="text-slate-500 text-[10.5px] leading-relaxed font-semibold">본 매물의 지도 및 인근 실거래 시세 추이는 프리미엄 회원 등급 전용 콘텐츠입니다. 등급을 상향하여 실시간 위치분석 정보를 확인해 보세요.</p>
-                    <button onclick="alert('등급 상향은 관리자 권한으로 즉시 조정 가능합니다.')" class="w-full bg-royalBlue text-white font-extrabold text-xs py-2 rounded-xl shadow-md hover:bg-royalHover transition-all">등급 상향 신청하기</button>
+                    <button onclick="v12Features.payPremiumAndUpgrade()" class="w-full bg-royalBlue text-white font-extrabold text-xs py-2 rounded-xl shadow-md hover:bg-royalHover transition-all">등급 상향 신청하기</button>
                 </div>
             </div>
         </div>
-        <div id="detail-group-panel-2" class="flex-1 overflow-y-auto p-4 sm:p-5 space-y-4 sm:space-y-5 custom-scrollbar bg-slate-50/50 hidden relative">
-            <div id="group-content-2" class="space-y-4 sm:space-y-5 w-full">
-                <div id="detail-panel-bid" class="space-y-4 sm:space-y-5">
-            <!-- AI 낙찰 시뮬레이션 지표 분석 -->
-            <div class="bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 rounded-2xl p-3.5 sm:p-4 space-y-2.5 shadow-sm mb-4">
-                <h4 class="text-xs sm:text-sm font-black text-royalBlue flex items-center gap-1.5">
-                    <i class="fa-solid fa-chart-simple"></i> AI 낙찰 시뮬레이션 지표 분석
-                </h4>
+        <div id="detail-group-panel-2" class="flex-1 overflow-y-auto p-3 sm:p-3.5 space-y-3 sm:space-y-3.5 custom-scrollbar bg-slate-50/50 hidden relative">
+            <div id="group-content-2" class="space-y-3 sm:space-y-3.5 w-full">
+                <!-- 2열 그리드로 쪼개어 금융/입찰 테이블들의 가로 늘어짐 방지 -->
+                <div class="grid grid-cols-1 xl:grid-cols-2 gap-4 sm:gap-5 w-full items-start">
+                    <!-- 왼쪽 열: 시뮬레이션 지표, 스마트 계산기, ROI 분석 테이블 -->
+                    <div class="space-y-4 sm:space-y-5 w-full">
+                        <!-- AI 낙찰 시뮬레이션 지표 분석 -->
+                        <div class="bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 rounded-2xl p-3.5 space-y-2 shadow-sm">
+                            <div class="flex items-center gap-1.5 pb-2 border-b border-blue-200/50 mb-1">
+                                <h4 class="text-xs sm:text-sm font-black text-slate-800 flex items-center gap-1.5">
+                                    <i class="fa-solid fa-chart-simple text-royalBlue"></i> AI 낙찰 시뮬레이션 지표 분석
+                                </h4>
+                            </div>
                 <div class="grid grid-cols-2 gap-2.5 text-[11px] sm:text-xs font-bold text-slate-700">
                     <div class="bg-white/80 p-2.5 rounded-xl border border-blue-100 flex flex-col justify-between">
-                        <span class="text-slate-455 text-[10px] sm:text-xs">예상 낙찰 확률</span>
+                        <span class="text-slate-500 text-[10px] sm:text-xs">예상 낙찰 확률</span>
                         <span id="detail-ai-bid-rate" class="text-xs sm:text-sm font-black text-royalBlue mt-0.5 font-outfit"></span>
                     </div>
                     <div class="bg-white/80 p-2.5 rounded-xl border border-blue-100 flex flex-col justify-between">
-                        <span class="text-slate-455 text-[10px] sm:text-xs">예상 명도 기간</span>
+                        <span class="text-slate-500 text-[10px] sm:text-xs">예상 명도 기간</span>
                         <span id="detail-ai-evict-period" class="text-xs sm:text-sm font-black text-amber-600 mt-0.5"></span>
                     </div>
                     <div class="bg-white/80 p-2.5 rounded-xl border border-blue-100 flex flex-col justify-between col-span-2">
-                        <span class="text-slate-455 text-[10px] sm:text-xs block mb-0.5">주변 시세 대조 분석 리포트</span>
+                        <span class="text-slate-500 text-[10px] sm:text-xs block mb-0.5">주변 시세 대조 분석 리포트</span>
                         <span id="detail-ai-market-compare" class="text-[11px] sm:text-xs font-black text-emeraldSuccess leading-relaxed"></span>
                     </div>
                 </div>
             </div>
 
             <!-- 🧮 세법 스마트 낙찰 계획서 계산기 -->
-            <div class="bg-white border border-slate-200 rounded-2xl p-3.5 sm:p-4 shadow-sm space-y-3 max-w-[720px] mx-auto w-full">
-                <div class="flex items-center justify-between pb-2 border-b border-slate-100">
+            <div class="bg-white border border-slate-200 rounded-2xl shadow-sm w-full overflow-hidden">
+                <div class="bg-slate-50 px-4 py-2.5 border-b border-slate-200 flex justify-between items-center">
                     <h4 class="text-xs sm:text-sm font-black text-slate-800 flex items-center gap-1.5">
                         <i class="fa-solid fa-calculator text-royalBlue"></i> 스마트 정밀 소요자금 계획서
                     </h4>
-                    <span id="tax-rate-badge" class="text-[9px] font-black px-2 py-0.5 rounded-full border"></span>
+                    <span id="tax-rate-badge" class="text-[9px] font-black px-2 py-0.5 rounded-full border border-slate-300 bg-white"></span>
                 </div>
+                <div class="p-3.5 space-y-2.5">
 
                 <div class="space-y-3">
                     <div>
@@ -1952,11 +2031,50 @@
             </div>
 
             <!-- 입찰 당일 필수 체크리스트 -->
-            <div class="bg-white border border-slate-200 rounded-2xl p-3.5 sm:p-4 space-y-2.5 shadow-sm">
+            <div class="bg-white border border-slate-200 rounded-2xl p-3 sm:p-3.5 space-y-2 shadow-sm">
                 <h4 class="text-xs sm:text-sm font-black text-slate-800 flex items-center gap-1.5">
                     <i class="fa-solid fa-clipboard-check text-royalBlue"></i> 📋 입찰 당일 필수 체크리스트
                 </h4>
                 <div id="detail-checklist-content" class="text-[10.5px] sm:text-xs font-medium text-slate-655 leading-relaxed space-y-1.5">
+                    <!-- Javascript에서 동적으로 주입됨 -->
+                </div>
+            </div>
+
+            <!-- 🎯 v1.2 실시간 모의 입찰 센터 -->
+            <div class="bg-white border border-slate-200 rounded-2xl p-3.5 sm:p-4 space-y-3 shadow-sm mt-3">
+                <h4 class="text-xs sm:text-sm font-black text-slate-800 flex items-center gap-1.5 pb-2 border-b border-slate-100">
+                    <i class="fa-solid fa-gamepad text-indigo-500"></i> 🎯 실시간 모의 입찰 센터 (v1.2)
+                </h4>
+                <div class="grid grid-cols-3 gap-2 text-center bg-slate-50 rounded-xl p-2.5 border border-slate-100">
+                    <div class="flex flex-col">
+                        <span class="text-[9px] text-slate-400 font-bold">참여 현황</span>
+                        <strong id="v12-mock-bids-count" class="text-xs font-black text-slate-700 font-outfit">0명 참여 중</strong>
+                    </div>
+                    <div class="flex flex-col border-x border-slate-200">
+                        <span class="text-[9px] text-slate-400 font-bold">평균 입찰가</span>
+                        <strong id="v12-mock-avg-price" class="text-xs font-black text-slate-700 font-outfit">0원</strong>
+                    </div>
+                    <div class="flex flex-col">
+                        <span class="text-[9px] text-slate-400 font-bold">평균 낙찰율</span>
+                        <strong id="v12-mock-ratio" class="text-xs font-black text-royalBlue font-outfit">--%</strong>
+                    </div>
+                </div>
+                <div class="space-y-2 mt-2">
+                    <label class="text-[10px] text-slate-500 font-bold block">나의 가상 입찰가 입력 (원 단위 입력)</label>
+                    <div class="flex gap-2">
+                        <input type="number" id="v12-mock-bid-input" placeholder="예: 250000000" class="flex-1 bg-slate-50 border border-slate-200 rounded-xl px-3 py-1.5 text-xs font-bold focus:outline-none focus:border-royalBlue focus:bg-white transition-all text-slate-800">
+                        <button onclick="v12Features.submitMockBid(selectedProperty.id, selectedProperty.appraised_value)" class="bg-royalBlue hover:bg-royalHover text-white text-xs font-bold px-3 py-1.5 rounded-xl shadow-sm transition-all select-none">제출</button>
+                    </div>
+                    <div id="v12-mock-bid-message" class="text-[10px] hidden font-bold mt-1"></div>
+                </div>
+            </div>
+
+            <!-- 💼 v1.2 경매 정식 등록 전문가 상담 연계 -->
+            <div class="bg-white border border-slate-200 rounded-2xl p-3.5 sm:p-4 space-y-2.5 shadow-sm mt-3">
+                <h4 class="text-xs sm:text-sm font-black text-slate-800 flex items-center gap-1.5 pb-2 border-b border-slate-100">
+                    <i class="fa-solid fa-user-tie text-indigo-500"></i> 💼 우수 매수대리 전문가 연계 광고 (v1.2)
+                </h4>
+                <div id="v12-experts-list" class="space-y-3">
                     <!-- Javascript에서 동적으로 주입됨 -->
                 </div>
             </div>
@@ -1966,7 +2084,7 @@
         <!-- 💰 [9] 시세/실거래가 탭 패널 (기본 숨김) -->
                 
             <!-- 🏆 시나리오별 입찰 수익성 시뮬레이터 -->
-            <div class="bg-white border border-slate-200 rounded-2xl p-3.5 sm:p-4 space-y-2.5 shadow-sm">
+            <div class="bg-white border border-slate-200 rounded-2xl p-3 sm:p-3.5 space-y-2 shadow-sm">
                 <h4 class="text-xs sm:text-sm font-black text-slate-800 flex items-center gap-1.5 pb-2 border-b border-slate-100">
                     <i class="fa-solid fa-chart-line text-royalBlue"></i> 🏆 시나리오별 입찰 수익성 시뮬레이션
                 </h4>
@@ -1990,7 +2108,7 @@
             </div>
 
             <!-- 🧠 AI 실전 투자 분석 총평 -->
-            <div class="bg-amber-50/30 border border-amber-200/60 rounded-2xl p-3.5 sm:p-4 space-y-2 shadow-sm">
+            <div class="bg-amber-50/30 border border-amber-200/60 rounded-2xl p-3 sm:p-3.5 space-y-2 shadow-sm">
                 <h4 class="text-xs sm:text-sm font-black text-slate-800 flex items-center gap-1.5">
                     <i class="fa-solid fa-brain text-amber-600"></i> 🧠 AI 실전 투자 분석 총평
                 </h4>
@@ -2004,7 +2122,23 @@
                     <i class="fa-solid fa-lock text-rose-500 text-3xl"></i>
                     <h4 class="text-slate-800 text-sm font-black">🔒 입찰 & 금융 분석 열람 제한</h4>
                     <p class="text-slate-500 text-[10.5px] leading-relaxed font-semibold">본 매물의 입찰 & 금융 상세 시뮬레이션은 프리미엄 회원 등급 전용 콘텐츠입니다. 등급을 상향하여 정밀 ROI 분석을 확인해 보세요.</p>
-                    <button onclick="alert('등급 상향은 관리자 권한으로 즉시 조정 가능합니다.')" class="w-full bg-royalBlue text-white font-extrabold text-xs py-2 rounded-xl shadow-md hover:bg-royalHover transition-all">등급 상향 신청하기</button>
+                    <button onclick="v12Features.payPremiumAndUpgrade()" class="w-full bg-royalBlue text-white font-extrabold text-xs py-2 rounded-xl shadow-md hover:bg-royalHover transition-all">등급 상향 신청하기</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 📢 상세페이지 하단 고정형 애드센스 광고판 -->
+        <div id="detail-bottom-ad-slot" class="w-full bg-slate-50 border-t border-slate-200 px-3.5 py-1.5 flex-shrink-0 mt-auto">
+            <div class="bg-white border border-slate-200 rounded-xl p-2 flex items-center justify-between shadow-sm relative overflow-hidden h-[54px] sm:h-[64px]">
+                <div class="space-y-0.5 z-10 max-w-[75%]">
+                    <div class="flex items-center gap-1.5">
+                        <span class="bg-slate-900 text-white text-[7.5px] font-black px-1.5 py-0.2 rounded uppercase">AD</span>
+                        <h4 id="detail-bottom-ad-title" class="text-[9.5px] sm:text-xs font-black text-slate-800 line-clamp-1">★ 실시간 1:1 경매 전문 권리분석 컨설팅</h4>
+                    </div>
+                    <p id="detail-bottom-ad-desc" class="text-[8.5px] sm:text-[9.5px] text-slate-400 font-bold line-clamp-1">전문 변호사와 세무사가 함께 진단하는 안전 입찰 맞춤형 솔루션.</p>
+                </div>
+                <div id="detail-bottom-ad-action" class="bg-royalBlue hover:bg-royalHover text-white text-[9px] sm:text-[10px] font-black px-2 sm:px-2.5 py-1 sm:py-1.5 rounded-lg z-10 transition-all select-none cursor-pointer">
+                    상담 신청
                 </div>
             </div>
         </div>
@@ -2642,6 +2776,10 @@
             initBudgetSliderZIndexController();
             restoreFiltersFromCache();
             initDataLoad();
+            
+            // v1.2 챗봇 및 큐레이션 바 가동 초기화
+            if (typeof v12Features !== 'undefined') v12Features.init();
+            if (typeof v12ThemeCuration !== 'undefined') v12ThemeCuration.injectCurationBar("v12-curation-container");
         });
 
 
@@ -3109,8 +3247,9 @@
             });
             
             // 🚀 AI 큐레이션 테마 필터링 추가 결합
-            if (activeTheme) {
-                filteredProperties = filterPropertiesByTheme(filteredProperties, activeTheme);
+            const currentCurationTheme = (typeof v12ThemeCuration !== 'undefined') ? v12ThemeCuration.getActiveTheme() : null;
+            if (currentCurationTheme) {
+                filteredProperties = filterPropertiesByTheme(filteredProperties, currentCurationTheme);
             }
             
             currentPage = 1;
@@ -3432,57 +3571,7 @@
             }
         }
 
-        // 🔍 AI 추천 테마 선택 함수 및 필터링 모듈
-        let activeTheme = null;
 
-        function selectTheme(themeKey) {
-            activeTheme = themeKey;
-
-            // 칩 버튼 활성화/비활성화 클래스 갱신
-            const keys = [
-                { key: null, id: "btn-theme-all", activeClass: "bg-royalBlue text-white border-royalBlue shadow-sm" },
-                { key: "clean_rights", id: "btn-theme-clean", activeClass: "bg-emerald-500 text-white border-emerald-500 shadow-sm" },
-                { key: "half_price", id: "btn-theme-half", activeClass: "bg-rose-500 text-white border-rose-500 shadow-sm" },
-                { key: "hot_yongin", id: "btn-theme-yongin", activeClass: "bg-indigo-500 text-white border-indigo-500 shadow-sm" },
-                { key: "lifestyle_3eok", id: "btn-theme-lifestyle", activeClass: "bg-amber-500 text-white border-amber-500 shadow-sm" },
-                { key: "yield_top", id: "btn-theme-yield", activeClass: "bg-blue-500 text-white border-blue-500 shadow-sm" },
-                { key: "redevelopment", id: "btn-theme-redevelopment", activeClass: "bg-orange-500 text-white border-orange-500 shadow-sm" },
-                { key: "mini_land", id: "btn-theme-miniland", activeClass: "bg-lime-600 text-white border-lime-600 shadow-sm" },
-                { key: "auto_machinery", id: "btn-theme-automachinery", activeClass: "bg-purple-500 text-white border-purple-500 shadow-sm" },
-                { key: "officetel_income", id: "btn-theme-officetel", activeClass: "bg-cyan-500 text-white border-cyan-500 shadow-sm" },
-                { key: "subway_safe", id: "btn-theme-subwaysafe", activeClass: "bg-teal-500 text-white border-teal-500 shadow-sm" },
-                { key: "small_building", id: "btn-theme-smallbuilding", activeClass: "bg-amber-700 text-white border-amber-700 shadow-sm" },
-                { key: "school_district", id: "btn-theme-schooldistrict", activeClass: "bg-emerald-600 text-white border-emerald-600 shadow-sm" },
-                { key: "capital_single", id: "btn-theme-capitalsingle", activeClass: "bg-violet-500 text-white border-violet-500 shadow-sm" },
-                { key: "local_healing", id: "btn-theme-localhealing", activeClass: "bg-green-600 text-white border-green-600 shadow-sm" },
-                { key: "heavy_dropped", id: "btn-theme-heavydropped", activeClass: "bg-red-600 text-white border-red-600 shadow-sm" },
-                { key: "factory_warehouse", id: "btn-theme-factorywarehouse", activeClass: "bg-slate-600 text-white border-slate-600 shadow-sm" },
-                { key: "share_investment", id: "btn-theme-shareinvestment", activeClass: "bg-rose-400 text-white border-rose-400 shadow-sm" },
-                
-                // 🎁 신규 8대 테마 키 등록
-                { key: "gangnam_class", id: "btn-theme-gangnam", activeClass: "bg-amber-500 text-white border-amber-500 shadow-sm" },
-                { key: "super_failed", id: "btn-theme-superfailed", activeClass: "bg-rose-500 text-white border-rose-500 shadow-sm" },
-                { key: "first_bid", id: "btn-theme-firstbid", activeClass: "bg-yellow-500 text-white border-yellow-500 shadow-sm" },
-                { key: "seoul_apartment", id: "btn-theme-seoulapt", activeClass: "bg-blue-500 text-white border-blue-500 shadow-sm" },
-                { key: "gyeonggi_residence", id: "btn-theme-gyeonggires", activeClass: "bg-green-500 text-white border-green-500 shadow-sm" },
-                { key: "safe_apartment", id: "btn-theme-safeapt", activeClass: "bg-emerald-500 text-white border-emerald-500 shadow-sm" },
-                { key: "monthly_rent_target", id: "btn-theme-monthlyrent", activeClass: "bg-violet-500 text-white border-violet-500 shadow-sm" },
-                { key: "non_residential_etc", id: "btn-theme-nonres", activeClass: "bg-slate-500 text-white border-slate-500 shadow-sm" }
-            ];
-
-            keys.forEach(k => {
-                const btn = document.getElementById(k.id);
-                if (btn) {
-                    if (k.key === themeKey) {
-                        btn.className = `px-2.5 py-0.5 rounded-full text-[10px] font-black border transition-all select-none flex items-center gap-1 whitespace-nowrap flex-shrink-0 ${k.activeClass}`;
-                    } else {
-                        btn.className = "px-2.5 py-0.5 rounded-full text-[10px] font-black border border-slate-200 hover:bg-slate-50 transition-all select-none text-slate-600 flex items-center gap-1 whitespace-nowrap flex-shrink-0";
-                    }
-                }
-            });
-
-            debouncedApplyFilters();
-        }
 
         // 🚀 AI 큐레이션 테마별 실시간 자체 알고리즘 필터 함수
         function filterPropertiesByTheme(properties, targetTheme) {
@@ -4874,7 +4963,11 @@
                     if (unit.includes("평")) {
                         val = Math.round(val * 3.3058 * 100) / 100;
                     }
-                    flAreas[fName] = val;
+                    if (flAreas[fName]) {
+                        flAreas[fName] = Math.max(flAreas[fName], val);
+                    } else {
+                        flAreas[fName] = val;
+                    }
                 }
 
                 let totFloors = Object.keys(flAreas).length;
@@ -4928,49 +5021,56 @@
                 }
 
                 if (ex === 0.0 && Object.keys(flAreas).length > 0) {
-                    let totalFloorArea = 0.0;
-                    if (targetFloor && flAreas[targetFloor]) {
-                        totalFloorArea = flAreas[targetFloor];
+                    const isVillaOrHouse = ["다세대", "빌라", "연립", "주택", "단독", "다가구"].some(k => targetText.includes(k));
+                    if (isVillaOrHouse && Object.keys(flAreas).length >= 1) {
+                        ex = totArea;
+                        estEx = false;
+                        estType = "exact";
                     } else {
-                        totalFloorArea = Math.max(...Object.values(flAreas));
-                    }
+                        let totalFloorArea = 0.0;
+                        if (targetFloor && flAreas[targetFloor]) {
+                            totalFloorArea = flAreas[targetFloor];
+                        } else {
+                            totalFloorArea = Math.max(...Object.values(flAreas));
+                        }
 
-                    const isVilla = ["다세대", "빌라", "연립"].some(k => targetText.includes(k));
-                    let divisor = 2;
-                    if (targetRoom) {
-                        const roomDigits = targetRoom.replace(/\D/g, "");
-                        if (roomDigits) {
-                            const roomNum = parseInt(roomDigits);
-                            if (!isVilla) {
-                                if (roomNum >= 100) {
-                                    const estDivisor = Math.floor(roomNum / 100);
-                                    divisor = estDivisor <= 1 ? 2 : estDivisor;
+                        const isVilla = ["다세대", "빌라", "연립"].some(k => targetText.includes(k));
+                        let divisor = 2;
+                        if (targetRoom) {
+                            const roomDigits = targetRoom.replace(/\D/g, "");
+                            if (roomDigits) {
+                                const roomNum = parseInt(roomDigits);
+                                if (!isVilla) {
+                                    if (roomNum >= 100) {
+                                        const estDivisor = Math.floor(roomNum / 100);
+                                        divisor = estDivisor <= 1 ? 2 : estDivisor;
+                                    } else {
+                                        divisor = roomNum > 1 ? roomNum : 2;
+                                    }
                                 } else {
-                                    divisor = roomNum > 1 ? roomNum : 2;
-                                }
-                            } else {
-                                const lastDigit = roomNum % 10;
-                                if (lastDigit === 1 || lastDigit === 2) {
-                                    divisor = 2;
-                                } else if (lastDigit === 3 || lastDigit === 4) {
-                                    divisor = 4;
-                                } else if (lastDigit === 5 || lastDigit === 6) {
-                                    divisor = 6;
-                                } else if (lastDigit > 6) {
-                                    divisor = lastDigit;
+                                    const lastDigit = roomNum % 10;
+                                    if (lastDigit === 1 || lastDigit === 2) {
+                                        divisor = 2;
+                                    } else if (lastDigit === 3 || lastDigit === 4) {
+                                        divisor = 4;
+                                    } else if (lastDigit === 5 || lastDigit === 6) {
+                                        divisor = 6;
+                                    } else if (lastDigit > 6) {
+                                        divisor = lastDigit;
+                                    }
                                 }
                             }
                         }
-                    }
 
-                    if (isVilla) {
-                        const estTotalFloors = totFloors > 0 ? totFloors : 1;
-                        ex = Math.round((totArea / (estTotalFloors * divisor)) * 100) / 100;
-                    } else {
-                        ex = Math.round((totalFloorArea / divisor) * 100) / 100;
+                        if (isVilla) {
+                            const estTotalFloors = totFloors > 0 ? totFloors : 1;
+                            ex = Math.round((totArea / (estTotalFloors * divisor)) * 100) / 100;
+                        } else {
+                            ex = Math.round((totalFloorArea / divisor) * 100) / 100;
+                        }
+                        estEx = true;
+                        estType = "estimated";
                     }
-                    estEx = true;
-                    estType = "estimated";
                 }
 
                 // 동/호수 뒤에 인접하여 단독 기재된 전용면적 유추 (예: '102호 84.95', '303호 29.24')
@@ -4986,9 +5086,10 @@
                     }
                 }
 
-                // 단위 생략 숫자 매칭 유추
+                // 단위 생략 숫자 매칭 유추 (주소 영역 제외)
                 if (ex === 0.0) {
-                    const noUnitMatch = targetText.match(/\b(59|84|114|135|165|24|32|34|45)(?:\.\d+)?\s*(?:형|타입|py)?\b/);
+                    const textWithoutAddr = address ? targetText.replace(address, "") : targetText;
+                    const noUnitMatch = textWithoutAddr.match(/\b(59|84|114|135|165|24|32|34|45)(?:\.\d+)?\s*(?:형|타입|py)?\b/);
                     if (noUnitMatch) {
                         const val = parseFloat(noUnitMatch[0].replace(/형|타입|py/g, "").trim());
                         if (val <= 50) {
@@ -5001,9 +5102,10 @@
                     }
                 }
 
-                // 단위 생략 일반적인 전용면적 범위의 단독 숫자 매칭 백업
+                // 단위 생략 일반적인 전용면적 범위의 단독 숫자 매칭 백업 (주소 영역 제외)
                 if (ex === 0.0) {
-                    const generalNumMatch = targetText.match(/\b(1[0-9]|[2-9][0-9]|1[0-9]{2}|2[0-9]{2})\b(?:\.\d+)?\s*(?:형|타입|py)?\b/);
+                    const textWithoutAddr = address ? targetText.replace(address, "") : targetText;
+                    const generalNumMatch = textWithoutAddr.match(/\b(1[0-9]|[2-9][0-9]|1[0-9]{2}|2[0-9]{2})\b(?:\.\d+)?\s*(?:형|타입|py)?\b/);
                     if (generalNumMatch) {
                         const val = parseFloat(generalNumMatch[0].replace(/형|타입|py/g, "").trim());
                         if (val <= 50) {
@@ -5068,24 +5170,7 @@
                 floorAreas = resultFull.flAreas;
             }
 
-            // 감정가 기반 면적 유추 적용 (아직도 전용면적이 0인 경우)
-            if (exclusiveArea === 0.0 && ptypeClean) {
-                const isSeoulMetropolitan = ["서울", "경기", "인천", "분당"].some(r => addrClean.includes(r));
-                const val = appraisedValue || 0;
-                if (ptypeClean.includes("아파트") || ptypeClean.includes("오피스텔")) {
-                    if (isSeoulMetropolitan) {
-                        exclusiveArea = val >= 1500000000 ? 114.8 : (val >= 600000000 ? 84.9 : 59.9);
-                    } else {
-                        exclusiveArea = val >= 700000000 ? 114.8 : (val >= 300000000 ? 84.9 : 59.9);
-                    }
-                    isEstimatedExclusive = true;
-                    exclEstType = "estimated";
-                } else if (ptypeClean.includes("다세대") || ptypeClean.includes("빌라") || ptypeClean.includes("연립") || ptypeClean.includes("주택")) {
-                    exclusiveArea = val >= 500000000 ? 84.9 : 59.9;
-                    isEstimatedExclusive = true;
-                    exclEstType = "estimated";
-                }
-            }
+
 
             if (isNonBuilding) {
                 exclusiveArea = 0.0;
@@ -5303,41 +5388,7 @@
                 item.floor_areas = parsed.floorAreas;
             }
 
-            // 완전 폴백 예외 복원
-            if (exclusiveArea <= 0) {
-                if (ptype.includes("아파트") || ptype.includes("오피스텔") || ptype.includes("다세대") || ptype.includes("빌라")) {
-                    const commonAreas = [59.9, 84.9, 114.8, 39.5, 74.6];
-                    exclusiveArea = commonAreas[hash % commonAreas.length];
-                } else if (ptype.includes("단독") || ptype.includes("다가구")) {
-                    const commonAreas = [120.5, 150.2, 180.8, 95.4];
-                    exclusiveArea = commonAreas[hash % commonAreas.length];
-                } else if (ptype.includes("상가") || ptype.includes("점포") || ptype.includes("근린")) {
-                    const commonAreas = [33.5, 66.8, 115.4, 25.8];
-                    exclusiveArea = commonAreas[hash % commonAreas.length];
-                } else if (ptype.includes("공장") || ptype.includes("창고")) {
-                    const commonAreas = [350.5, 480.2, 750.8];
-                    exclusiveArea = commonAreas[hash % commonAreas.length];
-                } else {
-                    exclusiveArea = 84.9;
-                }
-                item.is_estimated_exclusive = true;
-                item.exclusive_area_estimation_type = "fake";
-            }
-            if (landArea <= 0) {
-                if (ptype.includes("아파트") || ptype.includes("오피스텔")) {
-                    const factors = [0.18, 0.25, 0.32, 0.38];
-                    landArea = parseFloat((exclusiveArea * factors[hash % factors.length]).toFixed(2));
-                } else if (ptype.includes("다세대") || ptype.includes("빌라") || ptype.includes("단독") || ptype.includes("다가구")) {
-                    const factors = [0.55, 0.68, 0.78, 0.88];
-                    landArea = parseFloat((exclusiveArea * factors[hash % factors.length]).toFixed(2));
-                } else if (ptype.includes("토지") || ptype.includes("임야")) {
-                    const commonLands = [150.5, 330.2, 660.8, 1200.5];
-                    landArea = commonLands[hash % commonLands.length];
-                } else {
-                    landArea = parseFloat((exclusiveArea * 0.4).toFixed(2));
-                }
-                item.is_estimated_land = true;
-            }
+
 
             let supplyArea = item.supply_area || 0;
             if (supplyArea <= 0) {
@@ -5358,48 +5409,11 @@
             item.supply_area = supplyArea;
             item.building_area = buildingArea;
 
-            // 주거용 부동산 폴백 생성 (메타데이터에 단지정보가 없는 경우)
-            const isResidential = ["아파트", "오피스텔", "다세대", "빌라", "연립", "주택", "단독", "다가구"].some(k => ptype.includes(k));
-            if (isResidential && (!item.complex_info || !item.complex_info.complex_name)) {
-                const schoolNames = ["대치초등학교", "송파초등학교", "반포초등학교", "청라초등학교", "정자초등학교", "범어초등학교", "해운대초등학교", "한빛초등학교"];
-                const addrParts = item.address ? item.address.split(" ") : [];
-                
-                if (ptype.includes("아파트")) {
-                    const builders = ["삼성물산(래미안)", "현대건설(힐스테이트)", "GS건설(자이)", "대우건설(푸르지오)", "DL이앤씨(e편한세상)", "포스코이앤씨(더샵)"];
-                    const aptName = addrParts.length > 2 ? addrParts[addrParts.length - 2] + " 아파트" : "래미안 퍼스티지";
-                    item.complex_info = {
-                        complex_name: aptName,
-                        total_households: 350 + (hash * 27) % 2500,
-                        construction_company: builders[hash % builders.length],
-                        built_year: 2005 + (hash * 3) % 18
-                    };
-                } else if (ptype.includes("오피스텔")) {
-                    const offBrands = ["마이빌 오피스텔", "현대 에띠앙", "두산위브센티움", "디아이빌", "푸르지오 시티", "효성해링턴"];
-                    const offName = addrParts.length > 2 ? addrParts[addrParts.length - 2] + " 오피스텔" : "디아이빌 오피스텔";
-                    item.complex_info = {
-                        complex_name: offName,
-                        total_households: 80 + (hash * 13) % 400,
-                        construction_company: offBrands[hash % offBrands.length],
-                        built_year: 2010 + (hash * 2) % 14
-                    };
-                } else {
-                    const villaBrands = ["청화빌라", "현대빌라", "대명하이츠", "대성빌라", "삼성하이츠", "청담타운"];
-                    const villaName = addrParts.length > 2 ? addrParts[addrParts.length - 2] + " 빌라" : "청화하이츠";
-                    item.complex_info = {
-                        complex_name: villaName,
-                        total_households: 10 + (hash * 7) % 35,
-                        construction_company: villaBrands[hash % villaBrands.length],
-                        built_year: 1995 + (hash * 4) % 28
-                    };
-                }
-                
-                item.elementary_school = schoolNames[hash % schoolNames.length];
-                const baseDeal = item.appraised_value || 1000000000;
-                item.recent_deals = [
-                    {"deal_date": "2026-03", "deal_price": Math.round(baseDeal * 1.02), "floor": 12 + (hash % 8)},
-                    {"deal_date": "2026-01", "deal_price": Math.round(baseDeal * 0.98), "floor": 5 + (hash % 8)},
-                    {"deal_date": "2025-11", "deal_price": Math.round(baseDeal * 0.95), "floor": 18 - (hash % 8)}
-                ];
+            // 실데이터가 없으면 명시적으로 null 처리하여 화면에 '제공되지 않는 대상' 템플릿이 렌더링되게 유도합니다.
+            if (!item.complex_info || !item.complex_info.complex_name) {
+                item.complex_info = null;
+                item.elementary_school = "";
+                item.recent_deals = [];
             }
 
             return item;
@@ -5519,56 +5533,56 @@
                 if (nbMeta.asset_type === 'vehicle') {
                     customGridHtml = `
                         <div class="bg-slate-50 border border-slate-100 p-2 rounded-xl flex justify-between items-center">
-                            <span class="text-slate-450 font-semibold text-[10px] sm:text-xs">차종/모델명</span>
+                            <span class="text-slate-400 font-semibold text-[10px] sm:text-xs">차종/모델명</span>
                             <span class="font-extrabold text-slate-800">${nbMeta.model_name || "미상"}</span>
                         </div>
                         <div class="bg-slate-50 border border-slate-100 p-2 rounded-xl flex justify-between items-center">
-                            <span class="text-slate-450 font-semibold text-[10px] sm:text-xs">차량 등록번호</span>
+                            <span class="text-slate-400 font-semibold text-[10px] sm:text-xs">차량 등록번호</span>
                             <span class="font-extrabold text-slate-800">${nbMeta.vehicle_no || "미상"}</span>
                         </div>
                         <div class="bg-slate-50 border border-slate-100 p-2 rounded-xl flex justify-between items-center">
-                            <span class="text-slate-450 font-semibold text-[10px] sm:text-xs">모델 연식</span>
+                            <span class="text-slate-400 font-semibold text-[10px] sm:text-xs">모델 연식</span>
                             <span class="font-extrabold text-slate-800">${nbMeta.model_year || "미상"}</span>
                         </div>
                         <div class="bg-slate-50 border border-slate-100 p-2 rounded-xl flex justify-between items-center">
-                            <span class="text-slate-450 font-semibold text-[10px] sm:text-xs">누적 주행거리</span>
+                            <span class="text-slate-400 font-semibold text-[10px] sm:text-xs">누적 주행거리</span>
                             <span class="font-extrabold text-royalBlue">${nbMeta.mileage || "미상"}</span>
                         </div>
                     `;
                 } else if (nbMeta.asset_type === 'machinery') {
                     customGridHtml = `
                         <div class="bg-slate-50 border border-slate-100 p-2 rounded-xl flex justify-between items-center col-span-2">
-                            <span class="text-slate-450 font-semibold text-[10px] sm:text-xs">장비 규격/형식</span>
+                            <span class="text-slate-400 font-semibold text-[10px] sm:text-xs">장비 규격/형식</span>
                             <span class="font-extrabold text-slate-800 text-right">${nbMeta.specification || "미상"}</span>
                         </div>
                         <div class="bg-slate-50 border border-slate-100 p-2 rounded-xl flex justify-between items-center">
-                            <span class="text-slate-450 font-semibold text-[10px] sm:text-xs">제조회사</span>
+                            <span class="text-slate-400 font-semibold text-[10px] sm:text-xs">제조회사</span>
                             <span class="font-extrabold text-slate-800">${nbMeta.manufacturer || "미상"}</span>
                         </div>
                         <div class="bg-slate-50 border border-slate-100 p-2 rounded-xl flex justify-between items-center">
-                            <span class="text-slate-455 font-semibold text-[10px] sm:text-xs">공매 수량</span>
+                            <span class="text-slate-500 font-semibold text-[10px] sm:text-xs">공매 수량</span>
                             <span class="font-extrabold text-slate-800">${nbMeta.quantity || "1대 (기본)"}</span>
                         </div>
                     `;
                 } else if (nbMeta.asset_type === 'securities') {
                     customGridHtml = `
                         <div class="bg-slate-50 border border-slate-100 p-2 rounded-xl flex justify-between items-center col-span-2">
-                            <span class="text-slate-450 font-semibold text-[10px] sm:text-xs">발행 회사명</span>
+                            <span class="text-slate-400 font-semibold text-[10px] sm:text-xs">발행 회사명</span>
                             <span class="font-extrabold text-slate-800 text-right">${nbMeta.company_name || "미상"}</span>
                         </div>
                         <div class="bg-slate-50 border border-slate-100 p-2 rounded-xl flex justify-between items-center col-span-2">
-                            <span class="text-slate-450 font-semibold text-[10px] sm:text-xs">인수 주식수</span>
+                            <span class="text-slate-400 font-semibold text-[10px] sm:text-xs">인수 주식수</span>
                             <span class="font-extrabold text-royalBlue text-right">${nbMeta.quantity || "미상"}</span>
                         </div>
                     `;
                 } else {
                     customGridHtml = `
                         <div class="bg-slate-50 border border-slate-100 p-2 rounded-xl flex justify-between items-center">
-                            <span class="text-slate-455 font-semibold text-[10px] sm:text-xs">공매 수량</span>
+                            <span class="text-slate-500 font-semibold text-[10px] sm:text-xs">공매 수량</span>
                             <span class="font-extrabold text-slate-800">${nbMeta.quantity || "미상"}</span>
                         </div>
                         <div class="bg-slate-50 border border-slate-100 p-2 rounded-xl flex justify-between items-center col-span-2">
-                            <span class="text-slate-455 font-semibold text-[10px] sm:text-xs">보관 장소</span>
+                            <span class="text-slate-500 font-semibold text-[10px] sm:text-xs">보관 장소</span>
                             <span class="font-extrabold text-slate-800 text-right">${nbMeta.storage_location || "상세 내역 참고"}</span>
                         </div>
                     `;
@@ -5577,23 +5591,23 @@
                 // 공통 요율 및 감정가 추가.
                 customGridHtml += `
                     <div class="bg-slate-50 border border-slate-100 p-2 rounded-xl flex justify-between items-center">
-                        <span class="text-slate-450 font-semibold text-[10px] sm:text-xs">자산 용도</span>
+                        <span class="text-slate-400 font-semibold text-[10px] sm:text-xs">자산 용도</span>
                         <span class="font-extrabold text-slate-800">${item.ptype || "미상"}</span>
                     </div>
                     <div class="bg-slate-50 border border-slate-100 p-2 rounded-xl flex justify-between items-center">
-                        <span class="text-slate-450 font-semibold text-[10px] sm:text-xs">진행 회차</span>
+                        <span class="text-slate-400 font-semibold text-[10px] sm:text-xs">진행 회차</span>
                         <span class="font-extrabold text-slate-800">${item.round_info || "신건"}</span>
                     </div>
                     <div class="bg-slate-50 border border-slate-100 p-2 rounded-xl flex justify-between items-center">
-                        <span class="text-slate-450 font-semibold text-[10px] sm:text-xs">감정평가액</span>
+                        <span class="text-slate-400 font-semibold text-[10px] sm:text-xs">감정평가액</span>
                         <span class="font-extrabold text-slate-800 font-outfit">${formatKRW(item.appraised_value)}</span>
                     </div>
                     <div class="bg-slate-50 border border-slate-100 p-2 rounded-xl flex justify-between items-center">
-                        <span class="text-slate-450 font-semibold text-[10px] sm:text-xs">최저입찰액</span>
+                        <span class="text-slate-400 font-semibold text-[10px] sm:text-xs">최저입찰액</span>
                         <span class="font-extrabold text-rose-600 font-outfit">${formatKRW(item.minimum_bid)}</span>
                     </div>
                     <div class="bg-slate-50 border border-slate-100 p-2 rounded-xl flex justify-between items-center col-span-2">
-                        <span class="text-slate-455 font-semibold text-[10px] sm:text-xs">입찰일/마감 여부</span>
+                        <span class="text-slate-500 font-semibold text-[10px] sm:text-xs">입찰일/마감 여부</span>
                         <span class="font-extrabold text-slate-800">${item.bidding_date || "미상"} (${calculateRemainingDays(item.bidding_date) >= 0 ? 'D-' + calculateRemainingDays(item.bidding_date) : '종결'})</span>
                     </div>
                 `;
@@ -5662,51 +5676,51 @@
 
                 let standardGridHtml = `
                     <div class="bg-slate-50 border border-slate-100 p-2 rounded-xl flex justify-between items-center">
-                        <span class="text-slate-450 font-semibold text-[10px] sm:text-xs">부동산 용도</span>
+                        <span class="text-slate-400 font-semibold text-[10px] sm:text-xs">부동산 용도</span>
                         <span id="detail-spec-ptype" class="font-extrabold text-slate-800">${item.ptype || "미상"}</span>
                     </div>
                     <div class="bg-slate-50 border border-slate-100 p-2 rounded-xl flex justify-between items-center">
-                        <span class="text-slate-450 font-semibold text-[10px] sm:text-xs">진행 회차</span>
+                        <span class="text-slate-400 font-semibold text-[10px] sm:text-xs">진행 회차</span>
                         <span id="detail-spec-round" class="font-extrabold text-slate-800">${item.round_info || "신건"}</span>
                     </div>
                     <div class="bg-slate-50 border border-slate-100 p-2 rounded-xl flex justify-between items-center">
-                        <span class="text-slate-450 font-semibold text-[10px] sm:text-xs">소유자</span>
+                        <span class="text-slate-400 font-semibold text-[10px] sm:text-xs">소유자</span>
                         <span id="detail-owner" class="font-extrabold text-slate-800">${maskName(virtualOwner)}</span>
                     </div>
                     <div class="bg-slate-50 border border-slate-100 p-2 rounded-xl flex justify-between items-center">
-                        <span class="text-slate-450 font-semibold text-[10px] sm:text-xs">채무자</span>
+                        <span class="text-slate-400 font-semibold text-[10px] sm:text-xs">채무자</span>
                         <span id="detail-debtor" class="font-extrabold text-slate-800">${maskName(virtualDebtor)}</span>
                     </div>
                     <div class="bg-slate-50 border border-slate-100 p-2 rounded-xl flex justify-between items-center">
-                        <span class="text-slate-450 font-semibold text-[10px] sm:text-xs">전용 면적</span>
+                        <span class="text-slate-400 font-semibold text-[10px] sm:text-xs">전용 면적</span>
                         <span id="detail-spec-exclusive-py" class="font-extrabold text-slate-800 font-mono">${formatAreaHtml(exclusiveArea, exclusivePy, estExSuffix)}</span>
                     </div>
                     <div class="bg-slate-50 border border-slate-100 p-2 rounded-xl flex justify-between items-center">
-                        <span class="text-slate-455 font-semibold text-[10px] sm:text-xs">공급 면적</span>
+                        <span class="text-slate-500 font-semibold text-[10px] sm:text-xs">공급 면적</span>
                         <span id="detail-spec-supply-py" class="font-extrabold text-slate-800 font-mono">${formatAreaHtml(supplyArea, supplyPy, estSpSuffix)}</span>
                     </div>
                     <div class="bg-slate-50 border border-slate-100 p-2 rounded-xl flex justify-between items-center">
-                        <span class="text-slate-450 font-semibold text-[10px] sm:text-xs">토지 대지권</span>
+                        <span class="text-slate-400 font-semibold text-[10px] sm:text-xs">토지 대지권</span>
                         <span id="detail-spec-land-py" class="font-extrabold text-slate-800 font-mono">${formatAreaHtml(landArea, landPy, estLdSuffix)}</span>
                     </div>
                     <div class="bg-slate-50 border border-slate-100 p-2 rounded-xl flex justify-between items-center">
-                        <span class="text-slate-450 font-semibold text-[10px] sm:text-xs">건물 전용</span>
+                        <span class="text-slate-400 font-semibold text-[10px] sm:text-xs">건물 전용</span>
                         <span id="detail-spec-building-py" class="font-extrabold text-slate-800 font-mono">${formatAreaHtml(buildingArea, buildingPy, estBdSuffix)}</span>
                     </div>
                     <div class="bg-slate-50 border border-slate-100 p-2 rounded-xl flex justify-between items-center">
-                        <span class="text-slate-450 font-semibold text-[10px] sm:text-xs">감정평가액</span>
+                        <span class="text-slate-400 font-semibold text-[10px] sm:text-xs">감정평가액</span>
                         <span id="detail-spec-appraisal" class="font-extrabold text-slate-800 font-outfit">${formatKRW(item.appraised_value)}</span>
                     </div>
                     <div class="bg-slate-50 border border-slate-100 p-2 rounded-xl flex justify-between items-center">
-                        <span class="text-slate-450 font-semibold text-[10px] sm:text-xs">최저입찰액</span>
+                        <span class="text-slate-400 font-semibold text-[10px] sm:text-xs">최저입찰액</span>
                         <span id="detail-spec-minimum" class="font-extrabold text-rose-600 font-outfit">${formatKRW(item.minimum_bid)}</span>
                     </div>
                     <div class="bg-slate-50 border border-slate-100 p-2 rounded-xl flex justify-between items-center col-span-2">
-                        <span class="text-slate-450 font-semibold text-[10px] sm:text-xs">물건 구조/재질</span>
+                        <span class="text-slate-400 font-semibold text-[10px] sm:text-xs">물건 구조/재질</span>
                         <span id="detail-spec-structure" class="font-extrabold text-slate-800 text-right">${detectedStructure}</span>
                     </div>
                     <div class="bg-slate-50 border border-slate-100 p-2 rounded-xl flex justify-between items-center col-span-2">
-                        <span class="text-slate-455 font-semibold text-[10px] sm:text-xs">입찰일/마감 여부</span>
+                        <span class="text-slate-500 font-semibold text-[10px] sm:text-xs">입찰일/마감 여부</span>
                         <span id="detail-spec-date" class="font-extrabold text-slate-800">${item.bidding_date || "미상"} (${calculateRemainingDays(item.bidding_date) >= 0 ? 'D-' + calculateRemainingDays(item.bidding_date) : '종결'})</span>
                     </div>
                 `;
@@ -6075,63 +6089,23 @@
                 }
             }
 
-            // 📐 평형별 평면도 이미지 매칭 비활성화 (비부동산 자산인 경우 숨김 처리)
+            // 📐 평형별 평면도 이미지 매칭 비활성화 (실제 도면 이미지가 없거나 비부동산 자산인 경우 숨김 처리)
             const fpImgContainer = document.getElementById("detail-floorplan-img-container");
             const guideCard = document.getElementById("detail-floorplan-guide-card");
             const fpPanel = document.getElementById("detail-panel-floorplan");
 
-            if (isNonBuilding) {
+            const hasRealFloorplan = !isNonBuilding && item.images && item.images.length > 0;
+
+            if (!hasRealFloorplan) {
                 if (fpPanel) fpPanel.classList.add("hidden");
                 if (guideCard) guideCard.classList.add("hidden");
             } else {
                 if (fpPanel) fpPanel.classList.remove("hidden");
                 if (fpImgContainer) {
-                    if (item.images && item.images.length > 0) {
-                        fpImgContainer.innerHTML = `<img id="detail-floorplan-img" src="${item.images[0]}" alt="부동산 실제 평면도" class="w-full h-full object-contain">`;
-                        fpImgContainer.onclick = openFloorplanModal;
-                        if (guideCard) guideCard.classList.add("hidden");
-                    } else {
-                        const exclArea = item.exclusive_area || 0;
-                        let estImg = "./floorplan_modern_apartment.png";
-                        let sizeLabel = "";
-                        if (exclArea > 0) {
-                            if (exclArea <= 60) {
-                                estImg = "./floorplan_59.png";
-                                sizeLabel = "59㎡형 ";
-                            } else if (exclArea <= 90) {
-                                estImg = "./floorplan_84.png";
-                                sizeLabel = "84㎡형 ";
-                            } else {
-                                estImg = "./floorplan_114.png";
-                                sizeLabel = "114㎡형 ";
-                            }
-                        }
-
-                        let badgeText = "⚠️ 추정";
-                        let badgeColor = "bg-amber-500";
-                        if (item.exclusive_area_estimation_type === "fake") {
-                            badgeText = "⚠️ 허수";
-                            badgeColor = "bg-rose-500 animate-pulse";
-                        } else if (item.exclusive_area_estimation_type === "estimated") {
-                            badgeText = "⚠️ 추정";
-                            badgeColor = "bg-blue-500";
-                        }
-
-                        fpImgContainer.innerHTML = `
-                            <img id="detail-floorplan-img" src="${estImg}" alt="부동산 추정 평면도" class="w-full h-full object-contain opacity-80">
-                            <div class="absolute top-2.5 right-2.5 ${badgeColor} text-white text-[10px] font-black px-2.5 py-0.5 rounded-full shadow-sm select-none z-10 flex items-center justify-center">
-                                ${badgeText}
-                            </div>
-                            <div class="absolute bottom-2.5 left-2.5 bg-slate-800/80 text-white text-[10px] font-bold px-2.5 py-0.5 rounded-full select-none z-10">
-                                ${sizeLabel}AI 추정 구조도
-                            </div>
-                        `;
-
-                        fpImgContainer.onclick = openFloorplanModal;
-
-                        if (guideCard) guideCard.classList.remove("hidden");
-                    }
+                    fpImgContainer.innerHTML = `<img id="detail-floorplan-img" src="${item.images[0]}" alt="부동산 실제 평면도" class="w-full h-full object-contain">`;
+                    fpImgContainer.onclick = openFloorplanModal;
                 }
+                if (guideCard) guideCard.classList.add("hidden");
             }
 
             // ⚖️ 법정 서류 요약 테이블 및 상시 노출형 카드 데이터 동적 바인딩
@@ -6450,7 +6424,7 @@
                         <div class="flex flex-col items-center justify-center h-full p-6 text-center bg-slate-50 rounded-xl border border-dashed border-slate-300">
                             <span class="text-3xl mb-2">📦</span>
                             <strong class="text-xs text-slate-800 font-extrabold block">지적도 및 지리 지도 제공 불가</strong>
-                            <p class="text-[9.5px] text-slate-450 mt-1 leading-normal font-semibold">비부동산 자산은 지적 지도 및 로드뷰 매칭 서비스를 지원하지 않습니다.</p>
+                            <p class="text-[9.5px] text-slate-400 mt-1 leading-normal font-semibold">비부동산 자산은 지적 지도 및 로드뷰 매칭 서비스를 지원하지 않습니다.</p>
                             <span class="text-[9.5px] text-slate-500 font-black mt-2 bg-slate-100 px-2 py-1 rounded border border-slate-200">실 보관 장소: ${storageLoc}</span>
                         </div>
                     `;
@@ -6771,6 +6745,52 @@
                     `;
                 }
             }
+
+            // v1.2 모의입찰 데이터 및 전문가 리스트 실시간 로드 연동
+            if (typeof v12Features !== 'undefined') {
+                v12Features.loadMockBids(item.id, item.appraised_value);
+                v12Features.renderExperts(item.id);
+            }
+
+            // 미래 예상 시세 산출을 위해 매물 정보를 전역에 보관하고 예측 시뮬레이터를 업데이트합니다.
+            window.currentDetailItem = item;
+            updateFuturePricePrediction();
+        }
+
+        // 🔮 AI 미래 예상 시세 시뮬레이터 연산 함수 (1년/3년/5년/10년 후 예상시세 예측)
+        function updateFuturePricePrediction() {
+            const item = window.currentDetailItem;
+            if (!item) return;
+
+            const basePrice = item.appraised_value || 0;
+            const rateElements = document.getElementsByName("future-rate-select");
+            let rate = 3.0; // 기본 3% (표준)
+            for (let r of rateElements) {
+                if (r.checked) {
+                    rate = parseFloat(r.value);
+                    break;
+                }
+            }
+
+            // 각 예상 기간별 복리 상승률 및 가격 계산
+            const terms = [1, 3, 5, 10];
+            const termKeys = { 1: '1y', 3: '3y', 5: '5y', 10: '10y' };
+
+            terms.forEach(t => {
+                const key = termKeys[t];
+                const cumRate = (Math.pow(1 + rate / 100, t) - 1) * 100;
+                const estPrice = Math.round(basePrice * Math.pow(1 + rate / 100, t));
+
+                const rateEl = document.getElementById(`future-rate-${key}`);
+                const priceEl = document.getElementById(`future-price-${key}`);
+
+                if (rateEl) {
+                    rateEl.textContent = `+${cumRate.toFixed(2)}%`;
+                }
+                if (priceEl) {
+                    priceEl.textContent = formatKRW(estPrice);
+                }
+            });
         }
 
         // 🧠 주변 유사 추천 매물 미터(m) 단위 동적 연산 렌더러
@@ -6810,7 +6830,7 @@
                                 <span class="bg-blue-50 text-royalBlue text-[8.5px] font-black px-1.5 py-0.5 rounded border border-blue-200">
                                     ${item.ptype || '부동산'}
                                 </span>
-                                <span class="text-[9px] text-slate-450 font-black"><i class="fa-solid fa-location-dot text-royalBlue/70"></i> ${distanceText}</span>
+                                <span class="text-[9px] text-slate-400 font-black"><i class="fa-solid fa-location-dot text-royalBlue/70"></i> ${distanceText}</span>
                             </div>
                             <h5 class="text-[10px] font-extrabold text-slate-800 line-clamp-2 leading-snug group-hover:text-royalBlue transition-colors mt-1.5">
                                 ${item.address}
@@ -8117,6 +8137,70 @@
                     sidebarAdSlot.classList.add("hidden");
                 }
             }
+
+            // 📢 상세페이지 상단 광고 슬롯 제어
+            const detailTopAdSlot = document.getElementById("detail-top-ad-slot");
+            if (detailTopAdSlot) {
+                const ad = adSlots["detail_top_banner"];
+                if (ad && ad.active) {
+                    detailTopAdSlot.classList.remove("hidden");
+                    let contentHtml = "";
+                    if (ad.type === "adsense") {
+                        contentHtml = `<div class="w-full flex justify-center overflow-hidden">${ad.ad_code || ''}</div>`;
+                    } else {
+                        contentHtml = `
+                            <div class="bg-white border border-slate-200 rounded-xl p-2 flex items-center justify-between shadow-sm relative overflow-hidden h-[54px] sm:h-[64px]">
+                                <a href="${ad.link_url || '#'}" target="_blank" class="absolute inset-0 z-20"></a>
+                                <div class="space-y-0.5 z-10 max-w-[75%]">
+                                    <div class="flex items-center gap-1.5">
+                                        <span class="bg-slate-900 text-white text-[7.5px] font-black px-1.5 py-0.2 rounded uppercase">AD</span>
+                                        <h4 class="text-[9.5px] sm:text-xs font-black text-slate-800 line-clamp-1">${ad.title || ""}</h4>
+                                    </div>
+                                    <p class="text-[8.5px] sm:text-[9.5px] text-slate-400 font-bold line-clamp-1">${ad.desc || ""}</p>
+                                </div>
+                                <img src="${ad.image_url || './apartment_elegant_facade.png'}" alt="AD" class="absolute right-0 top-0 h-full w-[22%] object-cover object-center opacity-65 sm:opacity-85">
+                            </div>
+                        `;
+                    }
+                    detailTopAdSlot.innerHTML = contentHtml;
+                    if (ad.type === "adsense") executeAdScripts(detailTopAdSlot);
+                } else {
+                    detailTopAdSlot.classList.remove("hidden");
+                }
+            }
+
+            // 📢 상세페이지 하단 광고 슬롯 제어
+            const detailBottomAdSlot = document.getElementById("detail-bottom-ad-slot");
+            if (detailBottomAdSlot) {
+                const ad = adSlots["detail_bottom_banner"];
+                if (ad && ad.active) {
+                    detailBottomAdSlot.classList.remove("hidden");
+                    let contentHtml = "";
+                    if (ad.type === "adsense") {
+                        contentHtml = `<div class="w-full flex justify-center overflow-hidden">${ad.ad_code || ''}</div>`;
+                    } else {
+                        contentHtml = `
+                            <div class="bg-white border border-slate-200 rounded-xl p-2 flex items-center justify-between shadow-sm relative overflow-hidden h-[54px] sm:h-[64px]">
+                                <a href="${ad.link_url || '#'}" target="_blank" class="absolute inset-0 z-20"></a>
+                                <div class="space-y-0.5 z-10 max-w-[75%]">
+                                    <div class="flex items-center gap-1.5">
+                                        <span class="bg-slate-900 text-white text-[7.5px] font-black px-1.5 py-0.2 rounded uppercase">AD</span>
+                                        <h4 class="text-[9.5px] sm:text-xs font-black text-slate-800 line-clamp-1">${ad.title || ""}</h4>
+                                    </div>
+                                    <p class="text-[8.5px] sm:text-[9.5px] text-slate-400 font-bold line-clamp-1">${ad.desc || ""}</p>
+                                </div>
+                                <div class="bg-royalBlue text-white text-[9px] sm:text-[10px] font-black px-2 sm:px-2.5 py-1 sm:py-1.5 rounded-lg z-10 transition-all select-none cursor-pointer">
+                                    바로가기
+                                </div>
+                            </div>
+                        `;
+                    }
+                    detailBottomAdSlot.innerHTML = contentHtml;
+                    if (ad.type === "adsense") executeAdScripts(detailBottomAdSlot);
+                } else {
+                    detailBottomAdSlot.classList.remove("hidden");
+                }
+            }
         }
 
         // 📢 광고 카드 동적 렌더러 함수
@@ -8230,11 +8314,11 @@
             if (content2) content2.style.filter = "none";
             if (content3) content3.style.filter = "none";
 
-            // 전체 코딩/개발 기간 임시 우회 처리: 등급에 관계없이 100% 정보 노출 (등급 오버레이 락 해제)
-            if (false && userGrade === "B") {
+            // 유저 등급에 따른 실시간 락 활성화 처리
+            if (userGrade === "B") {
                 if (mask3) mask3.classList.remove("hidden");
                 if (content3) content3.style.filter = "blur(8px)";
-            } else if (false && userGrade === "C") {
+            } else if (userGrade === "C") {
                 if (mask2) mask2.classList.remove("hidden");
                 if (mask3) mask3.classList.remove("hidden");
                 if (content2) content2.style.filter = "blur(8px)";
@@ -8269,7 +8353,7 @@
 
                 panel.innerHTML = `
                     <div class="space-y-4">
-                        <div class="bg-white border border-slate-200 rounded-2xl p-4 shadow-sm space-y-3">
+                        <div class="bg-white border border-slate-200 rounded-2xl p-3 sm:p-3.5 shadow-sm space-y-2.5">
                             <h4 class="text-xs sm:text-sm font-black text-slate-800 flex items-center gap-1.5">
                                 <i class="fa-solid fa-shield-halved text-royalBlue"></i> 📋 ${assetName} 등록원부 및 압류 내역 권리 진단
                             </h4>
@@ -8319,7 +8403,7 @@
                 
                 panel.innerHTML = `
                     <div class="space-y-4">
-                        <div class="bg-white border border-slate-200 rounded-2xl p-4 shadow-sm space-y-3">
+                        <div class="bg-white border border-slate-200 rounded-2xl p-3 sm:p-3.5 shadow-sm space-y-2.5">
                             <h4 class="text-xs sm:text-sm font-black text-slate-800 flex items-center gap-1.5">
                                 <i class="fa-solid fa-coins text-royalBlue"></i> 💰 비부동산 자산 인수 금융 시뮬레이션
                             </h4>
@@ -8410,7 +8494,7 @@
                             </div>
                         </div>
 
-                        <div class="bg-white border border-slate-200 rounded-2xl p-4 shadow-sm space-y-3">
+                        <div class="bg-white border border-slate-200 rounded-2xl p-3 sm:p-3.5 shadow-sm space-y-2.5">
                             <h4 class="text-xs sm:text-sm font-black text-slate-800 flex items-center gap-1.5">
                                 <i class="fa-solid fa-chart-line text-royalBlue"></i> 📊 동종 모델 시세 분석 리포트
                             </h4>
@@ -8710,5 +8794,9 @@
             </div>
         </div>
     </div>
+
+    <!-- v1.2 큐레이션 및 핵심 피처 스크립트 로드 -->
+    <script src="./v1.2/frontend/components/ThemeCurationOverlay.js"></script>
+    <script src="./v1.2/frontend/components/v12_features.js"></script>
 </body>
 </html>

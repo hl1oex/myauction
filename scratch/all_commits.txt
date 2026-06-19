@@ -1,0 +1,82 @@
+745e279 fix: 상세페이지 광고 복구 및 4대 탭별 광고 연동 구현
+99f6827 style: 반응형 화면 크기 축소 시 매물 카드의 등급 표기와 D-day 배지 겹침 현상 수정
+9b3c1a0 fix: 로컬스토리지 캐시 한도 10,000건 확대 및 QuotaExceededError 예방 용량 최적화
+dbcb0c8 fix: 메인페이지 상단 및 사이드바 광고 노출 누락 복구
+1b401d8 fix: 비부동산 매물 상세 Drawer 화이트아웃 런타임 오류 핫픽스
+c0525cf feat: scrapers update with robust proxy bypass, multi-key rotation, 6-month search, and advanced non-building parser
+70998b4 feat: 차량 물건 제목에 포함된 보관소/본거지 주소를 기본 명세 및 외부 연동 허브에 연동하도록 수정
+884169c feat: 비부동산 자산(차량 등) 주요 법정 서류 동적 매핑 및 웹/모바일 양방향 예산 필터 조절 기능 보강
+3259bec fix: 상세페이지 탭 1 하단에 잔존하여 중복 노출되던 레거시 마크업 전체 제거 및 Drawer 태그 계층 구조 교정
+100af5b docs: 상세페이지 반응형 레이아웃 튜닝 완료 및 E2E 실서버 검증 내역 개발 체크리스트/의사록 반영
+f4b7985 design: 상세페이지 Drawer 대화면 반응형 확장 및 탭 1, 2 내 주요 카드 배치 대화면 2열 자동 스위칭 적용
+5b99674 design: 상세페이지 요약 및 각 탭별 카드를 2열 그리드에서 세로 1열 스택 구조로 정렬하여 시인성 개선
+071fcf7 fix: 부동산 상세페이지 탭 전환 시 기존 바인딩된 데이터가 뼈대 템플릿으로 초기화되어 날아가는 렌더링 버그 수정 및 백엔드 면적 스크래퍼 개선 반영
+994c7f1 feat: 동호수 인접 전용면적 유추 알고리즘 수정 및 상세페이지 소유주와 채무자 정보 실데이터 마스킹 연동 완료
+65cba74 상세페이지 4대 탭 디자인 통일 및 PC 2열 반응형 그리드 레이아웃 적용.
+e0173f9 fix: 상세페이지 스크립트 에러 복구 및 모바일 빌드 컴파일 안정화, Admin UI/광고 고도화 배포
+63c12b5 법원 및 온비드 매물 면적 추정 고도화 및 0㎡ 미상 표기 적용
+7aca83f 온비드 공매 수집기에 제목 기반 고도화 면적 추정 알고리즘 적용
+c81cf0a 추정 및 허수 배지를 둥근 캡슐 형태로 UI 디자인 개선
+0d0e0ef 상세페이지 4대 탭 디자인 통일 및 반응형 레이아웃 개선
+7edc948 feat: 모바일 상세 화면 디자인 통일 및 텍스트 시인성 상향 개편 완수
+c93a23d fix: 비부동산 필터 정밀화 핫픽스 및 중복 노출 결함 해결
+da2ab04 fix: 국토부 토지이음(eum.go.kr) 시스템 오류 링크 우회 처리 (자동 지번주소 복사 + 토스트 및 공식 검색페이지 연동)
+84fa3b9 feat: 네이버 부동산 신형 검색/단지 링크 정교화 및 평면도 하단 3사 로드뷰 버튼 완벽 복구
+b26fd36 네이버 부동산 신형/구형 링크 도메인 교정 및 평면도 영역 3사 로드뷰 바로가기 복원
+f46eede 면적 추정 및 허수 표시 방식 고도화 및 ⚠️ 기호 추가 적용
+e339cf6 온비드 비부동산 자산 필터 로직 및 로드뷰 상세 뷰 예외 처리 반영
+6f557de feat: 면적 추정 신뢰도 세분화(추정 vs 허수) 및 다세대 건물 명세 노출 구현
+ed2068a scrapers: 대법원 경매 매물의 제목 정보 기반 면적 파싱 및 추정 알고리즘 추가
+3dc00fa fix: 네이버 지도 전문 레이어(지번도, 위성도, 로드뷰) 연동 오류 수정
+4ff4c46 fix: 물건 용도별 네이버 부동산 신형 및 구형 검색 링크 분기 처리 구현
+f08bd62 fix: 네이버 부동산 신형 좌표 기반 지도 주소 체계 개편 반영
+1edc48d fix: PC 웹 4번 위치&시세분석 탭 화이트아웃 복구 (닫는 div 태그 누락 해결)
+2715ccd fix: PC 웹 정렬 기능 오작동 해결 및 단일 토글 정렬 복구
+26241e7 fix: 회원가입 시 허용 이메일 화이트리스트 가드 적용
+c89e945 feat: 상세페이지 7대 오류 수정 및 실서버 배포 완료
+934a92b fix: 실시간 연동 대기 지연 해결 및 로컬 스토리지 한도 초과 예방 슬라이싱 캐싱 적용
+71063e3 feat: 실시간 경시/공매 통합 시스템 고도화 및 PC/모바일 싱크 동기화 배포 완료
+7019db2 fix(web): 상세 드로어 TDZ 에러 해결 및 백엔드 어드민 바로가기 버튼 추가
+b1a6643 fix(mobile): 모바일 상세화면 JSX 구문 오류 수정 및 빌드 안정화
+39f5442 fix: 모바일 index.html 상대경로 빌드 후처리 스크립트 추가 및 워크플로우 연동
+45db8c4 fix: 모바일 상세 모달의 웹/네이브 렌더링 방식 개선 및 가독성 색상 보정
+318da8b Update Node.js version to 20 in deploy workflow
+ce6112b fix: restore missing outlink buttons in html markup
+5ef6849 deploy_gh_pages
+6acfaf9 docs and fix: implement 4-tab premium system, resolve mobile TS errors, and clean up legacy local backend assets
+9f0afd6 Feat: 모바일 및 PC 파비콘 불일치 해결 및 신규 3D 원형 파비콘 배포
+7aa10f4 Feat: 로그인 시 빈 화면 버그 수정 및 관심 매물 필터 버튼 추가
+b23c812 fix: 온비드 공매 데이터 수집 안정화 및 수집량 증대
+340eea3 fix: Supabase 1,000건 제한 우회 페이징 루프 구축 및 디데이 필터 렌더링 오류 해결
+7a60799 fix: Supabase 기본키 중복 에러 해결 및 대시보드 10대 차단 우회 기법 상세화
+e12c4b2 fix: enforce 180s timeout inside scraper loop and add requests timeout in database.py
+fedb26e fix: match DROP and CREATE policy name in init_schema.sql
+d5c5202 fix: cast appraised_value and minimum_bid to bigint in database.py
+a9cecaf feat: add Cloudflare WARP to workflow and stabilize scraper DB initialization
+c5b484b fix: Map IPv6 host in /etc/hosts for schema creation in Actions workflow
+1b234db fix: Bypass IPv6 with DNS64 nameserver configuration in Actions workflow
+3624bc3 feat: Add anon write policy and setup workflow schema creation
+7ca104a docs: 아키텍처 문서 내 온라인 이관 및 폴더 삭제 가이드 보강
+8a89ac5 feat: 아키텍처 온라인화 탭 연동 및 불필요 파일 .폴더 정리
+6603852 feat: 모바일 탭바 및 KPI 요약바 반응형 가독성 패치 완수
+a090dbd docs: v1.1 작업 완료 체크리스트 최신화
+a5367df feat: Firestore custom database 'action' 적용 및 웹/모바일 실시간 연동 완료
+19ba55a refactor: Firestore 클라이언트 초기화 방식 개선 (ADC Fallback 도입)
+e0dbd8e feat: 여백 축소, Firestore 실시간 연동 완료 및 계획서 키패드 스케일업
+d6c3528 fix: 탭바 버튼 반응형 글꼴 크기 개선 완료
+5185afb fix: PC 대시보드 탭바 반응형 패치, 레이아웃 여백 축소 및 Firestore 직접 연동 완료
+a8c353b feat: v1.1 배포 및 유명 포털 수준의 가독성 개선 작업 완료
+ab49c22 Release version v1.0: Simplify header and clean up old Streamlit code
+2d7eae0 Update API_BASE_URL with /action prefix
+55382df Update API endpoint to new static IP 168.107.33.213
+0d60b6b Cleanup unnecessary repository files and keep bats local only
+72fd5ba Update API_BASE_URL to live Oracle server for local view
+d43660a Deploy to Oracle Cloud Always Free server
+a90e613 Optimize data cache to 3 hours and add optimization banner to dashboard
+5b3c129 Fix filter reset StreamlitAPIException using callback and improve Onbid fetcher success criteria
+e520953 Implement automated background updater daemon and add data usage footer notice
+aad42c6 Enhance Onbid scraper with paginated movables, extend court scraper to 1 year, filter out sold items, and unify dashboard search/sorting UI
+7576278 Highlight Onbid internet bidding advantages, add Naver Maps link, show bidding round/failed counts, redesign Grade X to warning card layout
+a2f1999 Update program name to 부동산 경매 추천 시스템, add Onbid guides and visual styling
+dae095c Fix Onbid API mandatory parameters and add gitignore
+7d9cf40 First upload of auction system

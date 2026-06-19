@@ -1,0 +1,130 @@
+Line 3044:             const remainder = val % 100000000;
+Line 3045:             const man = Math.floor(remainder / 10000);
+Line 3046:             
+Line 3047:             let parts = [];
+Line 3048:             if (uk > 0) parts.push(`${uk}억`);
+Line 3049:             if (man > 0) parts.push(`${man.toLocaleString()}만`);
+Line 3050:             return parts.length > 0 ? parts.join(" ") + " 원" : `${val.toLocaleString()}원`;
+Line 3051:         }
+Line 3052: 
+Line 3053:         // 4. [신규 로직 통합] 실시간 다차원 지역/출처/일정 검색 필터 엔진 (페이지네이션 연동)
+Line 3054:         function applyFilters() {
+Line 3055:             const searchQuery = document.getElementById("search-input").value.trim().toLowerCase();
+Line 3056:             
+Line 3057:             const sourceCheckBoxes = document.querySelectorAll('input[name="source-check"]:checked');
+Line 3058:             const selectedSources = Array.from(sourceCheckBoxes).map(cb => cb.value);
+Line 3059:             
+Line 3060:             const ptypeCheckBoxes = document.querySelectorAll('input[name="ptype-check"]:checked');
+Line 3061:             const selectedPtypes = Array.from(ptypeCheckBoxes).map(cb => cb.value);
+Line 3062:             
+Line 3063:             const sidoCheckBoxes = document.querySelectorAll('input[name="sido-check"]:checked');
+Line 3064:             const selectedSidos = Array.from(sidoCheckBoxes).map(cb => cb.value);
+Line 3065: 
+Line 3066:             const dateLimit = parseInt(document.getElementById("date-filter").value);
+Line 3067:             const budgetMinLimit = parseInt(document.getElementById("budget-min-slider").value);
+Line 3068:             const budgetMaxLimit = parseInt(document.getElementById("budget-max-slider").value);
+Line 3069:             const hidePast = document.getElementById("hide-past-toggle").checked;
+Line 3070:             
+Line 3071:             const gradeFilterEl = document.querySelector('input[name="grade-filter"]:checked');
+Line 3072:             const gradeVal = gradeFilterEl ? gradeFilterEl.value : "safe";
+Line 3073:             
+Line 3074:             ['all', 'safe', 'risk'].forEach(g => {
+Line 3075:                 const el = document.getElementById(`grade-filter-${g}`);
+Line 3076:                 if (el) {
+Line 3077:                     if (g === gradeVal) {
+Line 3078:                         el.className = "block rounded py-0.5 bg-royalBlue text-white font-extrabold shadow-sm";
+Line 3079:                     } else {
+Line 3080:                         el.className = "block rounded py-0.5 text-slate-500 hover:bg-slate-100 font-bold";
+Line 3081:                     }
+Line 3082:                 }
+Line 3083:             });
+Line 3084: 
+Line 3085:             const sigunguCheckBoxes = document.querySelectorAll('input[name="sigungu-check"]:checked');
+Line 3086:             const selectedSigungus = Array.from(sigunguCheckBoxes).map(cb => cb.value);
+Line 3087: 
+Line 3088:             filteredProperties = originalProperties.filter(item => {
+Line 3089:                 const addressStr = item.address || "";
+Line 3090:                 const matchesKeyword = !searchQuery || 
+Line 3091:                     addressStr.toLowerCase().includes(searchQuery) ||
+Line 3092:                     (item.auction_no || "").toLowerCase().includes(searchQuery) ||
+Line 3093:                     (item.desc_content && item.desc_content.toLowerCase().includes(searchQuery)) ||
+Line 3094:                     (item.notes_content && item.notes_content.toLowerCase().includes(searchQuery)) ||
+Line 3095:                     (item.ptype && item.ptype.toLowerCase().includes(searchQuery));
+Line 3096:                 
+Line 3097:                 const priceVal = item.minimum_bid || item.appraised_value || 0;
+Line 3098:                 const matchesBudget = priceVal >= budgetMinLimit && (budgetMaxLimit >= 2000000000 || priceVal <= budgetMaxLimit);
+Line 3099:                 
+Line 3100:                 const matchesSource = selectedSources.length === 0 || 
+Line 3101:                     selectedSources.includes(item.source) ||
+Line 3102:                     (selectedSources.includes("onbid") && item.source === "onbid_etc") ||
+Line 3103:                     (selectedSources.includes("court") && item.source === "court_etc");
+Line 3104:                 
+Line 3105:                 const matchesDate = dateLimit === 999 || (item.remaining_days && item.remaining_days <= dateLimit);
+Line 3106:                 
+Line 3107:                 const matchesPast = !hidePast || (item.remaining_days && item.remaining_days >= 0);
+Line 3108:                 
+Line 3109:                 let matchesSido = selectedSidos.length === 0;
+Line 3110:                 if (selectedSidos.length > 0) {
+Line 3111:                     for (const sido of selectedSidos) {
+Line 3112:                         const aliases = [sido];
+Line 3113:                         if (sido === "서울") aliases.push("특별시");
+Line 3114:                         if (sido === "경기") aliases.push("경기도");
+Line 3115:                         let matched = false;
+Line 3116:                         aliases.forEach(al => {
+Line 3117:                             if (addressStr.includes(al)) matched = true;
+Line 3118:                         });
+Line 3119:                         if (matched) { matchesSido = true; break; }
+Line 3120:                     }
+Line 3121:                 }
+Line 3122:                 
+Line 3123:                 let matchesSigungu = true;
+Line 3124:                 if (selectedSigungus.length > 0) {
+Line 3125:                     matchesSigungu = false;
+Line 3126:                     selectedSigungus.forEach(sgFull => {
+Line 3127:                         const sg = sgFull.split(" ")[1];
+Line 3128:                         if (addressStr.includes(sg)) matchesSigungu = true;
+Line 3129:                     });
+Line 3130:                 }
+Line 3131: 
+Line 3132:                 let matchesGrade = true;
+Line 3133:                 if (gradeVal === 'safe') {
+Line 3134:                     matchesGrade = item.grade !== 'X';
+Line 3135:                 } else if (gradeVal === 'risk') {
+Line 3136:                     matchesGrade = item.grade === 'X';
+Line 3137:                 }
+Line 3138: 
+Line 3139:                 let matchesPtype = selectedPtypes.length === 0;
+Line 3140:                 if (selectedPtypes.length > 0) {
+Line 3141:                     const type = (item.ptype || "").toLowerCase();
+Line 3142:                     // 비부동산 개별 분류 여부 판별.
+Line 3143:                     const isVehicle = type.includes("차량") || type.includes("운송") || type.includes("자동차") || type.includes("선박") || type.includes("항공기") || type.includes("중기") || type.includes("지게차") || type.includes("suv");
+Line 3144:                     const isSecurity = type.includes("유가증권") || type.includes("주식") || type.includes("채권") || type.includes("지분") || type.includes("증권");
+Line 3145:                     const isMachinery = type.includes("기계") || (type.includes("장비") && !type.includes("운송장비")) || type.includes("기구") || type.includes("설비") || type.includes("기기");
+Line 3146: 
+Line 3147:                     for (const val of selectedPtypes) {
+Line 3148:                         if (val === "apart") {
+Line 3149:                             if (type.includes("아파트")) { matchesPtype = true; break; }
+Line 3150:                         } else if (val === "officetel") {
+Line 3151:                             if (type.includes("오피스텔")) { matchesPtype = true; break; }
+Line 3152:                         } else if (val === "villa") {
+Line 3153:                             if (type.includes("다세대") || type.includes("빌라") || type.includes("연립")) { matchesPtype = true; break; }
+Line 3154:                         } else if (val === "house") {
+Line 3155:                             if ((type.includes("주택") || type.includes("가구") || type.includes("단독") || type.includes("전원")) && !type.includes("아파트") && !type.includes("오피스텔") && !type.includes("다세대") && !type.includes("빌라") && !type.includes("연립")) { matchesPtype = true; break; }
+Line 3156:                         } else if (val === "store") {
+Line 3157:                             if (type.includes("상가") || type.includes("점포") || type.includes("근린") || type.includes("근생") || type.includes("생활시설") || type.includes("상업") || type.includes("빌딩") || type.includes("사무실")) { matchesPtype = true; break; }
+Line 3158:                         } else if (val === "land") {
+Line 3159:                             if (type.includes("토지") || type.includes("대지") || type.includes("임야") || type.includes("잡종지") || type.includes("대") || type.includes("전") || type.includes("답")) { matchesPtype = true; break; }
+Line 3160:                         } else if (val === "factory") {
+Line 3161:                             if (type.includes("공장") || type.includes("창고") || type.includes("산업")) { matchesPtype = true; break; }
+Line 3162:                         } else if (val === "vehicle") {
+Line 3163:                             if (isVehicle) { matchesPtype = true; break; }
+Line 3164:                         } else if (val === "security") {
+Line 3165:                             if (isSecurity) { matchesPtype = true; break; }
+Line 3166:                         } else if (val === "machinery") {
+Line 3167:                             if (isMachinery) { matchesPtype = true; break; }
+Line 3168:                         } else if (val === "etc_goods") {
+Line 3169:                             // 다른 비부동산 분류에 해당하지 않는 순수 기타동산/물품만 통과시킵니다.
+Line 3170:                             if ((type.includes("물품") || type.includes("기타물품") || type.includes("동산") || type.includes("기타동산") || item.source === 'onbid_etc' || item.source === 'court_etc') && !isVehicle && !isSecurity && !isMachinery) { matchesPtype = true; break; }
+Line 3171:                         }
+Line 3172:                     }
+Line 3173:                 }
