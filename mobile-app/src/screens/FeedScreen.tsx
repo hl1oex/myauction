@@ -730,6 +730,22 @@ export const FeedScreen: React.FC<FeedScreenProps> = ({ onSelectProperty, filter
           </TouchableOpacity>
         </View>
 
+        {/* 추천 검색어 제안 칩 바 */}
+        <View style={styles.suggestedSearchContainer}>
+          <Text style={styles.suggestedSearchTitle}>추천 검색어</Text>
+          <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.suggestedSearchScroll}>
+            {['아파트', '빌라', '서울', '경기', '유찰', '차량'].map((kw) => (
+              <TouchableOpacity
+                key={kw}
+                style={styles.suggestedSearchChip}
+                onPress={() => setFilters((prev) => ({ ...prev, search: kw }))}
+              >
+                <Text style={styles.suggestedSearchChipText}>{kw}</Text>
+              </TouchableOpacity>
+            ))}
+          </ScrollView>
+        </View>
+
         {/* 상세 필터 설정 패널 영역 */}
         {showFilterPanel && (
           <View style={styles.filterWrapper}>
@@ -1891,5 +1907,38 @@ const styles = StyleSheet.create({
     fontSize: 10,
     color: COLORS.slate500,
     marginTop: 1,
+  },
+  suggestedSearchContainer: {
+    paddingHorizontal: 14,
+    paddingVertical: 8,
+    backgroundColor: '#f8fafc',
+    borderBottomWidth: 1,
+    borderBottomColor: '#f1f5f9',
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  suggestedSearchTitle: {
+    fontSize: 11,
+    fontWeight: '900',
+    color: '#64748b',
+    marginRight: 8,
+  },
+  suggestedSearchScroll: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  suggestedSearchChip: {
+    backgroundColor: COLORS.white,
+    borderWidth: 1,
+    borderColor: '#e2e8f0',
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    borderRadius: 999,
+    marginRight: 6,
+  },
+  suggestedSearchChipText: {
+    fontSize: 10.5,
+    fontWeight: 'bold',
+    color: '#334155',
   },
 });

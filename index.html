@@ -831,6 +831,18 @@
             <div id="dashboard-view" class="flex flex-col flex-1 overflow-hidden">
                 <!-- 📢 메인 상단 배너 광고 슬롯 -->
                 <div id="main-top-ad-slot" class="w-full bg-white px-3.5 pt-2 hidden"></div>
+                <!-- 🔍 추천 검색어 제안 칩 바 -->
+                <div class="px-3.5 py-2 bg-slate-50 border-b border-slate-200/60 flex items-center gap-2 overflow-x-auto custom-scrollbar select-none">
+                    <span class="text-[10px] sm:text-xs font-black text-slate-500 flex-shrink-0">🔍 추천 검색어</span>
+                    <div class="flex gap-1.5">
+                        <button onclick="applySuggestedSearch('아파트')" class="bg-white border border-slate-200 text-slate-600 px-2 py-0.5 rounded-full text-[10px] font-bold hover:border-royalBlue hover:text-royalBlue transition-all">아파트</button>
+                        <button onclick="applySuggestedSearch('빌라')" class="bg-white border border-slate-200 text-slate-600 px-2 py-0.5 rounded-full text-[10px] font-bold hover:border-royalBlue hover:text-royalBlue transition-all">빌라/다세대</button>
+                        <button onclick="applySuggestedSearch('서울')" class="bg-white border border-slate-200 text-slate-600 px-2 py-0.5 rounded-full text-[10px] font-bold hover:border-royalBlue hover:text-royalBlue transition-all">서울</button>
+                        <button onclick="applySuggestedSearch('경기')" class="bg-white border border-slate-200 text-slate-600 px-2 py-0.5 rounded-full text-[10px] font-bold hover:border-royalBlue hover:text-royalBlue transition-all">경기</button>
+                        <button onclick="applySuggestedSearch('유찰')" class="bg-white border border-slate-200 text-slate-600 px-2 py-0.5 rounded-full text-[10px] font-bold hover:border-royalBlue hover:text-royalBlue transition-all">유찰</button>
+                        <button onclick="applySuggestedSearch('차량')" class="bg-white border border-slate-200 text-slate-600 px-2 py-0.5 rounded-full text-[10px] font-bold hover:border-royalBlue hover:text-royalBlue transition-all">차량</button>
+                    </div>
+                </div>
                 <!-- 정렬 및 리스트 필터 바 -->
                 <div class="px-3.5 py-1.5 bg-white border-b border-slate-200 flex flex-wrap justify-between items-center z-10 shadow-sm gap-2">
                     <div class="flex items-center gap-2 flex-wrap">
@@ -1094,31 +1106,37 @@
         
         <!-- 💎 상세 Drawer 4대 대분류 프리미엄 탭 메뉴 바 -->
         <div class="flex overflow-x-auto whitespace-nowrap bg-white p-2 gap-1.5 z-10 flex-shrink-0 custom-scrollbar border-b border-slate-200">
-            <button id="detail-group-tab-1-btn" onclick="changeDetailGroupTab(1)" class="inline-block py-1.5 px-3.5 text-center text-[10.5px] sm:text-xs font-black rounded-xl border border-transparent transition-all select-none bg-royalBlue text-white shadow-sm">1. 종합 분석</button>
-            <button id="detail-group-tab-2-btn" onclick="changeDetailGroupTab(2)" class="inline-block py-1.5 px-3.5 text-center text-[10.5px] sm:text-xs font-black rounded-xl border border-transparent transition-all select-none text-slate-500 hover:text-royalBlue hover:bg-slate-50 bg-slate-50/50">2. 권리 & 안전 분석</button>
-            <button id="detail-group-tab-3-btn" onclick="changeDetailGroupTab(3)" class="inline-block py-1.5 px-3.5 text-center text-[10.5px] sm:text-xs font-black rounded-xl border border-transparent transition-all select-none text-slate-500 hover:text-royalBlue hover:bg-slate-50 bg-slate-50/50">3. 입지 & 시세 분석</button>
-            <button id="detail-group-tab-4-btn" onclick="changeDetailGroupTab(4)" class="inline-block py-1.5 px-3.5 text-center text-[10.5px] sm:text-xs font-black rounded-xl border border-transparent transition-all select-none text-slate-500 hover:text-royalBlue hover:bg-slate-50 bg-slate-50/50">4. 입찰 & 금융 시뮬레이션</button>
+            <button id="detail-group-tab-1-btn" onclick="changeDetailGroupTab(1)" class="inline-block py-1.5 px-3.5 text-center text-[10.5px] sm:text-xs font-black rounded-xl border border-transparent transition-all select-none bg-royalBlue text-white shadow-sm">1. 종합 & 권리분석</button>
+            <button id="detail-group-tab-2-btn" onclick="changeDetailGroupTab(2)" class="inline-block py-1.5 px-3.5 text-center text-[10.5px] sm:text-xs font-black rounded-xl border border-transparent transition-all select-none text-slate-500 hover:text-royalBlue hover:bg-slate-50 bg-slate-50/50">2. 입찰 & 금융분석</button>
+            <button id="detail-group-tab-3-btn" onclick="changeDetailGroupTab(3)" class="inline-block py-1.5 px-3.5 text-center text-[10.5px] sm:text-xs font-black rounded-xl border border-transparent transition-all select-none text-slate-500 hover:text-royalBlue hover:bg-slate-50 bg-slate-50/50">3. 입지 & 시세분석</button>
         </div>
         <div id="detail-group-panel-1" class="flex-1 overflow-y-auto p-4 sm:p-5 space-y-4 sm:space-y-5 custom-scrollbar bg-slate-50/50">
             <div id="group-content-1" class="space-y-4 sm:space-y-5 w-full">
                 <!-- 1. 대표 이미지와 부동산 기본 명세 반응형 분기 레이아웃 -->
                 <div id="detail-panel-summary" class="grid grid-cols-1 xl:grid-cols-2 gap-4 sm:gap-5 items-start">
-                    <!-- 대표 이미지 영역 (실제 로드뷰 3D) -->
-                    <div class="bg-white border border-slate-200 rounded-2xl p-4 shadow-sm w-full">
+                    <!-- 대표 이미지 영역 (부동산: 3대 포털 로드뷰 연동 / 비부동산: 자산 대표 실사진) -->
+                    <div id="detail-roadview-card" class="bg-white border border-slate-200 rounded-2xl p-4 shadow-sm w-full">
                         <h4 id="detail-roadview-title" class="text-xs sm:text-sm font-black text-slate-800 flex items-center gap-1.5 mb-2.5">
-                            <i class="fa-solid fa-image text-royalBlue"></i> 🏢 부동산 대표 전경 (실제 로드뷰)
+                            <i class="fa-solid fa-image text-royalBlue"></i> 🏢 부동산 대표 전경
                         </h4>
-                        <div class="w-full h-[220px] rounded-xl overflow-hidden border border-slate-200 bg-slate-100 relative">
-                            <div id="detail-roadview" class="w-full h-full"></div>
-                            <div id="detail-roadview-fallback" class="absolute inset-0 flex flex-col items-center justify-center bg-slate-100 p-4 text-center hidden">
-                                <img src="./apartment_elegant_facade.png" alt="부동산 전경 폴백" class="absolute inset-0 w-full h-full object-cover opacity-30">
-                                <div class="relative z-10 space-y-2">
-                                    <p id="detail-roadview-fallback-text" class="text-xs font-black text-slate-700">해당 위치의 로드뷰를 불러올 수 없습니다.</p>
-                                    <a id="btn-naver-roadview-fallback" href="#" target="_blank" class="inline-flex items-center gap-1 bg-royalBlue text-white text-[10px] font-black px-2.5 py-1.5 rounded-lg shadow-sm hover:bg-royalHover transition-all">
-                                        <i class="fa-solid fa-map-location-dot"></i> 네이버 지도로 확인하기
-                                    </a>
-                                </div>
-                            </div>
+                        <!-- 부동산용 3대 포털 로드뷰 버튼 컨테이너 -->
+                        <div id="detail-roadview-buttons-container" class="grid grid-cols-3 gap-2 mt-2">
+                            <a id="btn-naver-roadview-hub" href="#" target="_blank" class="flex flex-col items-center justify-center p-3 rounded-xl border border-slate-200 bg-slate-50 hover:bg-slate-100 hover:border-emerald-500 hover:shadow-sm transition-all select-none cursor-pointer text-center group">
+                                <i class="fa-solid fa-street-view text-emerald-600 text-lg group-hover:scale-110 transition-transform"></i>
+                                <span class="text-emerald-600 font-extrabold text-[10.5px] mt-1.5">네이버 로드뷰</span>
+                            </a>
+                            <a id="btn-kakao-roadview-hub" href="#" target="_blank" class="flex flex-col items-center justify-center p-3 rounded-xl border border-slate-200 bg-slate-50 hover:bg-slate-100 hover:border-yellow-500 hover:shadow-sm transition-all select-none cursor-pointer text-center group">
+                                <i class="fa-solid fa-road text-yellow-600 text-lg group-hover:scale-110 transition-transform"></i>
+                                <span class="text-yellow-600 font-extrabold text-[10.5px] mt-1.5">카카오 로드뷰</span>
+                            </a>
+                            <a id="btn-google-roadview-hub" href="#" target="_blank" class="flex flex-col items-center justify-center p-3 rounded-xl border border-slate-200 bg-slate-50 hover:bg-slate-100 hover:border-blue-500 hover:shadow-sm transition-all select-none cursor-pointer text-center group">
+                                <i class="fa-solid fa-map-location-dot text-blue-600 text-lg group-hover:scale-110 transition-transform"></i>
+                                <span class="text-blue-600 font-extrabold text-[10.5px] mt-1.5">구글 스트리트뷰</span>
+                            </a>
+                        </div>
+                        <!-- 비부동산용 실사진 컨테이너 -->
+                        <div id="detail-roadview-image-container" class="w-full h-[220px] rounded-xl overflow-hidden border border-slate-200 bg-slate-100 relative hidden">
+                            <!-- JS에서 이미지 동적 주입 -->
                         </div>
                     </div>
 
@@ -1246,19 +1264,6 @@
                                     <i class="fa-solid fa-arrow-up-right-from-square"></i> 네이버부동산 단지 실제 평면도 바로 확인하기
                                 </a>
                             </div>
-                            <div class="mt-2.5">
-                                <span class="text-slate-450 font-bold text-[10px] sm:text-[11px] block mb-1.5">🧭 현장 분석용 3대 포털 로드뷰 비교 바로가기</span>
-                                <div class="grid grid-cols-3 gap-2">
-                                    <a id="btn-floorplan-naver-road" href="#" target="_blank" class="bg-emerald-50 border border-emerald-200 hover:border-emeraldSuccess hover:shadow-md rounded-xl py-2 px-1 flex flex-col items-center justify-center gap-1 transition-all text-[10px] font-black text-slate-700 select-none">
-                                        <i class="fa-solid fa-street-view text-emeraldSuccess text-sm"></i> 네이버 로드뷰
-                                    </a>
-                                    <a id="btn-floorplan-kakao-road" href="#" target="_blank" class="bg-emerald-50 border border-emerald-200 hover:border-amber-500 hover:shadow-md rounded-xl py-2 px-1 flex flex-col items-center justify-center gap-1 transition-all text-[10px] font-black text-slate-700 select-none">
-                                        <i class="fa-solid fa-road text-amber-500 text-sm"></i> 카카오 로드뷰
-                                    </a>
-                                    <a id="btn-floorplan-google-road" href="#" target="_blank" class="bg-blue-50 border border-blue-200 hover:border-royalBlue hover:shadow-md rounded-xl py-2 px-1 flex flex-col items-center justify-center gap-1 transition-all text-[10px] font-black text-slate-700 select-none">
-                                        <i class="fa-solid fa-map-location-dot text-royalBlue text-sm"></i> 구글 스트리트뷰
-                                    </a>
-                                </div>
                             </div>
                         </div>
 
@@ -1747,14 +1752,14 @@
             <div id="group-mask-3" class="absolute inset-0 bg-slate-900/60 backdrop-blur-sm z-30 flex flex-col items-center justify-center text-center p-6 hidden">
                 <div class="bg-white border border-slate-200 rounded-2xl p-6 max-w-sm shadow-2xl space-y-3">
                     <i class="fa-solid fa-lock text-rose-500 text-3xl"></i>
-                    <h4 class="text-slate-800 text-sm font-black">🔒 위치 & 시세 분석 열람 제한</h4>
+                    <h4 class="text-slate-800 text-sm font-black">🔒 입지 & 시세 분석 열람 제한</h4>
                     <p class="text-slate-500 text-[10.5px] leading-relaxed font-semibold">본 매물의 지도 및 인근 실거래 시세 추이는 프리미엄 회원 등급 전용 콘텐츠입니다. 등급을 상향하여 실시간 위치분석 정보를 확인해 보세요.</p>
                     <button onclick="alert('등급 상향은 관리자 권한으로 즉시 조정 가능합니다.')" class="w-full bg-royalBlue text-white font-extrabold text-xs py-2 rounded-xl shadow-md hover:bg-royalHover transition-all">등급 상향 신청하기</button>
                 </div>
             </div>
         </div>
-        <div id="detail-group-panel-4" class="flex-1 overflow-y-auto p-4 sm:p-5 space-y-4 sm:space-y-5 custom-scrollbar bg-slate-50/50 hidden relative">
-            <div id="group-content-4" class="space-y-4 sm:space-y-5 w-full">
+        <div id="detail-group-panel-2" class="flex-1 overflow-y-auto p-4 sm:p-5 space-y-4 sm:space-y-5 custom-scrollbar bg-slate-50/50 hidden relative">
+            <div id="group-content-2" class="space-y-4 sm:space-y-5 w-full">
                 <div id="detail-panel-bid" class="space-y-4 sm:space-y-5">
             <!-- AI 낙찰 시뮬레이션 지표 분석 -->
             <div class="bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 rounded-2xl p-3.5 sm:p-4 space-y-2.5 shadow-sm mb-4">
@@ -1970,7 +1975,7 @@
                 </div>
             </div>
             </div>
-            <div id="group-mask-4" class="absolute inset-0 bg-slate-900/60 backdrop-blur-sm z-30 flex flex-col items-center justify-center text-center p-6 hidden">
+            <div id="group-mask-2" class="absolute inset-0 bg-slate-900/60 backdrop-blur-sm z-30 flex flex-col items-center justify-center text-center p-6 hidden">
                 <div class="bg-white border border-slate-200 rounded-2xl p-6 max-w-sm shadow-2xl space-y-3">
                     <i class="fa-solid fa-lock text-rose-500 text-3xl"></i>
                     <h4 class="text-slate-800 text-sm font-black">🔒 입찰 & 금융 분석 열람 제한</h4>
@@ -2414,7 +2419,6 @@
         // 🚀 비부동산 자산 전환 시 원본 부동산 탭 복원용 캐시 변수
         let originalPanel2Html = "";
         let originalPanel3Html = "";
-        let originalPanel4Html = "";
 
         // 🚀 성능 극대화 고도화: 대용량 데이터 지연 로딩(Pagination) 및 디바운싱 데몬 설정
         let currentPage = 1;
@@ -2607,10 +2611,8 @@
             // 원본 탭 HTML 백업
             const p2 = document.getElementById("detail-group-panel-2");
             const p3 = document.getElementById("detail-group-panel-3");
-            const p4 = document.getElementById("detail-group-panel-4");
             if (p2) originalPanel2Html = p2.innerHTML;
             if (p3) originalPanel3Html = p3.innerHTML;
-            if (p4) originalPanel4Html = p4.innerHTML;
 
             initResponsiveLayout();
             initBudgetSliderZIndexController();
@@ -3387,6 +3389,20 @@
             }
         }
  
+        // 🔍 추천 검색어 클릭 시 검색 연동 함수
+        function applySuggestedSearch(keyword) {
+            const searchInput = document.getElementById("search-input");
+            if (searchInput) {
+                searchInput.value = keyword;
+                // 아코디언이 닫혀 있으면 열기
+                const accordion = document.getElementById("accordion-search");
+                if (accordion && accordion.classList.contains("hidden")) {
+                    toggleAccordion("accordion-search");
+                }
+                debouncedApplyFilters();
+            }
+        }
+
         // 🚀 입력 지연 디바운싱 필터 트리거 (성능 극대화)
         function debouncedApplyFilters() {
             clearTimeout(debounceTimer);
@@ -5095,7 +5111,6 @@
             const rvFallbackText = document.getElementById("detail-roadview-fallback-text");
             const tab2Btn = document.getElementById("detail-group-tab-2-btn");
             const tab3Btn = document.getElementById("detail-group-tab-3-btn");
-            const tab4Btn = document.getElementById("detail-group-tab-4-btn");
 
             const nonBuildingKeywords = ['차량', '자동차', '중기', '선박', '항공기', '운송', '지게차', '장비', '기계', '기구', '설비', '유가증권', '증권', '주식', '채권', '기타물품', '물품', '동산'];
             const isNonBuilding = item.source === 'court_etc' || item.source === 'onbid_etc' || nonBuildingKeywords.some(k => (item.ptype || "").includes(k));
@@ -5104,10 +5119,8 @@
             if (!isNonBuilding) {
                 const p2 = document.getElementById("detail-group-panel-2");
                 const p3 = document.getElementById("detail-group-panel-3");
-                const p4 = document.getElementById("detail-group-panel-4");
                 if (p2 && originalPanel2Html) p2.innerHTML = originalPanel2Html;
                 if (p3 && originalPanel3Html) p3.innerHTML = originalPanel3Html;
-                if (p4 && originalPanel4Html) p4.innerHTML = originalPanel4Html;
             }
 
             if (isNonBuilding) {
@@ -5115,14 +5128,12 @@
                 if (rvFallbackText) rvFallbackText.innerText = "비부동산 자산은 로드뷰를 제공하지 않습니다.";
                 if (tab2Btn) tab2Btn.classList.remove("hidden");
                 if (tab3Btn) tab3Btn.classList.remove("hidden");
-                if (tab4Btn) tab4Btn.classList.remove("hidden");
                 changeDetailGroupTab(currentDetailGroupTab || 1);
             } else {
                 if (rvTitle) rvTitle.innerHTML = `<i class="fa-solid fa-image text-royalBlue"></i> 🏢 부동산 대표 전경 (실제 로드뷰)`;
                 if (rvFallbackText) rvFallbackText.innerText = "해당 위치의 로드뷰를 불러올 수 없습니다.";
                 if (tab2Btn) tab2Btn.classList.remove("hidden");
                 if (tab3Btn) tab3Btn.classList.remove("hidden");
-                if (tab4Btn) tab4Btn.classList.remove("hidden");
                 changeDetailGroupTab(currentDetailGroupTab || 1);
             }
 
@@ -5668,17 +5679,28 @@
             if (fpKakaoRoad) fpKakaoRoad.href = `https://map.kakao.com/?q=${encodeURIComponent(cleanedNavAddress)}`;
             if (fpGoogleRoad) fpGoogleRoad.href = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(cleanedNavAddress)}`;
 
-            // 🗺️ 카카오 3D 로드뷰 연동 로직 (비부동산 분기)
-            const roadviewContainer = document.getElementById("detail-roadview");
-            const roadviewFallback = document.getElementById("detail-roadview-fallback");
-            if (roadviewContainer && roadviewFallback) {
-                if (isNonBuilding) {
-                    // 비부동산 자산인 경우: 로드뷰 대신 실사진 제공.
+            // 🗺️ 로드뷰 / 실사진 연동 로직 (비부동산 분기)
+            const rvButtonsContainer = document.getElementById("detail-roadview-buttons-container");
+            const rvImageContainer = document.getElementById("detail-roadview-image-container");
+            const rvTitle = document.getElementById("detail-roadview-title");
+
+            const hubNaverRoad = document.getElementById("btn-naver-roadview-hub");
+            const hubKakaoRoad = document.getElementById("btn-kakao-roadview-hub");
+            const hubGoogleRoad = document.getElementById("btn-google-roadview-hub");
+
+            // 기본 텍스트 기반 폴백 링크
+            if (hubNaverRoad) hubNaverRoad.href = `https://map.naver.com/v5/search/${encodeURIComponent(cleanedNavAddress)}/address?c=15,0,0,0,adh`;
+            if (hubKakaoRoad) hubKakaoRoad.href = `https://map.kakao.com/?q=${encodeURIComponent(cleanedNavAddress)}`;
+            if (hubGoogleRoad) hubGoogleRoad.href = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(cleanedNavAddress)}`;
+
+            if (isNonBuilding) {
+                if (rvTitle) rvTitle.innerHTML = `<i class="fa-solid fa-image text-royalBlue"></i> 📸 자산 대표 실사진`;
+                if (rvButtonsContainer) rvButtonsContainer.classList.add("hidden");
+                if (rvImageContainer) {
+                    rvImageContainer.classList.remove("hidden");
                     if (item.images && item.images.length > 0) {
-                        roadviewContainer.style.display = "block";
-                        roadviewFallback.classList.add("hidden");
-                        roadviewContainer.innerHTML = `
-                            <div class="relative w-full h-full bg-slate-955 flex items-center justify-center">
+                        rvImageContainer.innerHTML = `
+                            <div class="relative w-full h-full bg-slate-900 flex items-center justify-center">
                                 <img src="${item.images[0]}" class="w-full h-full object-contain" alt="자산 대표 이미지">
                                 <div class="absolute bottom-2 right-2 bg-slate-900/60 px-2 py-0.5 rounded text-[10px] text-white font-bold select-none">
                                     📸 실사진 (1/${item.images.length})
@@ -5686,93 +5708,63 @@
                             </div>
                         `;
                     } else {
-                        roadviewContainer.style.display = "none";
-                        roadviewFallback.classList.remove("hidden");
-                        const fbText = document.getElementById("detail-roadview-fallback-text");
-                        if (fbText) fbText.innerText = "비부동산 자산은 로드뷰를 제공하지 않습니다.";
-                        const fbBtn = document.getElementById("btn-naver-roadview-fallback");
-                        if (fbBtn) fbBtn.classList.add("hidden");
+                        rvImageContainer.innerHTML = `
+                            <div class="relative w-full h-full bg-slate-100 flex flex-col items-center justify-center p-4 text-center">
+                                <p class="text-xs font-black text-slate-500">등록된 실사진이 없습니다.</p>
+                            </div>
+                        `;
                     }
-                } else {
-                    if (typeof kakao !== "undefined" && kakao.maps && kakao.maps.services && kakao.maps.services.Status) {
-                        roadviewContainer.style.display = "block";
-                        roadviewFallback.classList.add("hidden");
-                        
-                        const geocoder = new kakao.maps.services.Geocoder();
-                        geocoder.addressSearch(cleanedNavAddress, function(result, status) {
-                            if (status === kakao.maps.services.Status.OK) {
-                                const coords = new kakao.maps.LatLng(result[0].y, result[0].x);
-                                const rv = new kakao.maps.Roadview(roadviewContainer);
-                                const rvClient = new kakao.maps.RoadviewClient();
-                                
-                                rvClient.getNearestPanoId(coords, 50, function(panoId) {
-                                    if (panoId) {
-                                        rv.setPanoId(panoId, coords);
-                                    } else {
-                                        showFallback();
-                                    }
-                                });
+                }
+            } else {
+                if (rvTitle) rvTitle.innerHTML = `<i class="fa-solid fa-map-location-dot text-royalBlue"></i> 🌐 3대 포털 현장 로드뷰 연동`;
+                if (rvButtonsContainer) rvButtonsContainer.classList.remove("hidden");
+                if (rvImageContainer) rvImageContainer.classList.add("hidden");
 
-                                // 건물명 추출 및 실시간 단지명 덮어쓰기
-                                let kakaoBuildingName = "";
-                                if (result[0].road_address && result[0].road_address.building_name) {
-                                    kakaoBuildingName = result[0].road_address.building_name;
-                                } else if (result[0].address && result[0].address.building_name) {
-                                    kakaoBuildingName = result[0].address.building_name;
-                                }
-                                
-                                if (kakaoBuildingName) {
-                                    const complexField = document.getElementById("detail-complex-name-field");
-                                    if (complexField) {
-                                        complexField.innerText = kakaoBuildingName;
-                                    }
-                                    if (item.complex_info) {
-                                        item.complex_info.complex_name = kakaoBuildingName;
-                                    }
-                                }
+                if (typeof kakao !== "undefined" && kakao.maps && kakao.maps.services && kakao.maps.services.Status) {
+                    const geocoder = new kakao.maps.services.Geocoder();
+                    geocoder.addressSearch(cleanedNavAddress, function(result, status) {
+                        if (status === kakao.maps.services.Status.OK) {
+                            // 좌표 획득 시 3사 로드뷰 링크도 좌표 기반 정밀 링크로 교체
+                            if (hubNaverRoad) hubNaverRoad.href = `https://map.naver.com/p/?c=${result[0].x},${result[0].y},17,0,0,0,rv`;
+                            if (hubKakaoRoad) hubKakaoRoad.href = `https://map.kakao.com/link/roadview/${result[0].y},${result[0].x}`;
+                            if (hubGoogleRoad) hubGoogleRoad.href = `https://www.google.com/maps/@?api=1&map_action=pano&viewpoint=${result[0].y},${result[0].x}`;
 
-                                // 🟢 카카오 Geocoder로 획득한 위경도 좌표로 네이버 부동산 지도 링크 정밀 맵핑
-                                const activePriceBtn = document.getElementById("btn-naver-land-price");
-                                const finalQuery = kakaoBuildingName || cleanedQuery || rawAddress;
-                                if (isComplexProperty) {
-                                    if (activePriceBtn) {
-                                        activePriceBtn.href = `https://fin.land.naver.com/map?center=${result[0].x},${result[0].y}&zoom=16&searchQuery=${encodeURIComponent(finalQuery)}`;
-                                    }
-                                    if (floorplanLink) {
-                                        if (!(item.auction_no === "2025타경502931" || (item.address && item.address.includes("한빛아파트")))) {
-                                            floorplanLink.href = `https://fin.land.naver.com/map?center=${result[0].x},${result[0].y}&zoom=16&searchQuery=${encodeURIComponent(finalQuery)}`;
-                                        }
-                                    }
-                                } else {
-                                    const nonComplexQuery = kakaoBuildingName ? `${cleanedNavAddress} ${kakaoBuildingName}` : rawAddress;
-                                    if (activePriceBtn) {
-                                        activePriceBtn.href = `https://fin.land.naver.com/map?center=${result[0].x},${result[0].y}&zoom=16&searchQuery=${encodeURIComponent(nonComplexQuery)}`;
-                                    }
-                                    if (floorplanLink) {
-                                        floorplanLink.href = `https://fin.land.naver.com/map?center=${result[0].x},${result[0].y}&zoom=16&searchQuery=${encodeURIComponent(nonComplexQuery)}`;
-                                    }
-                                }
-
-                                // 🟢 좌표 획득 시 3사 로드뷰 링크도 좌표 기반 정밀 링크로 교체
-                                if (fpNaverRoad) fpNaverRoad.href = `https://map.naver.com/p/?c=${result[0].x},${result[0].y},17,0,0,0,rv`;
-                                if (fpKakaoRoad) fpKakaoRoad.href = `https://map.kakao.com/link/roadview/${result[0].y},${result[0].x}`;
-                                if (fpGoogleRoad) fpGoogleRoad.href = `https://www.google.com/maps/@?api=1&map_action=pano&viewpoint=${result[0].y},${result[0].x}`;
-                            } else {
-                                showFallback();
+                            // 건물명 추출 및 실시간 단지명 덮어쓰기
+                            let kakaoBuildingName = "";
+                            if (result[0].road_address && result[0].road_address.building_name) {
+                                kakaoBuildingName = result[0].road_address.building_name;
+                            } else if (result[0].address && result[0].address.building_name) {
+                                kakaoBuildingName = result[0].address.building_name;
                             }
-                        });
-                    } else {
-                        showFallback();
-                    }
+                            
+                            if (kakaoBuildingName) {
+                                const complexField = document.getElementById("detail-complex-name-field");
+                                if (complexField) complexField.innerText = kakaoBuildingName;
+                                if (item.complex_info) item.complex_info.complex_name = kakaoBuildingName;
+                            }
 
-                    function showFallback() {
-                        roadviewContainer.style.display = "none";
-                        roadviewFallback.classList.remove("hidden");
-                        const fbBtn = document.getElementById("btn-naver-roadview-fallback");
-                        if (fbBtn) {
-                            fbBtn.href = `https://map.naver.com/v5/search/${encodeURIComponent(cleanedNavAddress)}`;
+                            const activePriceBtn = document.getElementById("btn-naver-land-price");
+                            const finalQuery = kakaoBuildingName || cleanedQuery || rawAddress;
+                            if (isComplexProperty) {
+                                if (activePriceBtn) {
+                                    activePriceBtn.href = `https://fin.land.naver.com/map?center=${result[0].x},${result[0].y}&zoom=16&searchQuery=${encodeURIComponent(finalQuery)}`;
+                                }
+                                if (floorplanLink) {
+                                    if (!(item.auction_no === "2025타경502931" || (item.address && item.address.includes("한빛아파트")))) {
+                                        floorplanLink.href = `https://fin.land.naver.com/map?center=${result[0].x},${result[0].y}&zoom=16&searchQuery=${encodeURIComponent(finalQuery)}`;
+                                    }
+                                }
+                            } else {
+                                const nonComplexQuery = kakaoBuildingName ? `${cleanedNavAddress} ${kakaoBuildingName}` : rawAddress;
+                                if (activePriceBtn) {
+                                    activePriceBtn.href = `https://fin.land.naver.com/map?center=${result[0].x},${result[0].y}&zoom=16&searchQuery=${encodeURIComponent(nonComplexQuery)}`;
+                                }
+                                if (floorplanLink) {
+                                    floorplanLink.href = `https://fin.land.naver.com/map?center=${result[0].x},${result[0].y}&zoom=16&searchQuery=${encodeURIComponent(nonComplexQuery)}`;
+                                }
+                            }
                         }
-                    }
+                    });
                 }
             }
 
@@ -7886,7 +7878,7 @@
             const nonBuildingKeywords = ['차량', '자동차', '중기', '선박', '항공기', '운송', '지게차', '장비', '기계', '기구', '설비', '유가증권', '증권', '주식', '채권', '기타물품', '물품', '동산'];
             const isNonBuilding = selectedProperty && (selectedProperty.source === 'court_etc' || selectedProperty.source === 'onbid_etc' || nonBuildingKeywords.some(k => (selectedProperty.ptype || "").includes(k)));
 
-            for (let i = 1; i <= 4; i++) {
+            for (let i = 1; i <= 3; i++) {
                 const btn = document.getElementById(`detail-group-tab-${i}-btn`);
                 const panel = document.getElementById(`detail-group-panel-${i}`);
                 if (btn) {
@@ -7923,31 +7915,23 @@
 
             const mask2 = document.getElementById("group-mask-2");
             const mask3 = document.getElementById("group-mask-3");
-            const mask4 = document.getElementById("group-mask-4");
             const content2 = document.getElementById("group-content-2");
             const content3 = document.getElementById("group-content-3");
-            const content4 = document.getElementById("group-content-4");
 
             if (mask2) mask2.classList.add("hidden");
             if (mask3) mask3.classList.add("hidden");
-            if (mask4) mask4.classList.add("hidden");
             if (content2) content2.style.filter = "none";
             if (content3) content3.style.filter = "none";
-            if (content4) content4.style.filter = "none";
 
             // 전체 코딩/개발 기간 임시 우회 처리: 등급에 관계없이 100% 정보 노출 (등급 오버레이 락 해제)
             if (false && userGrade === "B") {
                 if (mask3) mask3.classList.remove("hidden");
-                if (mask4) mask4.classList.remove("hidden");
                 if (content3) content3.style.filter = "blur(8px)";
-                if (content4) content4.style.filter = "blur(8px)";
             } else if (false && userGrade === "C") {
                 if (mask2) mask2.classList.remove("hidden");
                 if (mask3) mask3.classList.remove("hidden");
-                if (mask4) mask4.classList.remove("hidden");
                 if (content2) content2.style.filter = "blur(8px)";
                 if (content3) content3.style.filter = "blur(8px)";
-                if (content4) content4.style.filter = "blur(8px)";
             }
 
             updateDynamicBrowserTitle();
@@ -8164,10 +8148,9 @@
                 const auctionNo = document.getElementById("detail-no") ? document.getElementById("detail-no").innerText : "";
                 const cleanNo = auctionNo.replace("사건번호: ", "").trim();
                 const tabNames = {
-                    1: "종합분석",
-                    2: "권리분석",
-                    3: "수익분석",
-                    4: "위치분석"
+                    1: "종합&권리분석",
+                    2: "입찰&금융분석",
+                    3: "입지&시세분석"
                 };
                 const tabLabel = tabNames[currentDetailGroupTab] || "상세";
                 document.title = `부동산경공매 검색시스템 - ${cleanNo} [${tabLabel}]`;

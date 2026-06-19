@@ -26,7 +26,7 @@ interface DetailScreenProps {
   onBack: () => void;
 }
 
-type TabType = 'general' | 'rights' | 'bidding' | 'location' | 'etc_specs';
+type TabType = 'general' | 'bidding' | 'location';
 
 const estimateAuctionRounds = (appraisal: number, price: number, source: string) => {
   if (!appraisal || !price || appraisal <= 0 || price <= 0) {
@@ -1390,16 +1390,14 @@ export const DetailScreen: React.FC<DetailScreenProps> = ({ property, onBack }) 
           const isEtc = isNonBuildingMobile;
           const tabs = isEtc 
             ? [
-                { key: 'general', label: '1. 종합 명세' },
-                { key: 'rights', label: '2. 권리 & 안전' },
-                { key: 'location', label: '3. 보관지 & 입지' },
-                { key: 'bidding', label: '4. 입찰 & 금융' },
+                { key: 'general', label: '1. 종합 & 권리분석' },
+                { key: 'bidding', label: '2. 입찰 & 금융분석' },
+                { key: 'location', label: '3. 보관지 & 입지분석' },
               ]
             : [
-                { key: 'general', label: '1. 종합 정보' },
-                { key: 'rights', label: '2. 권리 & 안전' },
-                { key: 'location', label: '3. 입지 & 시세' },
-                { key: 'bidding', label: '4. 금융 & 시뮬레이션' },
+                { key: 'general', label: '1. 종합 & 권리분석' },
+                { key: 'bidding', label: '2. 입찰 & 금융분석' },
+                { key: 'location', label: '3. 입지 & 시세분석' },
               ];
           
           return (
@@ -2042,60 +2040,6 @@ export const DetailScreen: React.FC<DetailScreenProps> = ({ property, onBack }) 
                         <Text style={{ color: '#ffffff', fontSize: 10, fontWeight: 'bold' }}>구글 스트리트</Text>
                       </TouchableOpacity>
                     </View>
-
-                    {/* 📍 모바일 화면 내장형 카카오 로드뷰 뷰어 */}
-                    {currentProperty.address ? (
-                      <View style={{ marginTop: 12, height: 180, borderRadius: 12, overflow: 'hidden', borderWidth: 1, borderColor: '#cbd5e1' }}>
-                        <WebView
-                          originWhitelist={['*']}
-                          source={{
-                            html: `
-                              <!DOCTYPE html>
-                              <html>
-                              <head>
-                                  <meta charset="utf-8">
-                                  <meta name="viewport" content="width=device-width,initial-scale=1.0,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no">
-                                  <style>
-                                      html, body, #roadview { width: 100%; height: 100%; margin: 0; padding: 0; background: #cbd5e1; }
-                                  </style>
-                                  <script type="text/javascript" src="https://dapi.kakao.com/v2/maps/sdk.js?appkey=ec7b35c73770fbe949e52bf3ff940346&libraries=services"></script>
-                              </head>
-                              <body>
-                                  <div id="roadview"></div>
-                                  <script>
-                                      document.addEventListener("DOMContentLoaded", function() {
-                                          var address = "${currentProperty.address.replace(/"/g, '\\"')}";
-                                          if (!address) return;
-                                          var container = document.getElementById('roadview');
-                                          var geocoder = new kakao.maps.services.Geocoder();
-                                          geocoder.addressSearch(address, function(result, status) {
-                                              if (status === kakao.maps.services.Status.OK) {
-                                                  var coords = new kakao.maps.LatLng(result[0].y, result[0].x);
-                                                  var roadview = new kakao.maps.Roadview(container);
-                                                  var roadviewClient = new kakao.maps.RoadviewClient();
-                                                  roadviewClient.getNearestPanoId(coords, 50, function(panoId) {
-                                                      if (panoId) {
-                                                          roadview.setPanoId(panoId, coords);
-                                                      } else {
-                                                          container.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;height:100%;color:#64748b;font-size:12px;font-weight:bold;font-family:sans-serif;">💡 로드뷰 이미지를 찾을 수 없습니다.</div>';
-                                                      }
-                                                  });
-                                              } else {
-                                                  container.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;height:100%;color:#64748b;font-size:12px;font-weight:bold;font-family:sans-serif;">💡 주소 검색에 실패하였습니다.</div>';
-                                              }
-                                          });
-                                      });
-                                  </script>
-                              </body>
-                              </html>
-                            `
-                          }}
-                          style={{ flex: 1 }}
-                          javaScriptEnabled={true}
-                          domStorageEnabled={true}
-                        />
-                      </View>
-                    ) : null}
                   </View>
                 )}
               </View>
@@ -2130,8 +2074,8 @@ export const DetailScreen: React.FC<DetailScreenProps> = ({ property, onBack }) 
           </View>
         )}
 
-        {/* 2. 권리분석 탭 */}
-        {activeTab === 'rights' && (
+        {/* 2. 권리분석 탭 (종합&권리분석 탭으로 통합 노출) */}
+        {activeTab === 'general' && (
           <View style={{ minHeight: 300, position: 'relative' }}>
             {/* 📊 관할 법원 최근 3개월 매각 통계 카드 */}
             <View style={styles.sectionCard}>
@@ -3209,8 +3153,8 @@ export const DetailScreen: React.FC<DetailScreenProps> = ({ property, onBack }) 
           </View>
         )}
 
-        {/* 2. 자산 상세 명세 탭 (비부동산 전용) */}
-        {activeTab === 'etc_specs' && (
+        {/* 2. 자산 상세 명세 탭 (비부동산 전용, 종합&권리분석 탭으로 통합 노출) */}
+        {activeTab === 'general' && (
           <View>
             {currentProperty.car_info && (
               <View style={styles.sectionCard}>
