@@ -116,7 +116,7 @@
                         <h2 class="text-base font-extrabold text-slate-900 flex items-center gap-2">
                             <i class="fa-solid fa-rectangle-ad text-royalBlue"></i> 정밀 타겟 광고 구좌 관리자
                         </h2>
-                        <p class="text-[10px] text-slate-400 font-bold mt-0.5">상단 메인, 검색필터 하단, 매물 목록 피드 등 각 전용 광고 구좌를 통합 제어합니다.</p>
+                        <p class="text-[10px] text-slate-400 font-bold mt-0.5">상단 메인, 검색필터 하단, 매물 목록 피드 및 상세페이지 상하단 구좌를 통합 제어합니다.</p>
                     </div>
                     
                     <div class="flex items-center gap-3">
@@ -137,87 +137,9 @@
                     </div>
                 </div>
 
-                <!-- 비주얼 에뮬레이터 및 위치 미니맵 프레임 -->
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
-                    <div class="space-y-3">
-                        <h3 class="text-xs font-black text-slate-700">🖥️ 실시간 광고 노출 에뮬레이터 미리보기</h3>
-                        <div class="border border-slate-200 bg-slate-50/50 p-4 rounded-2xl flex justify-center items-center min-h-[240px]">
-                            <!-- 실제 매물 카드와 100% 동일 규격의 광고 목업 -->
-                            <div id="ad-preview-card" class="w-[300px] min-h-[360px] bg-white border border-slate-200 rounded-2xl p-3 shadow-sm relative overflow-hidden transition-all hover:shadow-md flex flex-col justify-between">
-                                <!-- 광고 내용 렌더러 -->
-                                <div id="ad-preview-container" class="flex-1 flex flex-col justify-between h-full">
-                                    <div class="text-center py-10">
-                                        <p class="text-xs text-slate-400 font-bold">광고 정보가 로드되지 않았습니다.</p>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="space-y-3">
-                        <h3 class="text-xs font-black text-slate-700">📍 광고 노출 구좌 위치 레이아웃 미니맵</h3>
-                        <div class="border border-slate-200 bg-slate-50/50 p-4 rounded-2xl flex flex-col items-center justify-center min-h-[240px]">
-                            <!-- 미니 브라우저 레이아웃 모형 -->
-                            <div class="w-full max-w-[340px] border border-slate-200 rounded-2xl overflow-hidden bg-white shadow-sm flex flex-col text-[8.5px]">
-                                <!-- 상단 탭/주소창 모형 -->
-                                <div class="bg-slate-100 border-b border-slate-200 px-3 py-1.5 flex items-center gap-1.5 select-none">
-                                    <div class="flex gap-1">
-                                        <span class="w-1.5 h-1.5 rounded-full bg-rose-400 block"></span>
-                                        <span class="w-1.5 h-1.5 rounded-full bg-amber-400 block"></span>
-                                        <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 block"></span>
-                                    </div>
-                                    <div class="bg-white border border-slate-200 rounded px-2 py-0.5 flex-1 text-center font-mono text-[7px] text-slate-400 select-all truncate">
-                                        action-b8c75.web.app/
-                                    </div>
-                                </div>
-                                <!-- 헤더 모형 -->
-                                <div class="bg-slate-900 text-white p-2 flex items-center justify-between border-b border-slate-200 select-none">
-                                    <span class="font-extrabold flex items-center gap-1">🏡 부동산경공매</span>
-                                    <div class="w-16 h-2.5 bg-slate-800 rounded-full"></div>
-                                </div>
-                                <!-- 컨텐츠 바디 모형 -->
-                                <div class="p-2 space-y-1.5 bg-slate-50 flex flex-col flex-grow select-none">
-                                    <!-- 1. main_top_banner 구좌 -->
-                                    <div id="minimap-main-top" onclick="selectSlotFromMinimap('main_top_banner')" class="border border-slate-200 rounded bg-white text-center py-1 font-black text-slate-450 hover:bg-amber-50 hover:border-amber-400 cursor-pointer transition-all duration-300">
-                                        🏢 상단 메인 광고 (main_top_banner)
-                                    </div>
-                                    <!-- 2열 그리드 바디 -->
-                                    <div class="flex gap-1.5 h-[130px]">
-                                        <!-- 좌측 사이드바 필터 모형 -->
-                                        <div class="w-[30%] border border-slate-200 rounded bg-white p-1 flex flex-col justify-between">
-                                            <div class="space-y-1">
-                                                <div class="h-2 bg-slate-100 rounded"></div>
-                                                <div class="h-2 bg-slate-100 rounded w-4/5"></div>
-                                            </div>
-                                            <!-- 2. sidebar_filter_banner 구좌 -->
-                                            <div id="minimap-sidebar" onclick="selectSlotFromMinimap('sidebar_filter_banner')" class="border border-slate-200 rounded bg-white text-center py-2.5 text-[7.5px] font-black text-slate-450 hover:bg-amber-50 hover:border-amber-400 cursor-pointer transition-all duration-300 flex flex-col justify-center leading-tight">
-                                                📂 필터 아래 광고<br>(sidebar_filter)
-                                            </div>
-                                        </div>
-                                        <!-- 우측 매물 리스트 피드 모형 -->
-                                        <div class="flex-grow border border-slate-200 rounded bg-white p-1 flex flex-col gap-1 overflow-hidden">
-                                            <div class="h-7 border border-slate-100 rounded-lg bg-slate-50 flex items-center px-1.5 justify-between">
-                                                <div class="w-8 h-2.5 bg-slate-200 rounded"></div>
-                                                <div class="w-4 h-2 bg-slate-200 rounded"></div>
-                                            </div>
-                                            <!-- 3. list_banner 구좌 -->
-                                            <div id="minimap-list" onclick="selectSlotFromMinimap('list_banner')" class="border border-slate-200 rounded bg-white text-center py-2 font-black text-slate-450 hover:bg-amber-50 hover:border-amber-400 cursor-pointer transition-all duration-300">
-                                                📰 피드 중간 광고 (list_banner)
-                                            </div>
-                                            <div class="h-7 border border-slate-100 rounded-lg bg-slate-50 flex items-center px-1.5 justify-between">
-                                                <div class="w-8 h-2.5 bg-slate-200 rounded"></div>
-                                                <div class="w-4 h-2 bg-slate-200 rounded"></div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- 설정 폼 -->
-                <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                <!-- 💎 좌측 광고 설정/Canvas 툴 및 우측 가이드/미니맵/에뮬레이터 1:1 대칭 그리드 -->
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 items-start">
+                    <!-- ◀️ 좌측 영역: 광고 설정 폼 및 Canvas 편집기 -->
                     <div class="space-y-4">
                         <div>
                             <label class="block text-xs font-black text-slate-700 mb-1.5">광고 송출 형태 선택</label>
@@ -323,6 +245,13 @@
                                             </div>
                                             <input type="range" id="slider-rotation" min="0" max="360" value="0" class="w-full h-1 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-royalBlue" oninput="applyFiltersToCanvas()">
                                         </div>
+                                        <div class="space-y-1">
+                                            <div class="flex justify-between">
+                                                <span>👁️ 불투명도 (Opacity)</span>
+                                                <span id="val-opacity">100%</span>
+                                            </div>
+                                            <input type="range" id="slider-opacity" min="0" max="100" value="100" class="w-full h-1 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-royalBlue" oninput="applyFiltersToCanvas()">
+                                        </div>
                                     </div>
 
                                     <!-- 텍스트 오버레이 꾸미기 컨트롤 -->
@@ -383,7 +312,7 @@
 
                                     <!-- 적용 버튼 -->
                                     <div class="flex gap-2 justify-end">
-                                        <button type="button" onclick="closeCanvasEditor()" class="bg-slate-100 hover:bg-slate-200 text-slate-655 text-[10.5px] font-black px-3.5 py-2.5 rounded-xl transition-all select-none">편집 취소</button>
+                                        <button type="button" onclick="closeCanvasEditor()" class="bg-slate-100 hover:bg-slate-200 text-slate-600 text-[10.5px] font-black px-3.5 py-2.5 rounded-xl transition-all select-none">편집 취소</button>
                                         <button type="button" onclick="applyCanvasToAdUrl()" class="bg-emeraldSuccess hover:bg-emerald-700 text-white text-[10.5px] font-black px-4 py-2.5 rounded-xl transition-all select-none shadow-sm">꾸민 이미지 최종 적용하기</button>
                                     </div>
                                 </div>
@@ -404,21 +333,139 @@
                         </div>
                     </div>
 
-                    <!-- 실시간 도움말 및 가이드 -->
-                    <div class="bg-slate-50 border border-slate-200 p-4 rounded-2xl flex flex-col justify-between text-[11px] font-semibold text-slate-600 leading-relaxed">
-                        <div class="space-y-2">
-                            <strong class="text-slate-800 block text-xs font-black"><i class="fa-solid fa-info-circle text-royalBlue"></i> 광고 관리 가이드</strong>
-                            <p>1. 광고 활성 스위치를 켜면 매물 추천 피드 리스트 중간에 광고판 카드가 즉시 생성됩니다.</p>
-                            <p>2. 직접 유치 광고는 로컬에 보관 중인 이미지 경로(`./apartment_elegant_facade.png`)나 외부 이미지 링크 모두 정상적으로 지원됩니다.</p>
-                            <p>3. 애드센스로 전환 시 애드센스 자바스크립트 스크립트 블록이 삽입되어 광고 서비스가 자동으로 연동됩니다.</p>
+                    <!-- ▶️ 우측 영역: 가이드, 2분할 1.5배 레이아웃 미니맵, 실시간 에뮬레이터 미리보기 -->
+                    <div class="space-y-6">
+                        <!-- 1. 실시간 도움말 및 가이드 -->
+                        <div class="bg-slate-50 border border-slate-200 p-4 rounded-2xl flex flex-col justify-between text-[11.5px] font-semibold text-slate-600 leading-relaxed shadow-sm">
+                            <div class="space-y-2">
+                                <strong class="text-slate-800 block text-xs font-black"><i class="fa-solid fa-info-circle text-royalBlue"></i> 광고 관리 가이드</strong>
+                                <p>1. 광고 활성 스위치를 켜면 매물 추천 피드 리스트 중간에 광고판 카드가 즉시 생성됩니다.</p>
+                                <p>2. 직접 유치 광고는 로컬에 보관 중인 이미지 경로(`./apartment_elegant_facade.png`)나 외부 이미지 링크 모두 정상적으로 지원됩니다.</p>
+                                <p>3. 애드센스로 전환 시 애드센스 자바스크립트 스크립트 블록이 삽입되어 광고 서비스가 자동으로 연동됩니다.</p>
+                                <p>4. 상세페이지 상하단 구좌를 활용하여 매물 분석 화면 진입 고객들에게 집중적으로 광고 타겟팅 노출을 진행할 수 있습니다.</p>
+                            </div>
+                            <button onclick="saveAdSettings()" class="w-full bg-royalBlue hover:bg-royalHover text-white text-xs font-black py-2.5 px-4 rounded-xl shadow-md transition-all select-none mt-4">
+                                <i class="fa-solid fa-save"></i> 광고 설정 업데이트 적용
+                            </button>
                         </div>
-                        <button onclick="saveAdSettings()" class="w-full bg-royalBlue hover:bg-royalHover text-white text-xs font-black py-2.5 px-4 rounded-xl shadow-md transition-all select-none mt-4">
-                            <i class="fa-solid fa-save"></i> 광고 설정 업데이트 적용
-                        </button>
+
+                        <!-- 2. 광고 노출 구좌 위치 레이아웃 미니맵 (2분할 1.5배) -->
+                        <div class="space-y-3">
+                            <h3 class="text-xs font-black text-slate-700 flex items-center gap-1.5"><i class="fa-solid fa-map-location-dot text-royalBlue"></i> 광고 노출 구좌 위치 레이아웃 미니맵 (1.5배 확대)</h3>
+                            <div class="border border-slate-200 bg-slate-50/50 p-4 rounded-2xl flex flex-col sm:flex-row items-center justify-center gap-4 min-h-[280px]">
+                                <!-- 1) 메인 피드 모형 -->
+                                <div class="w-full max-w-[220px] border border-slate-200 rounded-2xl overflow-hidden bg-white shadow-sm flex flex-col text-[8.5px] transition-all hover:shadow-md">
+                                    <!-- 상단 탭/주소창 모형 -->
+                                    <div class="bg-slate-100 border-b border-slate-200 px-3 py-1.5 flex items-center gap-1.5 select-none">
+                                        <div class="flex gap-1">
+                                            <span class="w-1.5 h-1.5 rounded-full bg-rose-400 block"></span>
+                                            <span class="w-1.5 h-1.5 rounded-full bg-amber-400 block"></span>
+                                            <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 block"></span>
+                                        </div>
+                                        <div class="bg-white border border-slate-200 rounded px-2 py-0.5 flex-1 text-center font-mono text-[7px] text-slate-400 select-all truncate">
+                                            action-b8c75.web.app/
+                                        </div>
+                                    </div>
+                                    <!-- 헤더 모형 -->
+                                    <div class="bg-slate-900 text-white p-2 flex items-center justify-between border-b border-slate-200 select-none">
+                                        <span class="font-extrabold flex items-center gap-0.5">🏡 메인추천</span>
+                                        <div class="w-10 h-2 bg-slate-800 rounded-full"></div>
+                                    </div>
+                                    <!-- 컨텐츠 바디 모형 -->
+                                    <div class="p-2 space-y-1.5 bg-slate-50 flex flex-col flex-grow select-none min-h-[160px]">
+                                        <!-- 1. main_top_banner 구좌 -->
+                                        <div id="minimap-main-top" onclick="selectSlotFromMinimap('main_top_banner')" class="border border-slate-200 rounded bg-white text-center py-1 font-black text-slate-450 hover:bg-amber-50 hover:border-amber-400 cursor-pointer transition-all duration-300">
+                                            🏢 상단 광고 (main_top)
+                                        </div>
+                                        <!-- 2열 그리드 바디 -->
+                                        <div class="flex gap-1.5 h-[110px]">
+                                            <!-- 좌측 사이드바 필터 모형 -->
+                                            <div class="w-[35%] border border-slate-200 rounded bg-white p-1 flex flex-col justify-between">
+                                                <div class="space-y-1">
+                                                    <div class="h-2 bg-slate-100 rounded"></div>
+                                                    <div class="h-2 bg-slate-100 rounded w-4/5"></div>
+                                                </div>
+                                                <!-- 2. sidebar_filter_banner 구좌 -->
+                                                <div id="minimap-sidebar" onclick="selectSlotFromMinimap('sidebar_filter_banner')" class="border border-slate-200 rounded bg-white text-center py-2 text-[7px] font-black text-slate-450 hover:bg-amber-50 hover:border-amber-400 cursor-pointer transition-all duration-300 flex flex-col justify-center leading-tight">
+                                                    📂 필터 아래<br>광고
+                                                </div>
+                                            </div>
+                                            <!-- 우측 매물 리스트 피드 모형 -->
+                                            <div class="flex-grow border border-slate-200 rounded bg-white p-1 flex flex-col gap-1 overflow-hidden">
+                                                <div class="h-6 border border-slate-100 rounded-lg bg-slate-50 flex items-center px-1.5 justify-between">
+                                                    <div class="w-8 h-2 bg-slate-200 rounded"></div>
+                                                </div>
+                                                <!-- 3. list_banner 구좌 -->
+                                                <div id="minimap-list" onclick="selectSlotFromMinimap('list_banner')" class="border border-slate-200 rounded bg-white text-center py-1.5 font-black text-slate-450 hover:bg-amber-50 hover:border-amber-400 cursor-pointer transition-all duration-300">
+                                                    📰 피드 광고 (list_banner)
+                                                </div>
+                                                <div class="h-6 border border-slate-100 rounded-lg bg-slate-50 flex items-center px-1.5 justify-between">
+                                                    <div class="w-8 h-2 bg-slate-200 rounded"></div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- 2) 상세페이지 모형 -->
+                                <div class="w-full max-w-[220px] border border-slate-200 rounded-2xl overflow-hidden bg-white shadow-sm flex flex-col text-[8.5px] transition-all hover:shadow-md">
+                                    <!-- 상단 탭/주소창 모형 -->
+                                    <div class="bg-slate-100 border-b border-slate-200 px-3 py-1.5 flex items-center gap-1.5 select-none">
+                                        <div class="flex gap-1">
+                                            <span class="w-1.5 h-1.5 rounded-full bg-rose-400 block"></span>
+                                            <span class="w-1.5 h-1.5 rounded-full bg-amber-400 block"></span>
+                                            <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 block"></span>
+                                        </div>
+                                        <div class="bg-white border border-slate-200 rounded px-2 py-0.5 flex-1 text-center font-mono text-[7px] text-slate-400 select-all truncate">
+                                            action-b8c75.web.app/detail
+                                        </div>
+                                    </div>
+                                    <!-- 헤더 모형 -->
+                                    <div class="bg-slate-900 text-white p-2 flex items-center justify-between border-b border-slate-200 select-none">
+                                        <span class="font-extrabold flex items-center gap-0.5">🏡 매물상세</span>
+                                        <div class="w-10 h-2 bg-slate-800 rounded-full"></div>
+                                    </div>
+                                    <!-- 컨텐츠 바디 모형 -->
+                                    <div class="p-2 space-y-1.5 bg-slate-50 flex flex-col flex-grow select-none min-h-[160px] justify-between">
+                                        <!-- 4. detail_top_banner 구좌 -->
+                                        <div id="minimap-detail-top" onclick="selectSlotFromMinimap('detail_top_banner')" class="border border-slate-200 rounded bg-white text-center py-1 font-black text-slate-450 hover:bg-amber-50 hover:border-amber-400 cursor-pointer transition-all duration-300">
+                                            🏢 상세 상단 광고 (detail_top)
+                                        </div>
+                                        
+                                        <!-- 내용 모형 -->
+                                        <div class="border border-slate-200 rounded bg-white p-1.5 flex flex-col gap-1">
+                                            <div class="h-2 bg-slate-100 rounded w-full"></div>
+                                            <div class="h-2 bg-slate-100 rounded w-5/6"></div>
+                                            <div class="h-2 bg-slate-100 rounded w-4/5"></div>
+                                        </div>
+
+                                        <!-- 5. detail_bottom_banner 구좌 -->
+                                        <div id="minimap-detail-bottom" onclick="selectSlotFromMinimap('detail_bottom_banner')" class="border border-slate-200 rounded bg-white text-center py-1 font-black text-slate-450 hover:bg-amber-50 hover:border-amber-400 cursor-pointer transition-all duration-300">
+                                            🏢 상세 하단 광고 (detail_bottom)
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 3. 실시간 광고 노출 에뮬레이터 미리보기 -->
+                        <div class="space-y-3">
+                            <h3 class="text-xs font-black text-slate-700 flex items-center gap-1.5"><i class="fa-solid fa-desktop text-royalBlue"></i> 실시간 광고 노출 에뮬레이터 미리보기</h3>
+                            <div class="border border-slate-200 bg-slate-50/50 p-4 rounded-2xl flex justify-center items-center min-h-[260px] shadow-inner">
+                                <!-- 실제 매물 카드와 100% 동일 규격의 광고 목업 -->
+                                <div id="ad-preview-card" class="w-[300px] min-h-[340px] bg-white border border-slate-200 rounded-2xl p-3 shadow-sm relative overflow-hidden transition-all hover:shadow-md flex flex-col justify-between">
+                                    <!-- 광고 내용 렌더러 -->
+                                    <div id="ad-preview-container" class="flex-1 flex flex-col justify-between h-full">
+                                        <div class="text-center py-10">
+                                            <p class="text-xs text-slate-400 font-bold">광고 정보가 로드되지 않았습니다.</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
-
             <!-- 👥 2. 고객 등급 권한 매니저 탭 -->
             <div id="panel-user-tab" class="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm space-y-5 hidden">
                 <div>
@@ -440,10 +487,26 @@
                 </div>
 
                 <!-- 회원 리스트 테이블 -->
+                <!-- 회원 검색 및 정렬 옵션 바 -->
+                <div class="flex flex-col sm:flex-row gap-3 items-center justify-between pb-3">
+                    <div class="relative w-full sm:max-w-xs">
+                        <input type="text" id="user-search-input" oninput="filterUsersList()" class="w-full text-xs font-bold p-2.5 border border-slate-200 rounded-xl bg-slate-50 focus:bg-white focus:border-royalBlue outline-none" placeholder="이메일 검색...">
+                    </div>
+                    <div>
+                        <select id="user-sort-select" onchange="filterUsersList()" class="text-xs font-black p-2.5 border border-slate-200 rounded-xl bg-slate-50 focus:bg-white outline-none">
+                            <option value="created_desc">📅 가입일 최신순</option>
+                            <option value="created_asc">📅 가입일 오래된순</option>
+                            <option value="email_asc">📧 이메일 오름차순</option>
+                            <option value="upgrade_requested">⚡ 등업 요청 우선순</option>
+                        </select>
+                    </div>
+                </div>
+
                 <div class="border border-slate-200 rounded-2xl overflow-hidden bg-white">
                     <table class="w-full text-left border-collapse">
                         <thead>
                             <tr class="bg-slate-50 border-b border-slate-200 text-slate-700 text-[10.5px] font-black">
+                                <th class="p-3 w-12 text-center">No.</th>
                                 <th class="p-3">가입 회원 이메일</th>
                                 <th class="p-3 w-1/5 text-center">등급 및 등업 결재</th>
                                 <th class="p-3 w-1/4 text-center">이용 기간 설정 (만료일)</th>
@@ -779,11 +842,13 @@ CREATE TRIGGER on_auth_user_created
 
         // 미니맵 노출 하이라이트 제어
         function updateMinimapHighlight(slotName) {
-            const slots = ["main_top_banner", "sidebar_filter_banner", "list_banner"];
+            const slots = ["main_top_banner", "sidebar_filter_banner", "list_banner", "detail_top_banner", "detail_bottom_banner"];
             const mapping = {
                 "main_top_banner": "minimap-main-top",
                 "sidebar_filter_banner": "minimap-sidebar",
-                "list_banner": "minimap-list"
+                "list_banner": "minimap-list",
+                "detail_top_banner": "minimap-detail-top",
+                "detail_bottom_banner": "minimap-detail-bottom"
             };
 
             slots.forEach(s => {
@@ -881,6 +946,8 @@ CREATE TRIGGER on_auth_user_created
                 uploadedImage = new Image();
                 uploadedImage.onload = function() {
                     document.getElementById("btn-open-canvas").classList.remove("hidden");
+                    const opSlider = document.getElementById("slider-opacity");
+                    if (opSlider) opSlider.value = 100;
                     openCanvasEditor();
                     applyFiltersToCanvas(); // 첫 렌더링
                 };
@@ -913,17 +980,19 @@ CREATE TRIGGER on_auth_user_created
             const contrast = document.getElementById("slider-contrast").value;
             const saturation = document.getElementById("slider-saturation").value;
             const rotation = document.getElementById("slider-rotation").value;
+            const opacity = document.getElementById("slider-opacity").value;
 
             document.getElementById("val-brightness").innerText = `${brightness}%`;
             document.getElementById("val-contrast").innerText = `${contrast}%`;
             document.getElementById("val-saturation").innerText = `${saturation}%`;
             document.getElementById("val-rotation").innerText = `${rotation}°`;
+            document.getElementById("val-opacity").innerText = `${opacity}%`;
 
             ctx.clearRect(0, 0, canvas.width, canvas.height);
             ctx.save();
 
-            // 필터 적용
-            ctx.filter = `brightness(${brightness}%) contrast(${contrast}%) saturate(${saturation}%)`;
+            // 필터 적용 (Opacity 추가)
+            ctx.filter = `brightness(${brightness}%) contrast(${contrast}%) saturate(${saturation}%) opacity(${opacity}%)`;
 
             // 회전/변환 적용 (중심 기준 회전)
             ctx.translate(canvas.width / 2, canvas.height / 2);
@@ -1137,99 +1206,147 @@ CREATE TRIGGER on_auth_user_created
         }
 
         // Supabase 연동 - 가입 유저 리스트 로드
+        // 전역 회원 목록 데이터 캐시
+
+        // Supabase 연동 - 가입 유저 리스트 로드
         async function loadUsersList() {
-            const tbody = document.getElementById("user-list-tbody");
             try {
                 const { data, error } = await supabaseClient
                     .from('user_profiles')
-                    .select('*')
-                    .order('email', { ascending: true });
+                    .select('*');
 
                 if (error) throw error;
 
                 usersList = data || [];
-                if (usersList.length === 0) {
-                    tbody.innerHTML = `
-                        <tr>
-                            <td colspan="5" class="p-8 text-center text-slate-400">등록된 가입 회원 데이터가 존재하지 않습니다.</td>
-                        </tr>
-                    `;
-                    return;
-                }
-
-                tbody.innerHTML = usersList.map(u => {
-                    const upgradeBadge = u.upgrade_requested 
-                        ? `<span class="inline-flex items-center gap-1 bg-rose-500 text-white text-[8.5px] font-black px-1.5 py-0.5 rounded-md animate-pulse shadow-sm"><i class="fa-solid fa-bolt text-yellow-300"></i> 등업 요청 중</span>` 
-                        : '';
-                    const membershipTier = u.membership_tier || 'regular';
-                    
-                    // 기간 기한 설정값
-                    let expiryStr = "";
-                    if (u.membership_expires_at) {
-                        const expDate = new Date(u.membership_expires_at);
-                        const offset = expDate.getTimezoneOffset();
-                        const local = new Date(expDate.getTime() - (offset*60*1000));
-                        expiryStr = local.toISOString().split('T')[0];
-                    }
-
-                    return `
-                        <tr class="border-b border-slate-100 hover:bg-slate-50/50">
-                            <td class="p-3 text-slate-800 font-extrabold select-all">
-                                <div class="flex items-center gap-1.5 flex-wrap">
-                                    <span>${u.email}</span>
-                                    ${upgradeBadge}
-                                </div>
-                            </td>
-                            <td class="p-3 text-center">
-                                <div class="flex flex-col gap-1.5 items-center justify-center">
-                                    <select id="grade-${u.id}" class="text-xs p-1.5 border border-slate-200 rounded-lg bg-white font-extrabold text-slate-700 focus:border-royalBlue outline-none w-[150px]">
-                                        <option value="A" ${u.grade === 'A' ? 'selected' : ''}>🥇 A등급 (100% 오픈)</option>
-                                        <option value="B" ${u.grade === 'B' ? 'selected' : ''}>🥈 B등급 (50% 오픈)</option>
-                                        <option value="C" ${u.grade === 'C' ? 'selected' : ''}>🥉 C등급 (20% 오픈)</option>
-                                    </select>
-                                    ${u.upgrade_requested ? `
-                                        <div class="flex gap-1 mt-1">
-                                            <button onclick="approveUpgradeRequest('${u.id}', '${u.email}')" class="bg-emeraldSuccess hover:bg-emerald-700 text-white text-[9px] font-black px-2 py-1 rounded shadow-sm">승인 (A)</button>
-                                            <button onclick="denyUpgradeRequest('${u.id}')" class="bg-rose-500 hover:bg-rose-600 text-white text-[9px] font-black px-2 py-1 rounded shadow-sm">반려</button>
-                                        </div>
-                                    ` : ''}
-                                </div>
-                            </td>
-                            <td class="p-3">
-                                <div class="flex flex-col gap-1.5">
-                                    <input type="date" id="expiry-${u.id}" value="${expiryStr}" class="text-xs p-1.5 border border-slate-200 rounded-lg bg-white font-extrabold text-slate-700 focus:border-royalBlue outline-none text-center">
-                                    <div class="flex gap-1 justify-center">
-                                        <button onclick="setQuickExpiry('${u.id}', 30)" class="bg-slate-100 hover:bg-slate-200 text-slate-600 text-[8.5px] px-1.5 py-0.5 rounded font-black border border-slate-200 select-none">30일</button>
-                                        <button onclick="setQuickExpiry('${u.id}', 90)" class="bg-slate-100 hover:bg-slate-200 text-slate-600 text-[8.5px] px-1.5 py-0.5 rounded font-black border border-slate-200 select-none">90일</button>
-                                        <button onclick="setQuickExpiry('${u.id}', 'infinite')" class="bg-slate-100 hover:bg-slate-200 text-slate-600 text-[8.5px] px-1.5 py-0.5 rounded font-black border border-slate-200 select-none">무제한</button>
-                                    </div>
-                                </div>
-                            </td>
-                            <td class="p-3 text-center">
-                                <select id="tier-${u.id}" class="text-xs p-1.5 border border-slate-200 rounded-lg bg-white font-extrabold text-slate-700 focus:border-royalBlue outline-none w-[120px]">
-                                    <option value="regular" ${membershipTier === 'regular' ? 'selected' : ''}>일반 (regular)</option>
-                                    <option value="premium" ${membershipTier === 'premium' ? 'selected' : ''}>⭐ 프리미엄 (premium)</option>
-                                </select>
-                            </td>
-                            <td class="p-3 text-center">
-                                <button onclick="saveUserCurationConfig('${u.id}')" class="bg-royalBlue hover:bg-royalHover text-white text-[10.5px] font-black px-3.5 py-2 rounded-xl transition-all shadow-md select-none">
-                                    저장
-                                </button>
-                            </td>
-                        </tr>
-                    `;
-                }).join('');
+                filterUsersList();
             } catch (err) {
                 console.error("유저 프로필 조회 실패", err);
+                const tbody = document.getElementById("user-list-tbody");
+                if (tbody) {
+                    tbody.innerHTML = `
+                        <tr>
+                            <td colspan="6" class="p-8 text-center text-rose-500 font-black">
+                                <i class="fa-solid fa-triangle-exclamation"></i> 회원 프로필 정보를 조회할 수 없습니다. 
+                                <br><span class="text-[10px] text-slate-400 font-semibold block mt-1">DB 테이블 셋업 탭의 SQL 구문을 먼저 실행해야 합니다.</span>
+                            </td>
+                        </tr>
+                    `;
+                }
+            }
+        }
+
+        // 회원 검색 및 정렬 필터 적용
+        function filterUsersList() {
+            const query = document.getElementById("user-search-input")?.value.trim().toLowerCase() || "";
+            const sortBy = document.getElementById("user-sort-select")?.value || "created_desc";
+
+            let filtered = [...usersList];
+
+            // 1. 검색어 필터링
+            if (query) {
+                filtered = filtered.filter(u => u.email && u.email.toLowerCase().includes(query));
+            }
+
+            // 2. 정렬 적용
+            filtered.sort((a, b) => {
+                if (sortBy === "created_desc") {
+                    const dateA = new Date(a.created_at || a.updated_at || 0);
+                    const dateB = new Date(b.created_at || b.updated_at || 0);
+                    return dateB - dateA;
+                } else if (sortBy === "created_asc") {
+                    const dateA = new Date(a.created_at || a.updated_at || 0);
+                    const dateB = new Date(b.created_at || b.updated_at || 0);
+                    return dateA - dateB;
+                } else if (sortBy === "email_asc") {
+                    return (a.email || "").localeCompare(b.email || "");
+                } else if (sortBy === "upgrade_requested") {
+                    const reqA = a.upgrade_requested ? 1 : 0;
+                    const reqB = b.upgrade_requested ? 1 : 0;
+                    return reqB - reqA; // true 우선 정렬
+                }
+                return 0;
+            });
+
+            renderUsersList(filtered);
+        }
+
+        // 회원 목록 실시간 UI 렌더링
+        function renderUsersList(list) {
+            const tbody = document.getElementById("user-list-tbody");
+            if (!tbody) return;
+
+            if (list.length === 0) {
                 tbody.innerHTML = `
                     <tr>
-                        <td colspan="5" class="p-8 text-center text-rose-500 font-black">
-                            <i class="fa-solid fa-triangle-exclamation"></i> 회원 프로필 정보를 조회할 수 없습니다. 
-                            <br><span class="text-[10px] text-slate-400 font-semibold block mt-1">DB 테이블 셋업 탭의 SQL 구문을 먼저 실행해야 합니다.</span>
+                        <td colspan="6" class="p-8 text-center text-slate-400">검색 조건에 맞는 회원 데이터가 존재하지 않습니다.</td>
+                    </tr>
+                `;
+                return;
+            }
+
+            tbody.innerHTML = list.map((u, idx) => {
+                const upgradeBadge = u.upgrade_requested 
+                    ? `<span class="inline-flex items-center gap-1 bg-rose-500 text-white text-[8.5px] font-black px-1.5 py-0.5 rounded-md animate-pulse shadow-sm"><i class="fa-solid fa-bolt text-yellow-300"></i> 등업 요청 중</span>` 
+                    : '';
+                const membershipTier = u.membership_tier || 'regular';
+                
+                // 기간 기한 설정값
+                let expiryStr = "";
+                if (u.membership_expires_at) {
+                    const expDate = new Date(u.membership_expires_at);
+                    const offset = expDate.getTimezoneOffset();
+                    const local = new Date(expDate.getTime() - (offset*60*1000));
+                    expiryStr = local.toISOString().split('T')[0];
+                }
+
+                return `
+                    <tr class="border-b border-slate-100 hover:bg-slate-50/50">
+                        <td class="p-3 text-center text-slate-500 font-bold">${idx + 1}</td>
+                        <td class="p-3 text-slate-800 font-extrabold select-all">
+                            <div class="flex items-center gap-1.5 flex-wrap">
+                                <span class="cursor-pointer text-royalBlue hover:underline" onclick="showUserDetailModal('${u.id}')">${u.email}</span>
+                                ${upgradeBadge}
+                            </div>
+                        </td>
+                        <td class="p-3 text-center">
+                            <div class="flex flex-col gap-1.5 items-center justify-center">
+                                <select id="grade-${u.id}" class="text-xs p-1.5 border border-slate-200 rounded-lg bg-white font-extrabold text-slate-700 focus:border-royalBlue outline-none w-[150px]">
+                                    <option value="A" ${u.grade === 'A' ? 'selected' : ''}>🥇 A등급 (100% 오픈)</option>
+                                    <option value="B" ${u.grade === 'B' ? 'selected' : ''}>🥈 B등급 (50% 오픈)</option>
+                                    <option value="C" ${u.grade === 'C' ? 'selected' : ''}>🥉 C등급 (20% 오픈)</option>
+                                </select>
+                                ${u.upgrade_requested ? `
+                                    <div class="flex gap-1 mt-1">
+                                        <button onclick="approveUpgradeRequest('${u.id}', '${u.email}')" class="bg-emeraldSuccess hover:bg-emerald-700 text-white text-[9px] font-black px-2 py-1 rounded shadow-sm">승인 (A)</button>
+                                        <button onclick="denyUpgradeRequest('${u.id}')" class="bg-rose-50 border border-rose-200 hover:bg-rose-100 text-rose-600 font-bold px-2 py-1 rounded shadow-sm">반려</button>
+                                    </div>
+                                ` : ''}
+                            </div>
+                        </td>
+                        <td class="p-3">
+                            <div class="flex flex-col gap-1.5">
+                                <input type="date" id="expiry-${u.id}" value="${expiryStr}" class="text-xs p-1.5 border border-slate-200 rounded-lg bg-white font-extrabold text-slate-700 focus:border-royalBlue outline-none text-center">
+                                <div class="flex gap-1 justify-center">
+                                    <button onclick="setQuickExpiry('${u.id}', 30)" class="bg-slate-100 hover:bg-slate-200 text-slate-600 text-[8.5px] px-1.5 py-0.5 rounded font-black border border-slate-200 select-none">30일</button>
+                                    <button onclick="setQuickExpiry('${u.id}', 90)" class="bg-slate-100 hover:bg-slate-200 text-slate-600 text-[8.5px] px-1.5 py-0.5 rounded font-black border border-slate-200 select-none">90일</button>
+                                    <button onclick="setQuickExpiry('${u.id}', 'infinite')" class="bg-slate-100 hover:bg-slate-200 text-slate-600 text-[8.5px] px-1.5 py-0.5 rounded font-black border border-slate-200 select-none">무제한</button>
+                                </div>
+                            </div>
+                        </td>
+                        <td class="p-3 text-center">
+                            <select id="tier-${u.id}" class="text-xs p-1.5 border border-slate-200 rounded-lg bg-white font-extrabold text-slate-700 focus:border-royalBlue outline-none w-[120px]">
+                                <option value="regular" ${membershipTier === 'regular' ? 'selected' : ''}>일반 (regular)</option>
+                                <option value="premium" ${membershipTier === 'premium' ? 'selected' : ''}>⭐ 프리미엄 (premium)</option>
+                            </select>
+                        </td>
+                        <td class="p-3 text-center">
+                            <button onclick="saveUserCurationConfig('${u.id}')" class="bg-royalBlue hover:bg-royalHover text-white text-[10.5px] font-black px-3.5 py-2 rounded-xl transition-all shadow-md select-none">
+                                저장
+                            </button>
                         </td>
                     </tr>
                 `;
-            }
+            }).join('');
         }
 
         // 회원 정보 및 이용 기간 변경 최종 DB 저장
@@ -1711,6 +1828,61 @@ CREATE TRIGGER on_auth_user_created
             }
             applyExplorerImage(tempSelectedImage);
         }
+
+        // 회원 상세 모달 열기 및 실시간 카운트 집계
+        async function showUserDetailModal(userId) {
+            const user = usersList.find(u => u.id === userId);
+            if (!user) return;
+
+            document.getElementById("detail-modal-email").innerText = user.email || "-";
+            
+            const gradeMap = { 'A': '🥇 A등급 (100% 오픈)', 'B': '🥈 B등급 (50% 오픈)', 'C': '🥉 C등급 (20% 오픈)' };
+            document.getElementById("detail-modal-grade").innerText = gradeMap[user.grade] || user.grade || "-";
+            
+            const tierMap = { 'premium': '⭐ 프리미엄 (premium)', 'regular': '일반 (regular)' };
+            document.getElementById("detail-modal-tier").innerText = tierMap[user.membership_tier] || user.membership_tier || "일반";
+            
+            let expiryStr = "지정되지 않음";
+            if (user.membership_expires_at) {
+                const expDate = new Date(user.membership_expires_at);
+                expiryStr = expDate.toLocaleDateString('ko-KR') + " " + expDate.toLocaleTimeString('ko-KR');
+            }
+            document.getElementById("detail-modal-expires").innerText = expiryStr;
+
+            // 실시간 카운트 집계 로딩 표시
+            document.getElementById("detail-modal-bid-count").innerText = "...건";
+            document.getElementById("detail-modal-consult-count").innerText = "...건";
+
+            document.getElementById("user-detail-modal").classList.remove("hidden");
+
+            try {
+                // 1. 모의입찰 카운트 집계
+                const { count: bidCount, error: bidErr } = await supabaseClient
+                    .from('mock_bids')
+                    .select('*', { count: 'exact', head: true })
+                    .eq('user_id', userId);
+
+                if (bidErr) throw bidErr;
+                document.getElementById("detail-modal-bid-count").innerText = `${bidCount || 0}건`;
+
+                // 2. 전문가 상담 카운트 집계
+                const { count: consultCount, error: consultErr } = await supabaseClient
+                    .from('expert_consultations')
+                    .select('*', { count: 'exact', head: true })
+                    .eq('user_id', userId);
+
+                if (consultErr) throw consultErr;
+                document.getElementById("detail-modal-consult-count").innerText = `${consultCount || 0}건`;
+            } catch (err) {
+                console.error("유저 활동 통계 집계 실패", err);
+                document.getElementById("detail-modal-bid-count").innerText = "오류";
+                document.getElementById("detail-modal-consult-count").innerText = "오류";
+            }
+        }
+
+        function closeUserDetailModal() {
+            document.getElementById("user-detail-modal").classList.add("hidden");
+        }
     </script>
 
     <!-- 🔑 어드민 전용 로그인 인증 모달 오버레이 (다크-골드 믹스 프리미엄 스타일) -->
@@ -1738,6 +1910,58 @@ CREATE TRIGGER on_auth_user_created
             <button onclick="adminLogin()" class="w-full bg-gradient-to-r from-amber-500 to-yellow-400 hover:from-amber-600 hover:to-yellow-500 text-slate-950 text-xs font-black py-3 px-4 rounded-xl shadow-lg transition-all active:scale-[0.98]">
                 안전 보안 로그인
             </button>
+        </div>
+    </div>
+
+    <!-- 👥 회원 상세 활동 정보 모달 팝업 (실시간 통계 집계 포함) -->
+    <div id="user-detail-modal" class="fixed inset-0 bg-slate-900/60 z-50 flex items-center justify-center hidden">
+        <div class="bg-white border border-slate-200 rounded-3xl p-6 max-w-md w-full mx-4 shadow-2xl flex flex-col space-y-4">
+            <div class="flex items-center justify-between border-b border-slate-100 pb-2.5">
+                <h3 class="text-sm font-black text-slate-800 flex items-center gap-1.5">
+                    <i class="fa-solid fa-id-card text-royalBlue"></i> 회원 상세 활동 프로필
+                </h3>
+                <button onclick="closeUserDetailModal()" class="text-slate-400 hover:text-rose-500 transition-colors"><i class="fa-solid fa-xmark text-lg"></i></button>
+            </div>
+            
+            <div class="space-y-3.5 text-xs text-slate-700 font-bold leading-normal">
+                <div class="grid grid-cols-3 gap-2 border-b border-slate-50 pb-2.5">
+                    <span class="text-slate-400 font-black">이메일 계정</span>
+                    <span id="detail-modal-email" class="col-span-2 text-slate-900 select-all font-extrabold"></span>
+                </div>
+                <div class="grid grid-cols-3 gap-2 border-b border-slate-50 pb-2.5">
+                    <span class="text-slate-400 font-black">회원 등급</span>
+                    <span id="detail-modal-grade" class="col-span-2 text-slate-900 font-extrabold"></span>
+                </div>
+                <div class="grid grid-cols-3 gap-2 border-b border-slate-50 pb-2.5">
+                    <span class="text-slate-400 font-black">멤버십 종류</span>
+                    <span id="detail-modal-tier" class="col-span-2 text-slate-900 font-extrabold"></span>
+                </div>
+                <div class="grid grid-cols-3 gap-2 border-b border-slate-50 pb-2.5">
+                    <span class="text-slate-400 font-black">멤버십 만료일</span>
+                    <span id="detail-modal-expires" class="col-span-2 text-slate-900 font-extrabold"></span>
+                </div>
+                
+                <!-- 실시간 활동 데이터 통계 블록 -->
+                <div class="bg-blue-50/50 border border-blue-100 rounded-2xl p-4 space-y-3.5">
+                    <h4 class="text-xs font-black text-royalBlue flex items-center gap-1.5">
+                        <i class="fa-solid fa-chart-simple"></i> 실시간 개인 활동 데이터 통계
+                    </h4>
+                    <div class="grid grid-cols-2 gap-4 text-center">
+                        <div class="bg-white border border-slate-100 p-3 rounded-xl shadow-sm">
+                            <span class="text-[9.5px] text-slate-400 block font-black">가상 모의입찰 참여</span>
+                            <span id="detail-modal-bid-count" class="text-lg font-black text-rose-600 mt-1 block">0건</span>
+                        </div>
+                        <div class="bg-white border border-slate-100 p-3 rounded-xl shadow-sm">
+                            <span class="text-[9.5px] text-slate-400 block font-black">전문가 상담 신청</span>
+                            <span id="detail-modal-consult-count" class="text-lg font-black text-royalBlue mt-1 block">0건</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="flex justify-end pt-2">
+                <button onclick="closeUserDetailModal()" class="px-4 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-600 font-black transition-all">닫기</button>
+            </div>
         </div>
     </div>
 
