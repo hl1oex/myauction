@@ -1080,8 +1080,16 @@
                 <p id="detail-no" class="text-[10px] sm:text-xs font-bold text-slate-500 mt-1"></p>
             </div>
             
-            <!-- 우측 스코어 영역 -->
+            <!-- 우측 스코어 및 공유 영역 -->
             <div class="flex items-center gap-2 sm:gap-3 absolute top-4 right-14 sm:static flex-shrink-0">
+                <!-- 💬 슬랙 및 텔레그램 공유 버튼 추가 -->
+                <button onclick="shareToSlack()" class="w-8 h-8 sm:w-10 sm:h-10 rounded-lg bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 text-emerald-700 flex items-center justify-center transition-all select-none" title="슬랙으로 공유">
+                    <i class="fa-brands fa-slack text-base sm:text-lg"></i>
+                </button>
+                <button onclick="shareToTelegram()" class="w-8 h-8 sm:w-10 sm:h-10 rounded-lg bg-sky-50 hover:bg-sky-100 border border-sky-200 text-sky-700 flex items-center justify-center transition-all select-none" title="텔레그램으로 공유">
+                    <i class="fa-brands fa-telegram text-base sm:text-lg"></i>
+                </button>
+
                 <div id="detail-score-circle" class="w-9 h-9 sm:w-14 sm:h-14 rounded-full border-2 sm:border-4 flex flex-col items-center justify-center font-outfit shadow-sm bg-white">
                     <span id="detail-score-val" class="text-xs sm:text-base font-black leading-none"></span>
                     <span class="text-[5px] sm:text-[8px] text-slate-400 font-bold leading-none mt-0.5 sm:mt-1">SCORE</span>
