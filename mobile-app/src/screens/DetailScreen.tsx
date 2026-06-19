@@ -1603,7 +1603,12 @@ export const DetailScreen: React.FC<DetailScreenProps> = ({ property, onBack }) 
         </View>
       )}
 
-      <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
+      <ScrollView 
+        ref={scrollViewRef}
+        style={styles.container} 
+        contentContainerStyle={styles.scrollContent} 
+        showsVerticalScrollIndicator={false}
+      >
         {/* 🏢 부동산/자산 대표 전경 이미지 */}
         <View style={styles.mainImageContainer}>
           {currentProperty.images && currentProperty.images.length > 0 ? (
@@ -4336,7 +4341,10 @@ const styles = StyleSheet.create({
   },
   container: {
     flex: 1,
+  },
+  scrollContent: {
     padding: 12,
+    paddingBottom: 120, // 하단 고정 광고 영역에 가려지지 않도록 충분한 여백 확보.
   },
   mainImageContainer: {
     width: '100%',
