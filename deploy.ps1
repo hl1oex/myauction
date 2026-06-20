@@ -33,6 +33,10 @@ Copy-Item -Path "favicon.png" -Destination "dist/mobile/" -Force
 Copy-Item -Path "favicon.ico" -Destination "dist/mobile/" -Force
 Copy-Item -Path "apartment_elegant_facade.png" -Destination "dist/" -Force
 Copy-Item -Path "floorplan_modern_apartment.png" -Destination "dist/" -Force
+Copy-Item -Path "slack_guide_screenshot.png" -Destination "dist/" -Force
+Copy-Item -Path "telegram_guide_screenshot.png" -Destination "dist/" -Force
+Copy-Item -Path "slack_guide_screenshot.png" -Destination "dist/mobile/" -Force
+Copy-Item -Path "telegram_guide_screenshot.png" -Destination "dist/mobile/" -Force
 if (Test-Path "v1.2") {
     Copy-Item -Path "v1.2" -Destination "dist/" -Recurse -Force
 }

@@ -5291,6 +5291,45 @@
                 document.body.appendChild(s);
             }
         }
+        // 브라우저 CORS 우회를 위해 다중 프록시를 순차 시도하는 헬퍼 함수
+        async function fetchViaProxy(targetUrl, options = {}) {
+            const proxyTemplates = [
+                (url) => `https://corsproxy.io/?${encodeURIComponent(url)}`,
+                (url) => `https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`,
+                (url) => `https://thingproxy.freeboard.io/fetch/${url}`
+            ];
+
+            let lastError = null;
+            for (let i = 0; i < proxyTemplates.length; i++) {
+                try {
+                    const proxyUrl = proxyTemplates[i](targetUrl);
+                    console.log(`CORS 프록시 시도 (${i + 1}/${proxyTemplates.length}):`, proxyUrl);
+                    const response = await fetch(proxyUrl, options);
+                    
+                    let data;
+                    try {
+                        data = await response.json();
+                    } catch (e) {
+                        if (!response.ok) {
+                            throw new Error(`HTTP error! status: ${response.status}`);
+                        }
+                        throw e;
+                    }
+
+                    // 슬랙 API 응답 규격 검증. 슬랙은 항상 ok 속성을 리턴합니다.
+                    // 만약 ok 속성이 누락된 경우, 프록시 자체의 유료 결제 유도 오류 등으로 판정하고 강제 throw 하여 다음 프록시로 넘깁니다.
+                    if (data && typeof data.ok === "undefined") {
+                        throw new Error(`Invalid proxy response (missing ok field). Response: ${JSON.stringify(data)}`);
+                    }
+
+                    return data;
+                } catch (err) {
+                    console.warn(`프록시 ${i + 1} 호출 실패, 다음 프록시 시도.`, err);
+                    lastError = err;
+                }
+            }
+            throw lastError || new Error("모든 CORS 프록시 호출에 실패했습니다.");
+        }
         // 📢 Supabase ads 광고 연동 로드 함수 (멀티 슬롯 대응)
         async function loadAdSettings() {
             try {
@@ -5892,88 +5931,59 @@
             }
         }
 
-        // 💬 [공유] 슬랙 및 텔레그램 매물 정보 실시간 공유 연동 함수
-        async function shareToSlack() {
+        // 📢 [공유] 통합 SNS/메시징 매물 정보 공유 연동 함수
+        async function sharePropertyDetail() {
             if (!selectedProperty) {
                 alert("공유할 매물 정보가 존재하지 않습니다.");
                 return;
             }
-            // GitHub Push Protection 회피를 위한 분할 조립
-            const slackWebhookUrl = "https://hooks.slack.com/services/" + "T0BCP8SEBUY/" + "B0BBZKPQ2J0/" + "ANFHir4aMpOsrGw1hNbTua5m";
+            
             const sourceKor = selectedProperty.source === 'court' || selectedProperty.source === 'court_etc' ? '법원 경매' : '온비드 공매';
-            const text = `📢 *[부동산경공매 알림] 매물 공유*
-*물건지 주소:* ${selectedProperty.address}
-*사건/관리번호:* ${selectedProperty.auction_no} (${sourceKor})
-*용도/구분:* ${selectedProperty.ptype}
-*감정평가액:* ${formatKRW(selectedProperty.appraised_value)}
-*최저입찰가:* ${formatKRW(selectedProperty.minimum_bid)}
-*매각/입찰기일:* ${selectedProperty.bidding_date}
-*AI 분석 등급:* ${selectedProperty.grade || '미상'}등급 (점수: ${selectedProperty.score || 0}점)
-*상세 링크:* https://myauction.r-e.kr/?detail=${selectedProperty.id}`;
+            const title = `[부동산경공매] 매물 공유`;
+            const text = `📢 [부동산경공매 알림] 매물 공유
+물건지 주소: ${selectedProperty.address}
+사건/관리번호: ${selectedProperty.auction_no} (${sourceKor})
+용도/구분: ${selectedProperty.ptype}
+감정평가액: ${formatKRW(selectedProperty.appraised_value)}
+최저입찰가: ${formatKRW(selectedProperty.minimum_bid)}
+매각/입찰기일: ${selectedProperty.bidding_date}
+AI 분석 등급: ${selectedProperty.grade || '미상'}등급 (점수: ${selectedProperty.score || 0}점)`;
+            const url = `https://myauction.r-e.kr/?detail=${selectedProperty.id}`;
 
-            try {
-                await fetch(slackWebhookUrl, {
-                    method: "POST",
-                    mode: "no-cors",
-                    headers: {
-                        "Content-Type": "text/plain"
-                    },
-                    body: JSON.stringify({ text: text })
-                });
-                alert("슬랙으로 매물 정보를 전송했습니다.");
-            } catch (err) {
-                console.error("Slack 공유 에러:", err);
-                alert("슬랙 전송 처리 중 오류가 발생했습니다.");
+            const shareData = {
+                title: title,
+                text: `${text}\n상세 링크: ${url}`,
+                url: url
+            };
+
+            // Web Share API가 지원되는 브라우저/환경인 경우 네이티브 공유 다이얼로그 호출
+            if (navigator.share && navigator.canShare && navigator.canShare(shareData)) {
+                try {
+                    await navigator.share(shareData);
+                    console.log("Web Share API 호출 성공");
+                } catch (err) {
+                    if (err.name !== 'AbortError') {
+                        console.error("공유 중 오류 발생, 클립보드 복사로 진행합니다.", err);
+                        fallbackCopyToClipboard(shareData.text);
+                    }
+                }
+            } else {
+                // 미지원 환경일 때 클립보드 복사 처리
+                fallbackCopyToClipboard(shareData.text);
             }
         }
 
-        async function shareToTelegram() {
-            if (!selectedProperty) {
-                alert("공유할 매물 정보가 존재하지 않습니다.");
-                return;
-            }
-            let chatId = localStorage.getItem("telegram_chat_id");
-            if (!chatId) {
-                chatId = prompt("텔레그램 메시지를 수신할 본인의 Chat ID를 입력해주세요.\n(반드시 텔레그램에서 @auctionnowbot 봇을 검색하고 대화방에서 /start를 먼저 입력해 주셔야 수신 가능합니다.)");
-                if (!chatId) return;
-                chatId = chatId.trim();
-                localStorage.setItem("telegram_chat_id", chatId);
-            }
-            // GitHub Push Protection 회피를 위한 분할 조립
-            const botToken = "8852350792:" + "AAEBPlA64GIztJa8XeSrqQd4-1rvJbvsOiA";
-            const sourceKor = selectedProperty.source === 'court' || selectedProperty.source === 'court_etc' ? '법원 경매' : '온비드 공매';
-            const text = `📢 *[부동산경공매 알림] 매물 공유*
-*물건지 주소:* ${selectedProperty.address}
-*사건/관리번호:* ${selectedProperty.auction_no} (${sourceKor})
-*용도/구분:* ${selectedProperty.ptype}
-*감정평가액:* ${formatKRW(selectedProperty.appraised_value)}
-*최저입찰가:* ${formatKRW(selectedProperty.minimum_bid)}
-*매각/입찰기일:* ${selectedProperty.bidding_date}
-*AI 분석 등급:* ${selectedProperty.grade || '미상'}등급 (점수: ${selectedProperty.score || 0}점)
-*상세 링크:* https://myauction.r-e.kr/?detail=${selectedProperty.id}`;
-
-            try {
-                const response = await fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json"
-                    },
-                    body: JSON.stringify({
-                        chat_id: chatId,
-                        text: text,
-                        parse_mode: "Markdown"
-                    })
+        // 클립보드 복사 폴백 함수
+        function fallbackCopyToClipboard(shareText) {
+            navigator.clipboard.writeText(shareText)
+                .then(() => {
+                    alert("매물 정보와 상세 링크가 클립보드에 성공적으로 복사되었습니다. 원하는 곳에 붙여넣어 공유하십시오.");
+                })
+                .catch((err) => {
+                    console.error("클립보드 복사 실패.", err);
+                    alert("공유하기를 실행할 수 없으며 클립보드 복사에도 실패했습니다.");
                 });
-                const data = await response.json();
-                if (data.ok) {
-                    alert("텔레그램으로 매물 정보를 성공적으로 발송했습니다!");
-                } else {
-                    console.error("텔레그램 전송 응답 오류:", data);
-                    alert(`텔레그램 전송에 실패했습니다: ${data.description || '올바른 ID가 아니거나 봇 대화방이 활성화되어 있지 않습니다.'}`);
-                    localStorage.removeItem("telegram_chat_id");
-                }
-            } catch (err) {
-                console.error("텔레그램 공유 에러:", err);
-                alert("텔레그램 전송 중 오류가 발생했습니다.");
-            }
-        }
+        }
+    
+        // v1.2 큐레이션 및 핵심 피처 스크립트 로드 완료 후 추가 바인딩은 ThemeCurationOverlay.js에서 수행합니다.
+        console.log("AI 경시/공매 통합 시스템 스크립트 로드 완료.");

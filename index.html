@@ -1082,12 +1082,9 @@
             
             <!-- 우측 스코어 및 공유 영역 -->
             <div class="flex items-center gap-2 sm:gap-3 absolute top-4 right-14 sm:static flex-shrink-0">
-                <!-- 💬 슬랙 및 텔레그램 공유 버튼 추가 -->
-                <button onclick="shareToSlack()" class="w-8 h-8 sm:w-10 sm:h-10 rounded-lg bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 text-emerald-700 flex items-center justify-center transition-all select-none" title="슬랙으로 공유">
-                    <i class="fa-brands fa-slack text-base sm:text-lg"></i>
-                </button>
-                <button onclick="shareToTelegram()" class="w-8 h-8 sm:w-10 sm:h-10 rounded-lg bg-sky-50 hover:bg-sky-100 border border-sky-200 text-sky-700 flex items-center justify-center transition-all select-none" title="텔레그램으로 공유">
-                    <i class="fa-brands fa-telegram text-base sm:text-lg"></i>
+                <!-- 📢 통합 SNS/메시징 공유하기 버튼 -->
+                <button onclick="sharePropertyDetail()" class="w-8 h-8 sm:w-10 sm:h-10 rounded-lg bg-royalBlue/5 hover:bg-royalBlue/10 border border-royalBlue/20 text-royalBlue flex items-center justify-center transition-all select-none" title="공유하기">
+                    <i class="fa-solid fa-share-nodes text-base sm:text-lg"></i>
                 </button>
 
                 <div id="detail-score-circle" class="w-9 h-9 sm:w-14 sm:h-14 rounded-full border-2 sm:border-4 flex flex-col items-center justify-center font-outfit shadow-sm bg-white">

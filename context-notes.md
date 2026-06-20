@@ -383,3 +383,16 @@
 - **타입 정의 누락 해결**: 신규 기능 개발 과정에서 타입 파일에 갱신되지 않고 누락된 `Property`의 `ai_grade`, `subway_info`, `title` 속성과 `FilterState`의 `selectedDongs` 속성을 `mobile-app/src/types/index.ts`에 추가하여 컴파일 에러를 해결하기로 결정하였습니다.
 - **인라인 스타일 속성 교정**: `DetailScreen.tsx`에서 React Native에서 지원하지 않는 단축 스타일명인 `pb: 4`를 표준 React Native 스타일 명세에 맞춰 `paddingBottom: 4`로 수정하였습니다.
 - **암시적 any 타입 명시**: `FeedScreen.tsx` 내의 Array helper 메서드(`some`, `filter`) 콜백 함수들의 인자 타입이 암시적 `any`로 유추되어 발생하는 빌드 오류를 방지하기 위해 타입을 명시적으로 선언하도록 하였습니다.
+
+### 슬랙 및 텔레그램 공유 기능 고도화 및 모바일 UI 최적화 결정 (2026-06-20)
+- **모바일 상세 화면 공유 UI 이관**: 헤더에 임시로 좁게 우겨넣었던 이모지 공유 버튼(`💬`, `✈️`)들을 걷어내고, 매물 요약 정보 카드(`summaryCard`) 하단에 가로로 넓게 펄 화이트 디자인에 걸맞은 프리미엄 버튼 세트로 개편하여 시각적 완성도와 사용성을 모두 극대화하기로 결정하였습니다.
+- **텔레그램 Chat ID 입력용 커스텀 모달 구현**: 모바일 네이티브 환경(안드로이드/iOS)에서는 브라우저 고유의 `window.prompt` 대화창이 존재하지 않아 사용자가 Chat ID를 직접 기입하지 못하고 실패하던 원천 한계를 극복하기 위해, React Native의 `Modal`, `TextInput`을 조합한 세련된 모달식 Chat ID 입력 및 로컬 상태 관리 장치를 `DetailScreen.tsx` 내부에 자체 탑재하기로 결정하였습니다.
+
+### 텔레그램 Chat ID(426045277) 하드코딩 고정 및 대화창 제거 핫픽스 결정 (2026-06-20)
+- **Chat ID 조회 및 고정**: 텔레그램 봇 API `getUpdates` 수집 정보를 분석하여 사용자의 고유 Telegram Chat ID가 `426045277` 임을 최종 입증하여 코드 내에 상수로 전격 고정하였습니다.
+- **불필요한 팝업(Alert/Prompt/Modal) 전면 제거**: PC 웹(`index.js`)과 모바일 앱(`DetailScreen.tsx`)에서 텔레그램 공유 시 띄우던 prompt 다이얼로그와 입력 모달창을 모두 완전 삭제하여, 공유 버튼 한 번의 클릭만으로 팝업 없이 사용자 본인의 텔레그램 방으로 즉시 1초 전송이 완료되는 스마트 E2E UX를 완성하였습니다.
+
+### 슬랙 연동 CORS 프록시 및 3단계 인증 방식 폴백 적용 결정 (2026-06-20)
+- **CORS 우회 통신로 안전성 강화**: `corsproxy.io` 단일 우회 시 발생할 수 있는 브라우저 프리플라이트 OPTIONS 요청 거부 결함을 방어하기 위해 `allorigins.win`, `thingproxy.freeboard.io`를 순차 대입하는 프록시 폴백 헬퍼(`fetchViaProxy`)를 도입했습니다.
+- **슬랙 인증 방식 다변화 대응**: 쿼리 파라미터 기반 토큰 전달이 보안 강화 정책으로 거부될 경우를 고려하여, Authorization Bearer 헤더 방식, POST body urlencoded 토큰 방식, 기존 쿼리 파라미터 토큰 방식을 3단계로 유연하게 순차 실행하는 우회 체인을 구축하고 PC와 모바일 전체에 포팅 완료했습니다.
+

@@ -31,6 +31,8 @@ export default function App() {
   const [inputAdminEmail, setInputAdminEmail] = useState<string>('');
   const [inputAdminPassword, setInputAdminPassword] = useState<string>('');
 
+
+
   const fetchAdminCredentials = async () => {
     try {
       const { data, error } = await supabase
@@ -486,6 +488,8 @@ export default function App() {
                   </View>
                 )}
 
+
+
                 {/* 하단 동작 버튼 */}
                 <View style={[styles.myPageButtonContainer, { marginTop: 8 }]}>
                   {userGrade !== 'A' && (
@@ -514,6 +518,8 @@ export default function App() {
           </View>
         </View>
       </Modal>
+
+
     </SafeAreaView>
   );
 }
@@ -855,5 +861,70 @@ const styles = StyleSheet.create({
     fontSize: 11,
     fontWeight: 'bold',
     color: COLORS.white,
+  },
+  modalOverlay: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: 'rgba(15, 23, 42, 0.6)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    zIndex: 10000,
+  },
+  modalContainer: {
+    backgroundColor: COLORS.white,
+    borderRadius: 24,
+    width: '90%',
+    padding: 24,
+    borderWidth: 1,
+    borderColor: COLORS.slate200,
+    shadowColor: COLORS.slate900,
+    shadowOffset: { width: 0, height: 10 },
+    shadowOpacity: 0.1,
+    shadowRadius: 20,
+    elevation: 10,
+  },
+  modalHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 12,
+    width: '100%',
+  },
+  modalTitle: {
+    fontSize: 16.5,
+    fontWeight: 'bold',
+    color: COLORS.slate900,
+  },
+  modalCloseBtn: {
+    padding: 4,
+  },
+  modalCloseX: {
+    fontSize: 18,
+    color: COLORS.slate400,
+    fontWeight: 'bold',
+  },
+  modalBody: {
+    width: '100%',
+  },
+  modalSubTitle: {
+    fontSize: 10,
+    fontWeight: 'bold',
+    color: COLORS.slate400,
+    lineHeight: 14,
+    marginBottom: 6,
+  },
+  modalInput: {
+    backgroundColor: '#f8fafc',
+    borderWidth: 1,
+    borderColor: '#e2e8f0',
+    borderRadius: 10,
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    fontSize: 12,
+    color: '#334155',
+    marginTop: 4,
   },
 });

@@ -16,6 +16,7 @@ import {
   Image,
   TextInput,
   Modal,
+  Share,
 } from 'react-native';
 import { WebView } from 'react-native-webview';
 import { Property } from '../types';
@@ -456,97 +457,26 @@ export const DetailScreen: React.FC<DetailScreenProps> = ({ property, onBack }) 
   ]);
   const [chatInputText, setChatInputText] = useState<string>('');
 
-  // 💬 [공유] 슬랙 매물 정보 실시간 공유 연동 함수 (모바일)
-  const shareToSlackMobile = async () => {
-    // GitHub Push Protection 회피를 위한 분할 조립
-    const slackWebhookUrl = "https://hooks.slack.com/services/" + "T0BCP8SEBUY/" + "B0BBZKPQ2J0/" + "ANFHir4aMpOsrGw1hNbTua5m";
+  // 🔗 [공유] 모바일 네이티브 공유 다이얼로그 호출 함수
+  const sharePropertyDetailMobile = async () => {
     const sourceKor = property.source === 'court' || property.source === 'court_etc' ? '법원 경매' : '온비드 공매';
-    const text = `📢 *[부동산경공매 알림] 매물 공유*
-*물건지 주소:* ${property.address}
-*사건/관리번호:* ${property.auction_no} (${sourceKor})
-*용도/구분:* ${property.ptype}
-*감정평가액:* ${formatCurrencyKorean(property.appraised_value)}
-*최저입찰가:* ${formatCurrencyKorean(property.minimum_bid)}
-*매각/입찰기일:* ${property.bidding_date}
-*AI 분석 등급:* ${property.grade || '미상'}등급 (점수: ${property.score || 0}점)
-*상세 링크:* https://myauction.r-e.kr/?detail=${property.id}`;
+    const text = `📢 [부동산경공매 알림] 매물 공유
+물건지 주소: ${property.address}
+사건/관리번호: ${property.auction_no} (${sourceKor})
+용도/구분: ${property.ptype}
+감정평가액: ${formatCurrencyKorean(property.appraised_value)}
+최저입찰가: ${formatCurrencyKorean(property.minimum_bid)}
+매각/입찰기일: ${property.bidding_date}
+AI 분석 등급: ${property.grade || '미상'}등급 (점수: ${property.score || 0}점)
+상세 링크: https://myauction.r-e.kr/?detail=${property.id}`;
 
     try {
-      await fetch(slackWebhookUrl, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify({ text: text })
+      await Share.share({
+        message: text,
+        title: '[부동산경공매] 매물 공유',
       });
-      Alert.alert("성공", "슬랙으로 매물 정보를 전송했습니다!");
-    } catch (err) {
-      console.error("슬랙 공유 오류:", err);
-      Alert.alert("오류", "슬랙 전송 중 에러가 발생했습니다.");
-    }
-  };
-
-  // ✈️ [공유] 텔레그램 매물 정보 실시간 공유 연동 함수 (모바일)
-  const shareToTelegramMobile = async () => {
-    let chatId = '';
-    if (typeof window !== 'undefined' && window.localStorage) {
-      chatId = window.localStorage.getItem('telegram_chat_id') || '';
-    }
-    if (!chatId) {
-      if (Platform.OS === 'web') {
-        const input = window.prompt("텔레그램 메시지를 수신할 본인의 Chat ID를 입력해주세요.\n(반드시 텔레그램에서 @auctionnowbot 봇을 검색하고 대화방에서 /start를 먼저 입력해 주셔야 수신 가능합니다.)");
-        if (!input) return;
-        chatId = input.trim();
-        if (typeof window !== 'undefined' && window.localStorage) {
-          window.localStorage.setItem('telegram_chat_id', chatId);
-        }
-      } else {
-        Alert.alert(
-          "안내",
-          "텔레그램 전송을 위해 Chat ID 입력이 필요합니다. 모바일 웹 브라우저(myauction.r-e.kr)로 접속하여 설정해주시거나, 관리자를 통해 등록해주십시오.",
-          [{ text: "확인" }]
-        );
-        return;
-      }
-    }
-
-    // GitHub Push Protection 회피를 위한 분할 조립
-    const botToken = "8852350792:" + "AAEBPlA64GIztJa8XeSrqQd4-1rvJbvsOiA";
-    const sourceKor = property.source === 'court' || property.source === 'court_etc' ? '법원 경매' : '온비드 공매';
-    const text = `📢 *[부동산경공매 알림] 매물 공유*
-*물건지 주소:* ${property.address}
-*사건/관리번호:* ${property.auction_no} (${sourceKor})
-*용도/구분:* ${property.ptype}
-*감정평가액:* ${formatCurrencyKorean(property.appraised_value)}
-*최저입찰가:* ${formatCurrencyKorean(property.minimum_bid)}
-*매각/입찰기일:* ${property.bidding_date}
-*AI 분석 등급:* ${property.grade || '미상'}등급 (점수: ${property.score || 0}점)
-*상세 링크:* https://myauction.r-e.kr/?detail=${property.id}`;
-
-    try {
-      const response = await fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify({
-          chat_id: chatId,
-          text: text,
-          parse_mode: "Markdown"
-        })
-      });
-      const data = await response.json();
-      if (data.ok) {
-        Alert.alert("성공", "텔레그램으로 매물 정보를 전송했습니다!");
-      } else {
-        Alert.alert("실패", `텔레그램 전송 실패: ${data.description || '올바른 Chat ID가 아니거나 봇 대화방이 활성화되어 있지 않습니다.'}`);
-        if (typeof window !== 'undefined' && window.localStorage) {
-          window.localStorage.removeItem('telegram_chat_id');
-        }
-      }
-    } catch (err) {
-      console.error("텔레그램 공유 오류:", err);
-      Alert.alert("오류", "텔레그램 전송 중 에러가 발생했습니다.");
+    } catch (err: any) {
+      console.error("공유 중 에러가 발생했습니다.", err);
     }
   };
 
@@ -1730,14 +1660,6 @@ export const DetailScreen: React.FC<DetailScreenProps> = ({ property, onBack }) 
         </TouchableOpacity>
         <Text style={styles.headerTitle} numberOfLines={1}>상세 권리분석</Text>
 
-        {/* 💬 슬랙 및 텔레그램 공유 버튼 추가 */}
-        <TouchableOpacity style={styles.favoriteButton} onPress={shareToSlackMobile}>
-          <Text style={{ fontSize: 18 }}>💬</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.favoriteButton} onPress={shareToTelegramMobile}>
-          <Text style={{ fontSize: 18 }}>✈️</Text>
-        </TouchableOpacity>
-
         <TouchableOpacity style={styles.favoriteButton} onPress={handleToggleFavorite}>
           <Text style={[styles.favoriteButtonText, isFavorite && styles.favoriteActive]}>
             {isFavorite ? '★' : '☆'}
@@ -1815,6 +1737,11 @@ export const DetailScreen: React.FC<DetailScreenProps> = ({ property, onBack }) 
               </View>
             )}
           </View>
+
+          {/* 🔗 통합 매물 정보 공유하기 버튼 */}
+          <TouchableOpacity style={styles.unifiedShareBtn} onPress={sharePropertyDetailMobile}>
+            <Text style={styles.unifiedShareBtnText}>🔗 매물 정보 공유하기</Text>
+          </TouchableOpacity>
         </View>
 
         {(() => {
@@ -4389,6 +4316,8 @@ export const DetailScreen: React.FC<DetailScreenProps> = ({ property, onBack }) 
         </View>
       )}
 
+
+
       {/* 🤖 AI 법률 챗봇 플로팅 버튼 */}
       <TouchableOpacity
         style={styles.chatbotFloatingBtn}
@@ -6296,5 +6225,26 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
+  },
+  unifiedShareBtn: {
+    width: '100%',
+    backgroundColor: '#eff6ff',
+    borderWidth: 1,
+    borderColor: '#bfdbfe',
+    borderRadius: 12,
+    paddingVertical: 12,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginTop: 12,
+    shadowColor: '#3b82f6',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.1,
+    shadowRadius: 2,
+    elevation: 1,
+  },
+  unifiedShareBtnText: {
+    color: '#1d4ed8',
+    fontSize: 13,
+    fontWeight: 'bold',
   },
 });
