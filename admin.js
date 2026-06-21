@@ -572,17 +572,17 @@
 
                 return `
                     <tr class="border-b border-slate-100 hover:bg-slate-50/50">
-                        <td class="p-3 text-center text-slate-500 font-bold">${idx + 1}</td>
-                        <td class="p-3 text-slate-800 font-extrabold select-all">
+                        <td class="p-3 text-center text-slate-500 font-bold whitespace-nowrap">${idx + 1}</td>
+                        <td class="p-3 text-slate-800 font-extrabold select-all whitespace-nowrap">
                             <div class="flex items-center gap-1.5 flex-wrap">
                                 <span class="cursor-pointer text-royalBlue hover:underline" onclick="showUserDetailModal('${u.id}')">${u.email}</span>
                                 ${upgradeBadge}
                             </div>
                         </td>
-                        <td class="p-3 text-center text-slate-600 font-extrabold">${providerStr}</td>
-                        <td class="p-3 text-center">${telegramIdStr}</td>
-                        <td class="p-3 text-center text-slate-600 font-extrabold">${signUpDateStr}</td>
-                        <td class="p-3 text-center">
+                        <td class="p-3 text-center text-slate-650 font-extrabold whitespace-nowrap">${providerStr}</td>
+                        <td class="p-3 text-center whitespace-nowrap">${telegramIdStr}</td>
+                        <td class="p-3 text-center text-slate-650 font-extrabold whitespace-nowrap">${signUpDateStr}</td>
+                        <td class="p-3 text-center whitespace-nowrap">
                             <div class="flex flex-col gap-1.5 items-center justify-center">
                                 <select id="tier-${u.id}" class="text-xs p-1.5 border border-slate-200 rounded-lg bg-white font-extrabold text-slate-700 focus:border-royalBlue outline-none w-[150px]">
                                     <option value="regular" ${membershipTier === 'regular' ? 'selected' : ''}>일반 (regular)</option>
@@ -596,7 +596,7 @@
                                 ` : ''}
                             </div>
                         </td>
-                        <td class="p-3">
+                        <td class="p-3 whitespace-nowrap">
                             <div class="flex flex-col gap-1.5">
                                 <input type="date" id="expiry-${u.id}" value="${expiryStr}" class="text-xs p-1.5 border border-slate-200 rounded-lg bg-white font-extrabold text-slate-700 focus:border-royalBlue outline-none text-center">
                                 <div class="flex gap-1 justify-center">
@@ -606,7 +606,7 @@
                                 </div>
                             </div>
                         </td>
-                        <td class="p-3 text-center">
+                        <td class="p-3 text-center whitespace-nowrap">
                             <button onclick="saveUserCurationConfig('${u.id}')" class="bg-royalBlue hover:bg-royalHover text-white text-[10.5px] font-black px-3.5 py-2 rounded-xl transition-all shadow-md select-none">
                                 저장
                             </button>
