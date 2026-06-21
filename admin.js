@@ -565,6 +565,11 @@
                     });
                 }
 
+                // 텔레그램 연동 정보 포맷팅
+                const telegramIdStr = u.telegram_chat_id 
+                    ? `<span class="inline-flex items-center gap-1 bg-blue-50 text-[#229ED9] text-[10px] font-black px-2 py-0.5 rounded-full border border-blue-150"><i class="fa-brands fa-telegram text-[11px]"></i> ${u.telegram_chat_id}</span>`
+                    : `<span class="text-slate-350 text-[10px] font-semibold">미연동</span>`;
+
                 return `
                     <tr class="border-b border-slate-100 hover:bg-slate-50/50">
                         <td class="p-3 text-center text-slate-500 font-bold">${idx + 1}</td>
@@ -575,6 +580,7 @@
                             </div>
                         </td>
                         <td class="p-3 text-center text-slate-600 font-extrabold">${providerStr}</td>
+                        <td class="p-3 text-center">${telegramIdStr}</td>
                         <td class="p-3 text-center text-slate-600 font-extrabold">${signUpDateStr}</td>
                         <td class="p-3 text-center">
                             <div class="flex flex-col gap-1.5 items-center justify-center">
@@ -1110,6 +1116,9 @@
                 createdStr = cDate.toLocaleDateString('ko-KR') + " " + cDate.toLocaleTimeString('ko-KR');
             }
             document.getElementById("detail-modal-created").innerText = createdStr;
+
+            // 텔레그램 연동 정보 바인딩
+            document.getElementById("detail-modal-telegram").innerText = user.telegram_chat_id || "미연동";
 
             // 실시간 카운트 집계 로딩 표시
             document.getElementById("detail-modal-bid-count").innerText = "...건";
