@@ -1075,10 +1075,10 @@ def scrape_court_data():
             except Exception as direct_err:
                 print(f"[-] 로컬 IP 다이렉트 웜업 오류 발생 ({direct_err}). 무시하고 크롤링 단계를 기동합니다.")
         
-        # 6개월 윈도우 생성 (무삭제 수집 유지)
+        # 2개월 윈도우 생성 (실시간 스케줄 고려)
         query_months = []
         today = datetime.date.today()
-        for i in range(6):
+        for i in range(2):
             y = today.year
             m = today.month + i
             if m > 12:
@@ -1103,38 +1103,39 @@ def scrape_court_data():
                         }
                     }
                 
-                # 랜덤 딜레이 적용 (Jitter)
-                time.sleep(0.01 + random.random() * 0.02)
-                
-                # 프록시 및 cURL 다중 우회 실행부
-                response_text = None
-                
-                # 1. 일반 Session POST 호출
-                try:
-                    curr_proxies = None
-                    if proxy_index > 0 and proxy_index - 1 < len(proxies_list):
-                        curr_proxies = {"http": f"http://{proxies_list[proxy_index - 1]}", "https": f"http://{proxies_list[proxy_index - 1]}"}
+                    # 랜덤 딜레이 적용 (Jitter)
+                    time.sleep(0.01 + random.random() * 0.02)
                     
-                    headers["User-Agent"] = random.choice(USER_AGENTS)
-                    r = session.post(post_url, json=payload, headers=headers, proxies=curr_proxies, timeout=7)
-                    if r.status_code == 200:
-                        response_text = r.text
-                except Exception as ex:
-                    print(f"[-] 일반 HTTP 요청 실패 ({ex}). cURL 우회로 넘어갑니다.")
-                
-                # 2. cURL Subprocess 우회 호출 (WAF 극복용 세컨드 루트)
-                if not response_text:
-                    print(f"[*] cURL 우회 통신 실행: {court_name} ({ymd})")
-                    response_text = fetch_url_via_curl(post_url, payload=payload, headers=headers, is_post=True)
-                
-                if response_text:
+                    # 프록시 및 cURL 다중 우회 실행부
+                    response_text = None
+                    
+                    # 1. 일반 Session POST 호출
                     try:
-                        data = json.loads(response_text)
-                        found_sessions = data.get("data", {}).get("dlt_rletDspslPbancLst", [])
-                        if found_sessions:
-                            sessions_list.extend(found_sessions)
-                    except Exception as json_err:
-                        print(f"[-] JSON 응답 파싱 실패: {json_err}")
+                        curr_proxies = None
+                        if proxy_index > 0 and proxy_index - 1 < len(proxies_list):
+                            curr_proxies = {"http": f"http://{proxies_list[proxy_index - 1]}", "https": f"http://{proxies_list[proxy_index - 1]}"}
+                        
+                        headers["User-Agent"] = random.choice(USER_AGENTS)
+                        r = session.post(post_url, json=payload, headers=headers, proxies=curr_proxies, timeout=7)
+                        if r.status_code == 200:
+                            response_text = r.text
+                    except Exception as ex:
+                        print(f"[-] 일반 HTTP 요청 실패 ({ex}). cURL 우회로 넘어갑니다.")
+                    
+                    # 2. cURL Subprocess 우회 호출 (WAF 극복용 세컨드 루트)
+                    if not response_text:
+                        print(f"[*] cURL 우회 통신 실행: {court_name} ({ymd})")
+                        response_text = fetch_url_via_curl(post_url, payload=payload, headers=headers, is_post=True)
+                    
+                    if response_text:
+                        try:
+                            data = json.loads(response_text)
+                            found_sessions = data.get("data", {}).get("dlt_rletDspslPbancLst", [])
+                            if found_sessions:
+                                sessions_list.extend(found_sessions)
+                        except Exception as json_err:
+                            print(f"[-] JSON 응답 파싱 실패: {json_err}")
+
                         
         print(f"[+] 총 {len(sessions_list)}개의 기일 세션을 확보했습니다. 상세 조회를 개시합니다.")
         
