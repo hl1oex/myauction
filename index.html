@@ -15,7 +15,7 @@
             };
         })();
     </script>
-    <title>AI 부동산 경시/공매 실시간 통합 추천 시스템 v1.1</title>
+    <title>AI 부동산 경시/공매 실시간 통합 추천 시스템 v1.3</title>
     <link rel="icon" type="image/png" href="./favicon.png">
     <!-- 💎 1. 프리미엄 디자인 타이포그래피를 위한 Google Fonts 연동 -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -241,6 +241,7 @@
         }
         .document-view table {
             width: 100% !important;
+            table-layout: fixed !important;
             border-collapse: collapse !important;
             margin: 1.25rem 0 !important;
             font-size: 0.78rem !important; /* 12.5px */
@@ -253,15 +254,19 @@
             background-color: #f8fafc !important; /* slate-50 */
             color: #1e293b !important; /* slate-800 */
             font-weight: 800 !important;
-            padding: 0.75rem 1rem !important;
+            padding: 0.5rem 0.75rem !important;
             border-bottom: 2px solid #e2e8f0 !important;
             text-align: left !important;
+            word-break: break-all !important;
+            white-space: normal !important;
         }
         .document-view td {
-            padding: 0.75rem 1rem !important;
+            padding: 0.5rem 0.75rem !important;
             color: #475569 !important; /* slate-600 */
             border-bottom: 1px solid #f1f5f9 !important;
             text-align: left !important;
+            word-break: break-all !important;
+            white-space: normal !important;
         }
         .document-view tr:hover {
             background-color: #f8fafc !important;
@@ -277,10 +282,29 @@
         .calculator-keypad button.font-outfit {
             font-size: 16px !important;
         }
+        /* 💻 우측 상세 서랍의 반응형 가로 너비 세부 조율 (너비 약 30% 추가 확장) */
+        @media (min-width: 768px) and (max-width: 1023px) {
+            #detail-drawer {
+                width: 90% !important;
+                max-width: 850px !important;
+            }
+        }
         @media (min-width: 1024px) {
             #detail-drawer {
-                width: 75% !important;
-                max-width: 75% !important;
+                width: 78% !important;
+                max-width: 1100px !important;
+            }
+        }
+        @media (min-width: 1280px) {
+            #detail-drawer {
+                width: 70% !important;
+                max-width: 1250px !important;
+            }
+        }
+        @media (min-width: 1536px) {
+            #detail-drawer {
+                width: 65% !important;
+                max-width: 1400px !important;
             }
         }
     </style>
@@ -301,7 +325,7 @@
             <div class="truncate">
                 <h1 onclick="goToHome()" class="cursor-pointer text-[10px] min-[360px]:text-xs sm:text-sm font-extrabold tracking-tight text-slate-900 flex items-center gap-1 min-[360px]:gap-1.5 whitespace-nowrap hover:text-royalBlue transition-all">
                     부동산경공매 검색시스템
-                    <span class="bg-blue-50 text-royalBlue text-[8px] min-[360px]:text-[9px] px-1 min-[360px]:px-1.5 py-0.2 rounded-full font-black border border-blue-200">v1.1</span>
+                    <span class="bg-blue-50 text-royalBlue text-[8px] min-[360px]:text-[9px] px-1 min-[360px]:px-1.5 py-0.2 rounded-full font-black border border-blue-200">v1.3</span>
                 </h1>
                 <p class="text-[8px] text-slate-400 font-bold uppercase tracking-wider leading-none">Premium Elegant Pearl White</p>
             </div>
@@ -867,7 +891,7 @@
                     <div class="flex flex-col gap-1 w-full md:w-auto truncate">
                         <!-- Site Info (PC환경처럼 모바일에도 고정 표시) -->
                         <div class="flex items-center justify-between md:justify-start gap-2 text-[9px] text-slate-400 font-extrabold tracking-wide uppercase border-b border-slate-800 md:border-b-0 pb-1 md:pb-0">
-                            <span class="flex items-center gap-1"><i class="fa-solid fa-circle-nodes text-royalBlue animate-pulse"></i> AI 경시/공매 통합 시스템 v1.1</span>
+                            <span class="flex items-center gap-1"><i class="fa-solid fa-circle-nodes text-royalBlue animate-pulse"></i> AI 경시/공매 통합 시스템 v1.3</span>
                             <span class="md:before:content-['|'] md:before:mx-2 md:before:text-slate-700 flex items-center gap-1"><i class="fa-solid fa-clock-rotate-left text-slate-500"></i> 실시간 수집 데몬 가동 중</span>
                         </div>
                         <!-- Live Preview Title -->
@@ -1067,21 +1091,26 @@
                 </div>
             </div>
         </div>
-        <!-- 🧮 [SLIDE-OVER DRAWER BACKDROP] 우측 상세 분석 서랍 배경 암전 레이어 -->
-    <div id="drawer-backdrop" class="fixed inset-0 bg-slate-900/40 z-40 hidden transition-opacity duration-300" onclick="closeDetailDrawer()"></div>
+        <!-- 🧮 [SLIDE-OVER DRAWER BACKDROP] 우측 상세 분석 서랍 배경 투명 레이어 -->
+        <div id="drawer-backdrop" class="fixed inset-0 bg-transparent z-40 hidden transition-opacity duration-300" onclick="closeDetailDrawer()"></div>
 
-    <!-- 🧮 [SLIDE-OVER DRAWER] 우측 상세 분석 슬라이드 서랍 (시안 2: 모던 포털 카드형) -->
-    <aside id="detail-drawer" class="fixed inset-y-0 right-0 z-50 w-full sm:max-w-[700px] xl:max-w-[1050px] 2xl:max-w-[1280px] bg-white shadow-2xl border-l border-slate-200 flex flex-col h-full transform translate-x-full transition-transform duration-300 ease-out">
-        <!-- 상세 헤더 (반응형 모바일 스코어 배치 및 빈칸 여백 줄임) -->
-        <div class="relative p-3.5 sm:p-4 border-b border-slate-200 bg-slate-50 flex flex-col sm:flex-row justify-between sm:items-start gap-2.5 sm:gap-3 pr-24 sm:pr-5">
+        <!-- 🧮 [SLIDE-OVER DRAWER] 우측 상세 분석 슬라이드 서랍 (시안 2: 모던 포털 카드형) -->
+        <aside id="detail-drawer" class="fixed inset-y-0 right-0 z-50 w-full bg-white shadow-2xl border-l border-slate-200 flex flex-col h-full transform translate-x-full transition-transform duration-300 ease-out hidden">
+            <!-- 상세 헤더 (반응형 모바일 스코어 배치 및 빈칸 여백 줄임) -->
+            <div class="relative p-3.5 sm:p-4 border-b border-slate-200 bg-slate-50 flex flex-col sm:flex-row justify-between sm:items-start gap-2.5 sm:gap-3 pr-24 sm:pr-5">
             <div class="space-y-1 sm:space-y-1.5 flex-1">
                 <span id="detail-badge" class="inline-block text-[10px] sm:text-xs font-black px-2 py-0.5 sm:px-2.5 sm:py-1 rounded-md"></span>
                 <h3 id="detail-address" class="text-xs sm:text-lg font-extrabold text-slate-900 leading-snug sm:leading-tight"></h3>
-                <p id="detail-no" class="text-[10px] sm:text-xs font-bold text-slate-500 mt-1"></p>
+                <p id="detail-no" class="text-xs sm:text-sm font-black text-slate-800 mt-1"></p>
             </div>
             
-            <!-- 우측 스코어 영역 -->
+            <!-- 우측 스코어 및 공유 영역 -->
             <div class="flex items-center gap-2 sm:gap-3 absolute top-4 right-14 sm:static flex-shrink-0">
+                <!-- 📢 통합 SNS/메시징 공유하기 버튼 -->
+                <button onclick="sharePropertyDetail()" class="w-8 h-8 sm:w-10 sm:h-10 rounded-lg bg-royalBlue/5 hover:bg-royalBlue/10 border border-royalBlue/20 text-royalBlue flex items-center justify-center transition-all select-none" title="공유하기">
+                    <i class="fa-solid fa-share-nodes text-base sm:text-lg"></i>
+                </button>
+
                 <div id="detail-score-circle" class="w-9 h-9 sm:w-14 sm:h-14 rounded-full border-2 sm:border-4 flex flex-col items-center justify-center font-outfit shadow-sm bg-white">
                     <span id="detail-score-val" class="text-xs sm:text-base font-black leading-none"></span>
                     <span class="text-[5px] sm:text-[8px] text-slate-400 font-bold leading-none mt-0.5 sm:mt-1">SCORE</span>
@@ -1114,7 +1143,7 @@
             <button id="detail-group-tab-2-btn" onclick="changeDetailGroupTab(2)" class="inline-block py-1.5 px-3.5 text-center text-[10.5px] sm:text-xs font-black rounded-xl border border-transparent transition-all select-none text-slate-500 hover:text-royalBlue hover:bg-slate-50 bg-slate-50/50">2. 입찰 & 금융분석</button>
             <button id="detail-group-tab-3-btn" onclick="changeDetailGroupTab(3)" class="inline-block py-1.5 px-3.5 text-center text-[10.5px] sm:text-xs font-black rounded-xl border border-transparent transition-all select-none text-slate-500 hover:text-royalBlue hover:bg-slate-50 bg-slate-50/50">3. 입지 & 시세분석</button>
         </div>
-        <div id="detail-group-panel-1" class="flex-1 overflow-y-auto p-3 sm:p-3.5 space-y-3 sm:space-y-3.5 custom-scrollbar bg-slate-50/50">
+        <div id="detail-group-panel-1" class="flex-1 overflow-y-auto p-2 sm:p-2.5 space-y-2 sm:space-y-2.5 custom-scrollbar bg-slate-50/50">
             <div id="group-content-1" class="space-y-4 sm:space-y-5 w-full">
                 <!-- 1. 대표 이미지와 부동산 기본 명세 반응형 분기 레이아웃 -->
                 <!-- 1. 대표 이미지와 부동산 기본 명세 반응형 분기 레이아웃 (단일 카드로 통합하여 불필요한 공백 제거) -->
@@ -1125,22 +1154,22 @@
                             <i class="fa-solid fa-image text-royalBlue"></i> 🏢 부동산 대표 전경
                         </h4>
                         <!-- 부동산용 3대 포털 로드뷰 버튼 컨테이너 -->
-                        <div id="detail-roadview-buttons-container" class="grid grid-cols-3 gap-2 mt-2">
-                            <a id="btn-naver-roadview-hub" href="#" target="_blank" class="flex flex-col items-center justify-center p-3 rounded-xl border border-slate-200 bg-slate-50 hover:bg-slate-100 hover:border-emerald-500 hover:shadow-sm transition-all select-none cursor-pointer text-center group">
-                                <i class="fa-solid fa-street-view text-emerald-600 text-lg group-hover:scale-110 transition-transform"></i>
-                                <span class="text-emerald-600 font-extrabold text-[10.5px] mt-1.5">네이버 로드뷰</span>
+                        <div id="detail-roadview-buttons-container" class="grid grid-cols-3 gap-2 mt-1">
+                            <a id="btn-naver-roadview-hub" href="#" target="_blank" class="flex flex-col items-center justify-center p-1.5 rounded-xl border border-slate-200 bg-slate-50 hover:bg-slate-100 hover:border-emerald-500 hover:shadow-sm transition-all select-none cursor-pointer text-center group">
+                                <i class="fa-solid fa-street-view text-emerald-600 text-base group-hover:scale-110 transition-transform"></i>
+                                <span class="text-emerald-600 font-extrabold text-[9.5px] mt-0.5">네이버 로드뷰</span>
                             </a>
-                            <a id="btn-kakao-roadview-hub" href="#" target="_blank" class="flex flex-col items-center justify-center p-3 rounded-xl border border-slate-200 bg-slate-50 hover:bg-slate-100 hover:border-yellow-500 hover:shadow-sm transition-all select-none cursor-pointer text-center group">
-                                <i class="fa-solid fa-road text-yellow-600 text-lg group-hover:scale-110 transition-transform"></i>
-                                <span class="text-yellow-600 font-extrabold text-[10.5px] mt-1.5">카카오 로드뷰</span>
+                            <a id="btn-kakao-roadview-hub" href="#" target="_blank" class="flex flex-col items-center justify-center p-1.5 rounded-xl border border-slate-200 bg-slate-50 hover:bg-slate-100 hover:border-yellow-500 hover:shadow-sm transition-all select-none cursor-pointer text-center group">
+                                <i class="fa-solid fa-road text-yellow-600 text-base group-hover:scale-110 transition-transform"></i>
+                                <span class="text-yellow-600 font-extrabold text-[9.5px] mt-0.5">카카오 로드뷰</span>
                             </a>
-                            <a id="btn-google-roadview-hub" href="#" target="_blank" class="flex flex-col items-center justify-center p-3 rounded-xl border border-slate-200 bg-slate-50 hover:bg-slate-100 hover:border-blue-500 hover:shadow-sm transition-all select-none cursor-pointer text-center group">
-                                <i class="fa-solid fa-map-location-dot text-blue-600 text-lg group-hover:scale-110 transition-transform"></i>
-                                <span class="text-blue-600 font-extrabold text-[10.5px] mt-1.5">구글 스트리트뷰</span>
+                            <a id="btn-google-roadview-hub" href="#" target="_blank" class="flex flex-col items-center justify-center p-1.5 rounded-xl border border-slate-200 bg-slate-50 hover:bg-slate-100 hover:border-blue-500 hover:shadow-sm transition-all select-none cursor-pointer text-center group">
+                                <i class="fa-solid fa-map-location-dot text-blue-600 text-base group-hover:scale-110 transition-transform"></i>
+                                <span class="text-blue-600 font-extrabold text-[9.5px] mt-0.5">구글 스트리트뷰</span>
                             </a>
                         </div>
                         <!-- 비부동산용 실사진 컨테이너 -->
-                        <div id="detail-roadview-image-container" class="w-full h-[220px] rounded-xl overflow-hidden border border-slate-200 bg-slate-100 relative hidden mt-2">
+                        <div id="detail-roadview-image-container" class="w-full h-[110px] rounded-xl overflow-hidden border border-slate-200 bg-slate-100 relative hidden mt-1.5">
                             <!-- JS에서 이미지 동적 주입 -->
                         </div>
                     </div>
@@ -1245,7 +1274,7 @@
                         <h4 class="text-xs sm:text-sm font-black text-slate-800 flex items-center gap-1.5 pb-2 border-b border-slate-100">
                             <i class="fa-solid fa-circle-info text-royalBlue"></i> 단지 기본 정보 및 시설 명세
                         </h4>
-                        <div class="overflow-x-auto border border-slate-200 rounded-xl overflow-hidden shadow-sm bg-white">
+                        <div class="overflow-x-hidden border border-slate-200 rounded-xl overflow-hidden shadow-sm bg-white">
                             <table class="w-full text-left border-collapse text-[13px] document-view">
                                 <tbody id="detail-complex-tbody" class="text-slate-700 font-medium">
                                     <!-- 동적 생성 -->
@@ -1300,10 +1329,8 @@
                     </div>
                 </div>
 
-                <!-- 3. 대화면 xl 해상도 대응 2열 반응형 그리드 레이아웃 (빈 공간 소거 및 테이블 가로 늘어짐 방지) -->
-                <div class="grid grid-cols-1 xl:grid-cols-2 gap-4 sm:gap-5 w-full items-start">
-                    <!-- 왼쪽 열: 기일 이력 및 외부 연동 허브와 유사 추천 매물 -->
-                    <div class="space-y-4 sm:space-y-5 w-full">
+                <!-- 3. 대화면 xl 해상도 대응 세로 1열 순차 플로우 배치 (좌우 찌그러짐 방지 및 공백 제거) -->
+                <div class="space-y-4 sm:space-y-5 w-full">
                         <!-- 경매 진행 기일 이력 -->
                         <div class="bg-white border border-slate-200 rounded-2xl shadow-sm w-full overflow-hidden">
                             <div class="bg-slate-50 px-4 py-2.5 border-b border-slate-200">
@@ -1312,14 +1339,14 @@
                                 </h4>
                             </div>
                             <div class="p-3.5 space-y-3">
-                                <div class="overflow-x-auto border border-slate-200 rounded-xl overflow-hidden shadow-sm bg-white">
+                                <div class="overflow-x-hidden border border-slate-200 rounded-xl overflow-hidden shadow-sm bg-white">
                                     <table class="w-full text-left border-collapse text-[13px] document-view">
                                         <thead>
                                             <tr class="bg-slate-50 border-b border-slate-200 text-slate-800 font-extrabold text-[12px]">
-                                                <th class="p-3 pl-4 w-1/4">회차</th>
-                                                <th class="p-3 w-1/3">입찰 기일</th>
-                                                <th class="p-3 text-right text-slate-800">최저 매각 가격</th>
-                                                <th class="p-3 pr-4 text-center">결과</th>
+                                                <th class="p-3 pl-4 w-[15%]">회차</th>
+                                                <th class="p-3 w-[35%]">입찰 기일</th>
+                                                <th class="p-3 text-right text-slate-800 w-[35%]">최저 매각 가격</th>
+                                                <th class="p-3 pr-4 text-center w-[15%]">결과</th>
                                             </tr>
                                         </thead>
                                         <tbody id="detail-giiil-tbody" class="text-slate-700 font-medium">
@@ -1380,22 +1407,7 @@
                             </div>
                         </div>
 
-                        <!-- 동일 용도/지역 기반 유사 추천 매물 -->
-                        <div class="bg-white border border-slate-200 rounded-2xl shadow-sm w-full overflow-hidden">
-                            <div class="bg-slate-50 px-4 py-2.5 border-b border-slate-200">
-                                <h4 class="text-xs sm:text-sm font-black text-slate-800 flex items-center gap-1.5">
-                                    <i class="fa-solid fa-handshake text-royalBlue"></i> 🤝 동일 용도/지역 기반 유사 추천 매물
-                                </h4>
-                            </div>
-                            <div class="p-3.5 space-y-3">
-                                <div id="detail-similar-container" class="grid grid-cols-3 gap-2">
-                                    <!-- 동적 렌더링 카드 3개 -->
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- 오른쪽 열: 법정 주요 서류 및 사건 기록 (대화면에서 가로폭이 늘어나는 문제 해결) -->
+                    <!-- 법정 주요 서류 및 사건 기록 (1열 플로우 배치로 글자 배열 찌그러짐 원천 차단) -->
                     <div class="bg-white border border-slate-200 rounded-2xl shadow-sm w-full overflow-hidden">
                         <div class="bg-slate-50 px-4 py-2.5 border-b border-slate-200">
                             <h4 class="text-xs sm:text-sm font-black text-slate-800 flex items-center gap-1.5">
@@ -1404,7 +1416,7 @@
                         </div>
                         <div class="p-3.5 space-y-2.5">
                             <p class="text-[9.5px] text-slate-500 leading-relaxed font-semibold">대법원 경매 및 감정 법원에서 공식 발행된 법정 주요 서류의 정밀 분석 명세 테이블입니다.</p>
-                            <div class="overflow-x-auto border border-slate-200 rounded-xl overflow-hidden shadow-sm bg-white">
+                            <div class="overflow-x-hidden border border-slate-200 rounded-xl overflow-hidden shadow-sm bg-white">
                                 <table class="w-full text-left border-collapse text-[13px] document-view">
                                     <thead>
                                         <tr class="bg-slate-50 border-b border-slate-200 text-slate-800 font-extrabold text-[12px]">
@@ -1522,7 +1534,7 @@
                     </div>
 
                     <!-- 공고문 원문 및 집행관 비고 요약 -->
-                    <div class="bg-white border border-slate-200 rounded-2xl p-4 shadow-sm w-full space-y-3">
+                    <div id="detail-desc-card" class="bg-white border border-slate-200 rounded-2xl p-4 shadow-sm w-full space-y-3">
                         <h4 class="text-xs sm:text-sm font-black text-slate-800 flex items-center gap-1.5 pb-2 border-b border-slate-100">
                             <i class="fa-solid fa-align-left text-slate-500"></i> 공고문 원문 및 집행관 비고 요약
                         </h4>
@@ -1530,22 +1542,22 @@
                     </div>
                 </div>
 
-                <!-- 임차인 및 등기부 반응형 분기 레이아웃 -->
-                <div class="grid grid-cols-1 xl:grid-cols-2 gap-4 sm:gap-5 items-start">
+                <!-- 임차인 및 등기부 반응형 분기 레이아웃 (세로 1열 플로우 배치로 가로 스크롤바 제거) -->
+                <div class="space-y-4 sm:space-y-5 w-full">
                     <!-- 🚪 [6] 점유현황 탭 패널 (기본 숨김) -->
                     <div id="detail-panel-occupancy" class="bg-white border border-slate-200 rounded-2xl p-4 shadow-sm space-y-3 w-full">
                         <h4 class="text-xs sm:text-sm font-black text-slate-800 flex items-center gap-1.5 pb-2 border-b border-slate-100">
                             <i class="fa-solid fa-door-closed text-royalBlue"></i> 임차인 및 점유자 관계 명세
                         </h4>
-                        <div class="overflow-x-auto border border-slate-200 rounded-xl overflow-hidden shadow-sm bg-white">
+                        <div class="overflow-x-hidden border border-slate-200 rounded-xl overflow-hidden shadow-sm bg-white">
                             <table class="w-full text-left border-collapse text-[13px] document-view">
                                 <thead>
                                     <tr class="bg-slate-50 border-b border-slate-200 text-slate-800 font-extrabold text-[12px]">
-                                        <th class="p-3 pl-4 border-b">점유자 구분</th>
-                                        <th class="p-3 border-b">전입일자</th>
-                                        <th class="p-3 border-b">확정일자</th>
-                                        <th class="p-3 border-b text-right">보증금/차임</th>
-                                        <th class="p-3 pr-4 border-b text-center">대항력</th>
+                                        <th class="p-3 pl-4 border-b w-[20%]">점유자 구분</th>
+                                        <th class="p-3 border-b w-[20%]">전입일자</th>
+                                        <th class="p-3 border-b w-[20%]">확정일자</th>
+                                        <th class="p-3 border-b text-right w-[25%]">보증금/차임</th>
+                                        <th class="p-3 pr-4 border-b text-center w-[15%]">대항력</th>
                                     </tr>
                                 </thead>
                                 <tbody id="detail-occupancy-tbody" class="text-slate-700 font-medium">
@@ -1560,15 +1572,15 @@
                         <h4 class="text-xs sm:text-sm font-black text-slate-800 flex items-center gap-1.5 pb-2 border-b border-slate-100">
                             <i class="fa-solid fa-book-open text-royalBlue"></i> 등기부등본 주요 권리 설정 요약
                         </h4>
-                        <div class="overflow-x-auto border border-slate-200 rounded-xl overflow-hidden shadow-sm bg-white">
+                        <div class="overflow-x-hidden border border-slate-200 rounded-xl overflow-hidden shadow-sm bg-white">
                             <table class="w-full text-left border-collapse text-[13px] document-view">
                                 <thead>
                                     <tr class="bg-slate-50 border-b border-slate-200 text-slate-800 font-extrabold text-[12px]">
-                                        <th class="p-3 pl-4 border-b">구분</th>
-                                        <th class="p-3 border-b">등기목적</th>
-                                        <th class="p-3 border-b">접수일자</th>
-                                        <th class="p-3 border-b">권리자 및 채권액</th>
-                                        <th class="p-3 pr-4 border-b text-center">낙찰후 효력</th>
+                                        <th class="p-3 pl-4 border-b w-[15%]">구분</th>
+                                        <th class="p-3 border-b w-[25%]">등기목적</th>
+                                        <th class="p-3 border-b w-[20%]">접수일자</th>
+                                        <th class="p-3 border-b w-[25%]">권리자 및 채권액</th>
+                                        <th class="p-3 pr-4 border-b text-center w-[15%]">낙찰후 효력</th>
                                     </tr>
                                 </thead>
                                 <tbody id="detail-registry-tbody" class="text-slate-700 font-medium">
@@ -1584,14 +1596,14 @@
                     <h4 class="text-xs sm:text-sm font-black text-slate-800 flex items-center gap-1.5 pb-2 border-b border-slate-100">
                         <i class="fa-solid fa-triangle-exclamation text-rose-600"></i> 낙찰자 인수 리스크 분석
                     </h4>
-                    <div class="overflow-x-auto border border-slate-200 rounded-xl overflow-hidden shadow-sm bg-white">
+                    <div class="overflow-x-hidden border border-slate-200 rounded-xl overflow-hidden shadow-sm bg-white">
                         <table class="w-full text-left border-collapse text-[13px] document-view">
                             <thead>
                                 <tr class="bg-slate-50 border-b border-slate-200 text-slate-800 font-extrabold text-[12px]">
-                                    <th class="p-3 pl-4 border-b">위험 항목</th>
-                                    <th class="p-3 border-b">권리 내용</th>
-                                    <th class="p-3 border-b text-right">예상 인수액</th>
-                                    <th class="p-3 pr-4 border-b">진단 및 의견</th>
+                                    <th class="p-3 pl-4 border-b w-[20%]">위험 항목</th>
+                                    <th class="p-3 border-b w-[30%]">권리 내용</th>
+                                    <th class="p-3 border-b text-right w-[20%]">예상 인수액</th>
+                                    <th class="p-3 pr-4 border-b w-[30%]">진단 및 의견</th>
                                 </tr>
                             </thead>
                             <tbody id="detail-takeover-tbody" class="text-slate-700 font-medium">
@@ -1609,15 +1621,15 @@
                         <p class="text-[10px] text-slate-500 leading-relaxed font-bold">
                             용도별 감정평가액 및 입찰가를 기준으로 배당 순위에 따라 자동 분배한 시뮬레이션입니다. 실제 채무 권리 조정에 따라 변동될 수 있습니다.
                         </p>
-                        <div class="overflow-x-auto border border-slate-200 rounded-xl overflow-hidden shadow-sm bg-white">
+                        <div class="overflow-x-hidden border border-slate-200 rounded-xl overflow-hidden shadow-sm bg-white">
                             <table class="w-full text-left border-collapse text-[13px] document-view">
                                 <thead>
                                     <tr class="bg-slate-50 border-b border-slate-200 text-slate-800 font-extrabold text-[12px]">
-                                        <th class="p-3 pl-4 border-b">순위</th>
-                                        <th class="p-3 border-b">채권자 (권리)</th>
-                                        <th class="p-3 border-b text-right">채권액/보증금</th>
-                                        <th class="p-3 border-b text-right">예상배당액</th>
-                                        <th class="p-3 pr-4 border-b text-center">소멸여부</th>
+                                        <th class="p-3 pl-4 border-b w-[10%]">순위</th>
+                                        <th class="p-3 border-b w-[30%]">채권자 (권리)</th>
+                                        <th class="p-3 border-b text-right w-[25%]">채권액/보증금</th>
+                                        <th class="p-3 border-b text-right w-[25%]">예상배당액</th>
+                                        <th class="p-3 pr-4 border-b text-center w-[10%]">소멸여부</th>
                                     </tr>
                                 </thead>
                                 <tbody id="detail-dividend-tbody" class="text-slate-700 font-medium">
@@ -1627,11 +1639,25 @@
                         </div>
                     </div>
                 </div>
+
+                <!-- 동일 용도/지역 기반 유사 추천 매물 (v1.3 맨 아래로 이동 및 6열 반응형 배치) -->
+                <div class="bg-white border border-slate-200 rounded-2xl shadow-sm w-full overflow-hidden mt-4">
+                    <div class="bg-slate-50 px-4 py-2.5 border-b border-slate-200">
+                        <h4 class="text-xs sm:text-sm font-black text-slate-800 flex items-center gap-1.5">
+                            <i class="fa-solid fa-handshake text-royalBlue"></i> 🤝 동일 용도/지역 기반 유사 추천 매물
+                        </h4>
+                    </div>
+                    <div class="p-3.5 space-y-3">
+                        <div id="detail-similar-container" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
+                            <!-- 동적 렌더링 카드 최대 6개 -->
+                        </div>
+                    </div>
+                </div>
             </div>
             <!-- 📈 [8] 매각통계 탭 패널 (기본 숨김) -->
             </div>
         </div>
-        <div id="detail-group-panel-3" class="flex-1 overflow-y-auto p-3 sm:p-3.5 space-y-3 sm:space-y-3.5 custom-scrollbar bg-slate-50/50 hidden relative">
+        <div id="detail-group-panel-3" class="flex-1 overflow-y-auto p-2 sm:p-2.5 space-y-2 sm:space-y-2.5 custom-scrollbar bg-slate-50/50 hidden relative">
             <div id="group-content-3" class="space-y-3 sm:space-y-3.5 w-full">
                 <!-- 위치 & 시세 분석 대화면 xl 대응 2열 반응형 그리드 레이아웃 -->
                 <div class="grid grid-cols-1 xl:grid-cols-2 gap-4 sm:gap-5 w-full items-start">
@@ -1747,15 +1773,15 @@
                                 </button>
                             </div>
 
-                                <div class="overflow-x-auto border border-slate-200 rounded-xl overflow-hidden mt-3 shadow-sm bg-white">
+                                <div class="overflow-x-hidden border border-slate-200 rounded-xl overflow-hidden mt-3 shadow-sm bg-white">
                                     <table class="w-full text-left border-collapse text-[13px] document-view">
                                         <thead>
                                             <tr class="bg-slate-50 border-b border-slate-200 text-slate-800 font-extrabold text-[12px]">
-                                                <th class="p-3 pl-4">거래일자</th>
-                                                <th class="p-3">면적 (전용)</th>
-                                                <th class="p-3 text-center">층수</th>
-                                                <th class="p-3 text-right">거래금액</th>
-                                                <th class="p-3 pr-4 text-center">변동률</th>
+                                                <th class="p-3 pl-4 w-[20%]">거래일자</th>
+                                                <th class="p-3 w-[20%]">면적 (전용)</th>
+                                                <th class="p-3 text-center w-[15%]">층수</th>
+                                                <th class="p-3 text-right w-[25%]">거래금액</th>
+                                                <th class="p-3 pr-4 text-center w-[20%]">변동률</th>
                                             </tr>
                                         </thead>
                                         <tbody id="detail-market-tbody" class="text-slate-700 font-medium">
@@ -1783,7 +1809,7 @@
                                 <h4 class="text-xs sm:text-sm font-black text-slate-800 flex items-center gap-1.5">
                                     <i class="fa-solid fa-wand-magic-sparkles text-royalBlue"></i> 🔮 AI 미래 예상 시세 시뮬레이터
                                 </h4>
-                                <span class="bg-blue-50 border border-blue-200 text-royalBlue text-[9px] font-black px-2 py-0.5 rounded-full">예측 엔진 v1.2</span>
+                                <span class="bg-blue-50 border border-blue-200 text-royalBlue text-[9px] font-black px-2 py-0.5 rounded-full">예측 엔진 v1.3</span>
                             </div>
                             <div class="p-3.5 space-y-3">
                                 <div class="bg-amber-50/50 border border-amber-200 rounded-xl p-2.5 text-[9.5px] text-amber-700 leading-normal font-semibold">
@@ -1806,38 +1832,68 @@
                                         </label>
                                     </div>
                                 </div>
-                                <div class="overflow-x-auto border border-slate-200 rounded-xl overflow-hidden shadow-sm bg-white">
-                                    <table class="w-full text-left border-collapse text-[13px] document-view">
-                                        <thead>
-                                            <tr class="bg-slate-50 border-b border-slate-200 text-slate-800 font-extrabold text-[12px]">
-                                                <th class="p-3 pl-4">예상 시점</th>
-                                                <th class="p-3">누적 상승률</th>
-                                                <th class="p-3 text-right">예상 추정 가격</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody class="text-slate-700 font-medium">
-                                            <tr class="border-b border-slate-100 hover:bg-slate-50/40 transition-colors">
-                                                <td class="p-3 pl-4 font-bold">1년 후</td>
-                                                <td class="p-3 text-emeraldSuccess font-extrabold" id="future-rate-1y">+3.0%</td>
-                                                <td class="p-3 text-right font-black font-outfit" id="future-price-1y">-원</td>
-                                            </tr>
-                                            <tr class="border-b border-slate-100 hover:bg-slate-50/40 transition-colors">
-                                                <td class="p-3 pl-4 font-bold">3년 후</td>
-                                                <td class="p-3 text-emeraldSuccess font-extrabold" id="future-rate-3y">+9.27%</td>
-                                                <td class="p-3 text-right font-black font-outfit" id="future-price-3y">-원</td>
-                                            </tr>
-                                            <tr class="border-b border-slate-100 hover:bg-slate-50/40 transition-colors">
-                                                <td class="p-3 pl-4 font-bold">5년 후</td>
-                                                <td class="p-3 text-emeraldSuccess font-extrabold" id="future-rate-5y">+15.93%</td>
-                                                <td class="p-3 text-right font-black font-outfit" id="future-price-5y">-원</td>
-                                            </tr>
-                                            <tr class="hover:bg-slate-50/40 transition-colors">
-                                                <td class="p-3 pl-4 font-bold">10년 후</td>
-                                                <td class="p-3 text-emeraldSuccess font-extrabold" id="future-rate-10y">+34.39%</td>
-                                                <td class="p-3 text-right font-black font-outfit" id="future-price-10y">-원</td>
-                                            </tr>
-                                        </tbody>
-                                    </table>
+                                <div class="bg-white border border-slate-200 rounded-xl p-3.5 space-y-3.5 shadow-sm">
+                                    <div class="space-y-3">
+                                        <!-- 1년 후 -->
+                                        <div class="space-y-1.5">
+                                            <div class="flex justify-between items-center text-xs font-bold text-slate-700">
+                                                <span class="flex items-center gap-1"><span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> 1년 후 예상</span>
+                                                <div class="flex items-center gap-2">
+                                                    <span id="future-rate-1y" class="text-emeraldSuccess font-black text-[11px]">+3.00%</span>
+                                                    <span id="future-price-1y" class="font-outfit font-black text-slate-900 font-mono text-[12px]">-원</span>
+                                                </div>
+                                            </div>
+                                            <div class="w-full bg-slate-100 rounded-full h-2 overflow-hidden">
+                                                <div id="future-bar-1y" class="bg-emerald-500 h-full rounded-full transition-all duration-500" style="width: 3%"></div>
+                                            </div>
+                                        </div>
+                                        <!-- 3년 후 -->
+                                        <div class="space-y-1.5">
+                                            <div class="flex justify-between items-center text-xs font-bold text-slate-700">
+                                                <span class="flex items-center gap-1"><span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> 3년 후 예상</span>
+                                                <div class="flex items-center gap-2">
+                                                    <span id="future-rate-3y" class="text-emeraldSuccess font-black text-[11px]">+9.27%</span>
+                                                    <span id="future-price-3y" class="font-outfit font-black text-slate-900 font-mono text-[12px]">-원</span>
+                                                </div>
+                                            </div>
+                                            <div class="w-full bg-slate-100 rounded-full h-2 overflow-hidden">
+                                                <div id="future-bar-3y" class="bg-emerald-500 h-full rounded-full transition-all duration-500" style="width: 9.27%"></div>
+                                            </div>
+                                        </div>
+                                        <!-- 5년 후 -->
+                                        <div class="space-y-1.5">
+                                            <div class="flex justify-between items-center text-xs font-bold text-slate-700">
+                                                <span class="flex items-center gap-1"><span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> 5년 후 예상</span>
+                                                <div class="flex items-center gap-2">
+                                                    <span id="future-rate-5y" class="text-emeraldSuccess font-black text-[11px]">+15.93%</span>
+                                                    <span id="future-price-5y" class="font-outfit font-black text-slate-900 font-mono text-[12px]">-원</span>
+                                                </div>
+                                            </div>
+                                            <div class="w-full bg-slate-100 rounded-full h-2 overflow-hidden">
+                                                <div id="future-bar-5y" class="bg-emerald-500 h-full rounded-full transition-all duration-500" style="width: 15.93%"></div>
+                                            </div>
+                                        </div>
+                                        <!-- 10년 후 -->
+                                        <div class="space-y-1.5">
+                                            <div class="flex justify-between items-center text-xs font-bold text-slate-700">
+                                                <span class="flex items-center gap-1"><span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> 10년 후 예상</span>
+                                                <div class="flex items-center gap-2">
+                                                    <span id="future-rate-10y" class="text-emeraldSuccess font-black text-[11px]">+34.39%</span>
+                                                    <span id="future-price-10y" class="font-outfit font-black text-slate-900 font-mono text-[12px]">-원</span>
+                                                </div>
+                                            </div>
+                                            <div class="w-full bg-slate-100 rounded-full h-2 overflow-hidden">
+                                                <div id="future-bar-10y" class="bg-emerald-500 h-full rounded-full transition-all duration-500" style="width: 34.39%"></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <hr class="border-slate-100 my-2">
+                                    
+                                    <div class="bg-blue-50/40 border border-blue-100 rounded-xl p-2.5 space-y-1.5 text-[9.5px] sm:text-[10px] text-slate-500 leading-relaxed font-medium">
+                                        <strong class="text-royalBlue block text-[10.5px] sm:text-xs font-black flex items-center gap-1"><i class="fa-solid fa-brain"></i> AI 시세 상승 예측 모델 작동 원리</strong>
+                                        <p>본 예측 모델은 물건지의 법정동 5개년 평균 부동산 지가 상승률, 인근 지역의 교통 호재 가중치 점수, 그리고 감정평가액의 장기 변동 트렌드를 융합하여 도출한 AI 시뮬레이션 복리 모델입니다. 보수적(연 1.5%), 표준(연 3.0%), 적극적(연 5.0%) 시나리오를 통해 최적의 매도 타이밍 및 누적 자산 가치 증가율을 시각화합니다.</p>
+                                    </div>
                                 </div>
                             </div>
                         </div> <!-- 👈 미래 예상 시뮬레이터 카드 닫기 -->
@@ -1853,7 +1909,7 @@
                 </div>
             </div>
         </div>
-        <div id="detail-group-panel-2" class="flex-1 overflow-y-auto p-3 sm:p-3.5 space-y-3 sm:space-y-3.5 custom-scrollbar bg-slate-50/50 hidden relative">
+        <div id="detail-group-panel-2" class="flex-1 overflow-y-auto p-2 sm:p-2.5 space-y-2 sm:space-y-2.5 custom-scrollbar bg-slate-50/50 hidden relative">
             <div id="group-content-2" class="space-y-3 sm:space-y-3.5 w-full">
                 <!-- 2열 그리드로 쪼개어 금융/입찰 테이블들의 가로 늘어짐 방지 -->
                 <div class="grid grid-cols-1 xl:grid-cols-2 gap-4 sm:gap-5 w-full items-start">
@@ -1866,7 +1922,7 @@
                                     <i class="fa-solid fa-chart-simple text-royalBlue"></i> AI 낙찰 시뮬레이션 지표 분석
                                 </h4>
                             </div>
-                <div class="grid grid-cols-2 gap-2.5 text-[11px] sm:text-xs font-bold text-slate-700">
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5 text-[11px] sm:text-xs font-bold text-slate-700">
                     <div class="bg-white/80 p-2.5 rounded-xl border border-blue-100 flex flex-col justify-between">
                         <span class="text-slate-500 text-[10px] sm:text-xs">예상 낙찰 확률</span>
                         <span id="detail-ai-bid-rate" class="text-xs sm:text-sm font-black text-royalBlue mt-0.5 font-outfit"></span>
@@ -1875,7 +1931,7 @@
                         <span class="text-slate-500 text-[10px] sm:text-xs">예상 명도 기간</span>
                         <span id="detail-ai-evict-period" class="text-xs sm:text-sm font-black text-amber-600 mt-0.5"></span>
                     </div>
-                    <div class="bg-white/80 p-2.5 rounded-xl border border-blue-100 flex flex-col justify-between col-span-2">
+                    <div class="bg-white/80 p-2.5 rounded-xl border border-blue-100 flex flex-col justify-between col-span-1 sm:col-span-2">
                         <span class="text-slate-500 text-[10px] sm:text-xs block mb-0.5">주변 시세 대조 분석 리포트</span>
                         <span id="detail-ai-market-compare" class="text-[11px] sm:text-xs font-black text-emeraldSuccess leading-relaxed"></span>
                     </div>
@@ -2032,21 +2088,21 @@
 
             <!-- 오른쪽 열: 모의 입찰 센터, 전문가 연계 광고, 입찰 체크리스트 -->
             <div class="space-y-4 sm:space-y-5 w-full">
-                <!-- 🎯 v1.2 실시간 모의 입찰 센터 -->
+                <!-- 🎯 v1.3 실시간 모의 입찰 센터 -->
                 <div class="bg-white border border-slate-200 rounded-2xl p-3.5 sm:p-4 space-y-3 shadow-sm">
                     <h4 class="text-xs sm:text-sm font-black text-slate-800 flex items-center gap-1.5 pb-2 border-b border-slate-100">
-                        <i class="fa-solid fa-gamepad text-indigo-500"></i> 🎯 실시간 모의 입찰 센터 (v1.2)
+                        <i class="fa-solid fa-gamepad text-indigo-500"></i> 🎯 실시간 모의 입찰 센터 (v1.3)
                     </h4>
-                    <div class="grid grid-cols-3 gap-2 text-center bg-slate-50 rounded-xl p-2.5 border border-slate-100">
-                        <div class="flex flex-col">
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-2.5 text-center bg-slate-50 rounded-xl p-2.5 border border-slate-100">
+                        <div class="flex flex-col justify-center py-1 sm:py-0">
                             <span class="text-[9px] text-slate-400 font-bold">참여 현황</span>
                             <strong id="v12-mock-bids-count" class="text-xs font-black text-slate-700 font-outfit">0명 참여 중</strong>
                         </div>
-                        <div class="flex flex-col border-x border-slate-200">
+                        <div class="flex flex-col justify-center border-y sm:border-y-0 sm:border-x border-slate-200/60 py-2 sm:py-0">
                             <span class="text-[9px] text-slate-400 font-bold">평균 입찰가</span>
                             <strong id="v12-mock-avg-price" class="text-xs font-black text-slate-700 font-outfit">0원</strong>
                         </div>
-                        <div class="flex flex-col">
+                        <div class="flex flex-col justify-center py-1 sm:py-0">
                             <span class="text-[9px] text-slate-400 font-bold">평균 낙찰율</span>
                             <strong id="v12-mock-ratio" class="text-xs font-black text-royalBlue font-outfit">--%</strong>
                         </div>
@@ -2093,10 +2149,10 @@
                     </div>
                 </div>
 
-                <!-- 💼 v1.2 경매 정식 등록 전문가 상담 연계 -->
+                <!-- 💼 v1.3 경매 정식 등록 전문가 상담 연계 -->
                 <div class="bg-white border border-slate-200 rounded-2xl p-3.5 sm:p-4 space-y-2.5 shadow-sm">
                     <h4 class="text-xs sm:text-sm font-black text-slate-800 flex items-center gap-1.5 pb-2 border-b border-slate-100">
-                        <i class="fa-solid fa-user-tie text-indigo-500"></i> 💼 우수 매수대리 전문가 연계 광고 (v1.2)
+                        <i class="fa-solid fa-user-tie text-indigo-500"></i> 💼 우수 매수대리 전문가 연계 광고 (v1.3)
                     </h4>
                     <div id="v12-experts-list" class="space-y-3">
                         <!-- Javascript에서 동적으로 주입됨 -->
@@ -2123,16 +2179,16 @@
                 <h4 class="text-xs sm:text-sm font-black text-slate-800 flex items-center gap-1.5 pb-2 border-b border-slate-100">
                     <i class="fa-solid fa-chart-line text-royalBlue"></i> 🏆 시나리오별 입찰 수익성 시뮬레이션
                 </h4>
-                <div class="overflow-x-auto border border-slate-200 rounded-xl overflow-hidden shadow-sm bg-white">
+                <div class="overflow-x-hidden border border-slate-200 rounded-xl overflow-hidden shadow-sm bg-white">
                     <table class="w-full text-left border-collapse text-[13px] document-view">
                         <thead>
                             <tr class="bg-slate-50 border-b border-slate-200 text-slate-800 font-extrabold text-[12px]">
-                                <th class="p-3 pl-4">구분 (입찰가율)</th>
-                                <th class="p-3 text-right">예상 입찰가</th>
-                                <th class="p-3 text-right">대출 (70%)</th>
-                                <th class="p-3 text-right">필요 자본금</th>
-                                <th class="p-3 text-right">연 이자 (4.5%)</th>
-                                <th class="p-3 pr-4 text-right text-rose-600">예측 ROI</th>
+                                <th class="p-3 pl-4 w-[20%]">구분 (입찰가율)</th>
+                                <th class="p-3 text-right w-[17%]">예상 입찰가</th>
+                                <th class="p-3 text-right w-[17%]">대출 (70%)</th>
+                                <th class="p-3 text-right w-[17%]">필요 자본금</th>
+                                <th class="p-3 text-right w-[17%]">연 이자 (4.5%)</th>
+                                <th class="p-3 pr-4 text-right text-rose-600 w-[12%]">예측 ROI</th>
                             </tr>
                         </thead>
                         <tbody id="detail-scenario-tbody" class="text-slate-700 font-medium">
@@ -2179,7 +2235,7 @@
         </div>
     </aside>
 
-    <script src="./index.js" defer></script>
+    <script src="./index.js?v=1.3.0" defer></script>
 
     <!-- 🧮 6. 프리미엄 로그인 및 회원가입 모달 (Elegant Pearl White 테마) -->
     <div id="login-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center hidden opacity-0 transition-opacity duration-300">
@@ -2259,6 +2315,36 @@
                     <div class="flex-1 min-w-0">
                         <p id="mypage-user-email" class="text-xs font-black text-slate-800 truncate">user@email.com</p>
                         <p id="mypage-user-grade" class="text-[10px] font-bold text-slate-400 mt-0.5">등급: C등급</p>
+                        <p id="mypage-user-created" class="text-[10px] font-bold text-slate-400 mt-0.5">가입일: -</p>
+                        <p id="mypage-user-provider" class="text-[10px] font-bold text-royalBlue mt-0.5">연동 상태: 일반 이메일</p>
+                    </div>
+                </div>
+
+                <!-- 📢 베타 테스트 기간 한정 혜택 안내 배너 -->
+                <div class="bg-amber-50/50 border border-amber-200 p-3 rounded-2xl flex flex-col gap-1 text-center">
+                    <strong class="text-[11px] font-black text-amber-800 flex items-center justify-center gap-1">
+                        <i class="fa-solid fa-gift text-xs"></i> 베타 테스트 기념 특별 이벤트
+                    </strong>
+                    <p class="text-[9.5px] text-slate-600 font-bold leading-normal">
+                        정식 베타 오픈 전까지 모든 가입 회원에게 전체 매물 분석 및 가상 모의입찰 권한이 주어지는 <strong>⭐ 프리미엄 혜택</strong>을 무료로 즉시 적용해 드립니다.
+                    </p>
+                </div>
+
+                <!-- [신규] 이메일 가입자를 위한 비밀번호 변경 설정 (소셜 연동 유저는 숨김) -->
+                <div id="mypage-password-change-container" class="border-t border-slate-100 pt-4 hidden space-y-3">
+                    <h4 class="text-xs font-black text-slate-800 flex items-center gap-1.5">
+                        <i class="fa-solid fa-key text-royalBlue"></i> 비밀번호 변경
+                    </h4>
+                    <div class="space-y-2">
+                        <div>
+                            <input type="password" id="mypage-user-pw" placeholder="새 비밀번호 입력" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs font-bold focus:bg-white focus:outline-none focus:border-royalBlue transition-all">
+                        </div>
+                        <div>
+                            <input type="password" id="mypage-user-pw-confirm" placeholder="새 비밀번호 확인" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs font-bold focus:bg-white focus:outline-none focus:border-royalBlue transition-all">
+                        </div>
+                        <button onclick="changeUserPasswordFromMyPage()" class="w-full py-2 bg-royalBlue hover:bg-royalHover text-white font-black rounded-xl text-xs transition-all flex items-center justify-center gap-1.5 shadow-sm">
+                            <i class="fa-solid fa-lock-open"></i> 비밀번호 변경하기
+                        </button>
                     </div>
                 </div>
 
@@ -2267,6 +2353,44 @@
                     <button id="mypage-upgrade-btn" onclick="requestUpgradeFromMyPage()" class="w-full py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-black rounded-xl text-[11px] transition-all">
                         👑 A등급 등급업 신청하기
                     </button>
+                </div>
+
+                <!-- ✈️ 텔레그램 알림 수신처 설정 -->
+                <div class="border-t border-slate-100 pt-4 space-y-3">
+                    <h4 class="text-xs font-black text-slate-800 flex items-center gap-1.5">
+                        <i class="fa-brands fa-telegram text-[#229ED9]"></i> 텔레그램 알림 서비스 연동
+                    </h4>
+                    <p class="text-[9px] text-slate-500 font-bold leading-normal">
+                        관심 등록한 매물의 기일 임박(D-1) 및 유찰 소식을 텔레그램으로 자동 수신합니다.<br>
+                        먼저 텔레그램에서 <a href="https://t.me/auctionnowbot" target="_blank" class="text-royalBlue underline">@auctionnowbot</a> 봇 대화방 입장 후 <strong>시작(또는 /start)</strong>을 누르셔야 합니다.
+                    </p>
+                    <div class="space-y-2">
+                        <!-- 수신처 입력 방식 선택 -->
+                        <div class="flex bg-slate-100 rounded-lg p-0.5 text-[9.5px] font-black">
+                            <button type="button" onclick="switchTelegramInputMode('username')" id="tg-btn-username" class="flex-1 py-1.5 rounded-md text-center bg-white text-slate-800 shadow-sm">
+                                @사용자명 등록 (일반용)
+                            </button>
+                            <button type="button" onclick="switchTelegramInputMode('chatid')" id="tg-btn-chatid" class="flex-1 py-1.5 rounded-md text-center text-slate-500 hover:text-slate-700">
+                                Chat ID 직접 등록 (전문가용)
+                            </button>
+                        </div>
+
+                        <!-- 사용자명 입력 폼 -->
+                        <div id="tg-form-username" class="space-y-1">
+                            <label class="block text-[9.5px] font-bold text-slate-400">본인의 텔레그램 사용자명 (@username)</label>
+                            <input type="text" id="tg-input-username" placeholder="예: @username" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs font-bold focus:bg-white focus:outline-none focus:border-royalBlue transition-all">
+                        </div>
+
+                        <!-- Chat ID 입력 폼 (기본 숨김) -->
+                        <div id="tg-form-chatid" class="space-y-1 hidden">
+                            <label class="block text-[9.5px] font-bold text-slate-400">본인의 텔레그램 Chat ID (숫자 번호)</label>
+                            <input type="text" id="tg-input-chatid" placeholder="예: 426045277" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs font-bold focus:bg-white focus:outline-none focus:border-royalBlue transition-all">
+                        </div>
+
+                        <button onclick="saveUserTelegramConfig()" class="w-full py-2 bg-royalBlue hover:bg-royalHover text-white font-black rounded-xl text-xs transition-all flex items-center justify-center gap-1.5 shadow-sm">
+                            <i class="fa-solid fa-cloud-arrow-up"></i> 텔레그램 정보 저장하기
+                        </button>
+                    </div>
                 </div>
 
                 <!-- 🔒 관리자 계정 변경 (admin_email과 일치할 때만 동적 노출) -->
