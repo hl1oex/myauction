@@ -72,7 +72,7 @@
                 </div>
                 <div>
                     <h1 class="text-sm sm:text-base font-extrabold text-slate-900 leading-tight">부동산경공매 검색시스템 - 백엔드 관리자</h1>
-                    <p class="text-[9.5px] font-bold text-slate-400">ADMIN CONTROL CENTER v1.2</p>
+                    <p class="text-[9.5px] font-bold text-slate-400">ADMIN CONTROL CENTER v1.3</p>
                 </div>
             </div>
             <div class="flex items-center gap-3">
@@ -102,8 +102,8 @@
             <button onclick="switchTab('consultation-tab')" id="btn-consultation-tab" class="w-full text-left bg-white text-slate-600 border border-slate-200 hover:bg-slate-50 px-4 py-3 rounded-xl font-black text-xs flex items-center gap-3 transition-all">
                 <i class="fa-solid fa-user-tie"></i> 전문가 상담 관리자
             </button>
-            <button onclick="switchTab('db-tab')" id="btn-db-tab" class="w-full text-left bg-white text-slate-600 border border-slate-200 hover:bg-slate-50 px-4 py-3 rounded-xl font-black text-xs flex items-center gap-3 transition-all">
-                <i class="fa-solid fa-database"></i> 데이터베이스 구축 SQL
+            <button onclick="switchTab('telegram-tab')" id="btn-telegram-tab" class="w-full text-left bg-white text-slate-600 border border-slate-200 hover:bg-slate-50 px-4 py-3 rounded-xl font-black text-xs flex items-center gap-3 transition-all">
+                <i class="fa-brands fa-telegram text-[#229ED9]"></i> 텔레그램 알림 서비스 매니저
             </button>
         </aside>
 
@@ -137,10 +137,109 @@
                     </div>
                 </div>
 
-                <!-- 💎 좌측 광고 설정/Canvas 툴 및 우측 가이드/미니맵/에뮬레이터 1:1 대칭 그리드 -->
-                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 items-start">
-                    <!-- ◀️ 좌측 영역: 광고 설정 폼 및 Canvas 편집기 -->
-                    <div class="space-y-4">
+                <!-- 💎 상단 1행: 광고 노출 위치 미니맵 & 실시간 광고 노출 에뮬레이터 (1:1 배치) -->
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <!-- 1. 광고 노출 위치 레이아웃 미니맵 (1.5배 확대) -->
+                    <div class="space-y-3 bg-white border border-slate-200 p-5 rounded-2xl shadow-sm">
+                        <h3 class="text-xs font-black text-slate-700 flex items-center gap-1.5"><i class="fa-solid fa-map-location-dot text-royalBlue"></i> 광고 노출 구좌 위치 레이아웃 미니맵 (1.5배 확대)</h3>
+                        <div class="border border-slate-200 bg-slate-50/50 p-4 rounded-2xl flex flex-col sm:flex-row items-center justify-center gap-4 min-h-[280px]">
+                            <!-- 1) 메인 피드 모형 -->
+                            <div class="w-full max-w-[220px] border border-slate-200 rounded-2xl overflow-hidden bg-white shadow-sm flex flex-col text-[8.5px] transition-all hover:shadow-md">
+                                <div class="bg-slate-100 border-b border-slate-200 px-3 py-1.5 flex items-center gap-1.5 select-none">
+                                    <div class="flex gap-1">
+                                        <span class="w-1.5 h-1.5 rounded-full bg-rose-400 block"></span>
+                                        <span class="w-1.5 h-1.5 rounded-full bg-amber-400 block"></span>
+                                        <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 block"></span>
+                                    </div>
+                                    <div class="bg-white border border-slate-200 rounded px-2 py-0.5 flex-1 text-center font-mono text-[7px] text-slate-400 select-all truncate">
+                                        myauction.r-e.kr/
+                                    </div>
+                                </div>
+                                <div class="bg-slate-900 text-white p-2 flex items-center justify-between border-b border-slate-200 select-none">
+                                    <span class="font-extrabold flex items-center gap-0.5">🏡 메인추천</span>
+                                    <div class="w-10 h-2 bg-slate-800 rounded-full"></div>
+                                </div>
+                                <div class="p-2 space-y-1.5 bg-slate-50 flex flex-col flex-grow select-none min-h-[160px]">
+                                    <div id="minimap-main-top" onclick="selectSlotFromMinimap('main_top_banner')" class="border border-slate-200 rounded bg-white text-center py-1 font-black text-slate-450 hover:bg-amber-50 hover:border-amber-400 cursor-pointer transition-all duration-300">
+                                        🏢 상단 광고 (main_top)
+                                    </div>
+                                    <div class="flex gap-1.5 h-[110px]">
+                                        <div class="w-[35%] border border-slate-200 rounded bg-white p-1 flex flex-col justify-between">
+                                            <div class="space-y-1">
+                                                <div class="h-2 bg-slate-100 rounded"></div>
+                                                <div class="h-2 bg-slate-100 rounded w-4/5"></div>
+                                            </div>
+                                            <div id="minimap-sidebar" onclick="selectSlotFromMinimap('sidebar_filter_banner')" class="border border-slate-200 rounded bg-white text-center py-2 text-[7px] font-black text-slate-450 hover:bg-amber-50 hover:border-amber-400 cursor-pointer transition-all duration-300 flex flex-col justify-center leading-tight">
+                                                📂 필터 아래<br>광고
+                                            </div>
+                                        </div>
+                                        <div class="flex-grow border border-slate-200 rounded bg-white p-1 flex flex-col gap-1 overflow-hidden">
+                                            <div class="h-6 border border-slate-100 rounded-lg bg-slate-50 flex items-center px-1.5 justify-between">
+                                                <div class="w-8 h-2 bg-slate-200 rounded"></div>
+                                            </div>
+                                            <div id="minimap-list" onclick="selectSlotFromMinimap('list_banner')" class="border border-slate-200 rounded bg-white text-center py-1.5 font-black text-slate-450 hover:bg-amber-50 hover:border-amber-400 cursor-pointer transition-all duration-300">
+                                                📰 피드 광고 (list_banner)
+                                            </div>
+                                            <div class="h-6 border border-slate-100 rounded-lg bg-slate-50 flex items-center px-1.5 justify-between">
+                                                <div class="w-8 h-2 bg-slate-200 rounded"></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- 2) 상세페이지 모형 -->
+                            <div class="w-full max-w-[220px] border border-slate-200 rounded-2xl overflow-hidden bg-white shadow-sm flex flex-col text-[8.5px] transition-all hover:shadow-md">
+                                <div class="bg-slate-100 border-b border-slate-200 px-3 py-1.5 flex items-center gap-1.5 select-none">
+                                    <div class="flex gap-1">
+                                        <span class="w-1.5 h-1.5 rounded-full bg-rose-400 block"></span>
+                                        <span class="w-1.5 h-1.5 rounded-full bg-amber-400 block"></span>
+                                        <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 block"></span>
+                                    </div>
+                                    <div class="bg-white border border-slate-200 rounded px-2 py-0.5 flex-1 text-center font-mono text-[7px] text-slate-400 select-all truncate">
+                                        myauction.r-e.kr/detail
+                                    </div>
+                                </div>
+                                <div class="bg-slate-900 text-white p-2 flex items-center justify-between border-b border-slate-200 select-none">
+                                    <span class="font-extrabold flex items-center gap-0.5">🏡 매물상세</span>
+                                    <div class="w-10 h-2 bg-slate-800 rounded-full"></div>
+                                </div>
+                                <div class="p-2 space-y-1.5 bg-slate-50 flex flex-col flex-grow select-none min-h-[160px] justify-between">
+                                    <div id="minimap-detail-top" onclick="selectSlotFromMinimap('detail_top_banner')" class="border border-slate-200 rounded bg-white text-center py-1 font-black text-slate-450 hover:bg-amber-50 hover:border-amber-400 cursor-pointer transition-all duration-300">
+                                        🏢 상세 상단 광고 (detail_top)
+                                    </div>
+                                    <div class="border border-slate-200 rounded bg-white p-1.5 flex flex-col gap-1">
+                                        <div class="h-2 bg-slate-100 rounded w-full"></div>
+                                        <div class="h-2 bg-slate-100 rounded w-5/6"></div>
+                                        <div class="h-2 bg-slate-100 rounded w-4/5"></div>
+                                    </div>
+                                    <div id="minimap-detail-bottom" onclick="selectSlotFromMinimap('detail_bottom_banner')" class="border border-slate-200 rounded bg-white text-center py-1 font-black text-slate-450 hover:bg-amber-50 hover:border-amber-400 cursor-pointer transition-all duration-300">
+                                        🏢 상세 하단 광고 (detail_bottom)
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 2. 실시간 광고 노출 에뮬레이터 미리보기 -->
+                    <div class="space-y-3 bg-white border border-slate-200 p-5 rounded-2xl shadow-sm">
+                        <h3 class="text-xs font-black text-slate-700 flex items-center gap-1.5"><i class="fa-solid fa-desktop text-royalBlue"></i> 실시간 광고 노출 에뮬레이터 미리보기</h3>
+                        <div class="border border-slate-200 bg-slate-50/50 p-4 rounded-2xl flex justify-center items-center min-h-[280px] shadow-inner">
+                            <!-- 실제 매물 카드와 100% 동일 규격의 광고 목업 -->
+                            <div id="ad-preview-card" class="w-[300px] min-h-[340px] bg-white border border-slate-200 rounded-2xl p-3 shadow-sm relative overflow-hidden transition-all hover:shadow-md flex flex-col justify-between">
+                                <div id="ad-preview-container" class="flex-1 flex flex-col justify-between h-full">
+                                    <div class="text-center py-10">
+                                        <p class="text-xs text-slate-400 font-bold">광고 정보가 로드되지 않았습니다.</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 💎 하단 2행: 광고 설정 제어 폼 & 광고 관리 가이드 (2/3 & 1/3 분할 배치) -->
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start border-t border-slate-100 pt-6">
+                    <!-- 광고 제어 설정 폼 (2/3 너비) -->
+                    <div class="lg:col-span-2 space-y-4">
                         <div>
                             <label class="block text-xs font-black text-slate-700 mb-1.5">광고 송출 형태 선택</label>
                             <div class="flex gap-4">
@@ -332,140 +431,8 @@
                             </div>
                         </div>
                     </div>
-
-                    <!-- ▶️ 우측 영역: 가이드, 2분할 1.5배 레이아웃 미니맵, 실시간 에뮬레이터 미리보기 -->
-                    <div class="space-y-6">
-                        <!-- 1. 실시간 도움말 및 가이드 -->
-                        <div class="bg-slate-50 border border-slate-200 p-4 rounded-2xl flex flex-col justify-between text-[11.5px] font-semibold text-slate-600 leading-relaxed shadow-sm">
-                            <div class="space-y-2">
-                                <strong class="text-slate-800 block text-xs font-black"><i class="fa-solid fa-info-circle text-royalBlue"></i> 광고 관리 가이드</strong>
-                                <p>1. 광고 활성 스위치를 켜면 매물 추천 피드 리스트 중간에 광고판 카드가 즉시 생성됩니다.</p>
-                                <p>2. 직접 유치 광고는 로컬에 보관 중인 이미지 경로(`./apartment_elegant_facade.png`)나 외부 이미지 링크 모두 정상적으로 지원됩니다.</p>
-                                <p>3. 애드센스로 전환 시 애드센스 자바스크립트 스크립트 블록이 삽입되어 광고 서비스가 자동으로 연동됩니다.</p>
-                                <p>4. 상세페이지 상하단 구좌를 활용하여 매물 분석 화면 진입 고객들에게 집중적으로 광고 타겟팅 노출을 진행할 수 있습니다.</p>
-                            </div>
-                            <button onclick="saveAdSettings()" class="w-full bg-royalBlue hover:bg-royalHover text-white text-xs font-black py-2.5 px-4 rounded-xl shadow-md transition-all select-none mt-4">
-                                <i class="fa-solid fa-save"></i> 광고 설정 업데이트 적용
-                            </button>
-                        </div>
-
-                        <!-- 2. 광고 노출 구좌 위치 레이아웃 미니맵 (2분할 1.5배) -->
-                        <div class="space-y-3">
-                            <h3 class="text-xs font-black text-slate-700 flex items-center gap-1.5"><i class="fa-solid fa-map-location-dot text-royalBlue"></i> 광고 노출 구좌 위치 레이아웃 미니맵 (1.5배 확대)</h3>
-                            <div class="border border-slate-200 bg-slate-50/50 p-4 rounded-2xl flex flex-col sm:flex-row items-center justify-center gap-4 min-h-[280px]">
-                                <!-- 1) 메인 피드 모형 -->
-                                <div class="w-full max-w-[220px] border border-slate-200 rounded-2xl overflow-hidden bg-white shadow-sm flex flex-col text-[8.5px] transition-all hover:shadow-md">
-                                    <!-- 상단 탭/주소창 모형 -->
-                                    <div class="bg-slate-100 border-b border-slate-200 px-3 py-1.5 flex items-center gap-1.5 select-none">
-                                        <div class="flex gap-1">
-                                            <span class="w-1.5 h-1.5 rounded-full bg-rose-400 block"></span>
-                                            <span class="w-1.5 h-1.5 rounded-full bg-amber-400 block"></span>
-                                            <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 block"></span>
-                                        </div>
-                                        <div class="bg-white border border-slate-200 rounded px-2 py-0.5 flex-1 text-center font-mono text-[7px] text-slate-400 select-all truncate">
-                                            action-b8c75.web.app/
-                                        </div>
-                                    </div>
-                                    <!-- 헤더 모형 -->
-                                    <div class="bg-slate-900 text-white p-2 flex items-center justify-between border-b border-slate-200 select-none">
-                                        <span class="font-extrabold flex items-center gap-0.5">🏡 메인추천</span>
-                                        <div class="w-10 h-2 bg-slate-800 rounded-full"></div>
-                                    </div>
-                                    <!-- 컨텐츠 바디 모형 -->
-                                    <div class="p-2 space-y-1.5 bg-slate-50 flex flex-col flex-grow select-none min-h-[160px]">
-                                        <!-- 1. main_top_banner 구좌 -->
-                                        <div id="minimap-main-top" onclick="selectSlotFromMinimap('main_top_banner')" class="border border-slate-200 rounded bg-white text-center py-1 font-black text-slate-450 hover:bg-amber-50 hover:border-amber-400 cursor-pointer transition-all duration-300">
-                                            🏢 상단 광고 (main_top)
-                                        </div>
-                                        <!-- 2열 그리드 바디 -->
-                                        <div class="flex gap-1.5 h-[110px]">
-                                            <!-- 좌측 사이드바 필터 모형 -->
-                                            <div class="w-[35%] border border-slate-200 rounded bg-white p-1 flex flex-col justify-between">
-                                                <div class="space-y-1">
-                                                    <div class="h-2 bg-slate-100 rounded"></div>
-                                                    <div class="h-2 bg-slate-100 rounded w-4/5"></div>
-                                                </div>
-                                                <!-- 2. sidebar_filter_banner 구좌 -->
-                                                <div id="minimap-sidebar" onclick="selectSlotFromMinimap('sidebar_filter_banner')" class="border border-slate-200 rounded bg-white text-center py-2 text-[7px] font-black text-slate-450 hover:bg-amber-50 hover:border-amber-400 cursor-pointer transition-all duration-300 flex flex-col justify-center leading-tight">
-                                                    📂 필터 아래<br>광고
-                                                </div>
-                                            </div>
-                                            <!-- 우측 매물 리스트 피드 모형 -->
-                                            <div class="flex-grow border border-slate-200 rounded bg-white p-1 flex flex-col gap-1 overflow-hidden">
-                                                <div class="h-6 border border-slate-100 rounded-lg bg-slate-50 flex items-center px-1.5 justify-between">
-                                                    <div class="w-8 h-2 bg-slate-200 rounded"></div>
-                                                </div>
-                                                <!-- 3. list_banner 구좌 -->
-                                                <div id="minimap-list" onclick="selectSlotFromMinimap('list_banner')" class="border border-slate-200 rounded bg-white text-center py-1.5 font-black text-slate-450 hover:bg-amber-50 hover:border-amber-400 cursor-pointer transition-all duration-300">
-                                                    📰 피드 광고 (list_banner)
-                                                </div>
-                                                <div class="h-6 border border-slate-100 rounded-lg bg-slate-50 flex items-center px-1.5 justify-between">
-                                                    <div class="w-8 h-2 bg-slate-200 rounded"></div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <!-- 2) 상세페이지 모형 -->
-                                <div class="w-full max-w-[220px] border border-slate-200 rounded-2xl overflow-hidden bg-white shadow-sm flex flex-col text-[8.5px] transition-all hover:shadow-md">
-                                    <!-- 상단 탭/주소창 모형 -->
-                                    <div class="bg-slate-100 border-b border-slate-200 px-3 py-1.5 flex items-center gap-1.5 select-none">
-                                        <div class="flex gap-1">
-                                            <span class="w-1.5 h-1.5 rounded-full bg-rose-400 block"></span>
-                                            <span class="w-1.5 h-1.5 rounded-full bg-amber-400 block"></span>
-                                            <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 block"></span>
-                                        </div>
-                                        <div class="bg-white border border-slate-200 rounded px-2 py-0.5 flex-1 text-center font-mono text-[7px] text-slate-400 select-all truncate">
-                                            action-b8c75.web.app/detail
-                                        </div>
-                                    </div>
-                                    <!-- 헤더 모형 -->
-                                    <div class="bg-slate-900 text-white p-2 flex items-center justify-between border-b border-slate-200 select-none">
-                                        <span class="font-extrabold flex items-center gap-0.5">🏡 매물상세</span>
-                                        <div class="w-10 h-2 bg-slate-800 rounded-full"></div>
-                                    </div>
-                                    <!-- 컨텐츠 바디 모형 -->
-                                    <div class="p-2 space-y-1.5 bg-slate-50 flex flex-col flex-grow select-none min-h-[160px] justify-between">
-                                        <!-- 4. detail_top_banner 구좌 -->
-                                        <div id="minimap-detail-top" onclick="selectSlotFromMinimap('detail_top_banner')" class="border border-slate-200 rounded bg-white text-center py-1 font-black text-slate-450 hover:bg-amber-50 hover:border-amber-400 cursor-pointer transition-all duration-300">
-                                            🏢 상세 상단 광고 (detail_top)
-                                        </div>
-                                        
-                                        <!-- 내용 모형 -->
-                                        <div class="border border-slate-200 rounded bg-white p-1.5 flex flex-col gap-1">
-                                            <div class="h-2 bg-slate-100 rounded w-full"></div>
-                                            <div class="h-2 bg-slate-100 rounded w-5/6"></div>
-                                            <div class="h-2 bg-slate-100 rounded w-4/5"></div>
-                                        </div>
-
-                                        <!-- 5. detail_bottom_banner 구좌 -->
-                                        <div id="minimap-detail-bottom" onclick="selectSlotFromMinimap('detail_bottom_banner')" class="border border-slate-200 rounded bg-white text-center py-1 font-black text-slate-450 hover:bg-amber-50 hover:border-amber-400 cursor-pointer transition-all duration-300">
-                                            🏢 상세 하단 광고 (detail_bottom)
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- 3. 실시간 광고 노출 에뮬레이터 미리보기 -->
-                        <div class="space-y-3">
-                            <h3 class="text-xs font-black text-slate-700 flex items-center gap-1.5"><i class="fa-solid fa-desktop text-royalBlue"></i> 실시간 광고 노출 에뮬레이터 미리보기</h3>
-                            <div class="border border-slate-200 bg-slate-50/50 p-4 rounded-2xl flex justify-center items-center min-h-[260px] shadow-inner">
-                                <!-- 실제 매물 카드와 100% 동일 규격의 광고 목업 -->
-                                <div id="ad-preview-card" class="w-[300px] min-h-[340px] bg-white border border-slate-200 rounded-2xl p-3 shadow-sm relative overflow-hidden transition-all hover:shadow-md flex flex-col justify-between">
-                                    <!-- 광고 내용 렌더러 -->
-                                    <div id="ad-preview-container" class="flex-1 flex flex-col justify-between h-full">
-                                        <div class="text-center py-10">
-                                            <p class="text-xs text-slate-400 font-bold">광고 정보가 로드되지 않았습니다.</p>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
+                </div> <!-- 👈 240번째 줄의 grid grid-cols-1 lg:grid-cols-3 닫기 -->
+            </div> <!-- 👈 113번째 줄의 panel-ad-tab 닫기 -->
             <!-- 👥 2. 고객 등급 권한 매니저 탭 -->
             <div id="panel-user-tab" class="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm space-y-5 hidden">
                 <div>
@@ -492,7 +459,10 @@
                     <div class="relative w-full sm:max-w-xs">
                         <input type="text" id="user-search-input" oninput="filterUsersList()" class="w-full text-xs font-bold p-2.5 border border-slate-200 rounded-xl bg-slate-50 focus:bg-white focus:border-royalBlue outline-none" placeholder="이메일 검색...">
                     </div>
-                    <div>
+                    <div class="flex gap-2 items-center w-full sm:w-auto justify-end">
+                        <button onclick="exportUsersToCSV()" class="bg-royalBlue hover:bg-royalHover text-white text-xs font-black py-2.5 px-4 rounded-xl flex items-center gap-1.5 transition-all shadow-sm">
+                            <i class="fa-solid fa-file-excel text-yellow-300"></i> 회원 리스트 Excel 다운로드
+                        </button>
                         <select id="user-sort-select" onchange="filterUsersList()" class="text-xs font-black p-2.5 border border-slate-200 rounded-xl bg-slate-50 focus:bg-white outline-none">
                             <option value="created_desc">📅 가입일 최신순</option>
                             <option value="created_asc">📅 가입일 오래된순</option>
@@ -508,127 +478,24 @@
                             <tr class="bg-slate-50 border-b border-slate-200 text-slate-700 text-[10.5px] font-black">
                                 <th class="p-3 w-12 text-center">No.</th>
                                 <th class="p-3">가입 회원 이메일</th>
-                                <th class="p-3 w-1/5 text-center">등급 및 등업 결재</th>
+                                <th class="p-3 w-1/12 text-center">가입 경로</th>
+                                <th class="p-3 w-1/8 text-center">가입일</th>
+                                <th class="p-3 w-1/5 text-center">멤버십 등급</th>
                                 <th class="p-3 w-1/4 text-center">이용 기간 설정 (만료일)</th>
-                                <th class="p-3 w-1/6 text-center">멤버십 (Tier)</th>
                                 <th class="p-3 w-1/6 text-center">관리 액션</th>
                             </tr>
                         </thead>
                         <tbody id="user-list-tbody" class="text-xs font-bold text-slate-750">
                             <!-- JS를 통해 실시간 목록 로딩 -->
                             <tr>
-                                <td colspan="5" class="p-8 text-center text-slate-400">회원 데이터를 불러오는 중입니다.</td>
+                                <td colspan="6" class="p-8 text-center text-slate-400">회원 데이터를 불러오는 중입니다.</td>
                             </tr>
                         </tbody>
                     </table>
                 </div>
             </div>
 
-            <!-- ⚙️ 3. 데이터베이스 구축 SQL 탭 -->
-            <div id="panel-db-tab" class="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm space-y-4 hidden">
-                <div>
-                    <h2 class="text-base font-extrabold text-slate-900 flex items-center gap-2">
-                        <i class="fa-solid fa-database text-royalBlue"></i> Supabase 데이터베이스 테이블 셋업 가이드
-                    </h2>
-                    <p class="text-[10px] text-slate-400 font-bold mt-0.5">광고 및 회원 등급 관리에 필요한 Supabase SQL 셋업 명령어 스크립트입니다.</p>
-                </div>
 
-                <div class="space-y-3">
-                    <p class="text-xs text-slate-600 font-semibold leading-relaxed">
-                        아래의 SQL 구문을 전체 복사하여 **Supabase Dashboard -> SQL Editor -> New Query** 창에 붙여넣고 **Run** 버튼을 눌러 실행해주시기 바랍니다.
-                    </p>
-                    
-                    <div class="relative bg-slate-900 rounded-2xl p-4 overflow-x-auto border border-slate-800">
-                        <button onclick="copySQLCode()" class="absolute top-3 right-3 bg-slate-800 hover:bg-slate-700 text-slate-300 text-[9.5px] font-black px-2.5 py-1.5 rounded-lg border border-slate-700 flex items-center gap-1 transition-all select-none">
-                            <i class="fa-solid fa-copy"></i> 복사하기
-                        </button>
-                        <pre id="sql-code-block" class="text-xs text-emerald-400 font-mono leading-relaxed select-all">
--- 0. 고객 프로필 테이블 membership_tier 컬럼 추가
-ALTER TABLE public.user_profiles ADD COLUMN IF NOT EXISTS membership_tier VARCHAR(50) DEFAULT 'regular';
-ALTER TABLE public.user_profiles ADD COLUMN IF NOT EXISTS membership_expires_at TIMESTAMP WITH TIME ZONE;
-
--- 0-1. 모의입찰(mock_bids) 테이블 구축
-CREATE TABLE IF NOT EXISTS public.mock_bids (
-    property_id BIGINT REFERENCES public.properties(id) ON DELETE CASCADE,
-    user_id UUID REFERENCES auth.users(id) ON DELETE CASCADE,
-    bid_price BIGINT NOT NULL,
-    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
-    PRIMARY KEY (property_id, user_id)
-);
-
--- 0-2. 전문가 상담(expert_consultations) 테이블 구축
-CREATE TABLE IF NOT EXISTS public.expert_consultations (
-    id SERIAL PRIMARY KEY,
-    property_id BIGINT REFERENCES public.properties(id) ON DELETE CASCADE,
-    user_id UUID REFERENCES auth.users(id) ON DELETE CASCADE,
-    expert_name VARCHAR(255) NOT NULL,
-    status VARCHAR(50) DEFAULT 'pending',
-    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
-);
-
--- 1. 광고판(ads) 데이터베이스 테이블 구축
-CREATE TABLE IF NOT EXISTS public.ads (
-    id SERIAL PRIMARY KEY,
-    slot_name VARCHAR(255) UNIQUE NOT NULL,
-    active BOOLEAN DEFAULT TRUE,
-    type VARCHAR(50) DEFAULT 'direct',
-    title VARCHAR(255),
-    desc TEXT,
-    ad_code TEXT,
-    image_url TEXT,
-    link_url TEXT,
-    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
-);
-
--- 초기 가로 배너 광고 데이터 인서트
-INSERT INTO public.ads (slot_name, active, type, title, desc, image_url, link_url)
-VALUES ('list_banner', true, 'direct', '★ 프리미엄 경공매 투자 VIP 멤버십 모집', '오직 1%를 위한 NPL 부실채권 및 지분 경매 핵심 노하우 단독 공개. 지금 가입 시 30% 한정 할인 적용!', './apartment_elegant_facade.png', 'https://action-b8c75.web.app')
-ON CONFLICT (slot_name) DO NOTHING;
-
--- 2. 시스템 관리자 계정(admin_config) 테이블 구축
-CREATE TABLE IF NOT EXISTS public.admin_config (
-    key VARCHAR(50) PRIMARY KEY,
-    value TEXT NOT NULL
-);
-
-INSERT INTO public.admin_config (key, value)
-VALUES 
-('admin_email', 'hl1oex@gmail.com'),
-('admin_password', '123456')
-ON CONFLICT (key) DO NOTHING;
-
--- 3. 고객 프로필 회원 등급(user_profiles) 테이블 구축
-CREATE TABLE IF NOT EXISTS public.user_profiles (
-    id UUID PRIMARY KEY REFERENCES auth.users(id) ON DELETE CASCADE,
-    email VARCHAR(255) NOT NULL,
-    grade VARCHAR(10) DEFAULT 'C',
-    upgrade_requested BOOLEAN DEFAULT FALSE,
-    updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
-);
-
--- 기존 테이블이 존재할 경우 upgrade_requested 컬럼 추가 SQL
-ALTER TABLE public.user_profiles ADD COLUMN IF NOT EXISTS upgrade_requested BOOLEAN DEFAULT FALSE;
-
--- 신규 유저 가입 시 자동으로 등급 테이블 행을 연계 생성하는 DB 트리거 함수 작성
-CREATE OR REPLACE FUNCTION public.handle_new_user()
-RETURNS trigger AS $$
-BEGIN
-  INSERT INTO public.user_profiles (id, email, grade, upgrade_requested)
-  VALUES (new.id, new.email, 'C', false)
-  ON CONFLICT (id) DO NOTHING;
-  RETURN new;
-END;
-$$ LANGUAGE plpgsql SECURITY DEFINER;
-
--- 트리거 생성
-DROP TRIGGER IF EXISTS on_auth_user_created ON auth.users;
-CREATE TRIGGER on_auth_user_created
-  AFTER INSERT ON auth.users
-  FOR EACH ROW EXECUTE FUNCTION public.handle_new_user();
-                        </pre>
-                    </div>
-                </div>
-            </div>
 
             <!-- 🎯 4. 실시간 모의입찰 매니저 탭 -->
             <div id="panel-mock-bid-tab" class="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm space-y-5 hidden">
@@ -690,11 +557,142 @@ CREATE TRIGGER on_auth_user_created
                     </table>
                 </div>
             </div>
+
+            <!-- 🚨 6. 텔레그램 알림 서비스 매니저 탭 -->
+            <div id="panel-telegram-tab" class="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm space-y-5 hidden">
+                <div class="border-b border-slate-100 pb-3 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                    <div>
+                        <h2 class="text-base font-extrabold text-slate-900 flex items-center gap-2">
+                            <i class="fa-brands fa-telegram text-[#229ED9]"></i> 텔레그램 알림 서비스 제어 보드
+                        </h2>
+                        <p class="text-[10px] text-slate-400 font-bold mt-0.5">D-Day 임박 및 유찰 관심 매물에 대한 자동 알림 배치를 관리하고, 테마별 타겟 공지를 수시 발송합니다.</p>
+                    </div>
+                </div>
+
+                <!-- 1) 발송 제어 설정 콘솔 및 수동 배치 트리거 -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <!-- 전체 및 기능별 온오프 스위치 -->
+                    <div class="md:col-span-2 border border-slate-200 rounded-2xl p-4 bg-slate-50/50 space-y-3.5">
+                        <strong class="text-xs font-black text-slate-700 block">⚙️ 실시간 자동 발송 규칙 설정</strong>
+                        <div class="space-y-3">
+                            <div class="flex items-center justify-between">
+                                <span class="text-xs font-bold text-slate-600">전체 텔레그램 알림 전송 가동 여부</span>
+                                <label class="relative inline-flex items-center cursor-pointer">
+                                    <input type="checkbox" id="tg-alert-global-toggle" class="sr-only peer" onchange="saveTelegramAdminSettings()">
+                                    <div class="w-10 h-5 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-[#229ED9]"></div>
+                                </label>
+                            </div>
+                            <div class="flex items-center justify-between border-t border-slate-100 pt-2.5">
+                                <span class="text-xs font-bold text-slate-600">D-Day 임박(D-1) 관심 매물 자동 알림</span>
+                                <label class="relative inline-flex items-center cursor-pointer">
+                                    <input type="checkbox" id="tg-alert-dday-toggle" class="sr-only peer" onchange="saveTelegramAdminSettings()">
+                                    <div class="w-10 h-5 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-[#229ED9]"></div>
+                                </label>
+                            </div>
+                            <div class="flex items-center justify-between border-t border-slate-100 pt-2.5">
+                                <span class="text-xs font-bold text-slate-600">유찰 감지(최저가 하락) 관심 매물 자동 알림</span>
+                                <label class="relative inline-flex items-center cursor-pointer">
+                                    <input type="checkbox" id="tg-alert-underbid-toggle" class="sr-only peer" onchange="saveTelegramAdminSettings()">
+                                    <div class="w-10 h-5 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-[#229ED9]"></div>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 수동 강제 발송 트리거 -->
+                    <div class="border border-slate-200 rounded-2xl p-4 bg-slate-50/50 flex flex-col justify-between">
+                        <div>
+                            <strong class="text-xs font-black text-slate-700 block">⚡ 수동 스케줄 배치 트리거</strong>
+                            <p class="text-[9.5px] text-slate-400 font-bold mt-1.5 leading-normal">
+                                당일 배치 작업을 브라우저에서 직접 강제 구동하여 회차 임박 및 유찰 소식을 분석하고 회원들에게 텔레그램으로 메세지를 일제히 전송합니다.
+                            </p>
+                        </div>
+                        <button onclick="triggerTelegramNotifierManual()" class="w-full bg-[#229ED9] hover:bg-[#1d8bcb] text-white text-[11px] font-black py-2.5 px-4 rounded-xl shadow-md transition-all select-none mt-3">
+                            <i class="fa-solid fa-play"></i> 당일 알림 배치 수동 즉시 실행
+                        </button>
+                    </div>
+                </div>
+
+                <!-- 2) 테마형 기획 알림 즉시 단체 발송기 -->
+                <div class="border border-slate-200 rounded-2xl p-4 space-y-4">
+                    <strong class="text-xs font-black text-slate-700 block"><i class="fa-solid fa-bullhorn text-amber-500"></i> 테마별 매물 기획 알림 즉시 일괄 발송기</strong>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div class="space-y-3 md:col-span-1 text-[11px] font-bold text-slate-650">
+                            <div>
+                                <label class="block mb-1.5 font-black text-slate-700">1. 대상 타겟 매물 테마 선택</label>
+                                <select id="tg-theme-select" onchange="onTelegramThemeChange()" class="w-full text-xs font-black p-2.5 border border-slate-200 rounded-xl bg-slate-50 focus:bg-white outline-none">
+                                    <option value="">-- 테마 선택 --</option>
+                                    <option value="dday">⏰ 입찰 기일 임박 매물 (D-1/D-Day)</option>
+                                    <option value="underbid">📉 회차 갱신 유찰 매물</option>
+                                    <option value="hot">🏆 AI 투자 추천 매물 (Score 80점 이상)</option>
+                                    <option value="small">💰 소액 투자 추천 매물 (최저가 1억 이하)</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block mb-1.5 font-black text-slate-700">2. 알림 발송 타겟 회원 범위</label>
+                                <select id="tg-target-grade" class="w-full text-xs font-black p-2.5 border border-slate-200 rounded-xl bg-slate-50 focus:bg-white outline-none">
+                                    <option value="all">👥 텔레그램 연동 전체 회원</option>
+                                    <option value="premium">👑 프리미엄 멤버십 회원 전용</option>
+                                    <option value="A">🥇 A등급 회원 전용</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <!-- 우측 편집 및 텍스트 미리보기 -->
+                        <div class="space-y-3 md:col-span-2">
+                            <div>
+                                <label class="block text-[11px] font-black text-slate-700 mb-1.5">3. 텔레그램 메시지 템플릿 본문 편집 (마크다운 지원)</label>
+                                <textarea id="tg-theme-message" rows="5" class="w-full text-xs font-mono p-3 border border-slate-200 rounded-xl bg-slate-50 focus:bg-white outline-none" placeholder="테마를 선택하시면 해당 테마의 분석 매물 목록을 파싱하여 기본 메시지 형태가 여기에 자동 생성됩니다. 수동으로 수정도 가능합니다."></textarea>
+                            </div>
+                            <div class="flex justify-end">
+                                <button type="button" onclick="sendTelegramThemeAlert()" class="bg-[#229ED9] hover:bg-[#1d8bcb] text-white text-[11px] font-black px-5 py-2.5 rounded-xl transition-all shadow-md select-none">
+                                    <i class="fa-solid fa-paper-plane"></i> 선택 회원들에게 즉시 단체 알람 쏘기
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 3) 실시간 텔레그램 발송 이력 로그 테이블 -->
+                <div class="space-y-3">
+                    <div class="flex justify-between items-center">
+                        <strong class="text-xs font-black text-slate-700"><i class="fa-solid fa-clock-rotate-left"></i> 텔레그램 발송 이력 로그</strong>
+                        <button onclick="loadTelegramLogs(1)" class="bg-slate-100 hover:bg-slate-200 border border-slate-200 text-slate-600 text-[10px] font-black px-2.5 py-1.5 rounded-lg select-none">새로고침</button>
+                    </div>
+                    <div class="border border-slate-200 rounded-2xl overflow-hidden bg-white">
+                        <table class="w-full text-left border-collapse">
+                            <thead>
+                                <tr class="bg-slate-50 border-b border-slate-200 text-slate-700 text-[10px] font-black">
+                                    <th class="p-3 w-12 text-center">No.</th>
+                                    <th class="p-3 w-1/5">수신자 이메일</th>
+                                    <th class="p-3 w-1/5">관련 매물</th>
+                                    <th class="p-3 w-28 text-center">알림 종류</th>
+                                    <th class="p-3 text-center">상태 및 내역</th>
+                                    <th class="p-3 w-28 text-center">발송 일시</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tg-logs-tbody" class="text-xs font-bold text-slate-750">
+                                <tr>
+                                    <td colspan="6" class="p-8 text-center text-slate-400">발송 로그가 존재하지 않습니다.</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <!-- 페이징 컨트롤 -->
+                    <div class="flex items-center justify-between text-[11px] font-bold text-slate-500 pt-1">
+                        <span id="tg-logs-page-info">1 / 1 페이지 (총 0건)</span>
+                        <div class="flex gap-2">
+                            <button id="tg-logs-prev-btn" onclick="changeTgLogsPage(-1)" class="px-2.5 py-1 border border-slate-250 rounded-lg hover:bg-slate-50 disabled:opacity-40 disabled:hover:bg-transparent">이전</button>
+                            <button id="tg-logs-next-btn" onclick="changeTgLogsPage(1)" class="px-2.5 py-1 border border-slate-250 rounded-lg hover:bg-slate-50 disabled:opacity-40 disabled:hover:bg-transparent">다음</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </section>
     </main>
 
     <!-- 💎 탭 스위칭 및 데이터 통신 실시간 바인딩 JS -->
-    <script src="./admin.js" defer></script>
+    <script src="./admin.js?v=1.3.0" defer></script>
 
     <!-- 🔑 어드민 전용 로그인 인증 모달 오버레이 (다크-골드 믹스 프리미엄 스타일) -->
     <div id="admin-login-overlay" class="fixed inset-0 bg-slate-950/90 z-50 flex items-center justify-center hidden">
@@ -751,6 +749,11 @@ CREATE TRIGGER on_auth_user_created
                     <span class="text-slate-400 font-black">멤버십 만료일</span>
                     <span id="detail-modal-expires" class="col-span-2 text-slate-900 font-extrabold"></span>
                 </div>
+                <div class="grid grid-cols-3 gap-2 border-b border-slate-50 pb-2.5">
+                    <span class="text-slate-400 font-black">가입 일자</span>
+                    <span id="detail-modal-created" class="col-span-2 text-slate-900 font-extrabold"></span>
+                </div>
+
                 
                 <!-- 실시간 활동 데이터 통계 블록 -->
                 <div class="bg-blue-50/50 border border-blue-100 rounded-2xl p-4 space-y-3.5">

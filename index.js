@@ -237,6 +237,22 @@
             }
         }
         // 🚀 첫 접속 시 캐시 유효성을 검증하여 필요한 경우에만 데이터를 가져오는 제어 함수
+        // [신규] 쿼리 스트링 (?detail=ID) 감지하여 상세 드로어 자동 오픈
+        function checkQueryStringAndOpenDetail() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const detailId = urlParams.get('detail');
+            if (detailId) {
+                const item = originalProperties.find(p => p.id === detailId);
+                if (item) {
+                    selectedProperty = item;
+                    loadDetailView(item);
+                    changeDetailGroupTab(1);
+                    openDetailDrawer(false); // pushState 중복 호출 방지
+                    updateDynamicBrowserTitle();
+                }
+            }
+        }
+
         async function initDataLoad() {
             loadAdSettings(); // 📢 Supabase 광고 설정 로드
             const sensor = document.getElementById("connection-sensor");
@@ -267,6 +283,7 @@
                         }
                         applyFilters();
                         isFirstLoad = false;
+                        checkQueryStringAndOpenDetail();
                         return;
                     }
                 } catch (err) {
@@ -275,6 +292,7 @@
             }
             // 3. 캐시가 구버전이거나 데이터가 없으면 서버에서 가져옵니다.
             await fetchDataFromServer(false);
+            checkQueryStringAndOpenDetail();
         }
         function loadFallbackData() {
             const sensor = document.getElementById("connection-sensor");
@@ -344,20 +362,21 @@
             document.getElementById("sync-court-time").innerText = "오프라인";
             document.getElementById("sync-onbid-time").innerText = "오프라인";
         }
-        // 브라우저 뒤로가기 발생 시 상세 드로어 가드 바인딩
+        // 브라우저 뒤로가기 발생 시 상세 드로어 가드 및 쿼리 스트링 연동 (v1.3)
         window.addEventListener('popstate', function(event) {
-            if (!event.state || !event.state.drawerOpen) {
-                const drawer = document.getElementById("detail-drawer");
-                if (drawer && drawer.classList.contains("translate-x-0")) {
-                    drawer.classList.remove("translate-x-0");
-                    drawer.classList.add("translate-x-full");
-                    const backdrop = document.getElementById("drawer-backdrop");
-                    if (backdrop) {
-                        setTimeout(() => {
-                            backdrop.classList.add("hidden");
-                        }, 300);
-                    }
+            const urlParams = new URLSearchParams(window.location.search);
+            const detailId = urlParams.get('detail');
+            if (detailId) {
+                const item = originalProperties.find(p => p.id === detailId);
+                if (item) {
+                    selectedProperty = item;
+                    loadDetailView(item);
+                    changeDetailGroupTab(1);
+                    openDetailDrawer(false);
+                    updateDynamicBrowserTitle();
                 }
+            } else {
+                closeDetailDrawer(false);
             }
         });
         // 🚀 Firebase 클라우드 초기화는 데이터 수집 함수에서 dynamic import 모듈로 로딩 및 할당합니다.
@@ -795,6 +814,46 @@
             if (uk > 0) parts.push(`${uk}억`);
             if (man > 0) parts.push(`${man.toLocaleString()}만`);
             return parts.length > 0 ? parts.join(" ") + " 원" : `${val.toLocaleString()}원`;
+        }
+        // [신규] 은행 및 금융사 이름에 부합하는 로고 아이콘을 동적으로 매핑합니다.
+        function getBankLogoHtml(bankName) {
+            if (!bankName) return "";
+            let colorClass = "bg-slate-100 text-slate-700 border-slate-200";
+            let shortName = "금융";
+            
+            if (bankName.includes("국민")) {
+                colorClass = "bg-amber-100 text-amber-800 border-amber-300 font-extrabold";
+                shortName = "KB";
+            } else if (bankName.includes("신한")) {
+                colorClass = "bg-blue-100 text-blue-800 border-blue-300 font-extrabold";
+                shortName = "신한";
+            } else if (bankName.includes("우리")) {
+                colorClass = "bg-sky-100 text-sky-800 border-sky-300 font-extrabold";
+                shortName = "우리";
+            } else if (bankName.includes("하나")) {
+                colorClass = "bg-emerald-100 text-emerald-800 border-emerald-300 font-extrabold";
+                shortName = "하나";
+            } else if (bankName.includes("농협")) {
+                colorClass = "bg-green-100 text-green-800 border-green-300 font-extrabold";
+                shortName = "농협";
+            } else if (bankName.includes("수협")) {
+                colorClass = "bg-cyan-100 text-cyan-800 border-cyan-300 font-extrabold";
+                shortName = "수협";
+            } else if (bankName.includes("기업")) {
+                colorClass = "bg-blue-50 text-blue-900 border-blue-455 font-extrabold";
+                shortName = "IBK";
+            } else if (bankName.includes("카드")) {
+                colorClass = "bg-rose-100 text-rose-800 border-rose-300 font-extrabold";
+                shortName = "카드";
+            } else if (bankName.includes("새마을")) {
+                colorClass = "bg-blue-100 text-blue-800 border-blue-300 font-extrabold";
+                shortName = "MG";
+            } else if (bankName.includes("신협")) {
+                colorClass = "bg-yellow-100 text-yellow-800 border-yellow-300 font-extrabold";
+                shortName = "신협";
+            }
+            
+            return `<span class="inline-flex items-center justify-center w-7 h-5 text-[9px] rounded border ${colorClass} mr-1 px-1 tracking-tight select-none align-middle font-sans">${shortName}</span>`;
         }
         // 4. [신규 로직 통합] 실시간 다차원 지역/출처/일정 검색 필터 엔진 (페이지네이션 연동)
         function applyFilters() {
@@ -1446,81 +1505,109 @@
             // 1. 건물만 매각 / 대지권 없음
             if (textToSearch.includes("대지권없음") || textToSearch.includes("토지만") || textToSearch.includes("건물만") || textToSearch.includes("대지권 미등기")) {
                 warnings.push(`
-                    <div class="border-l-4 border-rose-600 pl-3 py-1 space-y-1">
-                        <strong class="text-xs font-black text-rose-800">🧱 토지 사용권 분쟁 (건물만 매각 / 대지권 없음) 리스크</strong>
-                        <p class="text-[10px] text-slate-500 leading-relaxed">건물의 소유권만 낙찰받고 토지 사용권을 가져오지 못해 토지 소유주로부터 매달 땅 사용료(지료) 소송 또는 건물 철거 압박 소송에 처할 심각한 리스크가 있습니다.</p>
-                        <strong class="text-[10px] text-rose-700 block">👉 초보 대응 지침: 입찰 절대 금지. 토지 소유주와의 법적 대립으로 자산이 묶일 위험이 심대합니다.</strong>
+                    <div class="border-l-4 border-rose-500 bg-rose-50/70 p-3.5 rounded-r-xl shadow-sm space-y-2">
+                        <strong class="text-xs font-black text-rose-800 flex items-center gap-1.5">🧱 토지 사용권 분쟁 (건물만 매각 / 대지권 없음) 리스크</strong>
+                        <p class="text-[10.5px] text-slate-700 leading-relaxed font-semibold">
+                            건물의 소유권만 낙찰받고 토지 사용권을 가져오지 못해 토지 소유주로부터 매달 땅 사용료(지료) 청구 또는 <span class="bg-yellow-200/80 px-1 py-0.5 rounded text-rose-950 font-black">건물 철거 압박 소송</span>에 처할 심각한 리스크가 있습니다.
+                        </p>
+                        <strong class="text-[10px] text-rose-700 block font-extrabold bg-rose-100/60 p-1.5 rounded-lg border border-rose-200/30">
+                            👉 초보 대응 지침: <span class="bg-yellow-200/80 px-1 py-0.5 rounded text-rose-950 font-black">입찰 절대 금지.</span> 토지 소유주와의 법적 대립으로 자산이 묶일 위험이 매우 큽니다.
+                        </strong>
                     </div>
                 `);
             }
             // 2. 토지별도등기
             if (textToSearch.includes("토지별도")) {
                 warnings.push(`
-                    <div class="border-l-4 border-amber-500 pl-3 py-1 space-y-1">
-                        <strong class="text-xs font-black text-amber-800">📝 토지별도등기 인수 우려</strong>
-                        <p class="text-[10px] text-slate-500 leading-relaxed">토지에 집합건물 건축 전에 근저당 등 권리가 남아 있는 물건입니다. 낙찰금으로 해결되지 않고 소멸되지 않는 채무라면 고스란히 승계됩니다.</p>
-                        <strong class="text-[10px] text-amber-700 block">👉 초보 대응 지침: '매각물건명세서' 상에서 토지 근저당이 특별 매각조건으로 낙찰 후 말소되는지 반드시 재확인하십시오.</strong>
+                    <div class="border-l-4 border-amber-500 bg-amber-50/70 p-3.5 rounded-r-xl shadow-sm space-y-2">
+                        <strong class="text-xs font-black text-amber-800 flex items-center gap-1.5">📝 토지별도등기 인수 우려</strong>
+                        <p class="text-[10.5px] text-slate-700 leading-relaxed font-semibold">
+                            토지에 집합건물 건축 전에 근저당 등 권리가 남아 있는 물건입니다. 낙찰금으로 해결되지 않고 소멸되지 않는 채무라면 <span class="bg-yellow-200/80 px-1 py-0.5 rounded text-amber-950 font-black">낙찰자에게 고스란히 승계</span>됩니다.
+                        </p>
+                        <strong class="text-[10px] text-amber-700 block font-extrabold bg-amber-100/60 p-1.5 rounded-lg border border-amber-200/30">
+                            👉 초보 대응 지침: '매각물건명세서' 상에서 토지 근저당이 특별 매각조건으로 낙찰 후 말소되는지 반드시 재확인하십시오.
+                        </strong>
                     </div>
                 `);
             }
             // 3. 지분제한
             if (textToSearch.includes("지분")) {
                 warnings.push(`
-                    <div class="border-l-4 border-rose-600 pl-3 py-1 space-y-1">
-                        <strong class="text-xs font-black text-rose-800">👥 공동소유 지분 제한 리스크</strong>
-                        <p class="text-[10px] text-slate-500 leading-relaxed">자산의 지분(일부)만 획득하는 물건으로, 독단적으로 임대 계약을 맺거나 실거주를 하기 어려우며, 차후 지분분할청구소송 등 복잡한 공유자 간 소송을 야기합니다.</p>
-                        <strong class="text-[10px] text-rose-700 block">👉 초보 대응 지침: 공유 지분은 자유로운 매도가 극도로 어렵습니다. 전문가가 아니라면 절대 추천하지 않습니다.</strong>
+                    <div class="border-l-4 border-rose-500 bg-rose-50/70 p-3.5 rounded-r-xl shadow-sm space-y-2">
+                        <strong class="text-xs font-black text-rose-800 flex items-center gap-1.5">👥 공동소유 지분 제한 리스크</strong>
+                        <p class="text-[10.5px] text-slate-700 leading-relaxed font-semibold">
+                            자산의 지분(일부)만 획득하는 물건으로, 독단적으로 임대 계약을 맺거나 실거주를 하기 어려우며, 차후 지분분할청구소송 등 복잡한 <span class="bg-yellow-200/80 px-1 py-0.5 rounded text-rose-950 font-black">공유자 간 소송을 야기</span>합니다.
+                        </p>
+                        <strong class="text-[10px] text-rose-700 block font-extrabold bg-rose-100/60 p-1.5 rounded-lg border border-rose-200/30">
+                            👉 초보 대응 지침: 공유 지분은 자유로운 매도가 극도로 어렵습니다. 전문가가 아니라면 절대 추천하지 않습니다.
+                        </strong>
                     </div>
                 `);
             }
             // 4. 유치권
             if (textToSearch.includes("유치권") || textToSearch.includes("유치권 주장")) {
                 warnings.push(`
-                    <div class="border-l-4 border-rose-600 pl-3 py-1 space-y-1">
-                        <strong class="text-xs font-black text-rose-800">🛠️ 유치권 주장 (점유 및 공사대금 인수)</strong>
-                        <p class="text-[10px] text-slate-500 leading-relaxed">공사비를 회수하지 못한 업자 등이 불법/적법 점유하고 있는 물건입니다. 최악의 경우 공사 대금을 낙찰자가 대신 다 변제해주어야 명도 인도가 완료됩니다.</p>
-                        <strong class="text-[10px] text-rose-700 block">👉 초보 대응 지침: 입찰 절대 피하십시오. 유치권 성립 여부에 대한 장기 명도 소송 및 대위 변제 리스크가 극대화됩니다.</strong>
+                    <div class="border-l-4 border-rose-500 bg-rose-50/70 p-3.5 rounded-r-xl shadow-sm space-y-2">
+                        <strong class="text-xs font-black text-rose-800 flex items-center gap-1.5">🛠️ 유치권 주장 (점유 및 공사대금 인수)</strong>
+                        <p class="text-[10.5px] text-slate-700 leading-relaxed font-semibold">
+                            공사비를 회수하지 못한 업자 등이 불법/적법 점유하고 있는 물건입니다. 최악의 경우 공사 대금을 <span class="bg-yellow-200/80 px-1 py-0.5 rounded text-rose-950 font-black">낙찰자가 대신 변제</span>해주어야 명도 인도가 완료됩니다.
+                        </p>
+                        <strong class="text-[10px] text-rose-700 block font-extrabold bg-rose-100/60 p-1.5 rounded-lg border border-rose-200/30">
+                            👉 초보 대응 지침: 입찰 절대 피하십시오. 유치권 성립 여부에 대한 장기 명도 소송 및 대위 변제 리스크가 극대화됩니다.
+                        </strong>
                     </div>
                 `);
             }
             // 5. 명도 곤란 및 점유미상
             if (textToSearch.includes("명도곤란") || textToSearch.includes("점유관계미상")) {
                 warnings.push(`
-                    <div class="border-l-4 border-amber-500 pl-3 py-1 space-y-1">
-                        <strong class="text-xs font-black text-amber-800">🚪 불법/미상 점유자 명도 지연</strong>
-                        <p class="text-[10px] text-slate-500 leading-relaxed">점유주가 협상을 거부하거나 대화가 두절되어 있는 깜깜이 상태입니다. 강제 집행에 따른 강제 비용(평당 15만원 수준) 및 6개월 이상의 입주 연기가 예측됩니다.</p>
-                        <strong class="text-[10px] text-amber-700 block">👉 초보 대응 지침: 낙찰 잔금 납부 즉시 '인도명령'을 신청하되, 합의를 대비한 통상적 이사 비용을 예산에 산입하십시오.</strong>
+                    <div class="border-l-4 border-amber-500 bg-amber-50/70 p-3.5 rounded-r-xl shadow-sm space-y-2">
+                        <strong class="text-xs font-black text-amber-800 flex items-center gap-1.5">🚪 불법/미상 점유자 명도 지연</strong>
+                        <p class="text-[10.5px] text-slate-700 leading-relaxed font-semibold">
+                            점유주가 협상을 거부하거나 대화가 두절되어 있는 깜깜이 상태입니다. 강제 집행에 따른 <span class="bg-yellow-200/80 px-1 py-0.5 rounded text-amber-950 font-black">강제 비용(평당 15만원 수준)</span> 및 6개월 이상의 입주 연기가 예측됩니다.
+                        </p>
+                        <strong class="text-[10px] text-amber-700 block font-extrabold bg-amber-100/60 p-1.5 rounded-lg border border-amber-200/30">
+                            👉 초보 대응 지침: 낙찰 잔금 납부 즉시 '인도명령'을 신청하되, 합의를 대비한 통상적 이사 비용을 예산에 산입하십시오.
+                        </strong>
                     </div>
                 `);
             }
             // 6. 보증금 인수 대항력
             if (textToSearch.includes("인수") || textToSearch.includes("선순위") || textToSearch.includes("대항력") || textToSearch.includes("임차권") || textToSearch.includes("보증금 인수")) {
                 warnings.push(`
-                    <div class="border-l-4 border-rose-600 pl-3 py-1 space-y-1">
-                        <strong class="text-xs font-black text-rose-800">💰 대항력 있는 세입자 보증금 인수 (독박 채무)</strong>
-                        <p class="text-[10px] text-slate-500 leading-relaxed">말소기준권리보다 빠른 선순위 임차인이 있어 보증금이 법원에서 배당되지 못할 경우, **낙찰자가 세입자의 보증금 차액 전액을 현금으로 대신 갚아주어야만 점유 이전이 됩니다.**</p>
-                        <strong class="text-[10px] text-rose-700 block">👉 초보 대응 지침: 임차인의 배당 순위를 구하고 낙찰자가 독박을 써야 하는 보증금 인수 예상 금액을 미리 감액해 보수적으로 입찰가를 산정하십시오.</strong>
+                    <div class="border-l-4 border-rose-500 bg-rose-50/70 p-3.5 rounded-r-xl shadow-sm space-y-2">
+                        <strong class="text-xs font-black text-rose-800 flex items-center gap-1.5">💰 대항력 있는 세입자 보증금 인수 (독박 채무)</strong>
+                        <p class="text-[10.5px] text-slate-700 leading-relaxed font-semibold">
+                            말소기준권리보다 빠른 선순위 임차인이 있어 보증금이 법원에서 배당되지 못할 경우, <span class="bg-yellow-200/80 px-1 py-0.5 rounded text-rose-950 font-black">낙찰자가 세입자의 보증금 차액 전액을 현금으로 대신 갚아주어야만</span> 점유 이전이 됩니다.
+                        </p>
+                        <strong class="text-[10px] text-rose-700 block font-extrabold bg-rose-100/60 p-1.5 rounded-lg border border-rose-200/30">
+                            👉 초보 대응 지침: 임차인의 배당 순위를 구하고 낙찰자가 독박을 써야 하는 보증금 인수 예상 금액을 미리 감액해 보수적으로 입찰가를 산정하십시오.
+                        </strong>
                     </div>
                 `);
             }
             // 7. 깜깜이 투자 정보 부재
             if (textToSearch.includes("서류없음") || textToSearch.includes("확인불가") || textToSearch.includes("열람불가") || textToSearch.includes("자료없음")) {
                 warnings.push(`
-                    <div class="border-l-4 border-slate-500 pl-3 py-1 space-y-1">
-                        <strong class="text-xs font-black text-slate-800">⚠️ 정보 정보 부재 및 깜깜이 투자 우려</strong>
-                        <p class="text-[10px] text-slate-500 leading-relaxed">공식 서류나 임대차 조사가 투명하게 밝혀지지 않은 자산입니다. 예측하지 못한 내부 손상이나 불명예스러운 권리 관계가 사후에 발견될 리스크가 높습니다.</p>
-                        <strong class="text-[10px] text-slate-600 block">👉 초보 대응 지침: 현장 탐문 및 주민 조사를 통해 점유 실태를 명확히 구명하기 전에는 입찰을 피하십시오.</strong>
+                    <div class="border-l-4 border-slate-400 bg-slate-50/80 p-3.5 rounded-r-xl shadow-sm space-y-2">
+                        <strong class="text-xs font-black text-slate-800 flex items-center gap-1.5">⚠️ 정보 부재 및 깜깜이 투자 우려</strong>
+                        <p class="text-[10.5px] text-slate-700 leading-relaxed font-semibold">
+                            공식 서류나 임대차 조사가 투명하게 밝혀지지 않은 자산입니다. 예측하지 못한 <span class="bg-yellow-200/80 px-1 py-0.5 rounded text-slate-905 font-black">내부 손상이나 불명예스러운 권리 관계</span>가 사후에 발견될 리스크가 높습니다.
+                        </p>
+                        <strong class="text-[10px] text-slate-600 block font-extrabold bg-slate-200/60 p-1.5 rounded-lg border border-slate-300/40">
+                            👉 초보 대응 지침: 현장 탐문 및 주민 조사를 통해 점유 실태를 명확히 구명하기 전에는 입찰을 피하십시오.
+                        </strong>
                     </div>
                 `);
             }
             if (warnings.length === 0) {
                 warnings.push(`
-                    <div class="text-emeraldSuccess font-bold text-[10px] flex items-center gap-1">
-                        <i class="fa-solid fa-circle-check"></i> 권리 분석 결과 검출된 7대 하자가 전혀 없는 안전한 우량 부동산 매물입니다.
+                    <div class="border-l-4 border-emerald-500 bg-emerald-50/70 p-3.5 rounded-r-xl shadow-sm text-emerald-800 font-bold text-xs flex items-center gap-1.5">
+                        <i class="fa-solid fa-circle-check text-emerald-600"></i> 권리 분석 결과 검출된 7대 하자가 전혀 없는 안전한 우량 부동산 매물입니다.
                     </div>
                 `);
             }
-            return warnings.join('<div class="border-t border-slate-100 my-3"></div>');
+            return warnings.join('<div class="h-3"></div>');
         }
         // 9. 매물 선택 시 우측 상세분석 슬라이드 마운트 (테이블 행 활성화 및 실시간 프리뷰)
         // 9. 매물 선택 시 우측 상세분석 슬라이드 마운트 (카드 활성화 및 서랍 열기)
@@ -1585,17 +1672,25 @@
         // 💎 씨:리얼 부동산종합정보 주소 복사 후 새 창 연동 함수
         function copyAddressToClipboardAndOpenSeeReal() {
             if (selectedProperty && selectedProperty.address) {
-                const addr = selectedProperty.address;
-                // 브라우저 클립보드 복사 API 가동
+                const rawAddress = selectedProperty.address;
+                let cleanedAddress = rawAddress;
+                
+                // 괄호 및 상세 건물명/동호수 등을 정밀 정제하여 순수 지번/도로명만 남깁니다.
+                cleanedAddress = cleanedAddress.replace(/\(.*?\)/g, "").trim(); 
+                const match = cleanedAddress.match(/^([가-힣a-zA-Z0-9\s]+?\d+(?:-\d+)?)/);
+                if (match && match[1]) {
+                    cleanedAddress = match[1].trim();
+                }
+
                 if (navigator.clipboard && navigator.clipboard.writeText) {
-                    navigator.clipboard.writeText(addr).then(() => {
-                        showToastAlert(`📋 주소가 클립보드에 복사되었습니다.\n\n[${addr}]\n\n씨:리얼 검색창에 붙여넣어 조회해 보세요!`);
+                    navigator.clipboard.writeText(cleanedAddress).then(() => {
+                        showToastAlert(`📋 주소가 클립보드에 복사되었습니다.\n\n[${cleanedAddress}]\n\n씨:리얼 검색창에 붙여넣어 조회해 보세요!`);
                     }).catch(err => {
                         console.error('클립보드 복사 에러', err);
-                        fallbackCopyText(addr);
+                        fallbackCopyText(cleanedAddress);
                     });
                 } else {
-                    fallbackCopyText(addr);
+                    fallbackCopyText(cleanedAddress);
                 }
             } else {
                 alert('매물 정보가 올바르지 않습니다.');
@@ -1664,14 +1759,21 @@
             if (!selectedProperty) return;
             const rawAddress = selectedProperty.address || "";
             let cleanedNavAddress = rawAddress;
-            const navAddrMatch = rawAddress.match(/^([가-힣a-zA-Z0-9\s]+?\d+(?:-\d+)?)/);
+            
+            // 괄호 및 뒤쪽 상세동호수 정보 정밀 정제
+            cleanedNavAddress = cleanedNavAddress.replace(/\(.*?\)/g, "").trim(); 
+            const navAddrMatch = cleanedNavAddress.match(/^([가-힣a-zA-Z0-9\s]+?\d+(?:-\d+)?)/);
             if (navAddrMatch && navAddrMatch[1]) {
                 cleanedNavAddress = navAddrMatch[1].trim();
             }
+            
+            // 개편된 국토부 토지이음 주소 검색 쿼리 스키마를 반영하여 URL 빌드 (메인 페이지로 연결하여 깨짐 방지)
+            const targetUrl = `https://www.eum.go.kr/`;
+            
             try {
                 if (navigator.clipboard && navigator.clipboard.writeText) {
                     await navigator.clipboard.writeText(cleanedNavAddress);
-                    showToastAlert(`📋 주소가 클립보드에 복사되었습니다.\n\n[${cleanedNavAddress}]\n\n토지이음 검색창에 붙여넣어(Ctrl+V) 조회해 보세요!`, "https://www.eum.go.kr/web/ar/lu/luLand.jsp");
+                    showToastAlert(`📋 주소가 클립보드에 복사되었습니다.\n\n[${cleanedNavAddress}]\n\n토지이음 검색창에 붙여넣어(Ctrl+V) 조회해 보세요!`, targetUrl);
                 } else {
                     const textArea = document.createElement("textarea");
                     textArea.value = cleanedNavAddress;
@@ -1682,14 +1784,14 @@
                     const successful = document.execCommand('copy');
                     document.body.removeChild(textArea);
                     if (successful) {
-                        showToastAlert(`📋 주소가 클립보드에 복사되었습니다.\n\n[${cleanedNavAddress}]\n\n토지이음 검색창에 붙여넣어(Ctrl+V) 조회해 보세요!`, "https://www.eum.go.kr/web/ar/lu/luLand.jsp");
+                        showToastAlert(`📋 주소가 클립보드에 복사되었습니다.\n\n[${cleanedNavAddress}]\n\n토지이음 검색창에 붙여넣어(Ctrl+V) 조회해 보세요!`, targetUrl);
                     } else {
                         throw new Error('복사 실패');
                     }
                 }
             } catch (err) {
                 alert(`[주소 복사] 아래 주소를 직접 복사하여 토지이음에 검색해 보십시오.\n\n${cleanedNavAddress}`);
-                window.open("https://www.eum.go.kr/web/ar/lu/luLand.jsp", "_blank");
+                window.open(targetUrl, "_blank");
             }
         }
         // 모던 스타일 토스트 알림 메시지 (alert 대신 우아하게 노출한 뒤 지정 페이지 이동)
@@ -1933,24 +2035,24 @@
             const officialLandPriceDesc = "감정평가액 대비 약 65% 수준으로 산출된 가상 시뮬레이션 값입니다. 국토교통부 공시가격알리미 및 실거래가 대조 확인이 요구됩니다.";
             // 7) 토지이용계획 규제 요약 (주소 및 용도별 자동 식별 처리)
             let landUsePlan = "제2종일반주거지역";
-            let landUsePlanDesc = "일반적인 주거용 부동산 지대이며, 건폐율 60% 이하 및 용적률 150%에서 250% 이하의 제한을 받습니다.";
+            let landUsePlanDesc = "일반적인 주거용 부동산 지대로 중층 주택 중심의 편리한 주거환경을 조성하기 위한 지역입니다. 건폐율 60% 이하 및 용적률 150%에서 250% 이하의 제한을 받으며, 낙찰 후 리모델링이나 증축 시 일조 사선 제한 및 도로 사선 제한 등의 추가적인 건축 규제를 검토해야 합니다. 지자체 조례에 따라 세부 수치가 상이하므로 토지이음을 통한 조례 확인이 필수적입니다.";
             if (isCommercial) {
                 landUsePlan = "일반상업지역";
-                landUsePlanDesc = "상업 및 업무 기능 편익 증진을 위한 지역이며, 건폐율 80% 이하 및 용적률 300%에서 1300% 이하 범위에서 지자체 조례에 따라 적용됩니다.";
+                landUsePlanDesc = "상업 및 업무 기능의 편익 증진을 위한 고밀도 개발 가능 지역입니다. 건폐율 80% 이하 및 용적률 300%에서 1300% 이하 범위에서 지자체 조례에 따라 매우 높은 활용도를 가집니다. 경공매 시 주상복합이나 상가 빌딩의 낙찰가 산정 단계에서 용적률 한도를 최대로 활용할 수 있는지, 부설주차장 설치 기준을 충족하는지 여부가 핵심 가치 산정 요인입니다.";
             } else if (isLandOrFactory) {
                 if (textToSearch.includes("임야") || textToSearch.includes("보전")) {
                     landUsePlan = "보전관리지역";
-                    landUsePlanDesc = "자연환경 보호 및 산림 보호를 위해 관리 조례에 규제되며, 건폐율 20% 이하 및 용적률 50%에서 80% 이하가 적용됩니다.";
+                    landUsePlanDesc = "자연환경 보호, 산림 보호 및 수질오염 방지 등을 위해 개발을 제한하고 보전할 필요가 있는 지역입니다. 건폐율 20% 이하 및 용적률 50%에서 80% 이하가 적용되어 건축 행위가 극도로 제한됩니다. 단독주택이나 일부 농어업용 시설 외에는 신축이 불가능하므로, 낙찰 후 대지 개발이나 전원주택 단지 조성 목적의 무분별한 입찰은 금물입니다.";
                 } else if (ptype.includes("공장") || ptype.includes("산업")) {
                     landUsePlan = "준공업지역";
-                    landUsePlanDesc = "공업 편익 증진을 도모하되 주거, 상업 기능의 보완이 혼재 가능하며, 건폐율 70% 이하 및 용적률 200%에서 400% 이하 규제를 적용받습니다.";
+                    landUsePlanDesc = "경공업 및 기타 공업의 편익을 증진하되 주거, 상업, 업무 기능의 보완이 허용되는 유연한 지역입니다. 건폐율 70% 이하 및 용적률 200%에서 400% 이하가 적용됩니다. 공장 낙찰 후 지식산업센터, 오피스텔 등으로의 용도 전환이 용이하여 투자 가치가 높으나, 환경오염 유발 시설 등 업종 제한 및 도로망 확보 여부를 정밀 분석해야 합니다.";
                 } else {
                     landUsePlan = "계획관리지역";
-                    landUsePlanDesc = "도시지역으로의 편입이 예상되는 지역이며, 제한적인 이용 및 개발이 가능하고 건폐율 40% 이하 및 용적률 50%에서 100% 이하의 규제를 적용받습니다.";
+                    landUsePlanDesc = "도시지역으로의 편입이 예상되는 비도시지역 중 개발 잠재력이 가장 높은 핵심 토지입니다. 건폐율 40% 이하 및 용적률 50%에서 100% 이하 범위 내에서 공장, 창고, 근린생활시설 등의 다양한 개발 행위가 가능합니다. 토지 투자 경매의 1순위 타겟이나, 진입도로의 너비 요건(건축법상 4m 이상 도로에 접함) 등 인허가 가능 여부를 사전 검토하십시오.";
                 }
             } else if (ptype.includes("아파트") || textToSearch.includes("고층")) {
                 landUsePlan = "제3종일반주거지역";
-                landUsePlanDesc = "중고층 주택 중심의 편리한 주거환경을 조성하기 위한 지역이며, 건폐율 50% 이하 및 용적률 200%에서 300% 이하의 제한을 받습니다.";
+                landUsePlanDesc = "중고층 주택 중심의 편리한 주거환경을 조성하기 위한 지역입니다. 건폐율 50% 이하 및 용적률 200%에서 300% 이하의 제한을 받습니다. 아파트 단지 등 고층 주거용 건물이 많아 재건축/재개발 투자 가치 평가 시 대지지분 대비 용적률 마진이 얼마나 남아 있는지 분석하는 것이 가장 중요한 핵심 지표입니다.";
             }
             return {
                 investmentType,
@@ -1999,42 +2101,61 @@
             // 브라우저 타이틀 싱크
             updateDynamicBrowserTitle();
         }
-        // 서랍 열기 함수
-        function openDetailDrawer() {
+
+        // 서랍 열기 함수 (모달 오버레이 방식으로 복원)
+        function openDetailDrawer(shouldPushState = true) {
             const drawer = document.getElementById("detail-drawer");
             const backdrop = document.getElementById("drawer-backdrop");
-            if (drawer && backdrop) {
-                backdrop.classList.remove("hidden");
-                // 애니메이션 렌더링 지연 처리로 자연스러운 모션 유도
-                setTimeout(() => {
-                    drawer.classList.remove("translate-x-full");
-                    drawer.classList.add("translate-x-0");
-                }, 10);
-                // 브라우저 뒤로가기 가드 히스토리 추가
-                if (!window.history.state || !window.history.state.drawerOpen) {
-                    window.history.pushState({ drawerOpen: true }, '');
+            const mainGrid = document.getElementById("main-grid-container");
+            
+            if (drawer) {
+                // 모달/서랍 형태로 복원: 대시보드를 숨기지 않고 암전 배경과 서랍을 노출함
+                if (mainGrid) {
+                    mainGrid.classList.remove("hidden");
+                }
+                if (backdrop) {
+                    backdrop.classList.remove("hidden");
+                }
+                
+                drawer.classList.remove("hidden");
+                drawer.classList.remove("translate-x-full");
+                drawer.classList.add("translate-x-0");
+                
+                // 브라우저 뒤로가기 가드 및 쿼리 스트링 연동
+                if (shouldPushState && selectedProperty) {
+                    const newUrl = window.location.pathname + '?detail=' + encodeURIComponent(selectedProperty.id);
+                    window.history.pushState({ drawerOpen: true, detailId: selectedProperty.id }, '', newUrl);
                 }
             }
         }
-        // 서랍 닫기 함수
-        function closeDetailDrawer() {
+        // 서랍 닫기 함수 (모달 오버레이 방식으로 복원)
+        function closeDetailDrawer(shouldPopState = true) {
             const drawer = document.getElementById("detail-drawer");
             const backdrop = document.getElementById("drawer-backdrop");
-            if (drawer && backdrop) {
+            const mainGrid = document.getElementById("main-grid-container");
+            
+            if (drawer) {
+                drawer.classList.add("hidden");
                 drawer.classList.remove("translate-x-0");
                 drawer.classList.add("translate-x-full");
-                // 서랍이 닫히는 애니메이션(300ms) 완료 후 backdrop 숨김
-                setTimeout(() => {
+                
+                if (backdrop) {
                     backdrop.classList.add("hidden");
-                }, 300);
+                }
+                
+                if (mainGrid) {
+                    mainGrid.classList.remove("hidden");
+                }
+                
                 // 히스토리 상태 되돌리기
-                if (window.history.state && window.history.state.drawerOpen) {
-                    window.history.back();
+                if (shouldPopState && window.location.search) {
+                    window.history.pushState({ drawerOpen: false }, '', window.location.pathname);
                 }
             }
             // 브라우저 타이틀 홈 복원
             updateDynamicBrowserTitle();
         }
+
         // ESC 키 입력 시 우측 서랍(Drawer) 자동 닫기 기능 바인딩
         document.addEventListener("keydown", function(e) {
             if (e.key === "Escape") {
@@ -2942,7 +3063,7 @@
                 .replace(/\s+/g, " ")
                 .trim();
             document.getElementById("detail-address").innerText = cleanedTitleAddress;
-            document.getElementById("detail-no").innerText = `사건번호/관리번호 : ${item.auction_no} (${item.round_info})`;
+            document.getElementById("detail-no").innerHTML = `사건번호/관리번호 : <strong class="font-black text-lg sm:text-xl text-slate-900 select-all">${item.auction_no}</strong> <span class="text-xs sm:text-sm text-slate-500 font-bold">(${item.round_info})</span>`;
             // 2. 실시간 하단 프리뷰 바 동기화 (Hover & Click 통합 연동)
             const previewTitle = document.getElementById("preview-title");
             const previewPrice = document.getElementById("preview-price");
@@ -2978,8 +3099,19 @@
             } else {
                 scoreCircle.className = "w-9 h-9 sm:w-14 sm:h-14 rounded-full border-2 sm:border-4 border-slate-400 flex flex-col items-center justify-center font-outfit text-slate-500 bg-slate-50 shadow-sm flex-shrink-0";
             }
-            // 원문 설명 바인딩
-            document.getElementById("detail-desc").innerText = item.desc_content || "상세 비고 내용이 없습니다.";
+            // 원문 설명 바인딩 (v1.3 데이터가 없는 경우 해당 카드 자체를 삭제/숨김 처리)
+            const descCard = document.getElementById("detail-desc-card");
+            if (descCard) {
+                const descText = item.desc_content || item.notes_content || item.remarks || "";
+                const cleanDesc = descText.trim();
+                const hasDesc = cleanDesc !== "" && cleanDesc !== "상세 비고 내용이 없습니다." && cleanDesc !== "-" && cleanDesc !== "null";
+                if (hasDesc) {
+                    descCard.classList.remove("hidden");
+                    document.getElementById("detail-desc").innerText = cleanDesc;
+                } else {
+                    descCard.classList.add("hidden");
+                }
+            }
             // 🏠 물건 세부 스펙 분석 바인딩 (부동산 vs 비부동산 분기)
             const specGrid = document.getElementById("detail-spec-grid");
             const specTitle = document.getElementById("detail-spec-title");
@@ -3279,15 +3411,43 @@
                 const cash70 = Math.floor(singlePrice * 0.3 + singlePrice * 0.03);
                 const interest45 = Math.floor(loan70 * 0.045);
                 const roiRate = cash70 > 0 ? (((item.appraised_value - singlePrice - interest45) / cash70) * 100).toFixed(1) : "0.0";
-                let opinion = `본 매물은 감정평가액 ${formatKRW(item.appraised_value)} 대비 현재 ${est.discount}% 저감된 최저 입찰가 ${formatKRW(item.minimum_bid)}에 매각 절차가 진행 중인 법원 경매 물건입니다. `;
-                opinion += `만약 현재 회차의 최저가 수준에서 단독 낙찰을 받는다고 가정할 경우, 잔금 납부 시 LTV 70%인 ${formatKRW(loan70)}의 경락잔금대출을 활용할 수 있으며, 이 때 금융 비용을 차감한 실제 필요 자기자본(세금 및 부대비용 약 3% 포함)은 약 ${formatKRW(cash70)} 수준으로 파악됩니다. 시중 은행의 평균 대출 금리 연 4.5%를 대입하여 금융 비용 기회비용을 산출하면, 연간 약 ${formatKRW(interest45)}의 대출 이자가 발생하게 되며, 이는 매월 약 ${formatKRW(Math.floor(interest45/12))} 상당의 고정 금융 지출을 의미합니다. `;
-                opinion += `본 자산의 예상 임대 수익률과 인근 전세 시세의 전세가율을 고려한 세후 실질 투자 수익률(ROI)은 연 약 ${roiRate}% 수준으로 분석되며, 이는 현재 시중의 정기예금 이자율 및 채권 기대수익률을 대조했을 때 충분한 마진을 확보할 수 있는 투자성 지표를 나타내고 있습니다. `;
+                
+                let step1 = `본 매물은 감정평가액 <mark class="bg-yellow-100 px-1 py-0.5 rounded font-black text-slate-900">${formatKRW(item.appraised_value)}</mark> 대비 현재 <mark class="bg-yellow-100 px-1 py-0.5 rounded font-black text-rose-600">${est.discount}%</mark> 저감된 최저 입찰가 <mark class="bg-yellow-100 px-1 py-0.5 rounded font-black text-slate-900">${formatKRW(item.minimum_bid)}</mark>에 매각 절차가 진행 중인 법원 경매 물건입니다.`;
+                
+                let step2 = `현재 회차의 최저가 수준에서 단독 낙찰을 받는다고 가정할 경우, 잔금 납부 시 LTV 70%인 <mark class="bg-yellow-100 px-1 py-0.5 rounded font-black text-royalBlue">${formatKRW(loan70)}</mark>의 경락잔금대출을 활용할 수 있습니다. 이 때 금융 비용을 차감한 실제 필요 자기자본(세금 및 부대비용 약 3% 포함)은 약 <mark class="bg-yellow-100 px-1 py-0.5 rounded font-black text-royalBlue">${formatKRW(cash70)}</mark> 수준으로 파악됩니다. 시중 은행의 평균 대출 금리 연 4.5%를 대입하여 금융 비용 기회비용을 산출하면, 연간 약 <mark class="bg-yellow-100 px-1 py-0.5 rounded font-black text-rose-600">${formatKRW(interest45)}</mark>의 대출 이자가 발생하게 되며, 이는 매월 약 <mark class="bg-yellow-100 px-1 py-0.5 rounded font-black text-rose-600">${formatKRW(Math.floor(interest45/12))}</mark> 상당의 고정 금융 지출을 의미합니다. 본 자산의 예상 임대 수익률과 인근 전세 시세의 전세가율을 고려한 세후 실질 투자 수익률(ROI)은 연 약 <mark class="bg-yellow-100 px-1 py-0.5 rounded font-black text-emeraldSuccess">${roiRate}%</mark> 수준으로 분석되며, 이는 현재 시중의 정기예금 이자율 및 채권 기대수익률을 대조했을 때 충분한 마진을 확보할 수 있는 투자성 지표를 나타내고 있습니다.`;
+                
+                let step3 = '';
                 if (item.grade === "A" || item.grade === "B") {
-                    opinion += `해당 매물은 권리분석 정밀 검증 단계에서 등기부상 인수되는 낙찰자 부담 채무가 없으며, 임대차 현황 상으로도 낙찰자가 보증금을 독박 인수해야 할 선순위 대항력 임차인이 존재하지 않아 권리상 매우 안전한 A/B 등급 우량 자산으로 분류됩니다. 따라서 보수적인 응찰자는 감정가 대비 90% 내지 95% 선의 안정적인 단기 시세차익형 응찰가 밴드를 조율하고, 공격적 성향의 응찰자는 입지의 성장 잠재력 점수(score 가점)를 가중하여 감정가 대비 100%에 근접하더라도 선점 낙찰하는 밴드 조정 지침을 권장합니다.`;
+                    step3 = `해당 매물은 권리분석 정밀 검증 단계에서 등기부상 인수되는 낙찰자 부담 채무가 없으며, 임대차 현황 상으로도 낙찰자가 보증금을 독박 인수해야 할 선순위 대항력 임차인이 존재하지 않아 권리상 매우 안전한 우량 자산으로 분류됩니다. 따라서 보수적인 응찰자는 감정가 대비 90% 내지 95% 선의 안정적인 단기 시세차익형 응찰가 밴드를 조율하고, 공격적 성향 of 응찰자는 입지의 성장 잠재력 점수를 가중하여 감정가 대비 100%에 근접하더라도 선점 낙찰하는 밴드 조정 지침을 권장합니다.`;
                 } else {
-                    opinion += `다만, 본 매물은 권리 리스크 7대 리스크 하이브리드 필터링 검진 결과 위험도가 높은 비우량 자산(등급 외 또는 C/D/X 등급)으로 분류되어 각별한 주의가 요구됩니다. 유치권 신고 금액의 성립 가능성이나, 선순위 임차인이 법원에 배당요구를 신청하지 않아 발생할 수 있는 보증금 인수 책임(독박 채무 리스크)이 매우 농후합니다. 시뮬레이션상의 가상 수익률에만 안주하여 조급하게 입찰하지 마시고, 보수적인 낙찰을 위해 최소 1~2회 이상의 추가 유찰을 기다린 뒤 최저가가 64% 혹은 51%선으로 저감되었을 때 입찰가 밴드를 보수적으로 대폭 삭감 조정하여 응찰 여부를 결정하시길 바랍니다.`;
+                    step3 = `다만, 본 매물은 권리 리스크 7대 리스크 하이브리드 필터링 검진 결과 위험도가 높은 비우량 자산(등급 외 또는 C/D/X 등급)으로 분류되어 각별한 주의가 요구됩니다. 유치권 신고 금액의 성립 가능성이나, 선순위 임차인이 법원에 배당요구를 신청하지 않아 발생할 수 있는 보증금 인수 책임(독박 채무 리스크)이 매우 농후합니다. 시뮬레이션상의 가상 수익률에만 안주하여 조급하게 입찰하지 마시고, 보수적인 낙찰을 위해 최소 1~2회 이상의 추가 유찰을 기다린 뒤 최저가가 64% 혹은 51%선으로 저감되었을 때 입찰가 밴드를 보수적으로 대폭 삭감 조정하여 응찰 여부를 결정하시길 바랍니다.`;
                 }
-                commentEl.innerHTML = `<p class="leading-relaxed font-bold text-slate-700">${opinion}</p>`;
+
+                commentEl.innerHTML = `
+                    <div class="space-y-4 mt-2">
+                        <div class="bg-white border border-slate-100 rounded-xl p-3 shadow-sm space-y-1">
+                            <strong class="text-xs font-black text-slate-800 block flex items-center gap-1.5">
+                                <span class="flex items-center justify-center w-5 h-5 rounded-full bg-blue-50 text-royalBlue text-[10px] font-bold">1</span>
+                                자산 현황 및 마진 분석
+                            </strong>
+                            <p class="text-[11px] sm:text-xs text-slate-600 leading-relaxed">${step1}</p>
+                        </div>
+                        <div class="bg-white border border-slate-100 rounded-xl p-3 shadow-sm space-y-1">
+                            <strong class="text-xs font-black text-slate-800 block flex items-center gap-1.5">
+                                <span class="flex items-center justify-center w-5 h-5 rounded-full bg-blue-50 text-royalBlue text-[10px] font-bold">2</span>
+                                필요 자기자본 및 금융 비용
+                            </strong>
+                            <p class="text-[11px] sm:text-xs text-slate-600 leading-relaxed">${step2}</p>
+                        </div>
+                        <div class="bg-white border border-slate-100 rounded-xl p-3 shadow-sm space-y-1">
+                            <strong class="text-xs font-black text-slate-800 block flex items-center gap-1.5">
+                                <span class="flex items-center justify-center w-5 h-5 rounded-full bg-blue-50 text-royalBlue text-[10px] font-bold">3</span>
+                                권리 분석 기반 최종 가이드
+                            </strong>
+                            <p class="text-[11px] sm:text-xs text-slate-600 leading-relaxed">${step3}</p>
+                        </div>
+                    </div>
+                `;
             }
             // 하단 주변 유사 매물 추천 렌더링 호출
             renderSimilarProperties(item);
@@ -3420,7 +3580,7 @@
             const fpNaverRoad = document.getElementById("btn-floorplan-naver-road");
             const fpKakaoRoad = document.getElementById("btn-floorplan-kakao-road");
             const fpGoogleRoad = document.getElementById("btn-floorplan-google-road");
-            if (fpNaverRoad) fpNaverRoad.href = `https://map.naver.com/v5/search/${encodeURIComponent(cleanedNavAddress)}/address?c=15,0,0,0,adh`;
+            if (fpNaverRoad) fpNaverRoad.href = `https://map.naver.com/p/search/${encodeURIComponent(cleanedNavAddress)}`;
             if (fpKakaoRoad) fpKakaoRoad.href = `https://map.kakao.com/?q=${encodeURIComponent(cleanedNavAddress)}`;
             if (fpGoogleRoad) fpGoogleRoad.href = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(cleanedNavAddress)}`;
             // 🗺️ 로드뷰 / 실사진 연동 로직 (비부동산 분기)
@@ -3430,7 +3590,7 @@
             const hubKakaoRoad = document.getElementById("btn-kakao-roadview-hub");
             const hubGoogleRoad = document.getElementById("btn-google-roadview-hub");
             // 기본 텍스트 기반 폴백 링크
-            if (hubNaverRoad) hubNaverRoad.href = `https://map.naver.com/v5/search/${encodeURIComponent(cleanedNavAddress)}/address?c=15,0,0,0,adh`;
+            if (hubNaverRoad) hubNaverRoad.href = `https://map.naver.com/p/search/${encodeURIComponent(cleanedNavAddress)}`;
             if (hubKakaoRoad) hubKakaoRoad.href = `https://map.kakao.com/?q=${encodeURIComponent(cleanedNavAddress)}`;
             if (hubGoogleRoad) hubGoogleRoad.href = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(cleanedNavAddress)}`;
             if (isNonBuilding) {
@@ -3464,7 +3624,7 @@
                     geocoder.addressSearch(cleanedNavAddress, function(result, status) {
                         if (status === kakao.maps.services.Status.OK) {
                             // 좌표 획득 시 3사 로드뷰 링크도 좌표 기반 정밀 링크로 교체
-                            if (hubNaverRoad) hubNaverRoad.href = `https://map.naver.com/p/?c=${result[0].x},${result[0].y},17,0,0,0,rv`;
+                            if (hubNaverRoad) hubNaverRoad.href = `https://map.naver.com/p/entry/address/${encodeURIComponent(cleanedNavAddress)}?c=${result[0].x},${result[0].y},17,0,0,0,dh&p=${result[0].x},${result[0].y},0,0,rv`;
                             if (hubKakaoRoad) hubKakaoRoad.href = `https://map.kakao.com/link/roadview/${result[0].y},${result[0].x}`;
                             if (hubGoogleRoad) hubGoogleRoad.href = `https://www.google.com/maps/@?api=1&map_action=pano&viewpoint=${result[0].y},${result[0].x}`;
                             // 건물명 추출 및 실시간 단지명 덮어쓰기
@@ -3711,36 +3871,78 @@
                     <strong>[기일 관리 의견]</strong> 현재 연기나 정지 이력 없이 정상적으로 사법 절차가 집행되고 있으며 사건 진행 상태는 신건 매각 기일 대기 단계입니다.
                 `;
             }
-            // 법정 주요 서류 바로가기 시 팝업을 띄우지 않고 원본 법원 페이지로 바로 이동하도록 수정
-            const officialUrl = item.link_url || "https://www.courtauction.go.kr";
+            // 법정 주요 서류 바로가기 시 대법원 다이렉트 뷰어 URL로 연결
+            let courtName = "";
+            let cleanNo = item.auction_no || "";
+            if (item.auction_no) {
+                const bracketMatch = item.auction_no.match(/\[(.*?)\]/);
+                if (bracketMatch) {
+                    courtName = bracketMatch[1];
+                    cleanNo = item.auction_no.replace(/\[.*?\]/g, "").trim();
+                } else {
+                    const spaceMatch = item.auction_no.match(/^([가-힣\s]+지방법원|[가-힣\s]+지원|[가-힣\s]+법원|[가-힣\s]+시법원|[가-힣\s]+군법원)\s+(\d+타경\d+)/);
+                    if (spaceMatch) {
+                        courtName = spaceMatch[1].trim();
+                        cleanNo = spaceMatch[2];
+                    } else {
+                        const genericMatch = item.auction_no.match(/^(.*?)\s*(\d+타경\d+)/);
+                        if (genericMatch) {
+                            courtName = genericMatch[1].trim();
+                            cleanNo = genericMatch[2];
+                        }
+                    }
+                }
+            }
+            
+            function getCourtDocUrl(docType) {
+                if (!courtName || !item.auction_no) return item.link_url || "https://www.courtauction.go.kr";
+                const match = cleanNo.match(/(\d+)타경(\d+)/);
+                if (!match) return item.link_url || "https://www.courtauction.go.kr";
+                
+                const year = match[1];
+                const no = match[2];
+                const saNo = `${year}0130${String(no).padStart(6, '0')}`;
+                const encodedJiwon = encodeURIComponent(courtName);
+                
+                if (docType === "appraisal") {
+                    return `https://www.courtauction.go.kr/RetrieveRealEstExpraisalReport.laf?jiwonNm=${encodedJiwon}&saNo=${saNo}&mulNo=1`;
+                } else if (docType === "survey") {
+                    return `https://www.courtauction.go.kr/RetrieveRealEstStatusReport.laf?jiwonNm=${encodedJiwon}&saNo=${saNo}&mulNo=1`;
+                } else if (docType === "spec") {
+                    return `https://www.courtauction.go.kr/RetrieveRealEstSpecification.laf?jiwonNm=${encodedJiwon}&saNo=${saNo}&mulNo=1`;
+                } else {
+                    return `https://www.courtauction.go.kr/RetrieveRealEstDetail.laf?jiwonNm=${encodedJiwon}&saNo=${saNo}&mulNo=1`;
+                }
+            }
+
             const btnAppraisal = document.getElementById("btn-doc-appraisal");
             if (btnAppraisal) {
-                btnAppraisal.href = officialUrl;
+                btnAppraisal.href = getCourtDocUrl("appraisal");
                 btnAppraisal.setAttribute("target", "_blank");
                 btnAppraisal.onclick = null;
             }
             const btnSurvey = document.getElementById("btn-doc-survey");
             if (btnSurvey) {
-                btnSurvey.href = officialUrl;
+                btnSurvey.href = getCourtDocUrl("survey");
                 btnSurvey.setAttribute("target", "_blank");
                 btnSurvey.onclick = null;
             }
             const btnSpec = document.getElementById("btn-doc-spec");
             if (btnSpec) {
-                btnSpec.href = officialUrl;
+                btnSpec.href = getCourtDocUrl("spec");
                 btnSpec.setAttribute("target", "_blank");
                 btnSpec.onclick = null;
             }
             const btnHistory = document.getElementById("btn-doc-history");
             if (btnHistory) {
-                btnHistory.href = officialUrl;
+                btnHistory.href = getCourtDocUrl("history");
                 btnHistory.setAttribute("target", "_blank");
                 btnHistory.onclick = null;
             }
-            // 네이버 지도 레이어 이동 링크 바인딩 (v5 최신 스펙 적용).
-            const mapEditUrl = `https://map.naver.com/v5/search/${encodeURIComponent(cleanedNavAddress)}/address?c=15,0,0,0,dgh`;
-            const mapSatUrl = `https://map.naver.com/v5/search/${encodeURIComponent(cleanedNavAddress)}/address?c=15,0,0,1,dh`;
-            const mapRoadUrl = `https://map.naver.com/v5/search/${encodeURIComponent(cleanedNavAddress)}/address?c=15,0,0,0,adh`;
+            // 네이버 지도 레이어 이동 링크 바인딩 (v6 최신 스펙 적용).
+            const mapEditUrl = `https://map.naver.com/p/search/${encodeURIComponent(cleanedNavAddress)}?lids=cad`;
+            const mapSatUrl = `https://map.naver.com/p/search/${encodeURIComponent(cleanedNavAddress)}?lids=sat`;
+            const mapRoadUrl = `https://map.naver.com/p/search/${encodeURIComponent(cleanedNavAddress)}?lids=rv`;
             const btnMapEdit = document.getElementById("btn-naver-map-edit");
             if (btnMapEdit) btnMapEdit.href = mapEditUrl;
             const btnMapSat = document.getElementById("btn-naver-map-sat");
@@ -3870,7 +4072,7 @@
                     </tr>
                     <tr class="border-b border-slate-100 text-xs">
                         <td class="p-2 text-center text-slate-500 font-extrabold">3</td>
-                        <td class="p-2 text-slate-700">🏦 국민은행 (선순위 근저당)</td>
+                        <td class="p-2 text-slate-700">${getBankLogoHtml("국민은행")}국민은행 (선순위 근저당)</td>
                         <td class="p-2 text-right font-mono text-slate-600">${formatKRW(mortgage)}</td>
                         <td class="p-2 text-right font-mono text-emeraldSuccess font-extrabold">${formatKRW(mortgagePaid)}</td>
                         <td class="p-2 text-center text-emeraldSuccess font-extrabold">소멸</td>
@@ -3960,21 +4162,21 @@
                         <td class="p-2 text-center text-slate-500 font-extrabold">을구 1</td>
                         <td class="p-2 font-bold text-slate-700">근저당 설정 (말소기준)</td>
                         <td class="p-2 font-mono text-slate-500">2024-06-20</td>
-                        <td class="p-2 text-slate-700">🏦 국민은행 (${formatKRW(mortgageAmt)})</td>
+                        <td class="p-2 text-slate-700">${getBankLogoHtml("국민은행")}국민은행 (${formatKRW(mortgageAmt)})</td>
                         <td class="p-2 text-center text-emeraldSuccess font-extrabold">소멸 (말소)</td>
                     </tr>
                     <tr class="border-b border-slate-100 text-xs">
                         <td class="p-2 text-center text-slate-500 font-extrabold">갑구 4</td>
                         <td class="p-2 text-slate-700">가압류</td>
                         <td class="p-2 font-mono text-slate-500">2024-11-15</td>
-                        <td class="p-2 text-slate-700">신한카드 (${formatKRW(gamyAmt)})</td>
+                        <td class="p-2 text-slate-700">${getBankLogoHtml("신한카드")}신한카드 (${formatKRW(gamyAmt)})</td>
                         <td class="p-2 text-center text-emeraldSuccess font-extrabold">소멸 (말소)</td>
                     </tr>
                     <tr class="border-b border-slate-100 text-xs">
                         <td class="p-2 text-center text-slate-500 font-extrabold">갑구 5</td>
                         <td class="p-2 font-bold text-royalBlue">강제경매개시결정</td>
                         <td class="p-2 font-mono text-slate-500">2025-02-10</td>
-                        <td class="p-2 text-slate-700">경매신청인 신한카드</td>
+                        <td class="p-2 text-slate-700">경매신청인 ${getBankLogoHtml("신한카드")}신한카드</td>
                         <td class="p-2 text-center text-emeraldSuccess font-extrabold">소멸 (말소)</td>
                     </tr>
                 `;
@@ -4097,15 +4299,27 @@
                             <td class="p-2 bg-slate-50 font-extrabold text-slate-700">배정 학교</td>
                             <td class="p-2 text-slate-800" colspan="3">${item.elementary_school || '-'}</td>
                         </tr>
+                        <tr class="border-b border-slate-100 text-xs">
+                            <td class="p-2 bg-slate-50 font-extrabold text-slate-700">교통 연결망 및 대중교통</td>
+                            <td class="p-2 text-slate-800" colspan="3">${generateTrafficInfo(item.address)}</td>
+                        </tr>
                     `;
                 } else {
-                    const emptyText = item.source === 'court'
-                        ? '💡 본 경매 매물은 대법원 단지 상세 정보가 제공되지 않는 대상입니다. 지번 및 상세 시세는 네이버 부동산 아웃링크를 참고해 주십시오.'
-                        : '💡 본 공매 매물은 온비드 단지 상세 정보가 제공되지 않는 대상입니다. 지번 및 상세 시세는 네이버 부동산 아웃링크를 참고해 주십시오.';
                     complexTbody.innerHTML = `
-                        <tr>
-                            <td colspan="4" class="p-8 text-center text-xs text-slate-500 font-bold bg-slate-50 rounded-xl border border-dashed border-slate-200">
-                                ${emptyText}
+                        <tr class="border-b border-slate-100 text-xs">
+                            <td class="p-2 bg-slate-50 font-extrabold text-slate-700 w-1/4">용도지역/분류</td>
+                            <td class="p-2 text-slate-800">${item.ptype || '-'}</td>
+                            <td class="p-2 bg-slate-50 font-extrabold text-slate-700 w-1/4">수집 출처</td>
+                            <td class="p-2 text-slate-800">${item.source === 'court' || item.source === 'court_etc' ? '⚖️ 대법원 법원경매' : '🏢 캠코 온비드공매'}</td>
+                        </tr>
+                        <tr class="border-b border-slate-100 text-xs">
+                            <td class="p-2 bg-slate-50 font-extrabold text-slate-700">교통 연결망 및 대중교통</td>
+                            <td class="p-2 text-slate-800" colspan="3">${generateTrafficInfo(item.address)}</td>
+                        </tr>
+                        <tr class="border-b border-slate-100 text-xs">
+                            <td class="p-2 bg-slate-50 font-extrabold text-slate-700">종합 입지 평가</td>
+                            <td class="p-2 text-slate-800 text-[11px] leading-relaxed" colspan="3">
+                                📍 본 자산은 인접 도로망 및 인근 행정 생활 거점과의 연계성이 우수하며, 시내 정류장 버스 노선망을 통해 지하철역 및 고속버스터미널로의 이동이 수월합니다. 구체적인 위치 및 입지 평가는 우측의 '입지 & 시세분석' 탭 지도를 참고하시기 바랍니다.
                             </td>
                         </tr>
                     `;
@@ -4150,6 +4364,10 @@
                 if (priceEl) {
                     priceEl.textContent = formatKRW(estPrice);
                 }
+                const barEl = document.getElementById(`future-bar-${key}`);
+                if (barEl) {
+                    barEl.style.width = `${Math.min(100, Math.max(0, cumRate))}%`;
+                }
             });
         }
         // 🧠 주변 유사 추천 매물 미터(m) 단위 동적 연산 렌더러
@@ -4167,9 +4385,9 @@
                 const bSidoMatch = (b.address || "").startsWith(currentSido) ? 1 : 0;
                 return bSidoMatch - aSidoMatch;
             });
-            const targetList = similarList.slice(0, 3);
+            const targetList = similarList.slice(0, 6);
             if (targetList.length === 0) {
-                container.innerHTML = `<div class="col-span-3 text-center text-[10px] text-slate-400 py-6">유사 추천 매물이 없습니다.</div>`;
+                container.innerHTML = `<div class="col-span-full text-center text-[10px] text-slate-400 py-6">유사 추천 매물이 없습니다.</div>`;
                 return;
             }
             container.innerHTML = targetList.map((item, index) => {
@@ -4211,9 +4429,9 @@
             if (!selectedProperty) return;
             const calcInput = document.getElementById("calc-bid-input");
             const bidInputVal = parseInt(calcInput.value.replace(/,/g, '')) || 0;
-            // 디지털 화면 텍스트 실시간 동기화
+            // 디지털 화면 텍스트 실시간 동기화 (사용자 피드백 반영: 천단위 콤마 표기)
             const displayEl = document.getElementById("calc-display-won");
-            if (displayEl) displayEl.innerText = formatKRW(bidInputVal);
+            if (displayEl) displayEl.innerText = bidInputVal.toLocaleString() + "원";
             // ❶ 지방세법 실거래 보정 수식 (용도분기 적용)
             const ptype = (selectedProperty.ptype || "").toLowerCase();
             let taxRate = 0.015; // 아파트, 단독주택 등 주거용: 기본 디폴트 1.5%
@@ -4275,6 +4493,15 @@
             if (taxValAgency) taxValAgency.innerText = "+ " + formatKRW(agencyFee);
             const taxValTotal = document.getElementById("tax-val-total");
             if (taxValTotal) taxValTotal.innerText = formatKRW(totalBudget);
+
+            // [추가] 모의 입찰 인풋도 계산기 입력값과 동기화해 줍니다.
+            const mockInput = document.getElementById("v12-mock-bid-input");
+            if (mockInput) {
+                mockInput.value = calcInput.value;
+                if (typeof v12Features !== 'undefined' && typeof v12Features.updateMockBidSpread === 'function') {
+                    v12Features.updateMockBidSpread(bidInputVal);
+                }
+            }
         }
         function updateInterestRateLabel(val) {
             const label = document.getElementById("interest-rate-label");
@@ -4856,8 +5083,9 @@
         let favoritePropertyIds = new Set();
         let showFavoritesOnly = false;
         let isSignUpMode = false;
-        let userGrade = "C";
+        let userGrade = "regular";
         let isUpgradeRequested = false;
+        let userTelegramId = ""; // ✈️ 텔레그램 수신처 ID 전역 변수 추가
         let adSettings = null;
         let adSlots = {};
         let renderedCount = 0;
@@ -4885,9 +5113,10 @@
             if (!container) return;
             if (currentUser) {
                 const emailId = currentUser.email.split('@')[0];
+                const gradeLabel = userGrade === "premium" ? "프리미엄 회원" : "일반 회원";
                 container.innerHTML = `
                     <span onclick="openMyPageModal()" class="text-[8.5px] sm:text-[9.5px] font-black text-slate-600 bg-slate-100 px-1.5 sm:px-2.5 py-0.5 sm:py-1 rounded-full border border-slate-200 flex items-center gap-0.5 sm:gap-1 shadow-sm flex-shrink-0 cursor-pointer hover:bg-slate-200 transition-colors">
-                        <i class="fa-solid fa-user text-[8px] text-royalBlue"></i> <span class="max-w-[80px] sm:max-w-none truncate">${emailId}님 (${userGrade}등급)</span>
+                        <i class="fa-solid fa-user text-[8px] text-royalBlue"></i> <span class="max-w-[80px] sm:max-w-none truncate">${emailId}님 (${gradeLabel})</span>
                     </span>
                     <button onclick="handleLogout()" class="px-1.5 sm:px-2.5 py-0.5 sm:py-1 rounded-full border border-rose-200 text-rose-600 bg-white text-[8.5px] sm:text-[9.5px] font-black shadow-sm transition-all duration-300 cursor-pointer hover:bg-rose-50 active:scale-95 whitespace-nowrap ml-1 flex-shrink-0">
                         <i class="fa-solid fa-right-from-bracket mr-0.5"></i> 로그아웃
@@ -4931,15 +5160,76 @@
             const modal = document.getElementById("mypage-modal");
             if (!modal) return;
             document.getElementById("mypage-user-email").innerText = currentUser ? currentUser.email : "미인증 사용자";
-            document.getElementById("mypage-user-grade").innerText = `등급: ${userGrade}등급`;
+            const gradeLabel = userGrade === "premium" ? "프리미엄" : "일반";
+            document.getElementById("mypage-user-grade").innerText = `회원 등급: ${gradeLabel}`;
+            
+            // 가입일 표시
+            const createdEl = document.getElementById("mypage-user-created");
+            if (createdEl) {
+                if (currentUser && currentUser.created_at) {
+                    const signUpDate = new Date(currentUser.created_at).toLocaleDateString('ko-KR', {
+                        year: 'numeric',
+                        month: 'long',
+                        day: 'numeric'
+                    });
+                    createdEl.innerText = `가입일: ${signUpDate}`;
+                } else {
+                    createdEl.innerText = `가입일: 정보 없음`;
+                }
+            }
+            
+            // 소셜 제공자 정보 바인딩 및 표시
+            let provider = "이메일 가입";
+            if (currentUser && currentUser.app_metadata && currentUser.app_metadata.provider) {
+                const prov = currentUser.app_metadata.provider.toLowerCase();
+                if (prov === "google") provider = "구글 계정 연동됨";
+                else if (prov === "kakao") provider = "카카오 계정 연동됨";
+                else if (prov === "naver") provider = "네이버 계정 연동됨";
+            }
+            const providerEl = document.getElementById("mypage-user-provider");
+            if (providerEl) {
+                providerEl.innerText = `연동 상태: ${provider}`;
+            }
+
+            // 이메일 가입 유저인 경우에만 비밀번호 변경 폼을 노출시킵니다.
+            const pwContainer = document.getElementById("mypage-password-change-container");
+            if (pwContainer) {
+                if (currentUser && currentUser.app_metadata && currentUser.app_metadata.provider === "email") {
+                    pwContainer.classList.remove("hidden");
+                } else {
+                    pwContainer.classList.add("hidden");
+                }
+            }
+            
+            // ✈️ 텔레그램 수신처 정보 바인딩
+            const tgUsernameInput = document.getElementById("tg-input-username");
+            const tgChatIdInput = document.getElementById("tg-input-chatid");
+            if (tgUsernameInput && tgChatIdInput) {
+                if (userTelegramId) {
+                    if (userTelegramId.startsWith("@")) {
+                        tgUsernameInput.value = userTelegramId;
+                        tgChatIdInput.value = "";
+                        switchTelegramInputMode("username");
+                    } else {
+                        tgUsernameInput.value = "";
+                        tgChatIdInput.value = userTelegramId;
+                        switchTelegramInputMode("chatid");
+                    }
+                } else {
+                    tgUsernameInput.value = "";
+                    tgChatIdInput.value = "";
+                    switchTelegramInputMode("username");
+                }
+            }
+
             const upgradeBtn = document.getElementById("mypage-upgrade-btn");
             if (upgradeBtn) {
-                if (userGrade === "A") {
-                    upgradeBtn.innerText = "👑 이미 최상위 등급(A)입니다.";
+                if (userGrade === "premium") {
+                    upgradeBtn.innerText = "👑 이미 프리미엄 등급입니다.";
                     upgradeBtn.disabled = true;
                     upgradeBtn.className = "w-full py-2 bg-slate-100 text-slate-400 font-black rounded-xl text-[11px] cursor-not-allowed";
                 } else {
-                    upgradeBtn.innerText = "👑 A등급 등급업 신청하기";
+                    upgradeBtn.innerText = "👑 프리미엄 등급업 신청하기";
                     upgradeBtn.disabled = false;
                     upgradeBtn.className = "w-full py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-black rounded-xl text-[11px] transition-all";
                 }
@@ -4961,6 +5251,107 @@
                 modal.querySelector(".transform").classList.remove("scale-95");
                 modal.querySelector(".transform").classList.add("scale-100");
             }, 10);
+        }
+
+        // [신규] 일반 이메일 회원 비밀번호 변경 함수
+        async function changeUserPasswordFromMyPage() {
+            const newPw = document.getElementById("mypage-user-pw").value;
+            const confirmPw = document.getElementById("mypage-user-pw-confirm").value;
+            
+            if (!newPw) {
+                alert("변경할 새 비밀번호를 입력해 주십시오.");
+                return;
+            }
+            if (newPw.length < 6) {
+                alert("비밀번호는 최소 6자 이상이어야 합니다.");
+                return;
+            }
+            if (newPw !== confirmPw) {
+                alert("입력한 비밀번호가 서로 일치하지 않습니다.");
+                return;
+            }
+            
+            try {
+                const { error } = await supabaseClient.auth.updateUser({ password: newPw });
+                if (error) throw error;
+                alert("비밀번호가 성공적으로 변경되었습니다.");
+                document.getElementById("mypage-user-pw").value = "";
+                document.getElementById("mypage-user-pw-confirm").value = "";
+            } catch (err) {
+                console.error("비밀번호 변경 실패:", err);
+                alert(`비밀번호 변경 중 에러가 발생했습니다: ${err.message || err}`);
+            }
+        }
+        window.changeUserPasswordFromMyPage = changeUserPasswordFromMyPage;
+
+        // ✈️ 텔레그램 입력 방식 전환 함수
+        function switchTelegramInputMode(mode) {
+            const btnUsername = document.getElementById("tg-btn-username");
+            const btnChatid = document.getElementById("tg-btn-chatid");
+            const formUsername = document.getElementById("tg-form-username");
+            const formChatid = document.getElementById("tg-form-chatid");
+
+            if (!btnUsername || !btnChatid) return;
+
+            if (mode === "username") {
+                btnUsername.className = "flex-1 py-1.5 rounded-md text-center bg-white text-slate-800 shadow-sm cursor-pointer";
+                btnChatid.className = "flex-1 py-1.5 rounded-md text-center text-slate-500 hover:text-slate-700 cursor-pointer";
+                if (formUsername) formUsername.classList.remove("hidden");
+                if (formChatid) formChatid.classList.add("hidden");
+                btnUsername.dataset.mode = "username";
+            } else {
+                btnUsername.className = "flex-1 py-1.5 rounded-md text-center text-slate-500 hover:text-slate-700 cursor-pointer";
+                btnChatid.className = "flex-1 py-1.5 rounded-md text-center bg-white text-slate-800 shadow-sm cursor-pointer";
+                if (formUsername) formUsername.classList.add("hidden");
+                if (formChatid) formChatid.classList.remove("hidden");
+                btnUsername.dataset.mode = "chatid";
+            }
+        }
+
+        // ✈️ 텔레그램 수신처 저장 함수
+        async function saveUserTelegramConfig() {
+            if (!currentUser) {
+                alert("로그인 후 이용해 주시기 바랍니다.");
+                return;
+            }
+            const btnUsername = document.getElementById("tg-btn-username");
+            const isUsernameMode = btnUsername ? btnUsername.dataset.mode !== "chatid" : true;
+
+            let targetValue = "";
+            if (isUsernameMode) {
+                const usernameInput = document.getElementById("tg-input-username");
+                const usernameVal = usernameInput ? usernameInput.value.trim() : "";
+                if (usernameVal) {
+                    if (!usernameVal.startsWith("@")) {
+                        alert("사용자명은 @ 기호로 시작해야 합니다.");
+                        return;
+                    }
+                    targetValue = usernameVal;
+                }
+            } else {
+                const chatidInput = document.getElementById("tg-input-chatid");
+                const chatidVal = chatidInput ? chatidInput.value.trim() : "";
+                if (chatidVal) {
+                    if (isNaN(Number(chatidVal))) {
+                        alert("Chat ID는 숫자 형식이어야 합니다.");
+                        return;
+                    }
+                    targetValue = chatidVal;
+                }
+            }
+
+            try {
+                const { error } = await supabaseClient
+                    .from("user_profiles")
+                    .update({ telegram_chat_id: targetValue })
+                    .eq("id", currentUser.id);
+                if (error) throw error;
+                userTelegramId = targetValue;
+                alert("텔레그램 알림 수신 정보가 정상적으로 저장되었습니다.");
+            } catch (err) {
+                console.error("텔레그램 설정 저장 실패:", err);
+                alert("설정 저장 중 오류가 발생했습니다.");
+            }
         }
         function closeMyPageModal() {
             const modal = document.getElementById("mypage-modal");
@@ -5225,35 +5616,42 @@
                 applyFilters();
             }
         }
+        window.checkAllFilter = checkAllFilter;
         // 🔒 Supabase user_profiles 고객 등급 조회 함수
         async function fetchUserGrade() {
             if (!currentUser) {
-                userGrade = "C";
+                userGrade = "regular";
                 isUpgradeRequested = false;
+                userTelegramId = "";
                 return;
             }
             try {
                 const { data, error } = await supabaseClient
                     .from("user_profiles")
-                    .select("grade, upgrade_requested")
+                    .select("grade, upgrade_requested, telegram_chat_id")
                     .eq("id", currentUser.id)
                     .maybeSingle();
                 if (error) throw error;
                 if (data) {
-                    userGrade = data.grade || "C";
+                    // [베타 서비스 오픈 전 한정 프로모션] 가입한 모든 회원은 프리미엄(A등급) 혜택을 무료로 받습니다.
+                    // 원래 DB 등급과 무관하게 웹 클라이언트에서는 userGrade = 'premium'으로 설정합니다.
+                    userGrade = "premium";
                     isUpgradeRequested = !!data.upgrade_requested;
+                    userTelegramId = data.telegram_chat_id || "";
                 } else {
-                    // 기본 C등급으로 신규 프로필 생성
+                    // 기본 regular 등급으로 신규 프로필 생성 후 베타 프리미엄 혜택 부여
                     await supabaseClient
                         .from("user_profiles")
-                        .insert({ id: currentUser.id, grade: "C", email: currentUser.email, upgrade_requested: false });
-                    userGrade = "C";
+                        .insert({ id: currentUser.id, grade: "C", email: currentUser.email, upgrade_requested: false, telegram_chat_id: "" });
+                    userGrade = "premium";
                     isUpgradeRequested = false;
+                    userTelegramId = "";
                 }
             } catch (err) {
-                console.error("고객 등급 조회 실패 (C등급으로 설정):", err);
-                userGrade = "C";
+                console.error("고객 등급 조회 실패 (베타 서비스 프리미엄 자동 적용):", err);
+                userGrade = "premium";
                 isUpgradeRequested = false;
+                userTelegramId = "";
             }
         }
         // 🔒 등급 업그레이드 신청 API 연동
@@ -5606,10 +6004,8 @@
             if (content2) content2.style.filter = "none";
             if (content3) content3.style.filter = "none";
             // 유저 등급에 따른 실시간 락 활성화 처리
-            if (userGrade === "B") {
-                if (mask3) mask3.classList.remove("hidden");
-                if (content3) content3.style.filter = "blur(8px)";
-            } else if (userGrade === "C") {
+            if (userGrade !== "premium") {
+                // 프리미엄 회원이 아닌 경우(일반 회원) 2단계, 3단계 탭 마스크 활성화 및 블러 처리
                 if (mask2) mask2.classList.remove("hidden");
                 if (mask3) mask3.classList.remove("hidden");
                 if (content2) content2.style.filter = "blur(8px)";
@@ -5985,5 +6381,44 @@ AI 분석 등급: ${selectedProperty.grade || '미상'}등급 (점수: ${selecte
                 });
         }
     
-        // v1.2 큐레이션 및 핵심 피처 스크립트 로드 완료 후 추가 바인딩은 ThemeCurationOverlay.js에서 수행합니다.
+        // 🚇 주소 기반 교통 연결망 정보 동적 생성 헬퍼 함수 (v1.3.2 광역 대중교통망 고도화)
+        function generateTrafficInfo(address) {
+            if (!address) return "-";
+            const addr = address.replace(/\[.*?\]/g, "").trim();
+            
+            // 주요 거점별 교통망 시뮬레이션 매핑 데이터
+            const trafficDb = [
+                { keyword: "강남구", info: "🚇 지하철 2호선(역삼/강남역), 신분당선, 3/7/9호선 환승 용이 / 🚌 광역버스 및 공항버스 강남 대로변 노선망 도보 3분 이내 연접" },
+                { keyword: "서초구", info: "🚇 지하철 2/3/7/9호선(고속터미널역), 신분당선 인접 / 🚌 반포/서초 IC 고속도로 및 경부고속도로 진입 5분 이내, 서울남부터미널 인근" },
+                { keyword: "송파구", info: "🚇 지하철 2/8호선(잠실역), 3/5/9호선 연계 / 🚌 송파대로 및 잠실광역환승센터 도보 이용 가능, SRT 수서역 차량 10분" },
+                { keyword: "종로구", info: "🚇 지하철 1/3/5호선 종로3가역, 4호선 혜화역 도보권 / 🚌 세종대로 및 종로 버스전용차로 노선망 연계, 광화문 중심 업무지구 교통망 인접" },
+                { keyword: "마포구", info: "🚇 공항철도, 경의중앙선, 2/5/6호선(공덕역/합정역) 멀티 역세권 / 🚌 강변북로 및 마포대교 진입 용이, 신촌/홍대 방면 시내버스 다수 분포" },
+                { keyword: "분당구", info: "🚇 신분당선 및 수인분당선(판교역/정자역/서현역) 도보 5~10분 내 인접 / 🚌 분당-내곡, 분당-수서간 도시고속화도로 연접 및 광역버스 서울 강남/도심행 노선 풍부" },
+                { keyword: "성남", info: "🚇 지하철 8호선(산성역/남한산성입구역/모란역), 수인분당선 인접 / 🚌 성남대로 노선버스 풍부 및 서울/수도권 광역버스 정류장 도보 이용 가능" },
+                { keyword: "광주시", info: "🚇 경강선(경기광주역/초월역/곤지암역) 버스 환승 연계 / 🚌 광주종합버스터미널 인근, 성남 및 서울 강남/잠실행 직행좌석 광역버스 노선망 도보권 소재" },
+                { keyword: "용인", info: "🚇 신분당선(수지구청역/성복역), 수인분당선(기흥역/죽전역), 용인에버라인 연계 / 🚌 경부고속도로 수원신갈 IC 및 영동고속도로 용인 IC 진입 용이, 서울행 광역버스 다수 배차" },
+                { keyword: "고양", info: "🚇 지하철 3호선(일산역/마두역/백석역), 경의중앙선, 서해선 인접 / 🚌 자유로 및 외곽순환고속도로 진입 편리, 고양종합터미널 및 신촌/영등포행 광역버스 다수 배차" },
+                { keyword: "수원", info: "🚇 수인분당선(수원역/망포역), 지하철 1호선, 신분당선(광교중앙역) 인접 / 🚌 영동고속도로 동수원 IC, 수원역 KTX/SRT 철도 교통망 및 고속버스 연계 우수" },
+                { keyword: "부천", info: "🚇 지하철 1호선(부천역/송내역), 7호선(신중동역/상동역), 서해선 연계 / 🚌 경인고속도로 신흥/부천 IC 인접 및 시내외 간선 교통망 발달" },
+                { keyword: "안양", info: "🚇 지하철 1호선(안양역/명학역), 4호선(범계역/평촌역) 연계 / 🚌 외곽순환도로 안양성남고속도로 연접, 강남/서초행 광역 및 시내 버스 다수 배차" },
+                { keyword: "인천", info: "🚇 인천지하철 1/2호선, 수인분당선, 공항철도, 서울 1/7호선 광역망 / 🚌 인천종합버스터미널, 제1·2경인고속도로 접근 및 서울행 광역버스망 완비" },
+                { keyword: "수성구", info: "🚇 대구도시철도 2호선(범어역/만촌역), 3호선 연계 편리 / 🚌 범어네거리 중심 대구 주요 간선도로망 및 동대구역 KTX/SRT 차량 10분 이내 연접" },
+                { keyword: "해운대구", info: "🚇 부산도시철도 2호선(해운대역/벡스코역), 동해선 복선전철 인접 / 🚌 수영강변대로 및 부산도시고속도로 진입 용이, 해운대 광역 버스망 연접" },
+                { keyword: "유성구", info: "🚇 대전도시철도 1호선(유성온천역/반석역) 인접 / 🚌 호남고속도로 유성 IC 인접 및 대전 전역 시내버스망, 대전복합터미널 연계 버스망" }
+            ];
+
+            for (const item of trafficDb) {
+                if (addr.includes(item.keyword)) {
+                    return item.info;
+                }
+            }
+
+            // 매칭되는 대도시 거점이 없는 경우 기본 행정구역 기반 지능형 교통 텍스트 조립
+            const matchDong = addr.match(/([가-힇]+(?:동|읍|면|리|로))/);
+            const locationName = matchDong ? matchDong[1] : "인근";
+            
+            return `🚇 ${locationName} 인근 주요 대중교통망(도보 5~10분 거리 시내버스 정류장 소재) / 🚌 수도권 광역 노선 및 주요 간선 시내버스가 배차되어 인근 교통 거점 및 전철역 접근성이 양호하며, 주요 도로망으로의 차 진출입이 수월한 입지입니다.`;
+        }
+
+        // v1.3 큐레이션 및 핵심 피처 스크립트 로드 완료 후 추가 바인딩은 ThemeCurationOverlay.js에서 수행합니다.
         console.log("AI 경시/공매 통합 시스템 스크립트 로드 완료.");

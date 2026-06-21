@@ -26,8 +26,12 @@ def main():
 
     # 공식 도메인 리다이렉트 스크립트 정의
     redirect_script = """<script>
+        // /mobile (끝에 슬래시 없음) 접속 시 리소스 404 방지를 위해 /mobile/ 로 강제 리다이렉트
+        if (window.location.pathname === '/mobile') {
+            window.location.replace('https://myauction.r-e.kr/mobile/' + window.location.search + window.location.hash);
+        }
         // 구 Firebase 임시 도메인 접속 시 공식 도메인으로 강제 리다이렉트 처리
-        if (window.location.hostname.indexOf('action-b8c75') !== -1 || (window.location.hostname.indexOf('web.app') !== -1 && window.location.hostname.indexOf('myauction') === -1)) {
+        else if (window.location.hostname.indexOf('action-b8c75') !== -1 || (window.location.hostname.indexOf('web.app') !== -1 && window.location.hostname.indexOf('myauction') === -1)) {
             window.location.replace('https://myauction.r-e.kr' + window.location.pathname + window.location.search + window.location.hash);
         }
     </script>"""

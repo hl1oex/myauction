@@ -13,7 +13,7 @@
         };
         // 탭 토글링 구현
         function switchTab(tabId) {
-            const tabs = ['ad-tab', 'user-tab', 'db-tab', 'mock-bid-tab', 'consultation-tab'];
+            const tabs = ['ad-tab', 'user-tab', 'mock-bid-tab', 'consultation-tab', 'telegram-tab'];
             tabs.forEach(t => {
                 const panel = document.getElementById(`panel-${t}`);
                 const btn = document.getElementById(`btn-${t}`);
@@ -26,10 +26,25 @@
                 }
             });
             currentTabId = tabId;
-            if (tabId === 'mock-bid-tab') {
-                loadMockBidsList();
-            } else if (tabId === 'consultation-tab') {
-                loadConsultationsList();
+            try {
+                if (tabId === 'mock-bid-tab') {
+                    if (typeof loadMockBidsList === 'function') {
+                        loadMockBidsList();
+                    }
+                } else if (tabId === 'consultation-tab') {
+                    if (typeof loadConsultationsList === 'function') {
+                        loadConsultationsList();
+                    }
+                } else if (tabId === 'telegram-tab') {
+                    if (typeof loadTelegramAdminSettings === 'function') {
+                        loadTelegramAdminSettings();
+                    }
+                    if (typeof loadTelegramLogs === 'function') {
+                        loadTelegramLogs(1);
+                    }
+                }
+            } catch (err) {
+                console.error("탭 변경 후 데이터 로딩 실패:", err);
             }
         }
         // 폼 필드 토글
@@ -517,7 +532,20 @@
                 const upgradeBadge = u.upgrade_requested 
                     ? `<span class="inline-flex items-center gap-1 bg-rose-500 text-white text-[8.5px] font-black px-1.5 py-0.5 rounded-md animate-pulse shadow-sm"><i class="fa-solid fa-bolt text-yellow-300"></i> 등업 요청 중</span>` 
                     : '';
+                
+                // 가입 경로 (provider) 판별
+                let providerStr = "이메일";
+                if (u.provider) {
+                    const p = u.provider.toLowerCase();
+                    if (p === 'google') providerStr = "구글";
+                    else if (p === 'kakao') providerStr = "카카오";
+                    else if (p === 'naver') providerStr = "네이버";
+                    else providerStr = u.provider;
+                }
+
+                // 2단계 멤버십 등급 단순화 (regular / premium)
                 const membershipTier = u.membership_tier || 'regular';
+                
                 // 기간 기한 설정값
                 let expiryStr = "";
                 if (u.membership_expires_at) {
@@ -526,6 +554,17 @@
                     const local = new Date(expDate.getTime() - (offset*60*1000));
                     expiryStr = local.toISOString().split('T')[0];
                 }
+                // 가입일 포맷팅
+                let signUpDateStr = "정보 없음";
+                if (u.created_at) {
+                    const cDate = new Date(u.created_at);
+                    signUpDateStr = cDate.toLocaleDateString('ko-KR', {
+                        year: '2-digit',
+                        month: '2-digit',
+                        day: '2-digit'
+                    });
+                }
+
                 return `
                     <tr class="border-b border-slate-100 hover:bg-slate-50/50">
                         <td class="p-3 text-center text-slate-500 font-bold">${idx + 1}</td>
@@ -535,16 +574,17 @@
                                 ${upgradeBadge}
                             </div>
                         </td>
+                        <td class="p-3 text-center text-slate-600 font-extrabold">${providerStr}</td>
+                        <td class="p-3 text-center text-slate-600 font-extrabold">${signUpDateStr}</td>
                         <td class="p-3 text-center">
                             <div class="flex flex-col gap-1.5 items-center justify-center">
-                                <select id="grade-${u.id}" class="text-xs p-1.5 border border-slate-200 rounded-lg bg-white font-extrabold text-slate-700 focus:border-royalBlue outline-none w-[150px]">
-                                    <option value="A" ${u.grade === 'A' ? 'selected' : ''}>🥇 A등급 (100% 오픈)</option>
-                                    <option value="B" ${u.grade === 'B' ? 'selected' : ''}>🥈 B등급 (50% 오픈)</option>
-                                    <option value="C" ${u.grade === 'C' ? 'selected' : ''}>🥉 C등급 (20% 오픈)</option>
+                                <select id="tier-${u.id}" class="text-xs p-1.5 border border-slate-200 rounded-lg bg-white font-extrabold text-slate-700 focus:border-royalBlue outline-none w-[150px]">
+                                    <option value="regular" ${membershipTier === 'regular' ? 'selected' : ''}>일반 (regular)</option>
+                                    <option value="premium" ${membershipTier === 'premium' ? 'selected' : ''}>⭐ 프리미엄 (premium)</option>
                                 </select>
                                 ${u.upgrade_requested ? `
                                     <div class="flex gap-1 mt-1">
-                                        <button onclick="approveUpgradeRequest('${u.id}', '${u.email}')" class="bg-emeraldSuccess hover:bg-emerald-700 text-white text-[9px] font-black px-2 py-1 rounded shadow-sm">승인 (A)</button>
+                                        <button onclick="approveUpgradeRequest('${u.id}', '${u.email}')" class="bg-emeraldSuccess hover:bg-emerald-700 text-white text-[9px] font-black px-2 py-1 rounded shadow-sm">승인 (프리미엄)</button>
                                         <button onclick="denyUpgradeRequest('${u.id}')" class="bg-rose-50 border border-rose-200 hover:bg-rose-100 text-rose-600 font-bold px-2 py-1 rounded shadow-sm">반려</button>
                                     </div>
                                 ` : ''}
@@ -561,12 +601,6 @@
                             </div>
                         </td>
                         <td class="p-3 text-center">
-                            <select id="tier-${u.id}" class="text-xs p-1.5 border border-slate-200 rounded-lg bg-white font-extrabold text-slate-700 focus:border-royalBlue outline-none w-[120px]">
-                                <option value="regular" ${membershipTier === 'regular' ? 'selected' : ''}>일반 (regular)</option>
-                                <option value="premium" ${membershipTier === 'premium' ? 'selected' : ''}>⭐ 프리미엄 (premium)</option>
-                            </select>
-                        </td>
-                        <td class="p-3 text-center">
                             <button onclick="saveUserCurationConfig('${u.id}')" class="bg-royalBlue hover:bg-royalHover text-white text-[10.5px] font-black px-3.5 py-2 rounded-xl transition-all shadow-md select-none">
                                 저장
                             </button>
@@ -577,9 +611,9 @@
         }
         // 회원 정보 및 이용 기간 변경 최종 DB 저장
         async function saveUserCurationConfig(userId) {
-            const grade = document.getElementById(`grade-${userId}`).value;
             const tier = document.getElementById(`tier-${userId}`).value;
             const expiryVal = document.getElementById(`expiry-${userId}`).value;
+            const grade = (tier === 'premium') ? 'A' : 'C'; // 2단계 통합 등급 매핑
             let expiresAt = null;
             if (expiryVal) {
                 expiresAt = new Date(expiryVal).toISOString();
@@ -604,7 +638,7 @@
         }
         // 등업 요청 승인 액션
         async function approveUpgradeRequest(userId, email) {
-            if (!confirm(`${email} 회원의 등업 요청을 승인하시겠습니까?\n\n[승인 효과: A등급 변경 + 이용 기간 오늘부터 30일 설정]`)) return;
+            if (!confirm(`${email} 회원의 등업 요청을 승인하시겠습니까?\n\n[승인 효과: 프리미엄 등급 변경 + 이용 기간 오늘부터 30일 설정]`)) return;
             const expiryDate = new Date();
             expiryDate.setDate(expiryDate.getDate() + 30);
             try {
@@ -626,6 +660,67 @@
                 alert("승인 결재 처리에 실패하였습니다.");
             }
         }
+        // 회원 전체 정보 엑셀(CSV) 다운로드
+        function exportUsersToCSV() {
+            if (!usersList || usersList.length === 0) {
+                alert("다운로드할 회원 데이터가 존재하지 않습니다.");
+                return;
+            }
+            const headers = ["No.", "아이디(이메일)", "가입경로", "멤버십등급", "이용만료일", "등업요청여부", "가입일"];
+            const rows = usersList.map((u, idx) => {
+                let providerStr = "이메일";
+                if (u.provider) {
+                    const p = u.provider.toLowerCase();
+                    if (p === 'google') providerStr = "구글";
+                    else if (p === 'kakao') providerStr = "카카오";
+                    else if (p === 'naver') providerStr = "네이버";
+                    else providerStr = u.provider;
+                }
+                const membershipTier = (u.membership_tier === 'premium' || u.grade === 'A' || u.grade === 'B') ? '프리미엄' : '일반';
+                let expiryStr = "무제한";
+                if (u.membership_expires_at) {
+                    const expDate = new Date(u.membership_expires_at);
+                    const offset = expDate.getTimezoneOffset();
+                    const local = new Date(expDate.getTime() - (offset*60*1000));
+                    expiryStr = local.toISOString().split('T')[0];
+                }
+                const upgradeReq = u.upgrade_requested ? "요청중" : "N";
+                const signUpDate = u.created_at ? new Date(u.created_at).toISOString().split('T')[0] : "";
+                return [
+                    idx + 1,
+                    u.email || "",
+                    providerStr,
+                    membershipTier,
+                    expiryStr,
+                    upgradeReq,
+                    signUpDate
+                ];
+            });
+            let csvContent = "\uFEFF";
+            csvContent += headers.join(",") + "\r\n";
+            rows.forEach(row => {
+                const escapedRow = row.map(val => {
+                    const strVal = String(val);
+                    if (strVal.includes(",") || strVal.includes("\"") || strVal.includes("\n")) {
+                        return `"${strVal.replace(/"/g, '""')}"`;
+                    }
+                    return strVal;
+                });
+                csvContent += escapedRow.join(",") + "\r\n";
+            });
+            const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement("a");
+            link.setAttribute("href", url);
+            link.setAttribute("download", `경공매시스템_회원리스트_${new Date().toISOString().split('T')[0]}.csv`);
+            link.style.visibility = 'hidden';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+        window.exportUsersToCSV = exportUsersToCSV;
+        window.approveUpgradeRequest = approveUpgradeRequest;
+        window.saveUserCurationConfig = saveUserCurationConfig;
         // 등업 요청 반려 액션
         async function denyUpgradeRequest(userId) {
             if (!confirm("해당 회원의 등업 요청을 반려하시겠습니까? (등급 및 기간은 유지되며 요청 상태만 초기화됩니다)")) return;
@@ -1007,6 +1102,15 @@
                 expiryStr = expDate.toLocaleDateString('ko-KR') + " " + expDate.toLocaleTimeString('ko-KR');
             }
             document.getElementById("detail-modal-expires").innerText = expiryStr;
+            
+            // 가입일 바인딩
+            let createdStr = "정보 없음";
+            if (user.created_at) {
+                const cDate = new Date(user.created_at);
+                createdStr = cDate.toLocaleDateString('ko-KR') + " " + cDate.toLocaleTimeString('ko-KR');
+            }
+            document.getElementById("detail-modal-created").innerText = createdStr;
+
             // 실시간 카운트 집계 로딩 표시
             document.getElementById("detail-modal-bid-count").innerText = "...건";
             document.getElementById("detail-modal-consult-count").innerText = "...건";
@@ -1034,4 +1138,552 @@
         }
         function closeUserDetailModal() {
             document.getElementById("user-detail-modal").classList.add("hidden");
+        }
+
+        // ✈️ 텔레그램 설정 로드 및 동기화
+        async function loadTelegramAdminSettings() {
+            try {
+                const { data, error } = await supabaseClient
+                    .from('admin_config')
+                    .select('*');
+                if (error) throw error;
+                if (data && data.length > 0) {
+                    const alertEnabled = data.find(c => c.key === 'telegram_alert_enabled');
+                    const alertDday = data.find(c => c.key === 'alert_d_day_enabled');
+                    const alertUnderbid = data.find(c => c.key === 'alert_underbid_enabled');
+                    
+                    document.getElementById('tg-alert-global-toggle').checked = alertEnabled ? alertEnabled.value === 'true' : true;
+                    document.getElementById('tg-alert-dday-toggle').checked = alertDday ? alertDday.value === 'true' : true;
+                    document.getElementById('tg-alert-underbid-toggle').checked = alertUnderbid ? alertUnderbid.value === 'true' : true;
+                }
+            } catch (err) {
+                console.error("텔레그램 어드민 설정 로드 실패", err);
+            }
+        }
+
+        // ✈️ 텔레그램 설정 변경 사항 DB 저장
+        async function saveTelegramAdminSettings() {
+            const alertEnabled = document.getElementById('tg-alert-global-toggle').checked ? 'true' : 'false';
+            const alertDday = document.getElementById('tg-alert-dday-toggle').checked ? 'true' : 'false';
+            const alertUnderbid = document.getElementById('tg-alert-underbid-toggle').checked ? 'true' : 'false';
+            
+            try {
+                const updates = [
+                    { key: 'telegram_alert_enabled', value: alertEnabled },
+                    { key: 'alert_d_day_enabled', value: alertDday },
+                    { key: 'alert_underbid_enabled', value: alertUnderbid }
+                ];
+                
+                for (const u of updates) {
+                    const { error } = await supabaseClient
+                        .from('admin_config')
+                        .upsert({ key: u.key, value: u.value }, { onConflict: 'key' });
+                    if (error) throw error;
+                }
+                console.log("텔레그램 자동 발송 설정 저장 완료");
+            } catch (err) {
+                console.error("텔레그램 어드민 설정 저장 실패", err);
+                alert("설정 저장에 실패했습니다.");
+            }
+        }
+
+        // ✈️ 사용자명이나 Chat ID 기반으로 실제 텔레그램 Chat ID를 해결하는 헬퍼 함수
+        async function resolveTelegramChatId(botToken, identifier) {
+            if (!identifier) return null;
+            if (/^\d+$/.test(identifier) || /^\-\d+$/.test(identifier)) {
+                return identifier;
+            }
+            
+            const cleanUsername = identifier.replace(/^@/, '').trim().toLowerCase();
+            if (!cleanUsername) return null;
+            
+            try {
+                const res = await fetch(`https://api.telegram.org/bot${botToken}/getUpdates?offset=-10`);
+                if (!res.ok) throw new Error("Telegram API Error");
+                const body = await res.json();
+                if (body.ok && body.result) {
+                    for (let i = body.result.length - 1; i >= 0; i--) {
+                        const update = body.result[i];
+                        const message = update.message || update.edited_message || update.channel_post;
+                        if (message && message.from) {
+                            const fromUser = message.from.username || "";
+                            if (fromUser.toLowerCase() === cleanUsername) {
+                                return message.from.id.toString();
+                            }
+                        }
+                    }
+                }
+            } catch (err) {
+                console.warn("Telegram getUpdates를 통한 Chat ID 해결 실패", err);
+            }
+            return null;
+        }
+
+        // ✈️ 기획 알림 테마 변경 시 메시지 컴파일
+        async function onTelegramThemeChange() {
+            const theme = document.getElementById("tg-theme-select").value;
+            const textarea = document.getElementById("tg-theme-message");
+            if (!theme) {
+                textarea.value = "";
+                return;
+            }
+            textarea.value = "⏳ 매물 데이터를 분석하고 템플릿을 생성하는 중입니다...";
+            try {
+                let query = supabaseClient.from('properties').select('*');
+                const todayStr = new Date().toISOString().split('T')[0];
+                
+                if (theme === 'dday') {
+                    const tomorrow = new Date();
+                    tomorrow.setDate(tomorrow.getDate() + 1);
+                    const tomorrowStr = tomorrow.toISOString().split('T')[0];
+                    query = query.gte('bidding_date', todayStr).lte('bidding_date', tomorrowStr);
+                } else if (theme === 'hot') {
+                    query = query.gte('score', 80).order('score', { ascending: false });
+                } else if (theme === 'small') {
+                    query = query.lte('minimum_bid', 100000000).order('minimum_bid', { ascending: true });
+                }
+                
+                const { data, error } = await query.limit(50);
+                if (error) throw error;
+                
+                let filtered = data || [];
+                if (theme === 'underbid') {
+                    filtered = filtered.filter(p => p.appraised_value && p.minimum_bid && p.minimum_bid < p.appraised_value);
+                }
+                
+                const targetItems = filtered.slice(0, 5);
+                if (targetItems.length === 0) {
+                    textarea.value = `📢 [부동산경공매 검색시스템] 기획 추천 알림\n\n현재 해당 테마에 부합하는 분석 매물이 존재하지 않습니다.`;
+                    return;
+                }
+                
+                let msg = `📢 [부동산경공매 검색시스템] 기획 추천 알림\n\n`;
+                const themeNames = {
+                    'dday': '⏰ 입찰 기일 임박 매물 (D-1/D-Day)',
+                    'underbid': '📉 회차 갱신 유찰 매물',
+                    'hot': '🏆 AI 투자 추천 매물 (Score 80점 이상)',
+                    'small': '💰 소액 투자 추천 매물 (최저가 1억 이하)'
+                };
+                msg += `📌 오늘의 추천 테마: ${themeNames[theme] || '특선 매물'}\n`;
+                msg += `회원님을 위한 엄선된 핵심 경공매 매물 정보를 공유해 드립니다.\n\n`;
+                
+                targetItems.forEach((p, idx) => {
+                    const priceRatio = p.appraised_value ? Math.round((p.minimum_bid / p.appraised_value) * 100) : 100;
+                    const discountRate = 100 - priceRatio;
+                    
+                    msg += `${idx + 1}. [${p.source === 'court' || p.source === 'court_etc' ? '경매' : '공매'}] ${p.auction_no || p.case_number || '관리번호'}\n`;
+                    msg += `- 소재지: ${p.address || '--'}\n`;
+                    msg += `- 감정가: ${(p.appraised_value || 0).toLocaleString()}원\n`;
+                    msg += `- 최저가: ${(p.minimum_bid || 0).toLocaleString()}원 (${discountRate}% 저감)\n`;
+                    msg += `- 입찰일: ${p.bidding_date || '--'}\n`;
+                    msg += `- AI 투자등급: ${p.grade || 'C'}등급 (Score: ${p.score || 0}점)\n`;
+                    msg += `- 상세분석 확인하기: https://myauction.r-e.kr/?detail=${p.id}\n\n`;
+                });
+                
+                msg += `※ 상세 권리분석 및 예상배당표, LTV 금융 시뮬레이션은 공식 사이트 상세페이지에서 즉시 확인하실 수 있습니다.`;
+                textarea.value = msg;
+            } catch (err) {
+                console.error("테마 매물 로딩 실패", err);
+                textarea.value = "⚠️ 매물 데이터를 불러오는 도중 오류가 발생했습니다.";
+            }
+        }
+
+        // ✈️ 테마별 기획 알림 즉시 단체 발송 실행
+        async function sendTelegramThemeAlert() {
+            const gradeTarget = document.getElementById("tg-target-grade").value;
+            const message = document.getElementById("tg-theme-message").value.trim();
+            if (!message) {
+                alert("전송할 메시지 본문을 입력해 주십시오.");
+                return;
+            }
+            
+            if (!confirm("선택하신 회원들에게 메시지를 즉시 일괄 발송하시겠습니까?")) return;
+            
+            try {
+                const { data: configData, error: configErr } = await supabaseClient
+                    .from('admin_config')
+                    .select('*')
+                    .eq('key', 'telegram_bot_token')
+                    .single();
+                if (configErr) throw configErr;
+                const botToken = configData ? configData.value : '8852350792:AAEBPlA64GIztJa8XeSrqQd4-1rvJbvsOiA';
+                
+                let userQuery = supabaseClient.from('user_profiles').select('*').not('telegram_chat_id', 'is', null);
+                const { data: users, error: userErr } = await userQuery;
+                if (userErr) throw userErr;
+                
+                let targets = (users || []).filter(u => u.telegram_chat_id && u.telegram_chat_id.trim() !== "");
+                if (gradeTarget === 'premium') {
+                    targets = targets.filter(u => u.membership_tier === 'premium');
+                } else if (gradeTarget === 'A') {
+                    targets = targets.filter(u => u.grade === 'A');
+                }
+                
+                if (targets.length === 0) {
+                    alert("발송 대상 회원(텔레그램 연동 완료)이 존재하지 않습니다.");
+                    return;
+                }
+                
+                let successCount = 0;
+                let failCount = 0;
+                
+                alert(`총 ${targets.length}명의 회원에게 텔레그램 발송을 시작합니다.`);
+                
+                for (const user of targets) {
+                    const identifier = user.telegram_chat_id;
+                    const chatId = await resolveTelegramChatId(botToken, identifier);
+                    
+                    if (!chatId) {
+                        await supabaseClient.from('telegram_alert_logs').insert({
+                            user_id: user.id,
+                            alert_type: 'theme_manual',
+                            message: message,
+                            status: 'fail',
+                            error_message: `사용자명(${identifier})에 해당하는 Chat ID 조회 실패`
+                        });
+                        failCount++;
+                        continue;
+                    }
+                    
+                    try {
+                        const tgRes = await fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({
+                                chat_id: chatId,
+                                text: message
+                            })
+                        });
+                        
+                        const tgResult = await tgRes.json();
+                        if (tgResult.ok) {
+                            await supabaseClient.from('telegram_alert_logs').insert({
+                                user_id: user.id,
+                                alert_type: 'theme_manual',
+                                message: message,
+                                status: 'success'
+                            });
+                            successCount++;
+                        } else {
+                            await supabaseClient.from('telegram_alert_logs').insert({
+                                user_id: user.id,
+                                alert_type: 'theme_manual',
+                                message: message,
+                                status: 'fail',
+                                error_message: tgResult.description || '텔레그램 API 전송 거부'
+                            });
+                            failCount++;
+                        }
+                    } catch (err) {
+                        await supabaseClient.from('telegram_alert_logs').insert({
+                            user_id: user.id,
+                            alert_type: 'theme_manual',
+                            message: message,
+                            status: 'fail',
+                            error_message: err.message || '네트워크 통신 오류'
+                        });
+                        failCount++;
+                    }
+                }
+                
+                alert(`텔레그램 단체 발송이 완료되었습니다.\n성공: ${successCount}건 / 실패: ${failCount}건`);
+                loadTelegramLogs(1);
+            } catch (err) {
+                console.error("텔레그램 기획 알림 발송 중 에러 발생", err);
+                alert("알림 발송 처리 중 에러가 발생했습니다: " + err.message);
+            }
+        }
+
+        // ✈️ 당일 알림 배치 수동 즉시 실행 트리거
+        async function triggerTelegramNotifierManual() {
+            if (!confirm("당일 알림 배치 작업을 수동으로 즉시 구동하시겠습니까?")) return;
+            
+            try {
+                const { data: configData, error: configErr } = await supabaseClient
+                    .from('admin_config')
+                    .select('*');
+                if (configErr) throw configErr;
+                
+                const alertEnabled = configData.find(c => c.key === 'telegram_alert_enabled')?.value === 'true';
+                const alertDday = configData.find(c => c.key === 'alert_d_day_enabled')?.value === 'true';
+                const alertUnderbid = configData.find(c => c.key === 'alert_underbid_enabled')?.value === 'true';
+                const botToken = configData.find(c => c.key === 'telegram_bot_token')?.value || '8852350792:AAEBPlA64GIztJa8XeSrqQd4-1rvJbvsOiA';
+                
+                if (!alertEnabled) {
+                    alert("⚠️ 텔레그램 알림 발송 설정이 전면 비활성화 상태입니다. 설정을 켜고 실행해 주십시오.");
+                    return;
+                }
+                
+                if (!alertDday && !alertUnderbid) {
+                    alert("⚠️ 세부 알림 설정이 모두 비활성화 상태입니다.");
+                    return;
+                }
+                
+                const { data: users, error: userErr } = await supabaseClient
+                    .from('user_profiles')
+                    .select('*')
+                    .not('telegram_chat_id', 'is', null);
+                if (userErr) throw userErr;
+                
+                const tgUsers = (users || []).filter(u => u.telegram_chat_id && u.telegram_chat_id.trim() !== "");
+                if (tgUsers.length === 0) {
+                    alert("텔레그램 수신처가 등록된 회원이 존재하지 않습니다.");
+                    return;
+                }
+                
+                const { data: favorites, error: favErr } = await supabaseClient
+                    .from('user_favorites')
+                    .select('user_id, property_id');
+                if (favErr) throw favErr;
+                
+                if (!favorites || favorites.length === 0) {
+                    alert("등록된 회원 관심 매물이 존재하지 않습니다.");
+                    return;
+                }
+                
+                const favPropIds = [...new Set(favorites.map(f => f.property_id))];
+                const { data: properties, error: propErr } = await supabaseClient
+                    .from('properties')
+                    .select('*')
+                    .in('id', favPropIds);
+                if (propErr) throw propErr;
+                
+                const propMap = new Map(properties.map(p => [p.id, p]));
+                
+                const today = new Date();
+                today.setHours(0,0,0,0);
+                const tomorrow = new Date(today.getTime() + 86400000);
+                const tomorrowStr = tomorrow.toISOString().split('T')[0];
+                const todayStr = today.toISOString().split('T')[0];
+                
+                let sendCount = 0;
+                let failCount = 0;
+                
+                alert("관심 매물 분석 및 알림 전송을 구동합니다.");
+                
+                for (const user of tgUsers) {
+                    const userFavs = favorites.filter(f => f.user_id === user.id);
+                    if (userFavs.length === 0) continue;
+                    
+                    const identifier = user.telegram_chat_id;
+                    let chat_id = null;
+                    
+                    for (const fav of userFavs) {
+                        const p = propMap.get(fav.property_id);
+                        if (!p) continue;
+                        
+                        let isDdayAlert = false;
+                        let isUnderbidAlert = false;
+                        
+                        if (alertDday && p.bidding_date === tomorrowStr) {
+                            isDdayAlert = true;
+                        }
+                        
+                        let isUpdatedToday = false;
+                        if (p.updated_at) {
+                            const updateDate = new Date(p.updated_at).toISOString().split('T')[0];
+                            if (updateDate === todayStr) {
+                                isUpdatedToday = true;
+                            }
+                        }
+                        if (alertUnderbid && isUpdatedToday && p.appraised_value && p.minimum_bid && p.minimum_bid < p.appraised_value) {
+                            isUnderbidAlert = true;
+                        }
+                        
+                        if (!isDdayAlert && !isUnderbidAlert) continue;
+                        
+                        if (!chat_id) {
+                            chat_id = await resolveTelegramChatId(botToken, identifier);
+                        }
+                        
+                        const alertType = isDdayAlert ? 'D-Day 임박' : '유찰 감지';
+                        if (!chat_id) {
+                            await supabaseClient.from('telegram_alert_logs').insert({
+                                user_id: user.id,
+                                property_id: p.id,
+                                alert_type: alertType,
+                                message: `[발송대기] 텔레그램 사용자명(${identifier})에 매핑되는 Chat ID 조회 불가`,
+                                status: 'fail',
+                                error_message: '사용자명에 해당하는 Chat ID를 찾을 수 없습니다.'
+                            });
+                            failCount++;
+                            continue;
+                        }
+                        
+                        let alertText = "";
+                        if (isDdayAlert) {
+                            alertText = `⏰ [부동산경공매 검색시스템] 관심 매물 입찰 기일 임박(D-1) 안내\n\n`;
+                            alertText += `회원님이 등록하신 관심 매물의 입찰 기일이 내일로 다가왔습니다. 놓치지 마시고 확인하세요!\n\n`;
+                        } else {
+                            alertText = `📉 [부동산경공매 검색시스템] 관심 매물 유찰(가격 저감) 발생 안내\n\n`;
+                            alertText += `회원님이 등록하신 관심 매물이 유찰되어 최저입찰가가 하락하여 업데이트되었습니다. 새로운 기회를 확인해 보세요!\n\n`;
+                        }
+                        
+                        const priceRatio = p.appraised_value ? Math.round((p.minimum_bid / p.appraised_value) * 100) : 100;
+                        const discountRate = 100 - priceRatio;
+                        
+                        alertText += `▶ [${p.source === 'court' || p.source === 'court_etc' ? '경매' : '공매'}] ${p.auction_no || p.case_number || '관리번호'}\n`;
+                        alertText += `- 소재지: ${p.address || '--'}\n`;
+                        alertText += `- 감정가: ${(p.appraised_value || 0).toLocaleString()}원\n`;
+                        alertText += `- 최저가: ${(p.minimum_bid || 0).toLocaleString()}원 (${discountRate}% 저감)\n`;
+                        alertText += `- 입찰일: ${p.bidding_date || '--'}\n`;
+                        alertText += `- AI 추천등급: ${p.grade || 'C'}등급 (Score: ${p.score || 0}점)\n`;
+                        alertText += `- 상세분석 바로가기: https://myauction.r-e.kr/?detail=${p.id}\n\n`;
+                        alertText += `※ 자세한 소요자금 계획서 계산과 AI 명도 리포트는 공식 사이트에서 실시간 조회 가능합니다.`;
+                        
+                        try {
+                            const tgRes = await fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
+                                method: 'POST',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify({
+                                    chat_id: chat_id,
+                                    text: alertText
+                                })
+                            });
+                            
+                            const tgResult = await tgRes.json();
+                            if (tgResult.ok) {
+                                await supabaseClient.from('telegram_alert_logs').insert({
+                                    user_id: user.id,
+                                    property_id: p.id,
+                                    alert_type: alertType,
+                                    message: alertText,
+                                    status: 'success'
+                                });
+                                sendCount++;
+                            } else {
+                                await supabaseClient.from('telegram_alert_logs').insert({
+                                    user_id: user.id,
+                                    property_id: p.id,
+                                    alert_type: alertType,
+                                    message: alertText,
+                                    status: 'fail',
+                                    error_message: tgResult.description || '텔레그램 API 전송 거부'
+                                });
+                                failCount++;
+                            }
+                        } catch (err) {
+                            await supabaseClient.from('telegram_alert_logs').insert({
+                                user_id: user.id,
+                                property_id: p.id,
+                                alert_type: alertType,
+                                message: alertText,
+                                status: 'fail',
+                                error_message: err.message || '네트워크 오류'
+                            });
+                            failCount++;
+                        }
+                    }
+                }
+                
+                alert(`⚡ 수동 알림 배치 작업 완료!\n분석/전송 성공: ${sendCount}건 / 실패 및 대기: ${failCount}건`);
+                loadTelegramLogs(1);
+            } catch (err) {
+                console.error("수동 배치 실행 중 에러 발생", err);
+                alert("배치 실행 도중 에러가 발생했습니다: " + err.message);
+            }
+        }
+
+        // ✈️ 텔레그램 발송 이력 로그 로드 및 페이징
+        let currentTgLogsPage = 1;
+        const tgLogsPerPage = 10;
+
+        async function loadTelegramLogs(page) {
+            currentTgLogsPage = page;
+            const from = (page - 1) * tgLogsPerPage;
+            const to = from + tgLogsPerPage - 1;
+            
+            const tbody = document.getElementById("tg-logs-tbody");
+            if (!tbody) return;
+            
+            tbody.innerHTML = `
+                <tr>
+                    <td colspan="6" class="p-8 text-center text-slate-400">
+                        <i class="fa-solid fa-spinner animate-spin"></i> 발송 로그를 불러오는 중입니다...
+                    </td>
+                </tr>
+            `;
+            
+            try {
+                const { count, error: countErr } = await supabaseClient
+                    .from('telegram_alert_logs')
+                    .select('*', { count: 'exact', head: true });
+                if (countErr) throw countErr;
+                
+                const totalCount = count || 0;
+                const totalPages = Math.max(1, Math.ceil(totalCount / tgLogsPerPage));
+                
+                const { data, error } = await supabaseClient
+                    .from('telegram_alert_logs')
+                    .select('*, user_profiles(email), properties(auction_no, address, source)')
+                    .order('id', { ascending: false })
+                    .range(from, to);
+                if (error) throw error;
+                
+                document.getElementById("tg-logs-page-info").innerText = `${page} / ${totalPages} 페이지 (총 ${totalCount}건)`;
+                document.getElementById("tg-logs-prev-btn").disabled = page === 1;
+                document.getElementById("tg-logs-next-btn").disabled = page === totalPages;
+                
+                if (!data || data.length === 0) {
+                    tbody.innerHTML = `
+                        <tr>
+                            <td colspan="6" class="p-8 text-center text-slate-400">발송 로그가 존재하지 않습니다.</td>
+                        </tr>
+                    `;
+                    return;
+                }
+                
+                tbody.innerHTML = data.map((log, idx) => {
+                    const rowNo = totalCount - from - idx;
+                    const email = log.user_profiles ? log.user_profiles.email : '알수없음';
+                    
+                    let propInfo = '-';
+                    if (log.properties) {
+                        const sourceKo = log.properties.source === 'court' || log.properties.source === 'court_etc' ? '경매' : '공매';
+                        propInfo = `[${sourceKo}] ${log.properties.auction_no || '번호미상'}`;
+                    }
+                    
+                    let statusBadge = '';
+                    if (log.status === 'success') {
+                        statusBadge = `<span class="bg-emerald-50 text-emeraldSuccess border border-emerald-200 px-2 py-0.5 rounded text-[10px]">성공</span>`;
+                    } else {
+                        statusBadge = `<span class="bg-rose-50 text-rose-600 border border-rose-200 px-2 py-0.5 rounded text-[10px] cursor-help" title="${log.error_message || ''}">실패</span>`;
+                    }
+                    
+                    const dateStr = new Date(log.created_at).toLocaleString('ko-KR', { hour12: false });
+                    
+                    return `
+                        <tr class="border-b border-slate-100 hover:bg-slate-50/50">
+                            <td class="p-3 text-center text-slate-500 font-bold">${rowNo}</td>
+                            <td class="p-3 text-slate-800 font-extrabold select-all">${email}</td>
+                            <td class="p-3 text-slate-700 font-bold">${propInfo}</td>
+                            <td class="p-3 text-center font-black text-slate-600">${log.alert_type}</td>
+                            <td class="p-3 text-center">
+                                <div class="flex flex-col items-center gap-1">
+                                    ${statusBadge}
+                                    ${log.status === 'fail' ? `<span class="text-[9px] text-rose-500 max-w-[200px] truncate leading-tight">${log.error_message || ''}</span>` : ''}
+                                </div>
+                            </td>
+                            <td class="p-3 text-center font-mono text-slate-455 text-[10.5px]">${dateStr}</td>
+                        </tr>
+                    `;
+                }).join('');
+                
+            } catch (err) {
+                console.error("텔레그램 발송 로그 조회 실패", err);
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="6" class="p-8 text-center text-rose-500 font-black">
+                            <i class="fa-solid fa-triangle-exclamation"></i> 발송 로그 정보를 조회할 수 없습니다.
+                        </td>
+                    </tr>
+                `;
+            }
+        }
+
+        // ✈️ 텔레그램 발송 이력 로그 페이지 변경
+        function changeTgLogsPage(direction) {
+            const nextPage = currentTgLogsPage + direction;
+            if (nextPage < 1) return;
+            loadTelegramLogs(nextPage);
         }

@@ -82,6 +82,19 @@ const maskName = (name: string | undefined) => {
   return clean[0] + "ㅇ".repeat(Math.max(1, clean.length - 1));
 };
 
+const getBankLogoEmoji = (bankName: string | undefined) => {
+  if (!bankName) return "";
+  if (bankName.includes("국민")) return "🏦 [국민] ";
+  if (bankName.includes("신한")) return "🏦 [신한] ";
+  if (bankName.includes("우리")) return "🏦 [우리] ";
+  if (bankName.includes("하나")) return "🏦 [하나] ";
+  if (bankName.includes("농협")) return "🏦 [농협] ";
+  if (bankName.includes("수협")) return "🏦 [수협] ";
+  if (bankName.includes("기업")) return "🏦 [기업] ";
+  if (bankName.includes("카드")) return "💳 [" + bankName.replace("카드", "") + "카드] ";
+  return "🏦 [" + bankName + "] ";
+};
+
 const extractNonBuildingMetaMobile = (text: string, ptype: string, title?: string) => {
   const meta: any = {};
   if (!text) return meta;
@@ -426,7 +439,7 @@ export const DetailScreen: React.FC<DetailScreenProps> = ({ property, onBack }) 
     fetchExperts();
   }, []);
 
-  const [userGrade, setUserGrade] = useState<'A' | 'B' | 'C'>('C');
+  const [userGrade, setUserGrade] = useState<'premium' | 'regular'>('regular');
   const [similarProperties, setSimilarProperties] = useState<Property[]>([]);
   const [activeTab, setActiveTab] = useState<TabType>('general');
   const [futureGrowthRate, setFutureGrowthRate] = useState<number>(3.0);
@@ -509,13 +522,18 @@ AI 분석 등급: ${property.grade || '미상'}등급 (점수: ${property.score 
         .maybeSingle();
       if (error) throw error;
       if (data && data.grade) {
-        setUserGrade(data.grade as 'A' | 'B' | 'C');
+        const rawGrade = data.grade;
+        if (rawGrade === 'A' || rawGrade === 'B' || rawGrade === 'premium') {
+          setUserGrade('premium');
+        } else {
+          setUserGrade('regular');
+        }
       } else {
-        setUserGrade('C');
+        setUserGrade('regular');
       }
     } catch (err) {
       console.error('고객 등급 조회 실패:', err);
-      setUserGrade('C');
+      setUserGrade('regular');
     }
   };
 
@@ -751,7 +769,7 @@ AI 분석 등급: ${property.grade || '미상'}등급 (점수: ${property.score 
       } else {
         setUserId(null);
         setIsFavorite(false);
-        setUserGrade('C');
+        setUserGrade('regular');
       }
     });
 
@@ -764,7 +782,7 @@ AI 분석 등급: ${property.grade || '미상'}등급 (점수: ${property.score 
       } else {
         setUserId(null);
         setIsFavorite(false);
-        setUserGrade('C');
+        setUserGrade('regular');
       }
     });
 
@@ -1835,7 +1853,7 @@ AI 분석 등급: ${property.grade || '미상'}등급 (점수: ${property.score 
               <View style={styles.sectionTitleRow}>
                 <Text style={styles.sectionTitle}>📋 기본 매물 명세 정보</Text>
                 <View style={styles.gradeBadgeContainer}>
-                  <Text style={styles.gradeBadgeText}>내 등급: {userGrade === 'A' ? '🥇 Premium A' : userGrade === 'B' ? '🥈 VIP B' : '🥉 일반 C'}</Text>
+                  <Text style={styles.gradeBadgeText}>내 등급: {userGrade === 'premium' ? '🥇 Premium' : '🥉 일반 회원'}</Text>
                   <TouchableOpacity
                     style={styles.gradeUpgradeBtn}
                     onPress={async () => {
@@ -1867,7 +1885,7 @@ AI 분석 등급: ${property.grade || '미상'}등급 (점수: ${property.score 
               <View style={styles.infoTable}>
                 <View style={styles.infoRow}>
                   <Text style={styles.infoLabel}>사건/관리번호</Text>
-                  <Text style={styles.infoValue}>{currentProperty.auction_no}</Text>
+                  <Text style={[styles.infoValue, { fontWeight: 'bold', fontSize: 13, color: COLORS.royalBlue }]}>{currentProperty.auction_no}</Text>
                 </View>
                 <View style={styles.infoRow}>
                   <Text style={styles.infoLabel}>감정평가금액</Text>
@@ -2205,7 +2223,7 @@ AI 분석 등급: ${property.grade || '미상'}등급 (점수: ${property.score 
                   </View>
                   <View style={styles.infoRow}>
                     <Text style={styles.infoLabel}>채권자 (경매신청인)</Text>
-                    <Text style={styles.infoValue}>🏦 국민은행 (경락 대지분 등기설정)</Text>
+                    <Text style={styles.infoValue}>{getBankLogoEmoji("국민은행")}국민은행 (경락 대지분 등기설정)</Text>
                   </View>
                 </View>
               </View>
@@ -2532,21 +2550,21 @@ AI 분석 등급: ${property.grade || '미상'}등급 (점수: ${property.score 
                       <Text style={[styles.tableCell, { flex: 0.8 }]}>을구 1</Text>
                       <Text style={[styles.tableCell, { flex: 1.8, fontWeight: 'bold' }]}>근저당 (말소기준)</Text>
                       <Text style={[styles.tableCell, styles.textCenter]}>2024-06-20</Text>
-                      <Text style={[styles.tableCell, { flex: 1.6 }]}>🏦 국민은행 ({formatCurrencyKorean(mortgageAmt)})</Text>
+                      <Text style={[styles.tableCell, { flex: 1.6 }]}>{getBankLogoEmoji("국민은행")}국민은행 ({formatCurrencyKorean(mortgageAmt)})</Text>
                       <Text style={[styles.tableCell, styles.textCenter, { color: COLORS.emeraldSuccess, fontWeight: 'bold' }]}>소멸</Text>
                     </View>
                     <View style={styles.tableRow}>
                       <Text style={[styles.tableCell, { flex: 0.8 }]}>갑구 4</Text>
                       <Text style={[styles.tableCell, { flex: 1.8 }]}>가압류</Text>
                       <Text style={[styles.tableCell, styles.textCenter]}>2024-11-15</Text>
-                      <Text style={[styles.tableCell, { flex: 1.6 }]}>신한카드 ({formatCurrencyKorean(gamyAmt)})</Text>
+                      <Text style={[styles.tableCell, { flex: 1.6 }]}>{getBankLogoEmoji("신한카드")}신한카드 ({formatCurrencyKorean(gamyAmt)})</Text>
                       <Text style={[styles.tableCell, styles.textCenter, { color: COLORS.emeraldSuccess, fontWeight: 'bold' }]}>소멸</Text>
                     </View>
                     <View style={styles.tableRow}>
                       <Text style={[styles.tableCell, { flex: 0.8 }]}>갑구 5</Text>
                       <Text style={[styles.tableCell, { flex: 1.8, fontWeight: 'bold', color: COLORS.royalBlue }]}>강제경매개시결정</Text>
                       <Text style={[styles.tableCell, styles.textCenter]}>2025-02-10</Text>
-                      <Text style={[styles.tableCell, { flex: 1.6 }]}>신한카드 (경매신청)</Text>
+                      <Text style={[styles.tableCell, { flex: 1.6 }]}>{getBankLogoEmoji("신한카드")}신한카드 (경매신청)</Text>
                       <Text style={[styles.tableCell, styles.textCenter, { color: COLORS.emeraldSuccess, fontWeight: 'bold' }]}>소멸</Text>
                     </View>
                   </View>
@@ -2626,7 +2644,7 @@ AI 분석 등급: ${property.grade || '미상'}등급 (점수: ${property.score 
                     </View>
                     <View style={styles.tableRow}>
                       <Text style={[styles.tableCell, { flex: 0.5 }]}>3</Text>
-                      <Text style={[styles.tableCell, { flex: 1.5 }]}>🏦 국민은행 (선순위 근저당)</Text>
+                      <Text style={[styles.tableCell, { flex: 1.5 }]}>{getBankLogoEmoji("국민은행")}국민은행 (선순위 근저당)</Text>
                       <Text style={[styles.tableCell, styles.textRight]}>{formatCurrencyKorean(mortgage)}</Text>
                       <Text style={[styles.tableCell, styles.textRight, { color: COLORS.emeraldSuccess, fontWeight: 'bold' }]}>{formatCurrencyKorean(mortgagePaid)}</Text>
                       <Text style={[styles.tableCell, styles.textCenter, { color: COLORS.emeraldSuccess }]}>소멸</Text>
@@ -2685,12 +2703,12 @@ AI 분석 등급: ${property.grade || '미상'}등급 (점수: ${property.score 
               </View>
             </View>
 
-            {/* C등급 마스크 오버레이 */}
-            {userGrade === 'C' && (
+            {/* 일반 등급 마스크 오버레이 */}
+            {userGrade === 'regular' && (
               <View style={styles.maskOverlay}>
-                <Text style={styles.maskTitle}>🔒 권리분석 상세 정보 열람 제한 (B등급 이상)</Text>
+                <Text style={styles.maskTitle}>🔒 권리분석 상세 정보 열람 제한 (프리미엄 전용)</Text>
                 <Text style={styles.maskDesc}>
-                  정밀 등기 권리분석 요약표, 점유자 대항력 진단 및 인수 리스크, 예상 배당표 데이터를 열람하시려면 VIP(B등급) 또는 Premium(A등급)으로 업그레이드해주십시오.
+                  정밀 등기 권리분석 요약표, 점유자 대항력 진단 및 인수 리스크, 예상 배당표 데이터를 열람하시려면 Premium 회원으로 업그레이드해주십시오.
                 </Text>
                 <TouchableOpacity 
                   style={styles.maskButton} 
@@ -2700,7 +2718,7 @@ AI 분석 등급: ${property.grade || '미상'}등급 (점수: ${property.score 
                       return;
                     }
                     Alert.alert(
-                      '★ v1.2 프리미엄 멤버십 구독 안내 ★',
+                      '★ v1.3 프리미엄 멤버십 구독 안내 ★',
                       '월 19,900원에 AI 정밀 수익률 분석, 권리 안전도 검증, 법원/온비드 미상 등기부 자동 열람 혜택을 무제한으로 이용하실 수 있습니다.\n\n구독을 시작하시겠습니까?',
                       [
                         { text: '취소', style: 'cancel' },
@@ -2713,7 +2731,7 @@ AI 분석 등급: ${property.grade || '미상'}등급 (점수: ${property.score 
                                 .update({ membership_tier: 'premium', grade: 'A' })
                                 .eq('id', userId);
                               if (error) throw error;
-                              setUserGrade('A');
+                              setUserGrade('premium');
                               Alert.alert('결제 성공', '🎉 프리미엄 결제 및 구독 승인이 성공적으로 완료되었습니다! 모든 프리미엄 분석 도구가 무제한 개방됩니다.');
                             } catch (err) {
                               console.error('구독 결제 실패:', err);
@@ -4564,9 +4582,9 @@ const styles = StyleSheet.create({
     marginRight: 8,
   },
   auctionNo: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    color: COLORS.slate400,
+    fontSize: 18,
+    fontWeight: '900',
+    color: COLORS.royalBlue,
   },
   address: {
     fontSize: 20,

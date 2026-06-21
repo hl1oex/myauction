@@ -24,6 +24,8 @@ export default function App() {
   const [showMyPageModal, setShowMyPageModal] = useState<boolean>(false);
   const [userGrade, setUserGrade] = useState<'A' | 'B' | 'C'>('C');
   const [isUpgradeRequested, setIsUpgradeRequested] = useState<boolean>(false);
+  const [telegramId, setTelegramId] = useState<string>('');
+  const [telegramMode, setTelegramMode] = useState<'username' | 'chatid'>('username');
   
   // 🔒 시스템 관리자 동적 자격증명 상태
   const [adminEmail, setAdminEmail] = useState<string>('hl1oex@gmail.com');
@@ -103,19 +105,27 @@ export default function App() {
     try {
       const { data, error } = await supabase
         .from('user_profiles')
-        .select('grade, upgrade_requested')
+        .select('grade, upgrade_requested, telegram_chat_id')
         .eq('id', uid)
         .maybeSingle();
       if (error) throw error;
       if (data) {
         setUserGrade((data.grade || 'C') as 'A' | 'B' | 'C');
         setIsUpgradeRequested(!!data.upgrade_requested);
+        const savedTgId = data.telegram_chat_id || '';
+        setTelegramId(savedTgId);
+        if (savedTgId.startsWith('@')) {
+          setTelegramMode('username');
+        } else if (savedTgId) {
+          setTelegramMode('chatid');
+        }
       } else {
         await supabase
           .from('user_profiles')
-          .insert({ id: uid, grade: 'C', email: user?.email || '', upgrade_requested: false });
+          .insert({ id: uid, grade: 'C', email: user?.email || '', upgrade_requested: false, telegram_chat_id: '' });
         setUserGrade('C');
         setIsUpgradeRequested(false);
+        setTelegramId('');
       }
     } catch (err) {
       console.error('모바일 회원 등급 연동 실패:', err);
@@ -141,6 +151,39 @@ export default function App() {
     } catch (err) {
       console.error('등급 업그레이드 신청 실패:', err);
       Alert.alert('오류', '업그레이드 신청 중 오류가 발생했습니다.');
+    }
+  };
+
+  // ✈️ 텔레그램 수신 설정 저장 함수
+  const saveTelegramConfig = async () => {
+    if (!user) {
+      Alert.alert('안내', '로그인 후 이용해 주십시오.');
+      return;
+    }
+    const val = telegramId.trim();
+    if (telegramMode === 'username') {
+      if (val && !val.startsWith('@')) {
+        Alert.alert('실패', '사용자명은 @ 기호로 시작해야 합니다.');
+        return;
+      }
+    } else {
+      if (val && isNaN(Number(val))) {
+        Alert.alert('실패', 'Chat ID는 숫자 형식이어야 합니다.');
+        return;
+      }
+    }
+
+    try {
+      const { error } = await supabase
+        .from('user_profiles')
+        .update({ telegram_chat_id: val })
+        .eq('id', user.id);
+      if (error) throw error;
+      Alert.alert('성공', '텔레그램 알림 정보가 안전하게 저장되었습니다.');
+      fetchUserGrade(user.id);
+    } catch (err) {
+      console.error('텔레그램 수신설정 저장 에러:', err);
+      Alert.alert('오류', '텔레그램 설정 저장 중 에러가 발생했습니다.');
     }
   };
 
@@ -488,7 +531,79 @@ export default function App() {
                   </View>
                 )}
 
+                {/* ✈️ 텔레그램 알림 수신처 설정 */}
+                <View style={{ borderTopWidth: 1, borderTopColor: '#e2e8f0', paddingTop: 16, marginTop: 12, width: '100%' }}>
+                  <Text style={{ fontSize: 13, fontWeight: 'bold', color: '#1e293b', marginBottom: 4 }}>
+                    ✈️ 텔레그램 알림 서비스 연동
+                  </Text>
+                  <Text style={{ fontSize: 10, color: '#64748b', lineHeight: 14, marginBottom: 12 }}>
+                    관심 등록한 매물의 기일 임박(D-1) 및 유찰 소식을 텔레그램으로 수신합니다. 먼저 텔레그램에서 @auctionnowbot 봇과 대화를 시작(/start)해주세요.
+                  </Text>
 
+                  <View style={{ flexDirection: 'row', backgroundColor: '#f1f5f9', borderRadius: 10, padding: 3, marginBottom: 10 }}>
+                    <TouchableOpacity
+                      onPress={() => setTelegramMode('username')}
+                      style={{
+                        flex: 1,
+                        paddingVertical: 6,
+                        borderRadius: 8,
+                        alignItems: 'center',
+                        backgroundColor: telegramMode === 'username' ? '#fff' : 'transparent',
+                      }}
+                    >
+                      <Text style={{ fontSize: 10, fontWeight: 'bold', color: telegramMode === 'username' ? '#1e293b' : '#94a3b8' }}>@사용자명 등록 (일반용)</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity
+                      onPress={() => setTelegramMode('chatid')}
+                      style={{
+                        flex: 1,
+                        paddingVertical: 6,
+                        borderRadius: 8,
+                        alignItems: 'center',
+                        backgroundColor: telegramMode === 'chatid' ? '#fff' : 'transparent',
+                      }}
+                    >
+                      <Text style={{ fontSize: 10, fontWeight: 'bold', color: telegramMode === 'chatid' ? '#1e293b' : '#94a3b8' }}>Chat ID 직접 등록 (전문가용)</Text>
+                    </TouchableOpacity>
+                  </View>
+
+                  <TextInput
+                    style={{
+                      backgroundColor: '#f8fafc',
+                      borderWidth: 1,
+                      borderColor: '#e2e8f0',
+                      borderRadius: 12,
+                      paddingHorizontal: 12,
+                      paddingVertical: 8,
+                      fontSize: 12,
+                      color: '#334155',
+                      marginBottom: 10,
+                    }}
+                    placeholder={telegramMode === 'username' ? '예: @username' : '예: 426045277'}
+                    value={telegramId}
+                    onChangeText={setTelegramId}
+                    autoCapitalize="none"
+                    autoCorrect={false}
+                  />
+
+                  <TouchableOpacity
+                    style={{
+                      backgroundColor: COLORS.royalBlue,
+                      borderRadius: 12,
+                      paddingVertical: 10,
+                      alignItems: 'center',
+                      shadowColor: '#3b82f6',
+                      shadowOffset: { width: 0, height: 1 },
+                      shadowOpacity: 0.1,
+                      shadowRadius: 2,
+                      elevation: 1,
+                      marginBottom: 8,
+                    }}
+                    onPress={saveTelegramConfig}
+                  >
+                    <Text style={{ color: '#fff', fontSize: 12, fontWeight: 'bold' }}>텔레그램 정보 저장하기</Text>
+                  </TouchableOpacity>
+                </View>
 
                 {/* 하단 동작 버튼 */}
                 <View style={[styles.myPageButtonContainer, { marginTop: 8 }]}>
